@@ -19,6 +19,10 @@ import { TicTacToeBoard } from './Board';
 const lobbyClient = new LobbyClient({ server: `${window.location.protocol}//${window.location.hostname}:8000` });
 console.log("Created lobby.");
 console.log(lobbyClient);
+lobbyClient.listGames()
+  .then(console.log)
+  .catch(console.error);
+  
 lobbyClient.listMatches('tic-tac-toe').then( function({ matches }) {
   console.log("Number of matches: %d.", matches.length);
 });
