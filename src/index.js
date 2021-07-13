@@ -4,111 +4,188 @@ import ReactDOM from 'react-dom';
 //import App from './App';
 import { LobbyClient } from 'boardgame.io/client';
 import { Client } from 'boardgame.io/react';
-import { SocketIO } from 'boardgame.io/multiplayer'
+import { Local, SocketIO } from 'boardgame.io/multiplayer'
 import { TicTacToe } from './Game';
 import { TicTacToeBoard } from './Board';
 
-// const TicTacToeClient = Client({
-//   game: TicTacToe,
-//   board: TicTacToeBoard,
-//   //multiplayer: SocketIO({ server: 'localhost:8000' }),
-//   debug: true,
-// });
+// --- SETUP ------------------------------------------------------------------
+
+const PORT = process.env.PORT || 8000;
+const serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
 
 // Set-up lobby
-const lobbyClient = new LobbyClient({ server: `${window.location.protocol}//${window.location.hostname}:8000` });
+const lobbyClient = new LobbyClient({ server: serverOrigin });
 console.log("Created lobby.");
-console.log(lobbyClient);
-lobbyClient.listMatches('tic-tac-toe').then( function({ matches }) {
-  console.log("Number of matches: %d.", matches.length);
+lobbyClient.listMatches("tic-tac-toe").then( function({ matches }) {
+  console.log("Number of open games: %d.", matches.length);
+});
+
+// ----------------------------------------------------------------------------
+
+const copyToClipboard = () => {
+  var text = document.getElementById("copytext");
+  text.select();
+  document.execCommand("copy");
+  console.log(text);
+}
+
+const TicTacToeClient = Client({
+  game: TicTacToe,
+  board: TicTacToeBoard,
+  numPlayers: 2,
+  multiplayer: SocketIO({ server: serverOrigin }),
 });
 
 const App = () => {
   // Hooks
   const [inputName, setInputName] = useState("");
   const [inputMatchID, setInputMatchID] = useState("");
-  const [errMsg, setErrMsg] = useState("");
+  const [roomMatchID, setRoomMatchID] = useState("");
+  const [playerID, setPlayerID] = useState("");
+  const [credentials, setCredentials] = useState("");
+  const [errMsg, setErrMsg] = useState(""); // Any error messages to display
   const [state, setState] = useState(0); // 0 means free, 1 means in room, 2 means in game
 
-  // Variables
-  // var name;
-  // var matchID;
-  // var credentials;
-
-
   const createMatch = async () => {
-    const { matchID } = await lobbyClient.createMatch('tic-tac-toe', {
+    // Create a match and join.
+    const { matchID } = await lobbyClient.createMatch("tic-tac-toe", {
       numPlayers: 2,
     });
     console.log("Created match with ID: %s.", matchID);
     joinMatch(inputName, matchID);
-  };
+  }
 
   const joinMatch = async (name, matchID) => {
-    console.log("Joining match '%s' with name '%s'.", matchID, name);
-    const match = await lobbyClient.getMatch('tic-tac-toe', matchID);
-    const freeID = match.players.findIndex( x => !("name" in x));
-    console.log("... found empty seat %d.", freeID);
+    // Join a match with your name and the matchID.
+    let match
+    try {
+      match = await lobbyClient.getMatch("tic-tac-toe", matchID);
+    } catch {
+      setErrMsg("Cannot join: Match ID is invalid.");
+      return;
+    }
+    console.log("Joining match '%s' as '%s'...", matchID, name);
+    // find free seat
+    let seat;
+    for (let i=0; i<match.players.length; i++) {
+      const x = match.players[i];
+      if ("name" in x) {
+        if (x.name === name) {
+          setErrMsg("Cannot join: Name already taken.");
+          return;
+        }
+      } else if (seat === undefined) {
+        seat = i.toString();
+      }
+    }
+    if (seat === undefined) {
+      setErrMsg("Cannot join: No free seats available.");
+      return;
+    }
+    console.log("...found empty seat %s...", seat);
     const { playerCredentials } = await lobbyClient.joinMatch(
-      'tic-tac-toe',
+      "tic-tac-toe",
       matchID,
       {
-        playerID: freeID.toString(),
+        playerID: seat,
         playerName: name,
       }
     );
-    console.log("... received credentials: %s.", playerCredentials);
+    console.log("...received credentials...");
+    setRoomMatchID(matchID)
+    setPlayerID(seat);
+    setCredentials(playerCredentials)
     setState(1);
+    setErrMsg("");
     console.log("Success!");
   }
 
-  return (
-    <div>
-      {/* Show lobby. */}
-      <p>Lobby</p>
-      <p>Name: &nbsp;
-        <input
-          type="text"
-          maxLength={16}
-          spellCheck="false"
-          autoComplete="off"
-          onChange={(e) => setInputName(e.target.value)}
-          disabled={state !== 0}
-        />
-      </p>
-      <p>
-        <button onClick={createMatch} disabled={inputName.length ===0 || state !== 0}>
-            Create Match
-        </button>
-        &nbsp; or &nbsp;
-        <button onClick={() => joinMatch(inputName, inputMatchID)} 
-                disabled={inputName.length === 0 || inputMatchID.length !== 11 || state !== 0} >
-            Join Match
-        </button>
-        &nbsp; with ID: &nbsp;
-        <input
-          type="text"
-          maxLength={11}
-          spellCheck="false"
-          autoComplete="off"
-          onChange={(e) => setInputMatchID(e.target.value)}
-          disabled={state !== 0}
-        /> 
-      </p>
-      {/* If in a game, show additional info. */}
-      { state === 1 ? (
-        <div>
-          <p id="test">Game Made!</p>
-          <button onClick={() => setState(0)}>
-              Leave
+  const leaveMatch = async () => {
+    // Leave the match.
+    await lobbyClient.leaveMatch("tic-tac-toe", roomMatchID, {
+      playerID: playerID,
+      credentials: credentials,
+    });
+    setRoomMatchID("");
+    setPlayerID("");
+    setCredentials("")
+    setState(0);
+    console.log("Left match.")
+  }
+
+  if (state === 2) {
+    return (
+      <TicTacToeClient 
+        matchID={roomMatchID}
+        playerID={playerID}
+        credentials={credentials}
+      />
+    )
+  } else {
+    return (
+      <div>
+        {/* Show lobby. */}
+        <p>Name: &nbsp;
+          <input
+            type="text"
+            maxLength={16}
+            spellCheck="false"
+            autoComplete="off"
+            onChange={(e) => setInputName(e.target.value)}
+            disabled={state !== 0}
+          />
+        </p>
+        <p>
+          <button onClick={createMatch} disabled={inputName.length ===0 || state !== 0}>
+              Create Match
           </button>
-        </div>
-      ) : null
-      }
-      <p>{errMsg}</p>
-      
-    </div>
-  )
+          &nbsp; or &nbsp;
+          <button onClick={() => joinMatch(inputName, inputMatchID)} 
+                  disabled={inputName.length === 0 || inputMatchID.length !== 11 || state !== 0} >
+              Join Match
+          </button>
+          &nbsp; with ID: &nbsp;
+          <input
+            type="text"
+            maxLength={11}
+            spellCheck="false"
+            autoComplete="off"
+            onChange={(e) => setInputMatchID(e.target.value)}
+            disabled={state !== 0}
+          /> 
+        </p>
+        <p style={{ color: "red" }}>{errMsg}</p>
+        {/* If in a room, show additional info. */}
+        { state === 1 ? (
+          <div>
+            <hr></hr>
+            <p id="test">Joined Match ID: &nbsp;
+              <input
+                id="copytext"
+                type="text"
+                value={roomMatchID}
+                spellCheck="false"
+                readOnly
+              />
+              <input 
+                type="image"
+                src="assets/copy.png"
+                height="16px"
+                onClick={copyToClipboard}
+              />
+            </p>
+            <button onClick={leaveMatch}>
+              Leave
+            </button>
+            <button onClick={() => setState(2)}>
+              Start
+            </button>
+          </div>
+        ) : null
+        }
+      </div>
+    );
+  }
 };
 
 ReactDOM.render(

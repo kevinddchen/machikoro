@@ -1,8 +1,17 @@
 import React from 'react';
 
 export class TicTacToeBoard extends React.Component {
-  onClick(id) {
-    this.props.moves.clickCell(id);
+  
+  onClick = id => {
+    if (this.isActive(id)) {
+      this.props.moves.clickCell(id);
+    }
+  };
+
+  isActive(id) {
+    if (!this.props.isActive) return false;
+    if (this.props.G.cells[id] !== null) return false;
+    return true;
   }
 
   render() {
