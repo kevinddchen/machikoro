@@ -10,7 +10,8 @@ import { TicTacToeBoard } from './Board';
 
 // --- SETUP ------------------------------------------------------------------
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 80;
+console.log(PORT)
 const serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
 
 // Set-up lobby

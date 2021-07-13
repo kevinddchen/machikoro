@@ -3,7 +3,7 @@ import path from "path";
 import serve from "koa-static";
 import { TicTacToe } from './Game';
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 80;
 
 // game server
 const server = Server({
