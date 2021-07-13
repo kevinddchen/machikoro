@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
 //import './index.css';
 //import App from './App';
-import { LobbyClient } from 'boardgame.io/client';
-import { Client } from 'boardgame.io/react';
-import { Local, SocketIO } from 'boardgame.io/multiplayer'
-import { TicTacToe } from './Game';
-import { TicTacToeBoard } from './Board';
+import { LobbyClient } from "boardgame.io/client";
+import { Client } from "boardgame.io/react";
+import { Local, SocketIO } from "boardgame.io/multiplayer"
+import { TicTacToe } from "./Game";
+import { TicTacToeBoard } from "./Board";
 
 // --- SETUP ------------------------------------------------------------------
 
-const PORT = process.env.PORT || 80;
-console.log(PORT)
+const PORT = process.env.PORT || 8000;
 const serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
 
 // Set-up lobby
