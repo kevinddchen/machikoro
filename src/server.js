@@ -3,7 +3,7 @@ import path from "path";
 import serve from "koa-static";
 import { TicTacToe } from "./Game";
 
-const PORT = process.env.PORT || 8000;
+const port = process.env.PORT || 80;
 
 // game server
 const server = Server({
@@ -19,7 +19,7 @@ const absolutePath = path.resolve(__dirname, "../build");
 server.app.use(serve(absolutePath));
 
 server.run({
-  port: PORT,
+  port: port,
   callback: () => {
     server.app.use(
       async (ctx, next) => await serve(absolutePath)(
