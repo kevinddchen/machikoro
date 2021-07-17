@@ -7,20 +7,24 @@ import { SocketIO } from "boardgame.io/multiplayer"
 import { Machikoro } from "./Game";
 import { MachikoroBoard } from "./Board";
 
-// --- SETUP ------------------------------------------------------------------
+// --- Setup ------------------------------------------------------------------
 
 const port = process.env.PORT || 80;
 const serverOrigin = `${window.location.protocol}//${window.location.hostname}:${port}`;
 const gameName = "machikoro";
 
-// Set-up lobby
+// lobby client
 const lobbyClient = new LobbyClient({ server: serverOrigin });
 console.log("Created lobby.");
 
-// ----------------------------------------------------------------------------
+const MachikoroClient = Client({
+  game: Machikoro,
+  board: MachikoroBoard,
+  multiplayer: SocketIO({ server: serverOrigin }),
+});
 
 /**
- * Improved `setInterval`: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+ * Improved setInterval: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
  */
 function useInterval(callback, delay) {
   const savedCallback = useRef();
@@ -42,6 +46,8 @@ function useInterval(callback, delay) {
   }, [delay]);
 }
 
+// --- App --------------------------------------------------------------------
+
 const App = () => {
 
   // Hooks
@@ -54,10 +60,12 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(""); // Any error messages to display
   const [state, setState] = useState(0); // 0 means free, 1 means in room, 2 means in game
 
-  const defaultLobbyBody = <tr><td>Loading matches...</td></tr>;
+  const defaultLobbyBody = null;
   const [lobbyBody, setLobbyBody] = useState(defaultLobbyBody);
-  const defaultRoomBody = <tr><td>Loading players...</td></tr>;
+  const defaultRoomBody = null;
   const [roomBody, setRoomBody] = useState(defaultRoomBody);
+
+  // --- Match Management -----------------------------------------------------
 
   /**
    * Create a match and join.
@@ -166,16 +174,6 @@ const App = () => {
   }
 
   const debug = async () => {
-    const { matchID } = await lobbyClient.createMatch(gameName, {numPlayers: 2, unlisted: true});
-    await lobbyClient.joinMatch(
-      gameName,
-      matchID,
-      {
-        playerID: "0",
-        playerName: "test",
-      }
-    );
-    setPlayerID("0");
     setState(2);
   }
 
@@ -191,7 +189,7 @@ const App = () => {
     }
   }
   
-  useInterval(update, 1000);
+  useInterval(update, 100);
 
   const updateLobbyBody = (matches) => {
     const tbody = [];
@@ -265,11 +263,11 @@ const App = () => {
           </button>
           &nbsp;Players:&nbsp;
           <select 
-            value="4"
+            defaultValue="4"
             onChange={(e) => setNumPlayers(parseInt(e.target.value))}>
             <option value="2">2</option>
             <option value="3">3</option>
-            <option value="4" >4</option>
+            <option value="4">4</option>
             <option value="5">5</option>
           </select>
         </p>
@@ -283,8 +281,11 @@ const App = () => {
     return (
       <div>
         <p>In Match ID: {hMatchID}</p>
-        <button onClick={leaveMatch}>Leave</button>
-        <button onClick={startMatch}>Start</button>
+        <p>
+          <button onClick={leaveMatch}>Leave</button>
+          &nbsp;
+          <button onClick={startMatch}>Start</button>
+        </p>
         <hr></hr>
         <table cellPadding="3px"><tbody>{roomBody}</tbody></table>
         <p style={{ color: "red" }}>{errorMessage}</p>
@@ -292,11 +293,6 @@ const App = () => {
     );
   } else if (state === 2) {
     // Show game
-    const MachikoroClient = Client({
-      game: Machikoro,
-      board: MachikoroBoard,
-      multiplayer: SocketIO({ server: serverOrigin }),
-    });
     return (
       <MachikoroClient 
         matchID={hMatchID}
