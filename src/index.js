@@ -1,192 +1,311 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom";
 //import './index.css';
-//import App from './App';
 import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
-import { Local, SocketIO } from "boardgame.io/multiplayer"
-import { TicTacToe } from "./Game";
-import { TicTacToeBoard } from "./Board";
+import { SocketIO } from "boardgame.io/multiplayer"
+import { Machikoro } from "./Game";
+import { MachikoroBoard } from "./Board";
 
 // --- SETUP ------------------------------------------------------------------
 
 const port = process.env.PORT || 80;
 const serverOrigin = `${window.location.protocol}//${window.location.hostname}:${port}`;
+const gameName = "machikoro";
 
 // Set-up lobby
 const lobbyClient = new LobbyClient({ server: serverOrigin });
 console.log("Created lobby.");
-lobbyClient.listMatches("tic-tac-toe").then( function({ matches }) {
-  console.log("Number of open games: %d.", matches.length);
-});
 
 // ----------------------------------------------------------------------------
 
-const copyToClipboard = () => {
-  var text = document.getElementById("copytext");
-  text.select();
-  document.execCommand("copy");
-  console.log(text);
+/**
+ * Improved `setInterval`: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+ */
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
 }
 
-const TicTacToeClient = Client({
-  game: TicTacToe,
-  board: TicTacToeBoard,
-  numPlayers: 2,
-  multiplayer: SocketIO({ server: serverOrigin }),
-});
-
 const App = () => {
+
   // Hooks
-  const [inputName, setInputName] = useState("");
-  const [inputMatchID, setInputMatchID] = useState("");
-  const [roomMatchID, setRoomMatchID] = useState("");
-  const [playerID, setPlayerID] = useState("");
-  const [credentials, setCredentials] = useState("");
-  const [errMsg, setErrMsg] = useState(""); // Any error messages to display
+  const [hNumPlayers, setNumPlayers] = useState(4);
+  const [hName, setName] = useState("");
+  const [hMatchID, setMatchID] = useState("");
+  const [hPlayerID, setPlayerID] = useState("");
+  const [hCredentials, setCredentials] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState(""); // Any error messages to display
   const [state, setState] = useState(0); // 0 means free, 1 means in room, 2 means in game
 
+  const defaultLobbyBody = <tr><td>Loading matches...</td></tr>;
+  const [lobbyBody, setLobbyBody] = useState(defaultLobbyBody);
+  const defaultRoomBody = <tr><td>Loading players...</td></tr>;
+  const [roomBody, setRoomBody] = useState(defaultRoomBody);
+
+  /**
+   * Create a match and join.
+   */
   const createMatch = async () => {
-    // Create a match and join.
-    const { matchID } = await lobbyClient.createMatch("tic-tac-toe", {
-      numPlayers: 2,
-    });
-    console.log("Created match with ID: %s.", matchID);
-    joinMatch(inputName, matchID);
+    if (hName.length === 0) {
+      setErrorMessage("Please enter a name.");
+      return;
+    }
+    try {
+      const { matchID } = await lobbyClient.createMatch(gameName, {numPlayers: hNumPlayers});
+      console.log("Created match ID '%s'.", matchID);
+      joinMatch(hName, matchID);
+    } catch(e) {
+      console.error(e);
+    }
+    
   }
 
+  /**
+   * Try to join a match.
+   */
   const joinMatch = async (name, matchID) => {
-    // Join a match with your name and the matchID.
-    let match
+    if (hName.length === 0) {
+      setErrorMessage("Please enter a name.");
+      return;
+    }
     try {
-      match = await lobbyClient.getMatch("tic-tac-toe", matchID);
-    } catch {
-      setErrMsg("Cannot join: Match ID is invalid.");
-      return;
-    }
-    console.log("Joining match '%s' as '%s'...", matchID, name);
-    // find free seat
-    let seat;
-    for (let i=0; i<match.players.length; i++) {
-      const x = match.players[i];
-      if ("name" in x) {
-        if (x.name === name) {
-          setErrMsg("Cannot join: Name already taken.");
-          return;
+      const match = await lobbyClient.getMatch(gameName, matchID);
+      console.log("Trying to join match '%s'...", matchID);
+
+      // find a free seat
+      let seat;
+      for (let i=match.players.length-1; i>=0; i--) {
+        const x = match.players[i];
+        if ("name" in match.players[i]) {
+          if (match.players[i].name === name) {
+            setErrorMessage("Name already taken.");
+            return;
+          }
+        } else {
+          seat = i.toString();
         }
-      } else if (seat === undefined) {
-        seat = i.toString();
       }
+      if (seat === undefined) {
+        setErrorMessage("No free seats available.");
+        return;
+      }
+
+      // join game
+      console.log("...found seat %s...", seat)
+      const { playerCredentials } = await lobbyClient.joinMatch(
+        gameName,
+        matchID,
+        {
+          playerID: seat,
+          playerName: name,
+        }
+      );
+      setMatchID(matchID);
+      setPlayerID(seat);
+      setCredentials(playerCredentials);
+      setErrorMessage("");
+      setRoomBody(defaultRoomBody);
+      setState(1);
+      console.log("Success!");
+    } catch(e) {
+      console.error(e);
     }
-    if (seat === undefined) {
-      setErrMsg("Cannot join: No free seats available.");
-      return;
+  }
+
+  /**
+   * Leave a match.
+   */
+  const leaveMatch = async () => {
+    try {
+      await lobbyClient.leaveMatch(gameName, hMatchID, {
+        playerID: hPlayerID,
+        credentials: hCredentials,
+      });
+      setMatchID("");
+      setPlayerID("");
+      setCredentials("");
+      setErrorMessage("");
+      setLobbyBody(defaultLobbyBody);
+      setState(0);
+      console.log("Left match.")
+    } catch(e) {
+      console.error(e);
     }
-    console.log("...found empty seat %s...", seat);
-    const { playerCredentials } = await lobbyClient.joinMatch(
-      "tic-tac-toe",
+  }
+
+  const startMatch = async () => {
+    try {
+      const match = await lobbyClient.getMatch(gameName, hMatchID);
+      let count = 0;
+      match.players.map( x => { if ("name" in x) count += 1 });
+      if (count === match.players.length){
+        setState(2);
+      } else {
+        setErrorMessage("Room not full.");
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  const debug = async () => {
+    const { matchID } = await lobbyClient.createMatch(gameName, {numPlayers: 2, unlisted: true});
+    await lobbyClient.joinMatch(
+      gameName,
       matchID,
       {
-        playerID: seat,
-        playerName: name,
+        playerID: "0",
+        playerName: "test",
       }
     );
-    console.log("...received credentials...");
-    setRoomMatchID(matchID)
-    setPlayerID(seat);
-    setCredentials(playerCredentials)
-    setState(1);
-    setErrMsg("");
-    console.log("Success!");
+    setPlayerID("0");
+    setState(2);
   }
 
-  const leaveMatch = async () => {
-    // Leave the match.
-    await lobbyClient.leaveMatch("tic-tac-toe", roomMatchID, {
-      playerID: playerID,
-      credentials: credentials,
-    });
-    setRoomMatchID("");
-    setPlayerID("");
-    setCredentials("")
-    setState(0);
-    console.log("Left match.")
+  // --- Lobby Management -----------------------------------------------------
+
+  const update = async () => {
+    if (state === 0) {
+      const { matches } = await lobbyClient.listMatches(gameName);
+      updateLobbyBody(matches);
+    } else if (state === 1) {
+      const match = await lobbyClient.getMatch(gameName, hMatchID);
+      updateRoomBody(match);
+    }
+  }
+  
+  useInterval(update, 1000);
+
+  const updateLobbyBody = (matches) => {
+    const tbody = [];
+    if (matches.length === 0) {
+      tbody.push(
+        <tr><td>No open matches!</td></tr>
+      );
+    } else {
+      tbody.push(
+        <tr key="head">
+          <th>Match ID</th>
+          <th>Seats</th>
+        </tr>
+      );
+      for (let i=0; i<matches.length; i++) {
+        let count = 0;
+        matches[i].players.map( x => { if ("name" in x) count += 1 });
+        tbody.push(
+          <tr key={i}>
+            <td>{matches[i].matchID}</td>
+            <td>{count}/{matches[i].players.length}</td>
+            <td>
+              <button onClick={() => joinMatch(hName, matches[i].matchID)} disabled={state !== 0}>
+                Join
+              </button>
+            </td>
+          </tr>
+        );
+      }
+    }
+    setLobbyBody(tbody);
   }
 
-  if (state === 2) {
-    return (
-      <TicTacToeClient 
-        matchID={roomMatchID}
-        playerID={playerID}
-        credentials={credentials}
-      />
-    )
-  } else {
+  const updateRoomBody = (match) => {
+    const tbody = [
+      <tr key="head">
+          <th>Seat</th>
+          <th>Player</th>
+        </tr>
+    ];
+    for (let i=0; i<match.players.length; i++) {
+      tbody.push(
+        <tr key={i}>
+          <td>{match.players[i].id}</td>
+          <td>{match.players[i].name}</td>
+        </tr>
+      );
+    }
+    setRoomBody(tbody);
+  }
+
+  if (state === 0) {
+    // Show lobby
     return (
       <div>
-        {/* Show lobby. */}
-        <p>Name: &nbsp;
+        <p>
+          Name:&nbsp;
           <input
             type="text"
+            value={hName}
             maxLength={16}
             spellCheck="false"
             autoComplete="off"
-            onChange={(e) => setInputName(e.target.value)}
-            disabled={state !== 0}
+            onChange={(e) => setName(e.target.value)}
           />
+          <button onClick={debug}>Debug</button>
         </p>
         <p>
-          <button onClick={createMatch} disabled={inputName.length ===0 || state !== 0}>
-              Create Match
+          <button onClick={createMatch}>
+            Create Match
           </button>
-          &nbsp; or &nbsp;
-          <button onClick={() => joinMatch(inputName, inputMatchID)} 
-                  disabled={inputName.length === 0 || inputMatchID.length !== 11 || state !== 0} >
-              Join Match
-          </button>
-          &nbsp; with ID: &nbsp;
-          <input
-            type="text"
-            maxLength={11}
-            spellCheck="false"
-            autoComplete="off"
-            onChange={(e) => setInputMatchID(e.target.value)}
-            disabled={state !== 0}
-          /> 
+          &nbsp;Players:&nbsp;
+          <select 
+            value="4"
+            onChange={(e) => setNumPlayers(parseInt(e.target.value))}>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" >4</option>
+            <option value="5">5</option>
+          </select>
         </p>
-        <p style={{ color: "red" }}>{errMsg}</p>
-        {/* If in a room, show additional info. */}
-        { state === 1 ? (
-          <div>
-            <hr></hr>
-            <p id="test">Joined Match ID: &nbsp;
-              <input
-                id="copytext"
-                type="text"
-                value={roomMatchID}
-                spellCheck="false"
-                readOnly
-              />
-              <input 
-                type="image"
-                src="assets/copy.png"
-                height="16px"
-                onClick={copyToClipboard}
-              />
-            </p>
-            <button onClick={leaveMatch}>
-              Leave
-            </button>
-            <button onClick={() => setState(2)}>
-              Start
-            </button>
-          </div>
-        ) : null
-        }
+        <hr></hr>
+        <table cellPadding="3px"><tbody>{lobbyBody}</tbody></table>
+        <p style={{ color: "red" }}>{errorMessage}</p>
       </div>
     );
+  } else if (state === 1) {
+    // Show room
+    return (
+      <div>
+        <p>In Match ID: {hMatchID}</p>
+        <button onClick={leaveMatch}>Leave</button>
+        <button onClick={startMatch}>Start</button>
+        <hr></hr>
+        <table cellPadding="3px"><tbody>{roomBody}</tbody></table>
+        <p style={{ color: "red" }}>{errorMessage}</p>
+      </div>
+    );
+  } else if (state === 2) {
+    // Show game
+    const MachikoroClient = Client({
+      game: Machikoro,
+      board: MachikoroBoard,
+      multiplayer: SocketIO({ server: serverOrigin }),
+    });
+    return (
+      <MachikoroClient 
+        matchID={hMatchID}
+        playerID={hPlayerID}
+        credentials={hCredentials}
+      />
+    );
   }
-};
+}
 
 ReactDOM.render(
   <React.StrictMode>

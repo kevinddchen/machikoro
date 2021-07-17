@@ -1,49 +1,44 @@
-import { INVALID_MOVE } from 'boardgame.io/core'
+import { INVALID_MOVE } from "boardgame.io/core"
 
-function IsVictory(cells) {
-    const positions = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
-        [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
-    ];
-    for (let i=0; i<8; i++) {
-        const symbols = positions[i].map(x => cells[x]);
-        if (symbols.every(x => x != null && x === symbols[0])) {
-            return true;
-        };
-    };
-    return false;
-};
+const rollDice = (G, ctx, n) => {
+    let dice = ctx.random.Die(6, n);
+    console.log(dice);
+    G.state += 1;
+}
 
-function IsDraw(cells) {
-    return cells.every(x => x != null);
-};
+const buyEst = (G, ctx, est) => {
+    G.money[G.currPlayer] -= G.est_cost[est];
+    G.est_buyable[est] -= 1;
+    ctx.events.endTurn();
+}
 
-export const TicTacToe = {
+export const Machikoro = {
 
-    name: 'tic-tac-toe',
+    name: "machikoro",
 
-    setup: () => ({ cells: Array(9).fill(null) }),
+    setup: (ctx) => ({
+        state: 0,
+        currPlayer: 0,
+        est_cost:       [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2],
+        est_remaining:  [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
+        est_buyable:    [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
+        money:      Array(ctx.numPlayers).fill(10),
+        landmark_1: Array(ctx.numPlayers).fill(false),
+        landmark_2: Array(ctx.numPlayers).fill(false),
+        landmark_3: Array(ctx.numPlayers).fill(false),
+        landmark_4: Array(ctx.numPlayers).fill(false),
+    }),
 
     turn: {
-        moveLimit: 1,
+        onBegin: (G, ctx) => {
+            G.state = 0;
+            G.currPlayer = parseInt(ctx.currentPlayer);
+        }
+    },
+
+    moves: {
+        rollDice,
+        buyEst,
     },
   
-    moves: {
-        clickCell: (G, ctx, id) => {
-            if (G.cells[id] != null) {
-                return INVALID_MOVE;
-            };
-            G.cells[id] = ctx.currentPlayer;
-        },
-    },
-
-    endIf: (G, ctx) => {
-        if (IsVictory(G.cells)) {
-            return { winner: ctx.currentPlayer };
-        };
-        if (IsDraw(G.cells)) {
-            return { draw: true };
-        };
-    },
-
 };

@@ -1,13 +1,13 @@
-import { Server, Origins } from "boardgame.io/server";
 import path from "path";
 import serve from "koa-static";
-import { TicTacToe } from "./Game";
+import { Server, Origins } from "boardgame.io/server";
+import { Machikoro } from "./Game";
 
 const port = process.env.PORT || 80;
 
 // game server
 const server = Server({
-  games: [TicTacToe],
+  games: [Machikoro],
   origins: [
     Origins.LOCALHOST,
     "https://machikororo.herokuapp.com/",
