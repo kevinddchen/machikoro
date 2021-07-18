@@ -1,6 +1,6 @@
 import path from "path";
 import serve from "koa-static";
-import { Server, Origins } from "boardgame.io/server";
+import { Server } from "boardgame.io/server";
 import { Machikoro } from "./Game";
 
 const port = process.env.PORT || 80;
@@ -8,10 +8,6 @@ const port = process.env.PORT || 80;
 // game server
 const server = Server({
   games: [Machikoro],
-  origins: [
-    Origins.LOCALHOST,
-    "https://machikororo.herokuapp.com/",
-  ],
 });
 
 // serve front-end app from `build`

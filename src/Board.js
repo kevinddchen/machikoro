@@ -9,25 +9,32 @@ export class MachikoroBoard extends React.Component {
     const active = this.props.isActive;
     const player = this.props.playerID;
     
-    // rolling 
-    const canRoll = (n) => (active && G.state === 0 && ( n === 2 ? G.land_0[player] : true));
-    const clickRoll = (n) => (canRoll(n) && this.props.moves.rollDice(n));
-    const rollCellStyle = (n) => ({
-      backgroundColor: canRoll(n) ? "red" : "white",
+    // menu
+    const canRoll = (n) => (active && (G.state === 0)&& ( n === 2 ? G.land_0[player] : true));
+    const canKeep = (active && (G.state === 0) && (ctx.numMoves === 1));
+    const canUndo = (active && G.state === 2);
+    const canEnd = (active && (G.state === 1 || G.state === 2));
+    const menuTdStyle = (bool) => ({
+      backgroundColor: bool ? "red" : "white",
       padding: "3px",
     });
-    const canEnd = (active && G.state === 2);
-    const endCellStyle = {
-      backgroundColor: canEnd ? "red" : "white",
-      padding: "3px",
-    }
     const rollBody = (
       <tr>
-        <td style={rollCellStyle(1)}><button onClick={() => {clickRoll(1)}}>Roll 1</button></td>
-        <td style={rollCellStyle(2)}><button onClick={() => {clickRoll(2)}}>Roll 2</button></td>
-        <td width="50"></td>
-        <td><button disabled="true" onClick={() => {this.props.undo()}}>Undo</button></td>
-        <td style={endCellStyle}><button onClick={() => {canEnd && this.props.events.endTurn()}}>End Turn</button></td>
+        <td style={menuTdStyle(canRoll(1))}>
+          <button onClick={() => (canRoll(1) && this.props.moves.rollDice(1))}>Roll 1</button>
+        </td>
+        <td style={menuTdStyle(canRoll(2))}>
+          <button onClick={() => (canRoll(2) && this.props.moves.rollDice(2))}>Roll 2</button>
+        </td>
+        <td style={menuTdStyle(canKeep)}>
+          <button onClick={() => (canKeep && this.props.moves.commitRoll())}>Keep</button>
+        </td>
+        <td style={menuTdStyle(canUndo)}>
+          <button onClick={() => (canUndo && this.props.undo())}>Undo</button>
+        </td>
+        <td style={menuTdStyle(canEnd)}>
+          <button onClick={() => (canEnd && this.props.events.endTurn())}>End Turn</button>
+        </td>
       </tr>
     );
 
@@ -39,19 +46,18 @@ export class MachikoroBoard extends React.Component {
       if (est === 8) return (buyable && G.est_8[player] === 0);
       return buyable;
     };
-    const clickEst = (est) => (canBuyEst(est) && this.props.moves.buyEst(est));
-    const estCellStyle = (est) => ({
+    const estTdStyle = (est) => ({
       position: "relative",
       cursor: canBuyEst(est) ? "pointer" : "unset",
       backgroundColor: canBuyEst(est) ? "red" : "white",
       padding: "3px",
       paddingBottom: "0px",
     });
-    const estImageStyle = (est) => ({
+    const estImgStyle = (est) => ({
       filter: G.est_buyable[est] > 0 ? "unset" : "grayscale(100%)",
       width: "100px",
-    })
-    const estTextStyle = {
+    });
+    const estDivStyle = {
       position: "absolute",
       top: "5px",
       left: "5px",
@@ -64,9 +70,9 @@ export class MachikoroBoard extends React.Component {
       for (let col=0; col<5; col++) {
         const est = row*5 + col;
         tr.push(
-          <td style={estCellStyle(est)} onClick={() => {clickEst(est)}}>
-            <img style={estImageStyle(est)} src={`./assets/est${est}.gif`}/>
-            <div style={estTextStyle}>{G.est_buyable[est]}({G.est_remaining[est]})</div>
+          <td style={estTdStyle(est)} onClick={() => (canBuyEst(est) && this.props.moves.buyEst(est))}>
+            <img style={estImgStyle(est)} src={`./assets/est${est}.gif`} alt=""/>
+            <div style={estDivStyle}>{G.est_buyable[est]}({G.est_remaining[est]})</div>
           </td>
         );
       }
@@ -74,26 +80,27 @@ export class MachikoroBoard extends React.Component {
     }
 
     // landmarks
-    const canBuyLand = (land, i_player) => (
-      active && (G.state === 1) && (G.money[player] >= G.land_cost[land]) && !G[`land_${land}`][player]
-    );
-    const clickLand = (land, i_player) => {canBuyLand(land, i_player) && this.props.moves.buyLand(land)};
-    const landCellStyle = (land, i_player) => ({
-      cursor: canBuyLand(land, i_player) ? "pointer" : "unset",
-      backgroundColor: canBuyLand(land, i_player) ? "red" : "white",
+    const canBuyLand = (land, p) => (player == p) && active && (G.state === 1) && (G.money[player] >= G.land_cost[land]) && !G[`land_${land}`][player];
+    const landTdStyle = (land, p) => ({
+      cursor: canBuyLand(land, p) ? "pointer" : "unset",
+      backgroundColor: canBuyLand(land, p) ? "red" : "white",
       padding: "3px",
       paddingBottom: "0px",
     });
-    const landImageStyle = (land, i_player) => ({
-      filter: G[`land_${land}`][i_player] ? "unset" : "grayscale(100%)",
-      width: "75px",
-    })
+    const landImgStyle = (land, p) => ({
+      filter: G[`land_${land}`][p] ? "unset" : "grayscale(100%)",
+      width: "50px",
+    });
+    const miniDivStyle = {
+      display: "flex", 
+      justifyContent: "center",
+    };
 
     // players
-    const coinCellStyle = {
+    const coinTdStyle = {
       position: "relative",
     };
-    const coinTextStyle = {
+    const coinDivStyle = {
       position: "absolute",
       textAlign: "center",
       top: "5px",
@@ -104,40 +111,62 @@ export class MachikoroBoard extends React.Component {
     
     const playerBody = [];
     const data = this.props.matchData;
-    for (let i=0; i<data.length; i++) {
-      playerBody.push(
-        <td>
-          <table><tbody><tr>
-            <td width="25">
-              <div style={coinCellStyle}>
-                <img width="25" src="./assets/coin.png"/>
-                <div style={coinTextStyle}>{G.money[data[i].id]}</div>
-              </div>
-            </td>
-            <td>{data[i].name}</td>
-          </tr></tbody></table>
-          <table><tbody>
-            <tr>
-              <td style={landCellStyle(0)} onClick={() => {clickLand(0)}}>
-                <img style={landImageStyle(0, i)} src="./assets/land0.gif"/>
-              </td>
-              <td style={landCellStyle(1)} onClick={() => {clickLand(1)}}>
-                <img style={landImageStyle(1, i)} src="./assets/land1.gif"/>
-              </td>
-            </tr>
-            <tr>
-              <td style={landCellStyle(2)} onClick={() => {clickLand(2)}}>
-                <img style={landImageStyle(2, i)} src="./assets/land2.gif"/>
-              </td>
-              <td style={landCellStyle(3)} onClick={() => {clickLand(3)}}>
-                <img style={landImageStyle(3, i)} src="./assets/land3.gif"/>
-              </td>
-            </tr>
-          </tbody></table>
-        </td>
+    for (let p=0; p<data.length; p++) {
+      const td = []
+      td.push(
+        <table><tbody><tr>
+          <td style={coinTdStyle}>
+            <img width="25" src="./assets/coin.png" alt=""/>
+            <div style={coinDivStyle}>{G.money[data[p].id]}</div>
+          </td>
+          <td>{data[p].name}</td>
+        </tr></tbody></table>
       );
+      td.push(
+        <table><tbody>
+          <tr>
+            <td style={landTdStyle(0, p)} onClick={() => (canBuyLand(0, p) && this.props.moves.buyLand(0))}>
+              <img style={landImgStyle(0, p)} src="./assets/land0.gif" alt=""/>
+            </td>
+            <td style={landTdStyle(1, p)} onClick={() => (canBuyLand(1, p) && this.props.moves.buyLand(0))}>
+              <img style={landImgStyle(1, p)} src="./assets/land1.gif" alt=""/>
+            </td>
+          </tr>
+          <tr>
+            <td style={landTdStyle(2, p)} onClick={() => (canBuyLand(2, p) && this.props.moves.buyLand(0))}>
+              <img style={landImgStyle(2, p)} src="./assets/land2.gif" alt=""/>
+            </td>
+            <td style={landTdStyle(3, p)} onClick={() => (canBuyLand(3, p) && this.props.moves.buyLand(0))}>
+              <img style={landImgStyle(3, p)} src="./assets/land3.gif" alt=""/>
+            </td>
+          </tr>
+        </tbody></table>
+      );
+      for (let est=0; est<15; est++) {
+        for (let i=G[`est_${est}`][p]; i>0; i--) {
+          td.push(<div style={miniDivStyle}><img width="100px" src={`./assets/est${est}_mini.png`} alt=""/></div>);
+        }
+      }
+      playerBody.push(<td>{td}</td>);
     }
 
+    // log
+    const parseLine = (str) => (str.replace('/#./g', (x) => this.props.matchData[x[1]].name));
+    const logDivStyle = {
+      height: "200px",
+      width: "auto",
+      border: "double",
+      overflow: "auto",
+      fontSize: "12px",
+    };
+    const logBody = [];
+    for (let i=0; i<G.log.length; i++) {
+      let line = G.log[i].replace(/#./g, (x) => ((x[1].name === undefined) ? `"${x[1]}"` : this.props.matchData[x[1]].name));
+      //let line = G.log[i];
+      logBody.push(<div style={{whiteSpace: "pre"}}>{line}</div>);
+    }
+    
+    // render board
     return (
       <div>
         <table><tbody>
@@ -145,6 +174,7 @@ export class MachikoroBoard extends React.Component {
             <td>
               <table><tbody>{rollBody}</tbody></table>
               <table><tbody>{estBody}</tbody></table>
+              <div id="log_box" style={logDivStyle}>{logBody}</div>
             </td>
             {playerBody}
           </tr>
@@ -152,4 +182,20 @@ export class MachikoroBoard extends React.Component {
       </div>
     );
   }
+
+  componentDidUpdate() {
+    let box = document.getElementById("log_box");
+    box.scrollTop = box.scrollHeight;
+
+    // handle commit roll
+    if (this.props.G.state === 0){
+      if (this.props.G.land_3[this.props.ctx.currentPlayer]) {
+        if (this.props.ctx.numMoves > 1) this.props.moves.commitRoll();
+      } else {
+        if (this.props.ctx.numMoves > 0) this.props.moves.commitRoll();
+      }
+    }
+
+  }
+
 }

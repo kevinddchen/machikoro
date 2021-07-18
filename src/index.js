@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom";
-//import './index.css';
+import './index.css';
 import { LobbyClient } from "boardgame.io/client";
 import { Client } from "boardgame.io/react";
 import { SocketIO } from "boardgame.io/multiplayer"
@@ -23,10 +23,12 @@ const MachikoroClient = Client({
   multiplayer: SocketIO({ server: serverOrigin }),
 });
 
+// --- App --------------------------------------------------------------------
+
 /**
  * Improved setInterval: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
  */
-function useInterval(callback, delay) {
+ function useInterval(callback, delay) {
   const savedCallback = useRef();
 
   // Remember the latest callback.
@@ -46,8 +48,6 @@ function useInterval(callback, delay) {
   }, [delay]);
 }
 
-// --- App --------------------------------------------------------------------
-
 const App = () => {
 
   // Hooks
@@ -60,9 +60,9 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(""); // Any error messages to display
   const [state, setState] = useState(0); // 0 means free, 1 means in room, 2 means in game
 
-  const defaultLobbyBody = null;
+  const defaultLobbyBody = "";
   const [lobbyBody, setLobbyBody] = useState(defaultLobbyBody);
-  const defaultRoomBody = null;
+  const defaultRoomBody = "";
   const [roomBody, setRoomBody] = useState(defaultRoomBody);
 
   // --- Match Management -----------------------------------------------------
@@ -100,7 +100,6 @@ const App = () => {
       // find a free seat
       let seat;
       for (let i=match.players.length-1; i>=0; i--) {
-        const x = match.players[i];
         if ("name" in match.players[i]) {
           if (match.players[i].name === name) {
             setErrorMessage("Name already taken.");
@@ -180,12 +179,16 @@ const App = () => {
   // --- Lobby Management -----------------------------------------------------
 
   const update = async () => {
-    if (state === 0) {
-      const { matches } = await lobbyClient.listMatches(gameName);
-      updateLobbyBody(matches);
-    } else if (state === 1) {
-      const match = await lobbyClient.getMatch(gameName, hMatchID);
-      updateRoomBody(match);
+    try {
+      if (state === 0) {
+        const { matches } = await lobbyClient.listMatches(gameName);
+        updateLobbyBody(matches);
+      } else if (state === 1) {
+        const match = await lobbyClient.getMatch(gameName, hMatchID);
+        updateRoomBody(match);
+      }
+    } catch(e) {
+      console.error(e);
     }
   }
   
@@ -195,7 +198,7 @@ const App = () => {
     const tbody = [];
     if (matches.length === 0) {
       tbody.push(
-        <tr><td>No open matches!</td></tr>
+        <tr><td>No open matches.</td></tr>
       );
     } else {
       tbody.push(
@@ -212,9 +215,7 @@ const App = () => {
             <td>{matches[i].matchID}</td>
             <td>{count}/{matches[i].players.length}</td>
             <td>
-              <button onClick={() => joinMatch(hName, matches[i].matchID)} disabled={state !== 0}>
-                Join
-              </button>
+              <button onClick={() => joinMatch(hName, matches[i].matchID)} disabled={state !== 0}>Join</button>
             </td>
           </tr>
         );
@@ -226,9 +227,9 @@ const App = () => {
   const updateRoomBody = (match) => {
     const tbody = [
       <tr key="head">
-          <th>Seat</th>
-          <th>Player</th>
-        </tr>
+        <th>Seat</th>
+        <th>Player</th>
+      </tr>
     ];
     for (let i=0; i<match.players.length; i++) {
       tbody.push(
@@ -240,6 +241,8 @@ const App = () => {
     }
     setRoomBody(tbody);
   }
+
+  // --- Render ---------------------------------------------------------------
 
   if (state === 0) {
     // Show lobby
@@ -255,15 +258,14 @@ const App = () => {
             autoComplete="off"
             onChange={(e) => setName(e.target.value)}
           />
+          &nbsp;
           <button onClick={debug}>Debug</button>
         </p>
         <p>
-          <button onClick={createMatch}>
-            Create Match
-          </button>
+          <button onClick={createMatch}>Create Match</button>
           &nbsp;Players:&nbsp;
           <select 
-            defaultValue="4"
+            defaultValue={hNumPlayers}
             onChange={(e) => setNumPlayers(parseInt(e.target.value))}>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -271,9 +273,16 @@ const App = () => {
             <option value="5">5</option>
           </select>
         </p>
-        <hr></hr>
         <table cellPadding="3px"><tbody>{lobbyBody}</tbody></table>
         <p style={{ color: "red" }}>{errorMessage}</p>
+        <hr></hr>
+        <p>Things to do:</p>
+        <ul>
+          <li style={{color: "red"}}>Implement purple establishments</li>
+          <li style={{color: "red"}}>Implement amusement part</li>
+          <li>Log for buying establishments/landmarks</li>
+          <li>Allow refresh</li>
+        </ul>
       </div>
     );
   } else if (state === 1) {
@@ -286,7 +295,6 @@ const App = () => {
           &nbsp;
           <button onClick={startMatch}>Start</button>
         </p>
-        <hr></hr>
         <table cellPadding="3px"><tbody>{roomBody}</tbody></table>
         <p style={{ color: "red" }}>{errorMessage}</p>
       </div>
@@ -305,7 +313,7 @@ const App = () => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App/>
   </React.StrictMode>,
   document.getElementById('root')
 );
