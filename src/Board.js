@@ -188,7 +188,7 @@ export class MachikoroBoard extends React.Component {
     box.scrollTop = box.scrollHeight;
 
     // handle commit roll
-    if (this.props.G.state === 0){
+    if (this.props.isActive && this.props.G.state === 0){
       if (this.props.G.land_3[this.props.ctx.currentPlayer]) {
         if (this.props.ctx.numMoves > 1) this.props.moves.commitRoll();
       } else {
