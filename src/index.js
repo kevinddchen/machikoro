@@ -7,6 +7,20 @@ import { SocketIO } from "boardgame.io/multiplayer"
 import { Machikoro } from "./Game";
 import { MachikoroBoard } from "./Board";
 
+/** 
+ * Things to do:
+ * 
+ * IMPORTANT
+ * - Add end game
+ * - Implement variable supply
+ * - Implement Harbor expansion
+ * 
+ * OPTIONAL
+ * - Add info window
+ * - Optimize log
+ * - Allow page refresh
+ */
+
 // --- Setup ------------------------------------------------------------------
 
 const port = process.env.PORT || 80;
@@ -276,12 +290,10 @@ const App = () => {
         <table cellPadding="3px"><tbody>{lobbyBody}</tbody></table>
         <p style={{ color: "red" }}>{errorMessage}</p>
         <hr></hr>
-        <p>Things to do:</p>
+        <p>Important:</p>
         <ul>
-          <li style={{color: "red"}}>Implement purple establishments</li>
-          <li style={{color: "red"}}>Implement amusement part</li>
-          <li>Log for buying establishments/landmarks</li>
-          <li>Allow refresh</li>
+          <li>Do not refresh the page!</li>
+          <li>End game has not been implemented yet.</li>
         </ul>
       </div>
     );
@@ -289,7 +301,7 @@ const App = () => {
     // Show room
     return (
       <div>
-        <p>In Match ID: {hMatchID}</p>
+        <p>Match ID: {hMatchID}</p>
         <p>
           <button onClick={leaveMatch}>Leave</button>
           &nbsp;

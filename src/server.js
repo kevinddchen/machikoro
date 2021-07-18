@@ -11,14 +11,14 @@ const server = Server({
 });
 
 // serve front-end app from `build`
-const absolutePath = path.resolve(__dirname, "../build");
-server.app.use(serve(absolutePath));
+const frontEndAppBuildPath = path.resolve(__dirname, "../build");
+server.app.use(serve(frontEndAppBuildPath));
 
 server.run({
   port: port,
   callback: () => {
     server.app.use(
-      async (ctx, next) => await serve(absolutePath)(
+      async (ctx, next) => await serve(frontEndAppBuildPath)(
         Object.assign(ctx, { path: "index.html" }), 
         next
       )
