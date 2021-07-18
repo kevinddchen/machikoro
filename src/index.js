@@ -273,7 +273,7 @@ const App = () => {
             onChange={(e) => setName(e.target.value)}
           />
           &nbsp;
-          <button onClick={debug}>Debug</button>
+          {/*<button onClick={debug}>Debug</button>*/}
         </p>
         <p>
           <button onClick={createMatch}>Create Match</button>

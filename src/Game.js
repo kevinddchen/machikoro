@@ -188,7 +188,7 @@ export const Machikoro = {
         est_remaining:  [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
         est_buyable:    [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
         land_cost:      [4, 10, 16, 22],
-        money:      Array(ctx.numPlayers).fill(300),
+        money:      Array(ctx.numPlayers).fill(3),
         est_0:      Array(ctx.numPlayers).fill(1),
         est_1:      Array(ctx.numPlayers).fill(0),
         est_2:      Array(ctx.numPlayers).fill(1),
