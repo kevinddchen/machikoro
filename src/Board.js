@@ -27,13 +27,13 @@ export class MachikoroBoard extends React.Component {
       (ctx.numMoves === 0 || (ctx.numMoves === 1 && G.land_3[player]))
     );
     const canKeep = active && G.state === "roll" && ctx.numMoves > 0;
-    const canUndo = active;
     const canSkip = active && ["tv", "office1", "office2"].includes(G.state);
     const canEnd = active && (G.state === "buy" || G.state === "end");
     const menuTdStyle = (bool) => ({
       backgroundColor: bool ? "red" : "white",
       padding: "3px",
     });
+    const canUndo = active;
     const rollBody = (
       <tr>
         <td style={menuTdStyle(canRoll(1))}>
@@ -46,15 +46,15 @@ export class MachikoroBoard extends React.Component {
           <button onClick={() => (canKeep && this.props.moves.commitRoll())}>
             Keep{ canKeep ? `(${G.roll})` : null}</button> 
         </td>
-        <td width="100px"></td>
-        <td>
-          <button onClick={() => (canUndo && this.props.undo())}>Undo</button>
-        </td>
         <td style={menuTdStyle(canSkip)}>
           <button onClick={() => (canSkip && this.props.moves.skip())}>Skip</button>
         </td>
         <td style={menuTdStyle(canEnd)}>
           <button onClick={() => (canEnd && endTurn())}>End Turn</button>
+        </td>
+        <td width="100px"></td>
+        <td>
+          <button onClick={() => (canUndo && this.props.undo())}>Undo</button>
         </td>
       </tr>
     );
@@ -210,7 +210,7 @@ export class MachikoroBoard extends React.Component {
       <div>
         <table><tbody>
           <tr valign="top">
-            <td>
+            <td width="530px">
               <table><tbody>{rollBody}</tbody></table>
               <table><tbody>{estBody}</tbody></table>
             </td>

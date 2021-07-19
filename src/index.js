@@ -27,6 +27,8 @@ const port = process.env.PORT || 80;
 const serverOrigin = `${window.location.protocol}//${window.location.hostname}:${port}`;
 const gameName = "machikoro";
 
+console.log("Env: %s", process.env.NODE_ENV);
+
 // lobby client
 const lobbyClient = new LobbyClient({ server: serverOrigin });
 console.log("Created lobby.");
@@ -273,7 +275,9 @@ const App = () => {
             onChange={(e) => setName(e.target.value)}
           />
           &nbsp;
-          {/*<button onClick={debug}>Debug</button>*/}
+          {(process.env.NODE_ENV === "development") ? 
+            <button onClick={debug}>Debug</button>
+            : null}
         </p>
         <p>
           <button onClick={createMatch}>Create Match</button>
@@ -293,6 +297,7 @@ const App = () => {
         <p>Important:</p>
         <ul>
           <li>Do not refresh the page!</li>
+          <li>Use http, not https.</li>
           <li>End game has not been implemented yet.</li>
         </ul>
       </div>

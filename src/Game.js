@@ -150,7 +150,7 @@ function skip(G, ctx) {
 function get(G, player, amount) {
     if (amount > 0) {
         G.money[player] += amount;
-        G.log.push(`\t#${player} gets ${amount}`);
+        G.log.push(`\t#${player} earns $${amount}`);
     }
 }
 
@@ -159,7 +159,7 @@ function take(G, from, to, amount) {
     if (max > 0) {
         G.money[from] -= max;
         G.money[to] += max;
-        G.log.push(`\t#${from} pays #${to} ${amount}`);
+        G.log.push(`\t#${from} pays #${to} $${amount}`);
     }
 }
 
