@@ -81,7 +81,7 @@ class Room extends React.Component {
     tbody.push(
       <tr key={-1}>
         <th className="col_ind"></th>
-        <th className="col_id">Seat</th>
+        <th className="col_playerid">Seat</th>
         <th className="col_name">Name</th>
       </tr>
     );

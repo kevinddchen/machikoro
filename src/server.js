@@ -10,7 +10,7 @@ const server = Server({
   games: [Machikoro],
   origins: [
     // Allow your game site to connect.
-    'https://www.mygame.domain',
+    "https://playmachikoro.herokuapp.com/",
     // Allow localhost to connect, except when NODE_ENV is 'production'.
     Origins.LOCALHOST_IN_DEVELOPMENT,
   ],

@@ -171,7 +171,7 @@ class Lobby extends React.Component {
     } else {
       tbody.push(
         <tr key={-1}>
-          <th className="col_id">Match ID</th>
+          <th className="col_matchid">Match ID</th>
           <th className="col_seats">Seats</th>
         </tr>
       );
