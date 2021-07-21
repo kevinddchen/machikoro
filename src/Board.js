@@ -210,7 +210,7 @@ export class MachikoroBoard extends React.Component {
       <div>
         <table><tbody>
           <tr valign="top">
-            <td width="530px">
+            <td>
               <table><tbody>{rollBody}</tbody></table>
               <table><tbody>{estBody}</tbody></table>
             </td>

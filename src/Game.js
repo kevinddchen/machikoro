@@ -15,7 +15,6 @@ const est_names = [
     "Apple Orchard",
     "Produce Market",
 ]
-
 const land_names = [
     "Train Station",
     "Shopping Mall",
@@ -103,6 +102,7 @@ function buyEst(G, ctx, est) {
     const player = ctx.currentPlayer;
     G.money[player] -= G.est_cost[est];
     G.est_buyable[est] -= 1;
+    G.est_remaining[est] -= 1;
     G[`est_${est}`][player] += 1;
     G.state = "end";
     G.log.push(`\tbuy ${est_names[est]}`);
@@ -245,3 +245,5 @@ export const Machikoro = {
     },
   
 };
+
+export const gameName = "machikoro";

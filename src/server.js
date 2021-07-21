@@ -1,6 +1,6 @@
 import path from "path";
 import serve from "koa-static";
-import { Server } from "boardgame.io/server";
+import { Server, Origins } from "boardgame.io/server";
 import { Machikoro } from "./Game";
 
 const port = process.env.PORT || 80;
@@ -8,6 +8,12 @@ const port = process.env.PORT || 80;
 // game server
 const server = Server({
   games: [Machikoro],
+  origins: [
+    // Allow your game site to connect.
+    'https://www.mygame.domain',
+    // Allow localhost to connect, except when NODE_ENV is 'production'.
+    Origins.LOCALHOST_IN_DEVELOPMENT,
+  ],
 });
 
 // serve front-end app from `build`

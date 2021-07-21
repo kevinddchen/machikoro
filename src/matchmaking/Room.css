@@ -1,0 +1,13 @@
+.div {
+  padding: 2px;
+}
+
+.playerid {
+  width: 4ch;
+  text-align: left;
+}
+
+.name {
+  width: 16ch;
+  text-align: left;
+}
