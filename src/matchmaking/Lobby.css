@@ -1,13 +1,13 @@
-.div {
-  padding: 2px;
+.padded_div {
+  padding: 3px;
 }
 
-.matchid {
-  width: 12ch;
+.col_id {
+  width: 15ch;
   text-align: left;
 }
 
-.seats {
-  width: 4ch;
+.col_seats {
+  width: 5ch;
   text-align: left;
 }

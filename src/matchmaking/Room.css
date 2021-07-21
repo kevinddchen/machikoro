@@ -1,13 +1,18 @@
-.div {
-  padding: 2px;
+.padded_div {
+  padding: 3px;
 }
 
-.playerid {
+.col_ind {
+  width: 3ch;
+  text-align: right;
+}
+
+.col_id {
   width: 4ch;
   text-align: left;
 }
 
-.name {
+.col_name {
   width: 16ch;
   text-align: left;
 }

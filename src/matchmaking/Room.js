@@ -1,7 +1,7 @@
 import './Room.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
-import { gameName } from '../Game';
+import { gameName } from '../game/Game';
 import { checkDifferent } from './utils';
 
 class Room extends React.Component {
@@ -24,14 +24,25 @@ class Room extends React.Component {
 
     try {
       const match = await lobbyClient.getMatch(gameName, matchID);
-      const newPlayerList = match.players.map( (x) => (x.name ? x.name : ''));
-      console.log(newPlayerList);
+      let count = 0;
+      const newPlayerList = match.players.map( (x) => {
+        if (x.name) {
+          count++;
+          return x.name;
+        } else {
+          return '';
+        }
+      });
+      // if seats are all full, start match now
+      if (count === match.players.length) {
+        this.props.start(matchID, this.playerID, this.credentials);
+        return;
+      }
       if (checkDifferent(newPlayerList, this.state.playerList)) {
         this.setState({playerList: newPlayerList});
       }
     } catch(e) {
       console.error("(fetchMatch)", e);
-      return;
     }
   };
 
@@ -43,11 +54,12 @@ class Room extends React.Component {
       await this.props.lobbyClient.leaveMatch(gameName, matchID, { playerID, credentials });
       this.Authenticator.deleteCredentials(matchID);
       this.props.leaveRoom();
+      console.log("Left match.");
     } catch(e) {
-
+      this.props.setErrorMessage("Error in leaving match.");
+      console.error("(leaveMatch)", e);
     }
-    
-  }
+  };
 
   // --- React -----------------------------------------------------------------
 
@@ -68,14 +80,16 @@ class Room extends React.Component {
     const tbody = [];
     tbody.push(
       <tr key={-1}>
-        <th className="playerid">Seat</th>
-        <th className="name">Name</th>
-        <th></th>
+        <th className="col_ind"></th>
+        <th className="col_id">Seat</th>
+        <th className="col_name">Name</th>
       </tr>
     );
     for (let i=0; i<playerList.length; i++) {
+      const indicator = (i == parseInt(this.playerID)) ? '-->' : null
       tbody.push(
         <tr key={i}>
+          <td>{indicator}</td>
           <td>{i}</td>
           <td>{playerList[i]}</td>
         </tr>
@@ -87,14 +101,16 @@ class Room extends React.Component {
   render() {
     const { matchID } = this.props;
 
-    console.log("newrender");
     return (
       <div>
-        <div className="div">
-          In match ({matchID})&nbsp;
+        <div className="padded_div">
+          In match ({matchID}). 
+          Game will start when seats are filled.
+        </div>
+        <div className="padded_div">
           <button onClick={this.leaveMatch}>Leave</button>
         </div>
-        <div className="div">
+        <div className="padded_div">
           <table><tbody>{this.renderPlayerList()}</tbody></table>
         </div>
       </div>

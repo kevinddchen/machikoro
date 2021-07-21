@@ -1,7 +1,7 @@
 import path from "path";
 import serve from "koa-static";
 import { Server, Origins } from "boardgame.io/server";
-import { Machikoro } from "./Game";
+import { Machikoro } from "./game/Game";
 
 const port = process.env.PORT || 80;
 

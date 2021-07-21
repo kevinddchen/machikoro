@@ -1,7 +1,7 @@
 import './Lobby.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
-import { gameName } from '../Game';
+import { gameName } from '../game/Game';
 import { checkDifferent } from './utils';
 
 class Lobby extends React.Component {
@@ -52,7 +52,6 @@ class Lobby extends React.Component {
       }
     } catch(e) {
       console.error("(fetchMatches)", e);
-      return;
     }
   };
 
@@ -83,9 +82,9 @@ class Lobby extends React.Component {
 
   joinMatch = async (matchID) => {
     try {
-      if (this.hasCredentials(matchID) || await this._getCredentials(matchID)) {
+      if (this.hasCredentials(matchID) || await this._joinWithoutCredentials(matchID)) {
         this.props.joinRoom(matchID);
-        console.log(`Joined room for match '${matchID}'.`);
+        console.log(`Joined match '${matchID}'.`);
       }
     } catch(e) {
       this.props.setErrorMessage("Error in joining match.");
@@ -100,7 +99,7 @@ class Lobby extends React.Component {
   /**
    * Returns true on success, false on failure.
    */
-  async _getCredentials(matchID) {
+  _joinWithoutCredentials = async (matchID) => {
     const { name } = this.state;
 
     if (name.length === 0) {
@@ -136,9 +135,9 @@ class Lobby extends React.Component {
       }
     );
     this.Authenticator.saveCredentials(matchID, seat, playerCredentials);
-    console.log(`Obtained credentials for match '${matchID}'. Seat ${seat}.`);
+    console.log(`Obtained credentials for match '${matchID}', seat ${seat}.`);
     return true;
-  }
+  };
 
   // --- React -----------------------------------------------------------------
 
@@ -172,9 +171,8 @@ class Lobby extends React.Component {
     } else {
       tbody.push(
         <tr key={-1}>
-          <th className="matchid">Match ID</th>
-          <th className="seats">Seats</th>
-          <th></th>
+          <th className="col_id">Match ID</th>
+          <th className="col_seats">Seats</th>
         </tr>
       );
       for (let i=0; i<matchList.length; i++) {
@@ -203,7 +201,7 @@ class Lobby extends React.Component {
 
     return (
       <div>
-        <div className="div">
+        <div className="padded_div">
           Name:&nbsp;
           <input
             id="input_name"
@@ -214,7 +212,7 @@ class Lobby extends React.Component {
             onChange={this.setName}
           />
         </div>
-        <div className="div">
+        <div className="padded_div">
           <button onClick={this.createMatch}>Create Match</button>
           &nbsp;Players:&nbsp;
           <select 
@@ -226,7 +224,7 @@ class Lobby extends React.Component {
             <option value="5">5</option>
           </select>
         </div>
-        <div className="div">
+        <div className="padded_div">
           <table><tbody>{this.renderMatchList()}</tbody></table>
         </div>
       </div>

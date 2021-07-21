@@ -11,18 +11,16 @@ class Matchmaker extends React.Component {
       matchID: '',
       errorMessage: '',
     }
-    const port = process.env.PORT || 80;
-    const serverOrigin = `${window.location.protocol}//${window.location.hostname}:${port}`;
-    this.lobbyClient = new LobbyClient({ server: serverOrigin });
+    this.lobbyClient = new LobbyClient({ server: props.serverOrigin });
   }
 
   setErrorMessage = (msg) => {
     this.setState({errorMessage: msg});
-  }
+  };
 
   clearErrorMessage = () => {
     this.setState({errorMessage: ''});
-  }
+  };
 
   joinRoom = (matchID) => {
     this.setState({matchID});
@@ -32,7 +30,7 @@ class Matchmaker extends React.Component {
   leaveRoom = () => {
     this.setState({matchID: ''});
     this.clearErrorMessage();
-  }
+  };
 
   // --- React -----------------------------------------------------------------
 
@@ -41,7 +39,6 @@ class Matchmaker extends React.Component {
       await this.lobbyClient.listGames();
       console.log("Lobby client connected");
     } catch(e) {
-      this.setState({errorMessage: "Cannot connect to server."});
       console.error(e);
     }
   }
@@ -60,7 +57,7 @@ class Matchmaker extends React.Component {
             updateInterval={1000}
             setErrorMessage={this.setErrorMessage}
             leaveRoom={this.leaveRoom}
-            startMatch={() => {}}/>
+            start={this.props.start}/>
           :
           <Lobby 
             lobbyClient={this.lobbyClient}
