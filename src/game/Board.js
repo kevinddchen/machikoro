@@ -5,7 +5,7 @@ import PlayerInfo from './PlayerInfo';
 import Log from './Log';
 import { 
   canRollQ, 
-  canKeepQ, 
+  canCommitRollQ, 
   canEndQ, 
   canBuyEstQ, 
   canBuyLandQ, 
@@ -24,7 +24,7 @@ class MachikoroBoard extends React.Component {
     const { G, ctx, moves } = this.props;
 
     // auto commitRoll
-    if (canKeepQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
+    if (canCommitRollQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
       moves.commitRoll();
     }
   }
@@ -37,7 +37,7 @@ class MachikoroBoard extends React.Component {
     const player = parseInt(ctx.currentPlayer);
 
     const canRoll = (n) => isActive && canRollQ(G, ctx, n);
-    const canKeep = () => isActive && canKeepQ(G, ctx);
+    const canKeep = () => isActive && canCommitRollQ(G, ctx);
     const canEnd = () => isActive && canEndQ(G, ctx);
     const canBuyEst = (est) => isActive && canBuyEstQ(G, ctx, est);
     const canBuyLand = (p, land) => isActive && p === player && canBuyLandQ(G, ctx, land);
@@ -83,7 +83,7 @@ class MachikoroBoard extends React.Component {
                 rollTwo={() => moves.rollTwo()}
                 roll={G.roll}
                 canKeep={canKeep}
-                keep={() => canKeep() && moves.commitRoll()}
+                keep={() => moves.commitRoll()}
                 canEnd={canEnd}
                 endTurn={() => moves.endTurn()}
                 undo={() => this.props.undo()}

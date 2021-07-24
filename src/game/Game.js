@@ -1,9 +1,8 @@
-import { INVALID_MOVE } from 'boardgame.io/core';
+import { PlayerView, INVALID_MOVE } from 'boardgame.io/core';
 import { est_names, land_names } from './text';
 
 /**
  * TODO List:
- * - Add variable supply
  * - Add info window with descriptions
  * - !Add expansion cards!
  */
@@ -43,18 +42,22 @@ function rollTwo(G, ctx) {
 }
 
 function debugRoll(G, ctx, roll) {
+  // force roll; removed in production
   G.roll = roll;
   G.numRolls++;
   G.log.push(`\tdebug roll ${G.roll}`);
 }
 
-export function canKeepQ(G, ctx) {
+// --- Commit roll -------------------------------------------------------------
+
+export function canCommitRollQ(G, ctx) {
   return G.numRolls > 0 && G.state === "roll";
 }
 
-// --- Commit roll -------------------------------------------------------------
-
 function commitRoll(G, ctx) {
+  if (!canCommitRollQ(G, ctx)) {
+    return INVALID_MOVE;
+  }
   const player = parseInt(ctx.currentPlayer),
         N = ctx.numPlayers,
         backwards = [], // players in backward order
@@ -80,7 +83,7 @@ function commitRoll(G, ctx) {
       earn(G, player, (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][2]); // bakery
       break;
     case 4:
-      earn(G, player, (G[`land_${player}`][1] ? 4 : 3)*G[`est_${player}`][4]); // convenience
+      earn(G, player, (G[`land_${player}`][1] ? 4 : 3)*G[`est_${player}`][4]); // convenience store
       break;
     case 5:
       forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][5])); // forest
@@ -91,10 +94,10 @@ function commitRoll(G, ctx) {
       if (G[`est_${player}`][8] > 0) G.doOffice = true;
       break;
     case 7:
-      earn(G, player, 3*G[`est_${player}`][9]*G[`est_${player}`][1]); // cheese
+      earn(G, player, 3*G[`est_${player}`][9]*G[`est_${player}`][1]); // cheese factory
       break;
     case 8:
-      earn(G, player, 3*G[`est_${player}`][10]*(G[`est_${player}`][5] + G[`est_${player}`][11])); // furniture
+      earn(G, player, 3*G[`est_${player}`][10]*(G[`est_${player}`][5] + G[`est_${player}`][11])); // furniture factory
       break;
     case 9:
       backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 3 : 2)*G[`est_${p}`][12])); // restaurant
@@ -102,11 +105,11 @@ function commitRoll(G, ctx) {
       break;
     case 10:
       backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 3 : 2)*G[`est_${p}`][12])); // restaurant
-      forwards.forEach( (p) => earn(G, p, 3*G[`est_${p}`][13])); // orchard
+      forwards.forEach( (p) => earn(G, p, 3*G[`est_${p}`][13])); // apple orchard
       break;
     case 11:
     case 12:
-      earn(G, player, 2*G[`est_${player}`][14]*(G[`est_${player}`][0] + G[`est_${player}`][13])); // produce
+      earn(G, player, 2*G[`est_${player}`][14]*(G[`est_${player}`][0] + G[`est_${player}`][13])); // produce market
       break;
     default:
       break;
@@ -279,37 +282,75 @@ function checkEndGame(G, ctx, p) {
   }
 }
 
+// --- Variable supply ---------------------------------------------------------
+
+function checkDrawEst(G, ctx) {
+  let count = 0;
+  G.est_supply.forEach( (x) => {if (x > 0) count++});
+  return count < G.numReplenish;
+}
+
+function replenishSupply(G, ctx) {
+  while (G.secret.length > 0 && checkDrawEst(G, ctx)) {
+    const est = G.secret.pop();
+    G.est_supply[est]++;
+  }
+}
+
 // --- Game --------------------------------------------------------------------
 
 export const gameName = "machikoro";
+
+const defaultSetupData = {
+  supplyVariant: "var",
+};
 
 export const Machikoro = {
 
   name: gameName,
 
   setup: (ctx, setupData) => {
+    const n = ctx.numPlayers;
     const G = {
       est_cost:   [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2],
-      est_supply: [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
-      est_total:  [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
+      est_supply: Array(15).fill(0),
+      est_total:  [6, 6, 6, 6, 6, 6, n, n, n, 6, 6, 6, 6, 6, 6],
       land_cost:  [4, 10, 16, 22],
-      money: Array(ctx.numPlayers).fill(3),
+      money: Array(n).fill(100),
       log: [],
     };
+    // starting establishments
     for (let p=0; p<ctx.numPlayers; p++) {
       G[`est_${p}`] =   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       G[`land_${p}`] =  [false, false, false, false];
     }
+    // shuffle deck; this is stripped from G given to players
+    G.secret = [];
+    for (let est=0; est<G.est_total.length; est++) {
+      G.secret = G.secret.concat(Array(G.est_total[est]).fill(est));
+    }
+    G.secret = ctx.random.Shuffle(G.secret);
+    // additional setup
+    if (!setupData) setupData = defaultSetupData;
+    const { supplyVariant } = setupData;
+    if (supplyVariant === "tot") G.numReplenish = 100; // set to large number
+    if (supplyVariant === "var") G.numReplenish = 10;
+
     return G;
   },
 
   validateSetupData: (setupData, numPlayers) => {
+    if (setupData) {
+      const { supplyVariant } = setupData;
+      if (!["tot", "var"].includes(supplyVariant)) return false;
+    }
     if (numPlayers < 2) return false;
     if (numPlayers > 5) return false;
   },
 
   turn: {
     onBegin: (G, ctx) => {
+      replenishSupply(G, ctx);
       G.state = "roll";
       G.roll = 0;
       G.numRolls = 0;
@@ -345,5 +386,7 @@ export const Machikoro = {
     doOffice2: doOffice2,
     endTurn: endTurn,
   },
+
+  playerView: PlayerView.STRIP_SECRETS,
   
 };

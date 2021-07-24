@@ -9,6 +9,7 @@ class Room extends React.Component {
     super(props);
     this.state = {
       playerList: [], // string[]
+      supplyVariant: '',
     }
     this.interval = null;
     this.Authenticator = new Authenticator();
@@ -39,7 +40,10 @@ class Room extends React.Component {
         return;
       }
       if (checkDifferent(newPlayerList, this.state.playerList)) {
-        this.setState({playerList: newPlayerList});
+        this.setState({
+          playerList: newPlayerList,
+          supplyVariant: match.setupData.supplyVariant,
+        });
       }
     } catch(e) {
       console.error("(fetchMatch)", e);
@@ -65,6 +69,7 @@ class Room extends React.Component {
 
   componentDidMount() {
     const { updateInterval } = this.props;
+    this.fetchMatch();
     this.interval = setInterval(this.fetchMatch, updateInterval); 
   }
 
@@ -86,12 +91,18 @@ class Room extends React.Component {
       </tr>
     );
     for (let i=0; i<playerList.length; i++) {
-      const indicator = (i === parseInt(this.playerID)) ? '-->' : null
+      let indicator,
+          button;
+      if (i === parseInt(this.playerID)) {
+        indicator = '-->';
+        button = <button onClick={this.leaveMatch}>Leave</button>
+      }
       tbody.push(
         <tr key={i}>
           <td>{indicator}</td>
           <td>{i+1}</td>
           <td>{playerList[i]}</td>
+          <td>{button}</td>
         </tr>
       );
     }
@@ -100,15 +111,18 @@ class Room extends React.Component {
 
   render() {
     const { matchID } = this.props;
+    const { supplyVariant } = this.state;
+
+    let supplyVariantName = '';
+    if (supplyVariant === 'var' ) supplyVariantName = "Variable";
+    if (supplyVariant === 'tot' ) supplyVariantName = "Total";
 
     return (
       <div>
         <div className="padded_div">
-          In match ({matchID}). 
-          Game will start when seats are filled.
-        </div>
-        <div className="padded_div">
-          <button onClick={this.leaveMatch}>Leave</button>
+          <div>In match ({matchID}).</div>
+          <div>Supply variant: {supplyVariantName}</div>
+          <div>Game will start when seats are filled.</div>
         </div>
         <div className="padded_div">
           <table><tbody>{this.renderPlayerList()}</tbody></table>

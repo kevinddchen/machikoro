@@ -15,8 +15,8 @@ class Log extends React.Component {
 
     const { gamelog } = this.props;
 
-    // parse player names from the log, which are searched by a '#'
-    // replace '$' with emoji
+    // replace '$' with coin emoji
+    // parse player names, which are searched by a '#'
     const logBody = [];
     for (let i=0; i<gamelog.length; i++) {
       let line = gamelog[i];

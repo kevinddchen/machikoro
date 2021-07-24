@@ -11,6 +11,7 @@ class Lobby extends React.Component {
       name: '',
       numPlayers: 4,
       matchList: null, // {matchID: string, currPlayers: number, numPlayers: number}
+      supplyVariant: 'var',
     };
     this.matchCounts = null; // number[]
     this.interval = null;
@@ -18,14 +19,16 @@ class Lobby extends React.Component {
   }
 
   setName = (e) => {
-    // TODO: prevent bad user inputs
     this.setState({name: e.target.value});
   };
 
   setNumPlayers = (e) => {
-    // TODO: prevent bad user inputs
     this.setState({numPlayers: parseInt(e.target.value)});
   };
+
+  setSupplyVariant = (e) => {
+    this.setState({supplyVariant: e.target.value});
+  }
 
   /**
    * Periodically fetches list of matches from server. Updates render only when
@@ -64,14 +67,18 @@ class Lobby extends React.Component {
   // --- Match management ------------------------------------------------------
 
   createMatch = async () => {
-    const { name, numPlayers } = this.state;
+    const { name, numPlayers, supplyVariant } = this.state;
 
     if (name.length === 0) {
       this.props.setErrorMessage("Please enter a name.");
       return;
     }
     try {
-      const { matchID } = await this.props.lobbyClient.createMatch(gameName, {numPlayers: numPlayers});
+      //const setupData = {supplyVariant: supplyVariant};
+      const { matchID } = await this.props.lobbyClient.createMatch(gameName, {
+        numPlayers,
+        setupData: {supplyVariant},
+      });
       console.log(`Created match '${matchID}'.`);
       await this.joinMatch(matchID);
     } catch(e) {
@@ -143,11 +150,14 @@ class Lobby extends React.Component {
 
   componentDidMount() {
     const { updateInterval } = this.props;
-    const { name, numPlayers } = this.state;
+    const { name, numPlayers, supplyVariant } = this.state;
 
+    this.fetchMatches();
     this.interval = setInterval(this.fetchMatches, updateInterval); 
+    // set default values
     document.getElementById("input_name").value = name;
     document.getElementById("input_numPlayers").value = numPlayers;
+    document.getElementById("input_supplyVariant").value = supplyVariant;
   }
 
   componentWillUnmount() {
@@ -222,6 +232,13 @@ class Lobby extends React.Component {
             <option value="3">3</option>
             <option value="4">4</option>
             <option value="5">5</option>
+          </select>
+          &nbsp;Supply Variant:&nbsp;
+          <select 
+            id="input_supplyVariant"
+            onChange={this.setSupplyVariant}>
+            <option value="var">Variable</option>
+            <option value="tot">Total</option>
           </select>
         </div>
         <div className="padded_div">

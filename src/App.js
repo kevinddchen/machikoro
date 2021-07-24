@@ -22,6 +22,8 @@ class App extends React.Component {
     this.setState({ matchID, playerID, credentials });
   };
 
+  startDebug = () => process.env.NODE_ENV === 'development' && this.setState({debug: true});
+
   componentDidMount() {
     console.log(`env: ${process.env.NODE_ENV}.`);
   }
@@ -49,7 +51,7 @@ class App extends React.Component {
       return (
         <div>
           { process.env.NODE_ENV === 'development' ?
-            <button onClick={() => this.setState({debug: true})}>DEBUG</button>
+            <button onClick={this.startDebug}>DEBUG</button>
             : 
             null
           }
