@@ -1,3 +1,12 @@
+.active {
+  background-color: red;
+  cursor: pointer;
+}
+
+.inactive {
+  filter: grayscale(1);
+}
+
 .coin_td {
   position: relative;
 }
@@ -23,12 +32,6 @@
   padding: 3px;
 }
 
-.name_div_on {
-  padding: 3px;
-  background-color: red;
-  cursor: pointer;
-}
-
 .name_text {
   height: 25px;
   width: 120px;
@@ -36,19 +39,7 @@
   overflow: hidden;
 }
 
-.land_td_on {
-  padding: 3px;
-  background-color: red;
-  cursor: pointer;
-}
-
 .land_img {
-  filter: grayscale(1);
-  width: 54px;
-  display: block;
-}
-
-.land_img_on {
   width: 54px;
   display: block;
 }
@@ -57,14 +48,6 @@
   display: flex;
   justify-content: center;
 }
-
-.estmini_div_on {
-  display: flex;
-  justify-content: center;
-  background: red;
-  cursor: pointer;
-}
-
 
 .estmini_img {
   width: 100px;

@@ -1,22 +1,18 @@
+.active {
+  background-color: red;
+  cursor: pointer;
+}
+
+.inactive {
+  filter: grayscale(1);
+}
+
 .est_td {
   padding: 3px;
   position: relative;
 }
 
-.est_td_on {
-  padding: 3px;
-  position: relative;
-  background-color: red;
-  cursor: pointer;
-}
-
 .est_img {
-  filter: grayscale(1);
-  width: 114px;
-  display: block;
-}
-
-.est_img_on {
   width: 114px;
   display: block;
 }

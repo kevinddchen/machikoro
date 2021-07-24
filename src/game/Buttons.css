@@ -1,3 +1,7 @@
+.active {
+  background-color: red;
+}
+
 .buttons_button {
   width: 72px;
   display: block;
@@ -10,10 +14,4 @@
 .buttons_td {
   width: 72px;
   padding: 3px;
-}
-
-.buttons_td_on {
-  width: 72px;
-  padding: 3px;
-  background-color: red;
 }

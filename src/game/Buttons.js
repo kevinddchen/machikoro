@@ -1,5 +1,6 @@
 import './Buttons.css';
 import React from 'react';
+import classNames from 'classnames';
 
 class Buttons extends React.Component {
 
@@ -19,17 +20,17 @@ class Buttons extends React.Component {
 
     const tbody = 
       <tr>
-        <td className={canRoll(1) ? "buttons_td_on" : "buttons_td"}>
+        <td className={classNames("buttons_td", {"active": canRoll(1)})}>
           <button className="buttons_button" onClick={rollOne}>Roll 1</button>
         </td>
-        <td className={canRoll(2) ? "buttons_td_on" : "buttons_td"}>
+        <td className={classNames("buttons_td", {"active": canRoll(2)})}>
           <button className="buttons_button" onClick={rollTwo}>Roll 2</button>
         </td>
-        <td className={canKeep() ? "buttons_td_on" : "buttons_td"}>
+        <td className={classNames("buttons_td", {"active": canKeep()})}>
           <button className={canKeep() ? "buttons_button" : "buttons_hide"}
                   onClick={keep}>Keep({roll})</button>
         </td>
-        <td className={canEnd() ? "buttons_td_on" : "buttons_td"}>
+        <td className={classNames("buttons_td", {"active": canEnd()})}>
           <button className="buttons_button" onClick={endTurn}>End Turn</button>
         </td>
         <td>

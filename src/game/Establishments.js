@@ -1,5 +1,6 @@
 import './Establishments.css';
 import React from 'react';
+import classNames from 'classnames';
 
 class Establishments extends React.Component {
 
@@ -13,9 +14,24 @@ class Establishments extends React.Component {
       for (let col=0; col<5; col++) {
         const est = row*5 + col;
         tr.push(
-          <td key={col} className={canBuyEst(est) ? "est_td_on" : "est_td"} onClick={() => buyEst(est)}>
-            <img className={est_supply[est] > 0 ? "est_img_on" : "est_img"} src={`./assets/est${est}.gif`} alt=""/>
-            <div className="est_num">{est_supply[est]}({est_total[est]})</div>
+          <td key={col} 
+            className={classNames(
+              "est_td", 
+              {"active": canBuyEst(est)}
+            )} 
+            title="test"
+            onClick={() => buyEst(est)}
+          >
+            <img className={classNames(
+              "est_img",
+              {"inactive": est_supply[est] === 0}
+             )} 
+             src={`./assets/est${est}.gif`} 
+             alt=""
+            />
+            <div className="est_num">
+              {est_supply[est]}({est_total[est]})
+            </div>
           </td>
         );
       }
