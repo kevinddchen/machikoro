@@ -316,7 +316,7 @@ export const Machikoro = {
       est_supply: Array(15).fill(0),
       est_total:  [6, 6, 6, 6, 6, 6, n, n, n, 6, 6, 6, 6, 6, 6],
       land_cost:  [4, 10, 16, 22],
-      money: Array(n).fill(100),
+      money: Array(n).fill(3),
       log: [],
     };
     // starting establishments

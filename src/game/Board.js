@@ -21,10 +21,10 @@ class MachikoroBoard extends React.Component {
   }
 
   componentDidUpdate() {
-    const { G, ctx, moves } = this.props;
+    const { G, ctx, moves, isActive } = this.props;
 
     // auto commitRoll
-    if (canCommitRollQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
+    if (isActive && canCommitRollQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
       moves.commitRoll();
     }
   }
