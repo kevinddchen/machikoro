@@ -86,11 +86,11 @@ class Room extends React.Component {
       </tr>
     );
     for (let i=0; i<playerList.length; i++) {
-      const indicator = (i == parseInt(this.playerID)) ? '-->' : null
+      const indicator = (i === parseInt(this.playerID)) ? '-->' : null
       tbody.push(
         <tr key={i}>
           <td>{indicator}</td>
-          <td>{i}</td>
+          <td>{i+1}</td>
           <td>{playerList[i]}</td>
         </tr>
       );

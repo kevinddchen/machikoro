@@ -1,0 +1,30 @@
+.est_td {
+  padding: 3px;
+  position: relative;
+}
+
+.est_td_on {
+  padding: 3px;
+  position: relative;
+  background-color: red;
+  cursor: pointer;
+}
+
+.est_img {
+  filter: grayscale(1);
+  width: 114px;
+  display: block;
+}
+
+.est_img_on {
+  width: 114px;
+  display: block;
+}
+
+.est_num {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  color: white;
+  font-size: 14px;
+}

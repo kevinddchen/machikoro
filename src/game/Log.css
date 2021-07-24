@@ -1,0 +1,14 @@
+.log_box {
+  height: 600px;
+  width: 250px;
+  border: double;
+  overflow: auto;
+  font-size: 12px;
+}
+
+.log_div {
+  white-space: pre;
+  max-height: 15px;
+  display: flex;
+  align-items: center;
+}

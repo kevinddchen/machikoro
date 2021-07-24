@@ -1,249 +1,349 @@
-const est_names = [
-    "Wheat Field",
-    "Livestock Farm",
-    "Bakery",
-    "Cafe",
-    "Convenience Store",
-    "Forest",
-    "Stadium",
-    "TV Station",
-    "Office",
-    "Cheese Factory",
-    "Furniture Factory",
-    "Mine",
-    "Restaurant",
-    "Apple Orchard",
-    "Produce Market",
-]
-const land_names = [
-    "Train Station",
-    "Shopping Mall",
-    "Amusement Park",
-    "Radio Tower",
-]
+import { INVALID_MOVE } from 'boardgame.io/core';
+import { est_names, land_names } from './text';
 
-// --- Moves-------------------------------------------------------------------
+/**
+ * TODO List:
+ * - Add variable supply
+ * - Add info window with descriptions
+ * - !Add expansion cards!
+ */
 
-function rollDice(G, ctx, n) {
-    const dice = ctx.random.Die(6, n);
-    if (G.land_2[ctx.currentPlayer] && (dice.length === 2) && (dice[0] == dice[1])) {
-        G.repeat_turn = true;
-    } else {
-        G.repeat_turn = false;
-    }
-    const roll = dice.reduce( (a, b) => (a+b) );
-    G.roll = roll;
-    G.log.push(`\troll ${roll} (${dice})`);
+// --- State: roll -------------------------------------------------------------
+
+export function canRollQ(G, ctx, n) {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    G.state === "roll" && 
+    (G.numRolls === 0 || (G.numRolls === 1 && G[`land_${player}`][3])) && 
+    ( n === 2 ? G[`land_${player}`][0] : true) 
+  );
+}
+
+function rollOne(G, ctx) {
+  if (canRollQ(G, ctx, 1)) {
+    G.roll = ctx.random.Die(6);
+    G.numRolls++;
+    G.log.push(`\troll ${G.roll}`);
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
+function rollTwo(G, ctx) {
+  const player = parseInt(ctx.currentPlayer);
+  if (canRollQ(G, ctx, 2)) {
+    const dice = ctx.random.Die(6, 2);
+    if (G[`land_${player}`][2]) G.secondTurn = (dice[0] === dice[1]);
+    G.roll = dice.reduce( (a, b) => a+b );
+    G.numRolls++;
+    G.log.push(`\troll ${G.roll} (${dice})`);
+  } else {
+    return INVALID_MOVE;
+  }
 }
 
 function debugRoll(G, ctx, roll) {
-    G.roll = roll;
-    G.log.push(`\tdebug roll ${roll}`);
+  G.roll = roll;
+  G.numRolls++;
+  G.log.push(`\tdebug roll ${G.roll}`);
 }
+
+export function canKeepQ(G, ctx) {
+  return G.numRolls > 0 && G.state === "roll";
+}
+
+// --- Commit roll -------------------------------------------------------------
 
 function commitRoll(G, ctx) {
-    const player = parseInt(ctx.currentPlayer),
-        N = ctx.numPlayers;
-    const backwards = [];
-    const forwards = [player];
-    for (let i=1; i<N; i++)  {
-        backwards.push(((player-i)%N + N)%N); // JS modulo is negative
-        forwards.push((player+i)%N);
-    }
+  const player = parseInt(ctx.currentPlayer),
+        N = ctx.numPlayers,
+        backwards = [], // players in backward order
+        forwards = [player]; // players in forward order
+  for (let i=1; i<N; i++)  {
+      backwards.push(((player-i)%N + N)%N); // JS modulo is negative
+      forwards.push((player+i)%N);
+  }
 
-    switch (G.roll) {
-        case 1:
-            forwards.map( (p) => (get(G, p, 1*G.est_0[p])));
-            break;
-        case 2:
-            forwards.map( (p) => {
-                let amount = 1*G.est_1[p];
-                if (p === player) amount += (G.land_1[player] ? 2 : 1)*G.est_2[player];
-                get(G, p, amount);
-            });
-            break;
-        case 3:
-            backwards.map( (p) => (take(G, player, p, (G.land_1[p] ? 2 : 1)*G.est_3[p])));
-            get(G, player, (G.land_1[player] ? 2 : 1)*G.est_2[player]);
-            break;
-        case 4:
-            get(G, player, (G.land_1[player] ? 4 : 3)*G.est_4[player]);
-            break;
-        case 5:
-            forwards.map( (p) => (get(G, p, 1*G.est_5[p])));
-            break;
-        case 6:
-            if (G.est_6[player] > 0) backwards.map( (p) => (take(G, p, player, 2)));
-            if (G.est_7[player] > 0) G.do_tv = true;
-            if (G.est_8[player] > 0) G.do_office = true;
-            break;
-        case 7:
-            get(G, player, 3*G.est_9[player]*G.est_1[player]);
-            break;
-        case 8:
-            get(G, player, 3*G.est_10[player]*(G.est_5[player] + G.est_11[player]));
-            break;
-        case 9:
-            backwards.map( (p) => (take(G, player, p, (G.land_1[p] ? 3 : 2)*G.est_12[p])));
-            forwards.map( (p) => (get(G, p, 5*G.est_11[p])));
-            break;
-        case 10:
-            backwards.map( (p) => (take(G, player, p, (G.land_1[p] ? 3 : 2)*G.est_12[p])));
-            forwards.map( (p) => (get(G, p, 3*G.est_13[p])));
-            break;
-        case 11:
-        case 12:
-            get(G, player, 2*G.est_14[player]*(G.est_0[player] + G.est_13[player]));
-    }
-    G.state = nextState(G);
+  switch (G.roll) {
+    case 1:
+      forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][0])); // wheat
+      break;
+    case 2:
+      forwards.forEach( (p) => {
+        let amount = 1*G[`est_${p}`][1]; // livestock
+        if (p === player) amount += (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][2]; // bakery
+        earn(G, p, amount);
+      });
+      break;
+    case 3:
+      backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 2 : 1)*G[`est_${p}`][3])); // cafe
+      earn(G, player, (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][2]); // bakery
+      break;
+    case 4:
+      earn(G, player, (G[`land_${player}`][1] ? 4 : 3)*G[`est_${player}`][4]); // convenience
+      break;
+    case 5:
+      forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][5])); // forest
+      break;
+    case 6:
+      if (G[`est_${player}`][6] > 0) backwards.forEach( (p) => take(G, p, player, 2)); // stadium
+      if (G[`est_${player}`][7] > 0) G.doTV = true;
+      if (G[`est_${player}`][8] > 0) G.doOffice = true;
+      break;
+    case 7:
+      earn(G, player, 3*G[`est_${player}`][9]*G[`est_${player}`][1]); // cheese
+      break;
+    case 8:
+      earn(G, player, 3*G[`est_${player}`][10]*(G[`est_${player}`][5] + G[`est_${player}`][11])); // furniture
+      break;
+    case 9:
+      backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 3 : 2)*G[`est_${p}`][12])); // restaurant
+      forwards.forEach( (p) => earn(G, p, 5*G[`est_${p}`][11])); // mine
+      break;
+    case 10:
+      backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 3 : 2)*G[`est_${p}`][12])); // restaurant
+      forwards.forEach( (p) => earn(G, p, 3*G[`est_${p}`][13])); // orchard
+      break;
+    case 11:
+    case 12:
+      earn(G, player, 2*G[`est_${player}`][14]*(G[`est_${player}`][0] + G[`est_${player}`][13])); // produce
+      break;
+    default:
+      break;
+  }
+  afterCommit(G);
 }
 
-function buyEst(G, ctx, est) {
-    const player = ctx.currentPlayer;
-    G.money[player] -= G.est_cost[est];
-    G.est_buyable[est] -= 1;
-    G.est_remaining[est] -= 1;
-    G[`est_${est}`][player] += 1;
-    G.state = "end";
-    G.log.push(`\tbuy ${est_names[est]}`);
-}
-
-function buyLand(G, ctx, land) {
-    const player = ctx.currentPlayer;
-    G.money[player] -= G.land_cost[land];
-    G[`land_${land}`][player] = true;
-    G.state = "end";
-    G.log.push(`\tbuy ${land_names[land]}`);
-}
-
-function doTV(G, ctx, p) {
-    take(G, p, ctx.currentPlayer, 5);
-    G.do_tv = false;
-    G.state = nextState(G);
-};
-
-function doOffice(G, ctx, p, est) {
-    if (G.state === "office1") {
-        G.office_est = est;
-        G.state = "office2";
-    } else if (G.state === "office2") {
-        G[`est_${G.office_est}`][ctx.currentPlayer] -= 1;
-        G[`est_${est}`][ctx.currentPlayer] += 1;
-        G[`est_${G.office_est}`][p] += 1; 
-        G[`est_${est}`][p] -= 1; 
-        G.do_office = false;
-        G.state = nextState(G);
-    }
-}
-
-function skip(G, ctx) {
-    if (G.state === "tv") {
-        G.do_tv = false;
-    } else if (G.state === "office1" || G.state === "office2") {
-        G.do_office = false;
-    }
-    G.state = nextState(G);
-}
-
-// --- Helper functions -------------------------------------------------------
-
-function get(G, player, amount) {
-    if (amount > 0) {
-        G.money[player] += amount;
-        G.log.push(`\t#${player} earns $${amount}`);
-    }
+function earn(G, to, amount) {
+  if (amount > 0) {
+    G.money[to] += amount;
+    G.log.push(`\t#${to} earns ${amount} $`);
+  }
 }
 
 function take(G, from, to, amount) {
-    const max = Math.min(amount, G.money[from]);
-    if (max > 0) {
-        G.money[from] -= max;
-        G.money[to] += max;
-        G.log.push(`\t#${from} pays #${to} $${amount}`);
-    }
+  const max = Math.min(amount, G.money[from]);
+  if (max > 0) {
+    G.money[from] -= max;
+    G.money[to] += max;
+    G.log.push(`\t#${from} pays #${to} ${amount} $`);
+  }
 }
 
-function nextState(G) {
-    if (G.do_tv) {
-        return "tv";
-    } else if (G.do_office) {
-        return "office1";
-    } else {
-        return "buy";
-    }
+function afterCommit(G) {
+  if (G.doTV) {
+    G.state = "tv";
+  } else if (G.doOffice) {
+    G.state = "office1";
+  } else {
+    G.state = "buy";
+  }
 }
+
+// --- State: buy --------------------------------------------------------------
+
+export function canBuyEstQ(G, ctx, est) {
+  const player = parseInt(ctx.currentPlayer);
+  const buyable = (
+    G.state === "buy" && 
+    G.est_supply[est] > 0 && 
+    G.money[player] >= G.est_cost[est]
+  );
+  if (est === 6) return (buyable && G[`est_${player}`][6] === 0);
+  if (est === 7) return (buyable && G[`est_${player}`][7] === 0);
+  if (est === 8) return (buyable && G[`est_${player}`][8] === 0);
+  return buyable;
+}
+
+function buyEst(G, ctx, est) {
+  const player = parseInt(ctx.currentPlayer);
+  if (canBuyEstQ(G, ctx, est)) {
+    G.money[player] -= G.est_cost[est];
+    G.est_supply[est]--;
+    G.est_total[est]--;
+    G[`est_${player}`][est]++;
+    G.state = "end";
+    G.log.push(`\tbuy ${est_names[est]}`);
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
+export function canBuyLandQ(G, ctx, land) {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    G.state === "buy" && 
+    !G[`land_${player}`][land] &&
+    G.money[player] >= G.land_cost[land]
+  );
+}
+
+function buyLand(G, ctx, land) {
+  const player = parseInt(ctx.currentPlayer);
+  if (canBuyLandQ(G, ctx, land)) {
+    G.money[player] -= G.land_cost[land];
+    G[`land_${player}`][land] = true;
+    G.state = "end";
+    G.log.push(`\tbuy ${land_names[land]}`);
+    checkEndGame(G, ctx, player);
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
+// --- Special moves -----------------------------------------------------------
+
+export function canDoTVQ(G, ctx, p) {
+  const player = parseInt(ctx.currentPlayer);
+  return G.state === "tv" && p !== player;
+}
+
+function doTV(G, ctx, p) {
+  const player = parseInt(ctx.currentPlayer);
+  if (canDoTVQ(G, ctx, p)) {
+    take(G, p, player, 5);
+    G.doTV = false;
+    afterCommit(G);
+  } else {
+    return INVALID_MOVE;
+  }
+};
+
+export function canDoOffice1Q(G, ctx, est) {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    G.state === "office1" &&
+    ![6, 7, 8].includes(est) &&
+    G[`est_${player}`][est] > 0
+  );
+}
+
+function doOffice1(G, ctx, est) {
+  if (canDoOffice1Q(G, ctx, est)) {
+    G.officeEst = est;
+    G.state = "office2";
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
+export function canDoOffice2Q(G, ctx, p, est) {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    G.state === "office2" &&
+    p !== player && 
+    ![6, 7, 8].includes(est) &&
+    G[`est_${p}`][est] > 0
+  );
+}
+
+function doOffice2(G, ctx, p, est) {
+  const player = parseInt(ctx.currentPlayer);
+  if (canDoOffice2Q(G, ctx, p, est)) {
+    G[`est_${player}`][G.officeEst]--;
+    G[`est_${player}`][est]++;
+    G[`est_${p}`][est]--;
+    G[`est_${p}`][G.officeEst]++;
+    G.doOffice = false;
+    G.log.push(`\ttrade ${est_names[G.officeEst]} for ${est_names[est]} with #${p}`);
+    afterCommit(G);
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
+// --- State management --------------------------------------------------------
+
+export function canEndQ(G, ctx) {
+  return G.state === "buy" || G.state === "end";
+}
+
+function endTurn(G, ctx) {
+  const player = parseInt(ctx.currentPlayer);
+  if (canEndQ(G, ctx)) {
+    if (G.secondTurn) {
+      ctx.events.endTurn({next: player});
+    } else {
+      ctx.events.endTurn();
+    }
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
+function checkEndGame(G, ctx, p) {
+  // only done in `buyLand`
+  if (G[`land_${p}`].every( x => x)) {
+    G.log.push(`Game over. Winner: #${p}`);
+    ctx.events.endGame();
+  }
+}
+
+// --- Game --------------------------------------------------------------------
+
+export const gameName = "machikoro";
 
 export const Machikoro = {
 
-    name: "machikoro",
+  name: gameName,
 
-    setup: (ctx) => ({
-        state: "roll",
-        roll: -1,
-        repeat_turn: false,
-        do_tv: false,
-        do_office: false,
-        office_est: -1,
-        est_cost:       [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2],
-        est_remaining:  [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
-        est_buyable:    [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
-        land_cost:      [4, 10, 16, 22],
-        money:      Array(ctx.numPlayers).fill(3),
-        est_0:      Array(ctx.numPlayers).fill(1),
-        est_1:      Array(ctx.numPlayers).fill(0),
-        est_2:      Array(ctx.numPlayers).fill(1),
-        est_3:      Array(ctx.numPlayers).fill(0),
-        est_4:      Array(ctx.numPlayers).fill(0),
-        est_5:      Array(ctx.numPlayers).fill(0),
-        est_6:      Array(ctx.numPlayers).fill(0),
-        est_7:      Array(ctx.numPlayers).fill(0),
-        est_8:      Array(ctx.numPlayers).fill(0),
-        est_9:      Array(ctx.numPlayers).fill(0),
-        est_10:     Array(ctx.numPlayers).fill(0),
-        est_11:     Array(ctx.numPlayers).fill(0),
-        est_12:     Array(ctx.numPlayers).fill(0),
-        est_13:     Array(ctx.numPlayers).fill(0),
-        est_14:     Array(ctx.numPlayers).fill(0),
-        land_0:     Array(ctx.numPlayers).fill(false),
-        land_1:     Array(ctx.numPlayers).fill(false),
-        land_2:     Array(ctx.numPlayers).fill(false),
-        land_3:     Array(ctx.numPlayers).fill(false),
-        log: [],
-    }),
+  setup: (ctx, setupData) => {
+    const G = {
+      est_cost:   [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2],
+      est_supply: [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
+      est_total:  [6, 6, 6, 6, 6, 6, 4, 4, 4, 6, 6, 6, 6, 6, 6],
+      land_cost:  [4, 10, 16, 22],
+      money: Array(ctx.numPlayers).fill(3),
+      log: [],
+    };
+    for (let p=0; p<ctx.numPlayers; p++) {
+      G[`est_${p}`] =   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      G[`land_${p}`] =  [false, false, false, false];
+    }
+    return G;
+  },
 
-    turn: {
-        onBegin: (G, ctx) => {
-            G.state = "roll";
-            G.roll = -1;
-            G.repeat_turn = false;
-            G.do_tv = false;
-            G.do_office = false;
-            G.office_est = -1;
-            G.log.push(`Turn ${ctx.turn}: #${ctx.currentPlayer}`);
-            // if log is too long, trim
-            while (G.log.length > 100) {
-                G.log.shift();
-            }
-        }
+  validateSetupData: (setupData, numPlayers) => {
+    if (numPlayers < 2) return false;
+    if (numPlayers > 5) return false;
+  },
+
+  turn: {
+    onBegin: (G, ctx) => {
+      G.state = "roll";
+      G.roll = 0;
+      G.numRolls = 0;
+      G.doTV = false;
+      G.doOffice = false;
+      G.officeEst = null;
+      G.secondTurn = false;
+      G.log.push(`Turn ${ctx.turn}: #${ctx.currentPlayer}`);
+    }
+  },
+
+  moves: {
+    rollOne: {
+      move: rollOne,
+      undoable: false,
     },
-
-    moves: {
-        rollDice: {
-            move: rollDice,
-            undoable: false,
-        },
-        debugRoll,
-        commitRoll: {
-            move: commitRoll,
-            undoable: false,
-        },
-        buyEst,
-        buyLand,
-        doTV,
-        doOffice,
-        skip,
+    rollTwo: {
+      move: rollTwo,
+      undoable: false,
     },
+    debugRoll: {
+      move: debugRoll,
+      redact: true,
+    },
+    commitRoll: {
+      move: commitRoll,
+      undoable: false,
+    },
+    buyEst: buyEst,
+    buyLand: buyLand,
+    doTV: doTV,
+    doOffice1: doOffice1,
+    doOffice2: doOffice2,
+    endTurn: endTurn,
+  },
   
 };
-
-export const gameName = "machikoro";

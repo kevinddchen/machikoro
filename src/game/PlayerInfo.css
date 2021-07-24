@@ -1,0 +1,72 @@
+.coin_td {
+  position: relative;
+}
+
+.coin_img {
+  width: 25px;
+}
+
+.coin_num {
+  position: absolute;
+  text-align: center;
+  top: 5px;
+  width: 25px;
+  color: white;
+  font-size: 14px;
+}
+
+.land_td {
+  padding: 3px;
+}
+
+.name_div {
+  padding: 3px;
+}
+
+.name_div_on {
+  padding: 3px;
+  background-color: red;
+  cursor: pointer;
+}
+
+.name_text {
+  height: 25px;
+  width: 120px;
+  background: white;
+  overflow: hidden;
+}
+
+.land_td_on {
+  padding: 3px;
+  background-color: red;
+  cursor: pointer;
+}
+
+.land_img {
+  filter: grayscale(1);
+  width: 54px;
+  display: block;
+}
+
+.land_img_on {
+  width: 54px;
+  display: block;
+}
+
+.estmini_div {
+  display: flex;
+  justify-content: center;
+}
+
+.estmini_div_on {
+  display: flex;
+  justify-content: center;
+  background: red;
+  cursor: pointer;
+}
+
+
+.estmini_img {
+  width: 100px;
+  display: block;
+}

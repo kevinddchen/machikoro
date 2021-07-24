@@ -1,10 +1,9 @@
-import './index.css';
 import React from "react";
 import Matchmaker from './matchmaking/Matchmaker';
 import { Client } from "boardgame.io/react";
 import { SocketIO } from "boardgame.io/multiplayer"
 import { Machikoro } from "./game/Game";
-import { MachikoroBoard } from "./game/Board";
+import MachikoroBoard  from "./game/Board";
 
 class App extends React.Component {
   constructor(props) {
@@ -20,7 +19,6 @@ class App extends React.Component {
   }
 
   startMatch = (matchID, playerID, credentials) => {
-    console.log("here");
     this.setState({ matchID, playerID, credentials });
   };
 
