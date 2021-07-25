@@ -11,7 +11,8 @@ class Lobby extends React.Component {
       name: '',
       numPlayers: 4,
       matchList: null, // {matchID: string, currPlayers: number, numPlayers: number}
-      supplyVariant: 'var',
+      expansion: 'base',
+      supplyVariant: 'variable',
     };
     this.matchCounts = null; // number[]
     this.interval = null;
@@ -25,6 +26,10 @@ class Lobby extends React.Component {
   setNumPlayers = (e) => {
     this.setState({numPlayers: parseInt(e.target.value)});
   };
+
+  setExpansion = (e) => {
+    this.setState({expansion: e.target.value});
+  }
 
   setSupplyVariant = (e) => {
     this.setState({supplyVariant: e.target.value});
@@ -44,10 +49,12 @@ class Lobby extends React.Component {
       if (checkDifferent(newMatchCounts, this.matchCounts)) {
         const newMatchList = [];
         for (let i=0; i<matches.length; i++) {
+          const { matchID, players, setupData } = matches[i]
           newMatchList.push({
-            matchID: matches[i].matchID, 
+            matchID, 
             currPlayers: newMatchCounts[i],
-            numPlayers: matches[i].players.length
+            numPlayers: players.length,
+            setupData,
           });
         }
         this.setState({matchList: newMatchList});
@@ -67,7 +74,7 @@ class Lobby extends React.Component {
   // --- Match management ------------------------------------------------------
 
   createMatch = async () => {
-    const { name, numPlayers, supplyVariant } = this.state;
+    const { name, numPlayers, expansion, supplyVariant } = this.state;
 
     if (name.length === 0) {
       this.props.setErrorMessage("Please enter a name.");
@@ -77,7 +84,7 @@ class Lobby extends React.Component {
       //const setupData = {supplyVariant: supplyVariant};
       const { matchID } = await this.props.lobbyClient.createMatch(gameName, {
         numPlayers,
-        setupData: {supplyVariant},
+        setupData: {expansion, supplyVariant, startCoins: 3},
       });
       console.log(`Created match '${matchID}'.`);
       await this.joinMatch(matchID);
@@ -150,13 +157,14 @@ class Lobby extends React.Component {
 
   componentDidMount() {
     const { updateInterval } = this.props;
-    const { name, numPlayers, supplyVariant } = this.state;
+    const { name, numPlayers, expansion, supplyVariant } = this.state;
 
     this.fetchMatches();
     this.interval = setInterval(this.fetchMatches, updateInterval); 
     // set default values
     document.getElementById("input_name").value = name;
     document.getElementById("input_numPlayers").value = numPlayers;
+    document.getElementById("input_expansion").value = expansion;
     document.getElementById("input_supplyVariant").value = supplyVariant;
   }
 
@@ -183,10 +191,11 @@ class Lobby extends React.Component {
         <tr key={-1}>
           <th className="col_matchid">Match ID</th>
           <th className="col_seats">Seats</th>
+          <th className="col_setup">Setup</th>
         </tr>
       );
       for (let i=0; i<matchList.length; i++) {
-        const { matchID, currPlayers, numPlayers } = matchList[i];
+        const { matchID, currPlayers, numPlayers, setupData } = matchList[i];
         let button;
         if (this.hasCredentials(matchID)) {
           button = <button onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
@@ -199,6 +208,7 @@ class Lobby extends React.Component {
           <tr key={i}>
             <td>{matchID}</td>
             <td>{currPlayers}/{numPlayers}</td>
+            <td>({setupData.expansion}, {setupData.supplyVariant})</td>
             <td>{button}</td>
           </tr>
         );
@@ -223,23 +233,30 @@ class Lobby extends React.Component {
           />
         </div>
         <div className="padded_div">
-          <button onClick={this.createMatch}>Create Match</button>
-          &nbsp;Players:&nbsp;
           <select 
             id="input_numPlayers"
             onChange={this.setNumPlayers}>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            <option value="2">2 players</option>
+            <option value="3">3 players</option>
+            <option value="4">4 players</option>
+            <option value="5">5 players</option>
           </select>
-          &nbsp;Supply Variant:&nbsp;
+          &nbsp;
+          <select 
+            id="input_expansion"
+            onChange={this.setExpansion}>
+            <option value="base">Base Game</option>
+            <option value="harbor">Harbor Expansion</option>
+          </select>
+          &nbsp;
           <select 
             id="input_supplyVariant"
             onChange={this.setSupplyVariant}>
-            <option value="var">Variable</option>
-            <option value="tot">Total</option>
+            <option value="variable">Variable Supply</option>
+            <option value="total">Total Supply</option>
           </select>
+          &nbsp;
+          <button onClick={this.createMatch}>Create Match</button>
         </div>
         <div className="padded_div">
           <table><tbody>{this.renderMatchList()}</tbody></table>

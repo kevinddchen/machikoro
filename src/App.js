@@ -1,3 +1,4 @@
+import './App.css';
 import React from "react";
 import Matchmaker from './matchmaking/Matchmaker';
 import { Client } from "boardgame.io/react";
@@ -51,10 +52,17 @@ class App extends React.Component {
       return (
         <div>
           { process.env.NODE_ENV === 'development' ?
-            <button onClick={this.startDebug}>DEBUG</button>
+            <div className="padded_div">
+              <button onClick={this.startDebug}>
+                DEBUG
+              </button>
+            </div>
             : 
             null
           }
+          <div className="title">
+            Machikoro
+          </div>
           <Matchmaker 
             serverOrigin={this.serverOrigin}
             start={this.startMatch}/>

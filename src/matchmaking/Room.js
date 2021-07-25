@@ -9,6 +9,7 @@ class Room extends React.Component {
     super(props);
     this.state = {
       playerList: [], // string[]
+      expansion: '',
       supplyVariant: '',
     }
     this.interval = null;
@@ -40,9 +41,11 @@ class Room extends React.Component {
         return;
       }
       if (checkDifferent(newPlayerList, this.state.playerList)) {
+        const { expansion, supplyVariant } = match.setupData;
         this.setState({
           playerList: newPlayerList,
-          supplyVariant: match.setupData.supplyVariant,
+          expansion,
+          supplyVariant,
         });
       }
     } catch(e) {
@@ -111,17 +114,14 @@ class Room extends React.Component {
 
   render() {
     const { matchID } = this.props;
-    const { supplyVariant } = this.state;
-
-    let supplyVariantName = '';
-    if (supplyVariant === 'var' ) supplyVariantName = "Variable";
-    if (supplyVariant === 'tot' ) supplyVariantName = "Total";
+    const { expansion, supplyVariant } = this.state;
 
     return (
       <div>
         <div className="padded_div">
           <div>In match ({matchID}).</div>
-          <div>Supply variant: {supplyVariantName}</div>
+          <div>- Expansion: {expansion}</div>
+          <div>- Supply variant: {supplyVariant}</div>
           <div>Game will start when seats are filled.</div>
         </div>
         <div className="padded_div">
