@@ -1,12 +1,14 @@
 import './PlayerInfo.css';
 import React from 'react';
 import classNames from 'classnames';
+import { est_order } from './Establishments';
 
 class PlayerInfo extends React.Component {
 
   render() {
 
     const {
+      player,
       p, 
       money, 
       name, 
@@ -20,15 +22,19 @@ class PlayerInfo extends React.Component {
       doOffice,
     } = this.props;
 
+    const land_img = "land_img" + (p === player ? "_self" : "");
+    const estmini_div = "estmini_div" + (p === player ? "_self" : "");
+
     const minis = []
-    for (let est=0; est<15; est++) {
-      for (let i=0; i<est_p[est]; i++) {
+    for (let i=0; i<25; i++) {
+      const { est, mini } = est_order[i];
+      for (let count=0; count<est_p[est]; count++) {
         minis.push(
-          <div key={`${est}_${i}`} 
-            className={classNames("estmini_div", {"active": canDoOffice(p, est)})}
+          <div key={`${est}_${count}`} 
+            className={classNames(estmini_div, {"active": canDoOffice(p, est)})}
             onClick={() => doOffice(p, est)}
           >
-            <img className="estmini_img" src={`./assets/est${est}_mini.png`} alt=""/>
+            <img className="estmini_img" src={`./assets/${mini}`} alt=""/>
           </div>
         );
       }
@@ -46,22 +52,22 @@ class PlayerInfo extends React.Component {
         <table><tbody>
           <tr>
             <td className={classNames("land_td", {"active": canBuyLand(p, 0)})} onClick={() => buyLand(p, 0)}>
-              <img className={classNames("land_img", {"inactive": !land_p[0]})} src="./assets/land0.gif" alt=""/>
+              <img className={classNames(land_img, {"inactive": !land_p[0]})} src="./assets/land0.gif" alt=""/>
             </td>
             <td className={classNames("land_td", {"active": canBuyLand(p, 1)})} onClick={() => buyLand(p, 1)}>
-              <img className={classNames("land_img", {"inactive": !land_p[1]})} src="./assets/land1.gif" alt=""/>
+              <img className={classNames(land_img, {"inactive": !land_p[1]})} src="./assets/land1.gif" alt=""/>
             </td>
           </tr>
           <tr>
             <td className={classNames("land_td", {"active": canBuyLand(p, 2)})} onClick={() => buyLand(p, 2)}>
-              <img className={classNames("land_img", {"inactive": !land_p[2]})} src="./assets/land2.gif" alt=""/>
+              <img className={classNames(land_img, {"inactive": !land_p[2]})} src="./assets/land2.gif" alt=""/>
             </td>
             <td className={classNames("land_td", {"active": canBuyLand(p, 3)})} onClick={() => buyLand(p, 3)}>
-              <img className={classNames("land_img", {"inactive": !land_p[3]})} src="./assets/land3.gif" alt=""/>
+              <img className={classNames(land_img, {"inactive": !land_p[3]})} src="./assets/land3.gif" alt=""/>
             </td>
           </tr>
         </tbody></table>
-        {minis}
+        <div>{minis}</div>
       </td>
     );
 

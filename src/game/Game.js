@@ -1,12 +1,6 @@
 import { PlayerView, INVALID_MOVE } from 'boardgame.io/core';
 import { est_names, land_names } from './text';
 
-/**
- * TODO List:
- * - Add info window with descriptions
- * - !Add expansion cards!
- */
-
 // --- State: roll -------------------------------------------------------------
 
 export function canRollQ(G, ctx, n) {
@@ -60,8 +54,8 @@ function commitRoll(G, ctx) {
   }
   const player = parseInt(ctx.currentPlayer),
         N = ctx.numPlayers,
-        backwards = [], // players in backward order
-        forwards = [player]; // players in forward order
+        backwards = [], // players in backward order, excluding current player
+        forwards = [player]; // players in forward order, starting with current player
   for (let i=1; i<N; i++)  {
       backwards.push(((player-i)%N + N)%N); // JS modulo is negative
       forwards.push((player+i)%N);
@@ -69,11 +63,14 @@ function commitRoll(G, ctx) {
 
   switch (G.roll) {
     case 1:
-      forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][0])); // wheat
+      backwards.forEach( (p) => {
+        if (G[`land_${p}`][5]) take(G, player, p, (G[`land_${p}`][1] ? 4 : 3)*G[`est_${p}`][15]) // sushi bar
+      }); 
+      forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][0])); // wheat field
       break;
     case 2:
       forwards.forEach( (p) => {
-        let amount = 1*G[`est_${p}`][1]; // livestock
+        let amount = 1*G[`est_${p}`][1]; // livestock farm
         if (p === player) amount += (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][2]; // bakery
         earn(G, p, amount);
       });
@@ -83,25 +80,44 @@ function commitRoll(G, ctx) {
       earn(G, player, (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][2]); // bakery
       break;
     case 4:
-      earn(G, player, (G[`land_${player}`][1] ? 4 : 3)*G[`est_${player}`][4]); // convenience store
+      forwards.forEach( (p) => {
+        let amount = 1*G[`est_${p}`][16]; // flower orchard
+        if (p === player) amount += (G[`land_${player}`][1] ? 4 : 3)*G[`est_${player}`][4]; // convenience store
+        earn(G, p, amount);
+      });
       break;
     case 5:
       forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][5])); // forest
       break;
     case 6:
+      earn(G, player, (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][17]*G[`est_${player}`][16]) // flower shop
       if (G[`est_${player}`][6] > 0) backwards.forEach( (p) => take(G, p, player, 2)); // stadium
-      if (G[`est_${player}`][7] > 0) G.doTV = true;
-      if (G[`est_${player}`][8] > 0) G.doOffice = true;
+      if (G[`est_${player}`][7] > 0) G.doTV = true; // TV station
+      if (G[`est_${player}`][8] > 0) G.doOffice = true; // office
       break;
     case 7:
-      earn(G, player, 3*G[`est_${player}`][9]*G[`est_${player}`][1]); // cheese factory
+      backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 2 : 1)*G[`est_${p}`][18])); // pizza joint
+      earn(G, player, 3*G[`est_${player}`][9]*countAnimal(G, player)); // cheese factory
+      if (G[`est_${player}`][19] > 0) 
+        backwards.forEach( (p) => take(G, p, player, countCup(G, p)+countBread(G, p) )); // publisher
       break;
     case 8:
-      earn(G, player, 3*G[`est_${player}`][10]*(G[`est_${player}`][5] + G[`est_${player}`][11])); // furniture factory
+      backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 2 : 1)*G[`est_${p}`][21])); // hamburger stand
+      forwards.forEach( (p) => {
+        let amount = (G[`land_${p}`][5] ? 3 : 0)*G[`est_${p}`][20]; // mackerel boat
+        if (p === player) amount += 3*G[`est_${player}`][10]*countGear(G, player); // furniture factory
+        earn(G, p, amount);
+      });
+      if (G[`est_${player}`][22] > 0) backwards.forEach( (p) => {
+        if (G.money[p] >= 10) take(G, player, p, Math.floor(G.money[p]/2)); // tax office
+      });
       break;
     case 9:
       backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 3 : 2)*G[`est_${p}`][12])); // restaurant
       forwards.forEach( (p) => earn(G, p, 5*G[`est_${p}`][11])); // mine
+      if (G[`est_${player}`][22] > 0) backwards.forEach( (p) => {
+        if (G.money[p] >= 10) take(G, player, p, Math.floor(G.money[p]/2)); // tax office
+      });
       break;
     case 10:
       backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 3 : 2)*G[`est_${p}`][12])); // restaurant
@@ -109,10 +125,21 @@ function commitRoll(G, ctx) {
       break;
     case 11:
     case 12:
-      earn(G, player, 2*G[`est_${player}`][14]*(G[`est_${player}`][0] + G[`est_${player}`][13])); // produce market
+    case 13:
+    case 14:
+      forwards.forEach( (p) => {
+        let amount = 0;
+        if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0)
+          amount += ctx.random.Die(6, 2).reduce( (a, b) => a+b )*G[`est_${p}`][23]; // tuna boat
+        if (p === player && [11, 12].includes(G.roll)) 
+          amount += 2*G[`est_${player}`][14]*countPlant(G, player) // produce market
+        if (p === player && [12, 13].includes(G.roll))
+          amount += 2*G[`est_${player}`][24]*countCup(G, player) // food warehouse
+        earn(G, p, amount);
+      });
       break;
     default:
-      break;
+      return INVALID_MOVE;
   }
   afterCommit(G);
 }
@@ -131,6 +158,31 @@ function take(G, from, to, amount) {
     G.money[to] += max;
     G.log.push(`\t#${from} pays #${to} ${amount} $`);
   }
+}
+
+function countCup(G, p) {
+  const ests = G[`est_${p}`];
+  return ests[3] + ests[12] + ests[15] + ests[18] + ests[21];
+}
+
+function countBread(G, p) {
+  const ests = G[`est_${p}`];
+  return ests[2] + ests[4] + ests[17];
+}
+
+function countAnimal(G, p) {
+  const ests = G[`est_${p}`];
+  return ests[1];
+}
+
+function countGear(G, p) {
+  const ests = G[`est_${p}`];
+  return ests[5] + ests[11];
+}
+
+function countPlant(G, p) {
+  const ests = G[`est_${p}`];
+  return ests[0] + ests[13] + ests[16];
 }
 
 function afterCommit(G) {
@@ -216,7 +268,7 @@ export function canDoOffice1Q(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
   return (
     G.state === "office1" &&
-    ![6, 7, 8].includes(est) &&
+    ![6, 7, 8, 19, 22].includes(est) &&
     G[`est_${player}`][est] > 0
   );
 }
@@ -235,7 +287,7 @@ export function canDoOffice2Q(G, ctx, p, est) {
   return (
     G.state === "office2" &&
     p !== player && 
-    ![6, 7, 8].includes(est) &&
+    ![6, 7, 8, 19, 22].includes(est) &&
     G[`est_${p}`][est] > 0
   );
 }
@@ -301,8 +353,9 @@ function replenishSupply(G, ctx) {
 
 export const gameName = "machikoro";
 
-const defaultSetupData = {
-  supplyVariant: "var",
+const debugSetupData = {
+  supplyVariant: "tot",
+  startCoins: 100,
 };
 
 export const Machikoro = {
@@ -310,19 +363,24 @@ export const Machikoro = {
   name: gameName,
 
   setup: (ctx, setupData) => {
+    if (!setupData) setupData = debugSetupData;
+    const { supplyVariant, startCoins } = setupData;
     const n = ctx.numPlayers;
     const G = {
-      est_cost:   [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2],
-      est_supply: Array(15).fill(0),
-      est_total:  [6, 6, 6, 6, 6, 6, n, n, n, 6, 6, 6, 6, 6, 6],
-      land_cost:  [4, 10, 16, 22],
-      money: Array(n).fill(100),
+      est_cost:   [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2,
+                   2, 2, 1, 1, 5, 2, 1, 4, 5, 2],
+      est_supply: Array(25).fill(0),
+      est_total:  [6, 6, 6, 6, 6, 6, n, n, n, 6, 6, 6, 6, 6, 6,
+                   6, 6, 6, 6, n, 6, 6, n, 6, 6],
+      land_cost:  [4, 10, 16, 22, 0, 2, 30],
+      money:      Array(n).fill(startCoins),
       log: [],
     };
     // starting establishments
     for (let p=0; p<ctx.numPlayers; p++) {
-      G[`est_${p}`] =   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      G[`land_${p}`] =  [false, false, false, false];
+      G[`est_${p}`] =   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      G[`land_${p}`] =  [false, false, false, false, true, false, false];
     }
     // shuffle deck; this is stripped from G given to players
     G.secret = [];
@@ -330,9 +388,7 @@ export const Machikoro = {
       G.secret = G.secret.concat(Array(G.est_total[est]).fill(est));
     }
     G.secret = ctx.random.Shuffle(G.secret);
-    // additional setup
-    if (!setupData) setupData = defaultSetupData;
-    const { supplyVariant } = setupData;
+    // supply variant
     if (supplyVariant === "tot") G.numReplenish = 100; // set to large number
     if (supplyVariant === "var") G.numReplenish = 10;
 
@@ -341,8 +397,9 @@ export const Machikoro = {
 
   validateSetupData: (setupData, numPlayers) => {
     if (setupData) {
-      const { supplyVariant } = setupData;
+      const { supplyVariant, startCoins } = setupData;
       if (!["tot", "var"].includes(supplyVariant)) return false;
+      if (startCoins !== 3) return false; 
     }
     if (numPlayers < 2) return false;
     if (numPlayers > 5) return false;

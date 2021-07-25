@@ -57,6 +57,7 @@ class MachikoroBoard extends React.Component {
       playerInfoList.push(
         <PlayerInfo 
           key={p}
+          player={parseInt(this.props.playerID)}
           p={p}
           money={G.money[p]}
           name={this.names[p]}

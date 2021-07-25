@@ -33,23 +33,42 @@
 }
 
 .name_text {
-  height: 25px;
-  width: 120px;
+  width: 80px;
   background: white;
   overflow: hidden;
+  font-size: 10pt;
 }
 
-.land_img {
-  width: 54px;
+.land_img_self {
+  width: 70px;
   display: block;
 }
 
+.land_img {
+  width: 35px;
+  display: block;
+}
+
+.estmini_div_self {
+  width: 100px;
+  margin: 0 auto;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
 .estmini_div {
-  display: flex;
-  justify-content: center;
+  width: 80px;
+  margin: 0 auto;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.estmini_img_self {
+  width: 100%;
+  display: block;
 }
 
 .estmini_img {
-  width: 100px;
+  width: 100%;
   display: block;
 }

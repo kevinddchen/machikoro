@@ -77,7 +77,7 @@ class Lobby extends React.Component {
       //const setupData = {supplyVariant: supplyVariant};
       const { matchID } = await this.props.lobbyClient.createMatch(gameName, {
         numPlayers,
-        setupData: {supplyVariant},
+        setupData: {supplyVariant, startCoins: 3},
       });
       console.log(`Created match '${matchID}'.`);
       await this.joinMatch(matchID);
