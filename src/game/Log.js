@@ -13,16 +13,16 @@ class Log extends React.Component {
 
   render() {
 
-    const { gamelog } = this.props;
+    const { log } = this.props;
 
-    // replace '$' with coin emoji
-    // parse player names, which are searched by a '#'
+    
+    
     const logBody = [];
-    for (let i=0; i<gamelog.length; i++) {
-      let line = gamelog[i];
-      line = line.replace(/\$/g, "\uD83D\uDFE4");
-      line = line.replace(/#./g, this.parseName);
-      logBody.push(<div className="log_div">{line}</div>);
+    for (let i=0; i<log.length; i++) {
+      let { id, msg } = log[i];
+      msg = msg.replace(/\$/g, "\uD83D\uDFE4"); // replace '$' with coin emoji
+      msg = msg.replace(/#./g, this.parseName); // parse player names, which are searched by a '#'
+      logBody.push(<div key={id} className="log_div">{msg}</div>);
     }
 
     return (

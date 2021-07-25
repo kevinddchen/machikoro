@@ -3,11 +3,16 @@
 }
 
 .col_matchid {
-  width: 14ch;
+  min-width: 12ch;
   text-align: left;
 }
 
 .col_seats {
-  width: 5ch;
+  min-width: 5ch;
+  text-align: left;
+}
+
+.col_setup {
+  min-width: 12ch;
   text-align: left;
 }

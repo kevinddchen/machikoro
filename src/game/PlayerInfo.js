@@ -1,6 +1,7 @@
 import './PlayerInfo.css';
 import React from 'react';
 import classNames from 'classnames';
+import StackTable from './StackTable';
 import { est_order, land_order } from './meta';
 
 class PlayerInfo extends React.Component {
@@ -12,10 +13,11 @@ class PlayerInfo extends React.Component {
       p, 
       money, 
       name, 
-      canBuyLand, 
-      buyLand, 
+      land_use,
       land_p, 
       est_p, 
+      canBuyLand, 
+      buyLand, 
       canDoTV,
       doTV,
       canDoOffice,
@@ -25,12 +27,31 @@ class PlayerInfo extends React.Component {
     const land_img = "land_img" + (p === playerID ? "_self" : "");
     const estmini_div = "estmini_div" + (p === playerID ? "_self" : "");
 
+    // landmarks
+    const Table = new StackTable(2);
+    for (let i=0; i<land_order.length; i++) {
+      const { land, img_path } = land_order[i];
+      if (land_use[land])
+        Table.push(
+          <td key={i} 
+            className={classNames("land_td", {"active": canBuyLand(p, land)})} 
+            onClick={() => buyLand(p, land)}
+          >
+            <img className={classNames(land_img, {"inactive": !land_p[land]})} 
+              src={`./assets/${img_path}`}
+              alt=""
+            />
+          </td>
+        ); 
+    }
+
+    // establishment miniatures
     const minis = []
-    for (let i=0; i<25; i++) {
+    for (let i=0; i<est_order.length; i++) {
       const { est, mini } = est_order[i];
       for (let count=0; count<est_p[est]; count++) {
         minis.push(
-          <div key={`${est}_${count}`} 
+          <div key={`${i}_${count}`} 
             className={classNames(estmini_div, {"active": canDoOffice(p, est)})}
             onClick={() => doOffice(p, est)}
           >
@@ -38,27 +59,6 @@ class PlayerInfo extends React.Component {
           </div>
         );
       }
-    }
-
-    const tbody = [];
-    for (let row=0; row<3; row++) {
-      const tr = [];
-      for (let col=0; col<2; col++) {
-        const i = row*2 + col;
-        const { land, name } = land_order[i];
-        tr.push(
-          <td key={col} 
-            className={classNames("land_td", {"active": canBuyLand(p, land)})} 
-            onClick={() => buyLand(p, land)}
-          >
-            <img className={classNames(land_img, {"inactive": !land_p[land]})} 
-              src={`./assets/${name}`}
-              alt=""
-            />
-          </td>
-        );
-      }
-      tbody.push(<tr key={row}>{tr}</tr>);
     }
 
     return (
@@ -70,7 +70,7 @@ class PlayerInfo extends React.Component {
         <div className={classNames("name_div", {"active": canDoTV(p)})} onClick={() => doTV(p)}>
           <div className="name_text">{name}</div>
         </div>
-        <table><tbody>{tbody}</tbody></table>
+        {Table.render()}
         <div>{minis}</div>
       </td>
     );

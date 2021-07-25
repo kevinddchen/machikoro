@@ -7,8 +7,8 @@ export function canRollQ(G, ctx, n) {
   const player = parseInt(ctx.currentPlayer);
   return (
     G.state === "roll" && 
-    (G.numRolls === 0 || (G.numRolls === 1 && G[`land_${player}`][3])) && // radio tower
-    ( n === 2 ? G[`land_${player}`][0] : true) 
+    (n === 1 || (n === 2 && G[`land_${player}`][0])) && // train station 
+    (G.numRolls === 0 || (G.numRolls === 1 && G[`land_${player}`][3])) // radio tower
   );
 }
 
@@ -17,7 +17,7 @@ function rollOne(G, ctx) {
   if (canRollQ(G, ctx, 1)) {
     G.roll = ctx.random.Die(6);
     G.numRolls++;
-    G.log.push(`\troll ${G.roll}`);
+    log(G, `\troll ${G.roll}`);
   } else {
     return INVALID_MOVE;
   }
@@ -28,20 +28,21 @@ function rollTwo(G, ctx) {
   const player = parseInt(ctx.currentPlayer);
   if (canRollQ(G, ctx, 2)) {
     const dice = ctx.random.Die(6, 2);
-    if (G[`land_${player}`][2]) G.secondTurn = (dice[0] === dice[1]); // amusement park
+    if (G[`land_${player}`][2]) 
+      G.secondTurn = (dice[0] === dice[1]); // amusement park
     G.roll = dice.reduce( (a, b) => a+b );
     G.numRolls++;
-    G.log.push(`\troll ${G.roll} (${dice})`);
+    log(G, `\troll ${G.roll} (${dice})`);
   } else {
     return INVALID_MOVE;
   }
 }
 
-// Force roll outcome; move is removed in production.
+// Force roll outcome; this move is removed in production.
 function debugRoll(G, ctx, roll) {
   G.roll = roll;
   G.numRolls++;
-  G.log.push(`\tdebug roll ${G.roll}`);
+  log(G, `\tdebug roll ${G.roll}`);
 }
 
 // --- Commit roll -------------------------------------------------------------
@@ -135,7 +136,7 @@ function commitRoll(G, ctx) {
         if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0) {
           let roll = ctx.random.Die(6, 2).reduce( (a, b) => a+b );
           amount += roll*G[`est_${p}`][23]; // tuna boat
-          G.log.push(`\t(tuna boat roll: ${roll})`);
+          log(G, `\t(tuna boat roll: ${roll})`);
         }
         if (p === player && [11, 12].includes(G.roll)) 
           amount += 2*G[`est_${player}`][14]*countPlant(G, player) // produce market
@@ -154,7 +155,7 @@ function commitRoll(G, ctx) {
 function earn(G, to, amount) {
   if (amount > 0) {
     G.money[to] += amount;
-    G.log.push(`\t#${to} earns ${amount} $`);
+    log(G, `\t#${to} earns ${amount} $`);
   }
 }
 
@@ -164,7 +165,7 @@ function take(G, from, to, amount) {
   if (max > 0) {
     G.money[from] -= max;
     G.money[to] += max;
-    G.log.push(`\t#${from} pays #${to} ${amount} $`);
+    log(G, `\t#${from} pays #${to} ${amount} $`);
   }
 }
 
@@ -217,7 +218,7 @@ export function canAddTwoQ(G, ctx) {
 function addTwo(G, ctx) {
   if (canAddTwoQ(G, ctx)) {
     G.roll += 2;
-    G.log.push(`\tchange roll to ${G.roll}`);
+    log(G, `\tchange roll to ${G.roll}`);
     commitRoll(G, ctx);
   } else {
     return INVALID_MOVE;
@@ -230,8 +231,11 @@ export function canBuyEstQ(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
   const buyable = (
     G.state === "buy" && 
+    G.est_use[est] && 
     G.est_supply[est] > 0 && 
-    (G.money[player] >= G.est_cost[est] || (G.money[player] === 0 && G.est_cost[est] === 1)) // city hall
+    ((G.money[player] >= G.est_cost[est]) || 
+     (G[`land_${player}`][4] && G.money[player] === 0 && G.est_cost[est] === 1) // city hall
+    ) 
   );
   if ([6, 7, 8, 19, 22].includes(est)) {
     return (buyable && G[`est_${player}`][est] === 0);
@@ -249,7 +253,7 @@ function buyEst(G, ctx, est) {
     G.est_total[est]--;
     G[`est_${player}`][est]++;
     G.state = "end";
-    G.log.push(`\tbuy ${est_names[est]}`);
+    log(G, `\tbuy ${est_names[est]}`);
   } else {
     return INVALID_MOVE;
   }
@@ -259,6 +263,7 @@ export function canBuyLandQ(G, ctx, land) {
   const player = parseInt(ctx.currentPlayer);
   return (
     G.state === "buy" && 
+    G.land_use[land] && 
     !G[`land_${player}`][land] &&
     G.money[player] >= G.land_cost[land]
   );
@@ -271,7 +276,7 @@ function buyLand(G, ctx, land) {
     G.money[player] -= G.land_cost[land];
     G[`land_${player}`][land] = true;
     G.state = "end";
-    G.log.push(`\tbuy ${land_names[land]}`);
+    log(G, `\tbuy ${land_names[land]}`);
     checkEndGame(G, ctx, player);
   } else {
     return INVALID_MOVE;
@@ -335,7 +340,7 @@ function doOffice2(G, ctx, p, est) {
     G[`est_${p}`][est]--;
     G[`est_${p}`][G.officeEst]++;
     G.doOffice = false;
-    G.log.push(`\ttrade ${est_names[G.officeEst]} for ${est_names[est]} with #${p}`);
+    log(G, `\ttrade ${est_names[G.officeEst]} for ${est_names[est]} with #${p}`);
     afterCommit(G);
   } else {
     return INVALID_MOVE;
@@ -363,11 +368,21 @@ function endTurn(G, ctx) {
   }
 }
 
-// end-of-game only check in `buyLand`
+// end-of-game only checked in `buyLand`
 function checkEndGame(G, ctx, p) {
-  if (G[`land_${p}`].every( x => x)) {
-    G.log.push(`Game over. Winner: #${p}`);
-    ctx.events.endGame();
+  for (let land=0; land<G.land_use.length; land++) {
+    if (G.land_use[land] && !G[`land_${p}`][land])
+      return;
+  }
+  log(G, `Game over. Winner: #${p}`);
+  ctx.events.endGame();
+}
+
+function log(G, msg) {
+  G.log.push({id: G.log_i, msg});
+  G.log_i++;
+  while (G.log.length > 200) {
+    G.log.shift();
   }
 }
 
@@ -390,9 +405,11 @@ function replenishSupply(G, ctx) {
 
 export const gameName = "machikoro";
 
+// set-up to use in debug mode
 const debugSetupData = {
-  supplyVariant: "tot",
-  startCoins: 100,
+  expansion: "harbor",
+  supplyVariant: "total",
+  startCoins: 99,
 };
 
 export const Machikoro = {
@@ -401,41 +418,56 @@ export const Machikoro = {
 
   setup: (ctx, setupData) => {
     if (!setupData) setupData = debugSetupData;
-    const { supplyVariant, startCoins } = setupData;
+    const { expansion, supplyVariant, startCoins } = setupData;
+
     const n = ctx.numPlayers;
     const G = {
-      est_cost:   [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2,
+      est_cost:   [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2, // cost of each establishment
                    2, 2, 1, 1, 5, 2, 1, 4, 5, 2],
-      est_supply: Array(25).fill(0),
-      est_total:  [6, 6, 6, 6, 6, 6, n, n, n, 6, 6, 6, 6, 6, 6,
+      est_supply: Array(25).fill(0), // number of each establishment available to buy
+      est_total:  [6, 6, 6, 6, 6, 6, n, n, n, 6, 6, 6, 6, 6, 6, // total copies of each establishment
                    6, 6, 6, 6, n, 6, 6, n, 6, 6],
-      land_cost:  [4, 10, 16, 22, 0, 2, 30],
+      land_cost:  [4, 10, 16, 22, 0, 2, 30], // cost of each landmark
       money:      Array(n).fill(startCoins),
       log: [],
+      log_i: 0,
     };
     // starting establishments
-    for (let p=0; p<ctx.numPlayers; p++) {
-      G[`est_${p}`] =   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    for (let p=0; p<n; p++) {
+      G[`est_${p}`] =   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // each player's establishments
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      G[`land_${p}`] =  [false, false, false, false, true, false, false];
+      G[`land_${p}`] =  Array(7).fill(false); // each player's landmarks
     }
-    // shuffle deck; this is stripped from G given to players
+    // expansion
+    if (expansion === "base") {
+      G.est_use = Array(15).fill(true).concat(Array(10).fill(false)); // use establishment in this game?
+      G.land_use = Array(4).fill(true).concat(Array(3).fill(false)); // use landmark in this game?
+    } else if (expansion === "harbor") {
+      G.est_use = Array(25).fill(true);
+      G.land_use = Array(7).fill(true);
+      for (let p=0; p<n; p++) {
+        G[`land_${p}`][4] = true; // each player starts with city hall
+      }
+    }
+    // shuffle deck; secret is stripped from the G given to players
     G.secret = [];
-    for (let est=0; est<G.est_total.length; est++) {
-      G.secret = G.secret.concat(Array(G.est_total[est]).fill(est));
+    for (let est=0; est<G.est_use.length; est++) {
+      if (G.est_use[est])
+        G.secret = G.secret.concat(Array(G.est_total[est]).fill(est));
     }
     G.secret = ctx.random.Shuffle(G.secret);
     // supply variant
-    if (supplyVariant === "tot") G.numReplenish = 100; // set to large number
-    if (supplyVariant === "var") G.numReplenish = 10;
+    if (supplyVariant === "total") G.numReplenish = G.est_use.length + 1;
+    if (supplyVariant === "variable") G.numReplenish = 10;
 
     return G;
   },
 
   validateSetupData: (setupData, numPlayers) => {
     if (setupData) {
-      const { supplyVariant, startCoins } = setupData;
-      if (!["tot", "var"].includes(supplyVariant)) return false;
+      const { expansion, supplyVariant, startCoins } = setupData;
+      if (!["base", "harbor"].includes(expansion)) return false;
+      if (!["total", "variable"].includes(supplyVariant)) return false;
       if (startCoins !== 3) return false; 
     }
     if (numPlayers < 2) return false;
@@ -452,7 +484,7 @@ export const Machikoro = {
       G.doOffice = false;
       G.officeEst = null;
       G.secondTurn = false;
-      G.log.push(`Turn ${ctx.turn}: #${ctx.currentPlayer}`);
+      log(G, `Turn ${ctx.turn}: #${ctx.currentPlayer}`);
     }
   },
 

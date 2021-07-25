@@ -63,10 +63,11 @@ class MachikoroBoard extends React.Component {
           p={p}
           money={G.money[p]}
           name={this.names[p]}
-          canBuyLand={canBuyLand}
-          buyLand={(p, land) => p === player && moves.buyLand(land)}
+          land_use={G.land_use}
           land_p={G[`land_${p}`]}
           est_p={G[`est_${p}`]}
+          canBuyLand={canBuyLand}
+          buyLand={(p, land) => p === player && moves.buyLand(land)}
           canDoTV={canDoTV}
           doTV={(p) => moves.doTV(p)}
           canDoOffice={canDoOffice}
@@ -94,6 +95,7 @@ class MachikoroBoard extends React.Component {
                 undo={() => this.props.undo()}
               />
               <Establishments 
+                est_use={G.est_use}
                 est_supply={G.est_supply}
                 est_total={G.est_total}
                 canBuyEst={canBuyEst}
@@ -103,7 +105,7 @@ class MachikoroBoard extends React.Component {
             {playerInfoList}
             <td>
               <Log 
-                gamelog={G.log}
+                log={G.log}
                 names={this.names}
               />
             </td>
