@@ -2,13 +2,12 @@
   background-color: red;
 }
 
-.buttons_button {
-  width: 72px;
-  display: block;
+.hide {
+  display: none;
 }
 
-.buttons_hide {
-  display: none;
+.buttons_button {
+  width: 72px;
 }
 
 .buttons_td {

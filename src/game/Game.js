@@ -1,5 +1,5 @@
 import { PlayerView, INVALID_MOVE } from 'boardgame.io/core';
-import { est_names, land_names } from './text';
+import { est_names, land_names } from './meta';
 
 // --- State: roll -------------------------------------------------------------
 
@@ -7,11 +7,12 @@ export function canRollQ(G, ctx, n) {
   const player = parseInt(ctx.currentPlayer);
   return (
     G.state === "roll" && 
-    (G.numRolls === 0 || (G.numRolls === 1 && G[`land_${player}`][3])) && 
+    (G.numRolls === 0 || (G.numRolls === 1 && G[`land_${player}`][3])) && // radio tower
     ( n === 2 ? G[`land_${player}`][0] : true) 
   );
 }
 
+// Roll one die
 function rollOne(G, ctx) {
   if (canRollQ(G, ctx, 1)) {
     G.roll = ctx.random.Die(6);
@@ -22,11 +23,12 @@ function rollOne(G, ctx) {
   }
 }
 
+// Roll two dice (train station)
 function rollTwo(G, ctx) {
   const player = parseInt(ctx.currentPlayer);
   if (canRollQ(G, ctx, 2)) {
     const dice = ctx.random.Die(6, 2);
-    if (G[`land_${player}`][2]) G.secondTurn = (dice[0] === dice[1]);
+    if (G[`land_${player}`][2]) G.secondTurn = (dice[0] === dice[1]); // amusement park
     G.roll = dice.reduce( (a, b) => a+b );
     G.numRolls++;
     G.log.push(`\troll ${G.roll} (${dice})`);
@@ -35,8 +37,8 @@ function rollTwo(G, ctx) {
   }
 }
 
+// Force roll outcome; move is removed in production.
 function debugRoll(G, ctx, roll) {
-  // force roll; removed in production
   G.roll = roll;
   G.numRolls++;
   G.log.push(`\tdebug roll ${G.roll}`);
@@ -48,6 +50,7 @@ export function canCommitRollQ(G, ctx) {
   return G.numRolls > 0 && G.state === "roll";
 }
 
+// Commit roll and compute outcomes
 function commitRoll(G, ctx) {
   if (!canCommitRollQ(G, ctx)) {
     return INVALID_MOVE;
@@ -129,8 +132,11 @@ function commitRoll(G, ctx) {
     case 14:
       forwards.forEach( (p) => {
         let amount = 0;
-        if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0)
-          amount += ctx.random.Die(6, 2).reduce( (a, b) => a+b )*G[`est_${p}`][23]; // tuna boat
+        if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0) {
+          let roll = ctx.random.Die(6, 2).reduce( (a, b) => a+b );
+          amount += roll*G[`est_${p}`][23]; // tuna boat
+          G.log.push(`\t(tuna boat roll: ${roll})`);
+        }
         if (p === player && [11, 12].includes(G.roll)) 
           amount += 2*G[`est_${player}`][14]*countPlant(G, player) // produce market
         if (p === player && [12, 13].includes(G.roll))
@@ -144,6 +150,7 @@ function commitRoll(G, ctx) {
   afterCommit(G);
 }
 
+// Player `to` gets coins from the bank
 function earn(G, to, amount) {
   if (amount > 0) {
     G.money[to] += amount;
@@ -151,6 +158,7 @@ function earn(G, to, amount) {
   }
 }
 
+// Player `from` gives `to` coins
 function take(G, from, to, amount) {
   const max = Math.min(amount, G.money[from]);
   if (max > 0) {
@@ -185,6 +193,7 @@ function countPlant(G, p) {
   return ests[0] + ests[13] + ests[16];
 }
 
+// Do special purple establishments
 function afterCommit(G) {
   if (G.doTV) {
     G.state = "tv";
@@ -195,6 +204,26 @@ function afterCommit(G) {
   }
 }
 
+export function canAddTwoQ(G, ctx) {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    canCommitRollQ(G, ctx) &&
+    G[`land_${player}`][5] &&
+    G.roll >= 10
+  );
+}
+
+// Variant of `commitRoll` where add two to dice roll (harbor)
+function addTwo(G, ctx) {
+  if (canAddTwoQ(G, ctx)) {
+    G.roll += 2;
+    G.log.push(`\tchange roll to ${G.roll}`);
+    commitRoll(G, ctx);
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
 // --- State: buy --------------------------------------------------------------
 
 export function canBuyEstQ(G, ctx, est) {
@@ -202,18 +231,20 @@ export function canBuyEstQ(G, ctx, est) {
   const buyable = (
     G.state === "buy" && 
     G.est_supply[est] > 0 && 
-    G.money[player] >= G.est_cost[est]
+    (G.money[player] >= G.est_cost[est] || (G.money[player] === 0 && G.est_cost[est] === 1)) // city hall
   );
-  if (est === 6) return (buyable && G[`est_${player}`][6] === 0);
-  if (est === 7) return (buyable && G[`est_${player}`][7] === 0);
-  if (est === 8) return (buyable && G[`est_${player}`][8] === 0);
-  return buyable;
+  if ([6, 7, 8, 19, 22].includes(est)) {
+    return (buyable && G[`est_${player}`][est] === 0);
+  } else {
+    return buyable;
+  }
 }
 
+// Buy an establishment
 function buyEst(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
   if (canBuyEstQ(G, ctx, est)) {
-    G.money[player] -= G.est_cost[est];
+    G.money[player] = Math.max(G.money[player] - G.est_cost[est], 0); // prevent go below 0
     G.est_supply[est]--;
     G.est_total[est]--;
     G[`est_${player}`][est]++;
@@ -233,6 +264,7 @@ export function canBuyLandQ(G, ctx, land) {
   );
 }
 
+// Buy a landmark
 function buyLand(G, ctx, land) {
   const player = parseInt(ctx.currentPlayer);
   if (canBuyLandQ(G, ctx, land)) {
@@ -253,6 +285,7 @@ export function canDoTVQ(G, ctx, p) {
   return G.state === "tv" && p !== player;
 }
 
+// Pick another player to take money from
 function doTV(G, ctx, p) {
   const player = parseInt(ctx.currentPlayer);
   if (canDoTVQ(G, ctx, p)) {
@@ -273,6 +306,7 @@ export function canDoOffice1Q(G, ctx, est) {
   );
 }
 
+// Pick your own establishment to trade
 function doOffice1(G, ctx, est) {
   if (canDoOffice1Q(G, ctx, est)) {
     G.officeEst = est;
@@ -292,6 +326,7 @@ export function canDoOffice2Q(G, ctx, p, est) {
   );
 }
 
+// Pick someone else's establishment to trade
 function doOffice2(G, ctx, p, est) {
   const player = parseInt(ctx.currentPlayer);
   if (canDoOffice2Q(G, ctx, p, est)) {
@@ -316,8 +351,10 @@ export function canEndQ(G, ctx) {
 function endTurn(G, ctx) {
   const player = parseInt(ctx.currentPlayer);
   if (canEndQ(G, ctx)) {
+    if (G.state === "buy" && G[`land_${player}`][6]) 
+      earn(G, player, 10); // airport
     if (G.secondTurn) {
-      ctx.events.endTurn({next: player});
+      ctx.events.endTurn({next: player}); // amusement park
     } else {
       ctx.events.endTurn();
     }
@@ -326,8 +363,8 @@ function endTurn(G, ctx) {
   }
 }
 
+// end-of-game only check in `buyLand`
 function checkEndGame(G, ctx, p) {
-  // only done in `buyLand`
   if (G[`land_${p}`].every( x => x)) {
     G.log.push(`Game over. Winner: #${p}`);
     ctx.events.endGame();
@@ -432,10 +469,8 @@ export const Machikoro = {
       move: debugRoll,
       redact: true,
     },
-    commitRoll: {
-      move: commitRoll,
-      undoable: false,
-    },
+    commitRoll: commitRoll,
+    addTwo: addTwo,
     buyEst: buyEst,
     buyLand: buyLand,
     doTV: doTV,

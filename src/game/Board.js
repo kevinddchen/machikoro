@@ -6,12 +6,13 @@ import Log from './Log';
 import { 
   canRollQ, 
   canCommitRollQ, 
-  canEndQ, 
+  canAddTwoQ,
   canBuyEstQ, 
   canBuyLandQ, 
   canDoTVQ, 
   canDoOffice1Q, 
   canDoOffice2Q,
+  canEndQ, 
 } from './Game';
 
 class MachikoroBoard extends React.Component {
@@ -24,7 +25,7 @@ class MachikoroBoard extends React.Component {
     const { G, ctx, moves, isActive } = this.props;
 
     // auto commitRoll
-    if (isActive && canCommitRollQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
+    if (isActive && canCommitRollQ(G, ctx) && !canAddTwoQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
       moves.commitRoll();
     }
   }
@@ -38,6 +39,7 @@ class MachikoroBoard extends React.Component {
 
     const canRoll = (n) => isActive && canRollQ(G, ctx, n);
     const canKeep = () => isActive && canCommitRollQ(G, ctx);
+    const canAddTwoKeep = () => isActive && canAddTwoQ(G, ctx);
     const canEnd = () => isActive && canEndQ(G, ctx);
     const canBuyEst = (est) => isActive && canBuyEstQ(G, ctx, est);
     const canBuyLand = (p, land) => isActive && p === player && canBuyLandQ(G, ctx, land);
@@ -57,7 +59,7 @@ class MachikoroBoard extends React.Component {
       playerInfoList.push(
         <PlayerInfo 
           key={p}
-          player={parseInt(this.props.playerID)}
+          playerID={parseInt(this.props.playerID)}
           p={p}
           money={G.money[p]}
           name={this.names[p]}
@@ -85,6 +87,8 @@ class MachikoroBoard extends React.Component {
                 roll={G.roll}
                 canKeep={canKeep}
                 keep={() => moves.commitRoll()}
+                canAddTwoKeep={canAddTwoKeep}
+                addTwoKeep={() => moves.addTwo()}
                 canEnd={canEnd}
                 endTurn={() => moves.endTurn()}
                 undo={() => this.props.undo()}
