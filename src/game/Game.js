@@ -136,7 +136,8 @@ function commitRoll(G, ctx) {
         if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0) {
           let roll = ctx.random.Die(6, 2).reduce( (a, b) => a+b );
           amount += roll*G[`est_${p}`][23]; // tuna boat
-          log(G, `\t(tuna boat roll: ${roll})`);
+          if (G[`est_${p}`][23] > 0) 
+            log(G, `\t(tuna boat roll: ${roll})`);
         }
         if (p === player && [11, 12].includes(G.roll)) 
           amount += 2*G[`est_${player}`][14]*countPlant(G, player) // produce market
@@ -165,7 +166,7 @@ function take(G, from, to, amount) {
   if (max > 0) {
     G.money[from] -= max;
     G.money[to] += max;
-    log(G, `\t#${from} pays #${to} ${amount} $`);
+    log(G, `\t#${from} pays #${to} ${max} $`);
   }
 }
 
