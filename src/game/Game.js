@@ -113,14 +113,14 @@ function commitRoll(G, ctx) {
         earn(G, p, amount);
       });
       if (G[`est_${player}`][22] > 0) backwards.forEach( (p) => {
-        if (G.money[p] >= 10) take(G, player, p, Math.floor(G.money[p]/2)); // tax office
+        if (G.money[p] >= 10) take(G, p, player, Math.floor(G.money[p]/2)); // tax office
       });
       break;
     case 9:
       backwards.forEach( (p) => take(G, player, p, (G[`land_${p}`][1] ? 3 : 2)*G[`est_${p}`][12])); // restaurant
       forwards.forEach( (p) => earn(G, p, 5*G[`est_${p}`][11])); // mine
       if (G[`est_${player}`][22] > 0) backwards.forEach( (p) => {
-        if (G.money[p] >= 10) take(G, player, p, Math.floor(G.money[p]/2)); // tax office
+        if (G.money[p] >= 10) take(G, p, player, Math.floor(G.money[p]/2)); // tax office
       });
       break;
     case 10:
@@ -502,8 +502,14 @@ export const Machikoro = {
       move: debugRoll,
       redact: true,
     },
-    commitRoll: commitRoll,
-    addTwo: addTwo,
+    commitRoll: {
+      move: commitRoll,
+      undoable: false,
+    },
+    addTwo: {
+      move: addTwo,
+      undoable: false,
+    },
     buyEst: buyEst,
     buyLand: buyLand,
     doTV: doTV,
