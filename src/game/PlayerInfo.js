@@ -48,14 +48,15 @@ class PlayerInfo extends React.Component {
     // establishment miniatures
     const minis = []
     for (let i=0; i<est_order.length; i++) {
-      const { est, mini } = est_order[i];
+      const { est, mini_path } = est_order[i];
+      console.log(est, mini_path);
       for (let count=0; count<est_p[est]; count++) {
         minis.push(
           <div key={`${i}_${count}`} 
             className={classNames(estmini_div, {"active": canDoOffice(p, est)})}
             onClick={() => doOffice(p, est)}
           >
-            <img className="estmini_img" src={`./assets/${mini}`} alt=""/>
+            <img className="estmini_img" src={`./assets/${mini_path}`} alt=""/>
           </div>
         );
       }
