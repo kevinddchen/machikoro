@@ -49,7 +49,6 @@ class PlayerInfo extends React.Component {
     const minis = []
     for (let i=0; i<est_order.length; i++) {
       const { est, mini_path } = est_order[i];
-      console.log(est, mini_path);
       for (let count=0; count<est_p[est]; count++) {
         minis.push(
           <div key={`${i}_${count}`} 

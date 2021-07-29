@@ -24,7 +24,7 @@ export const est_names = [
   "Tax Office",           // 22
   "Tuna Boat",            // 23
   "Food Warehouse",       // 24
-]
+];
 
 export const est_order = [
   // Blue
@@ -58,6 +58,11 @@ export const est_order = [
   {est: 22, img_path: "est22.png", mini_path: "est22_mini.png"}, // tax office 
 ];
 
+// for hybrid supply
+export const deck1 = [0, 1, 16, 5, 2, 4, 17, 15, 3];
+export const deck2 = [20, 11, 13, 23, 9, 10, 14, 24, 18, 21, 12];
+export const deck3 = [6, 7, 8, 19, 22];
+
 export const land_names = [
   "Train Station",    // 0
   "Shopping Mall",    // 1
@@ -66,7 +71,7 @@ export const land_names = [
   "City Hall",        // 4
   "Harbor",           // 5
   "Airport",          // 6
-]
+];
 
 export const land_order = [
   //{land: 4, img_path: "land4.png"},
@@ -76,4 +81,4 @@ export const land_order = [
   {land: 2, img_path: "land2.gif"},
   {land: 3, img_path: "land3.gif"},
   {land: 6, img_path: "land6.png"},
-]
+];

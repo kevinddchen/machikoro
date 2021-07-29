@@ -12,7 +12,7 @@ class Lobby extends React.Component {
       numPlayers: 4,
       matchList: null, // {matchID: string, currPlayers: number, numPlayers: number}
       expansion: 'base',
-      supplyVariant: 'variable',
+      supplyVariant: 'hybrid',
     };
     this.matchCounts = null; // number[]
     this.interval = null;
@@ -251,7 +251,9 @@ class Lobby extends React.Component {
           &nbsp;
           <select 
             id="input_supplyVariant"
-            onChange={this.setSupplyVariant}>
+            onChange={this.setSupplyVariant}
+          >
+            <option value="hybrid">Hybrid Supply</option>
             <option value="variable">Variable Supply</option>
             <option value="total">Total Supply</option>
           </select>

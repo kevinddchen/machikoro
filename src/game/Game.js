@@ -1,5 +1,5 @@
 import { PlayerView, INVALID_MOVE } from 'boardgame.io/core';
-import { est_names, land_names } from './meta';
+import { est_names, land_names, deck1, deck2, deck3 } from './meta';
 
 // --- State: roll -------------------------------------------------------------
 
@@ -68,7 +68,7 @@ function commitRoll(G, ctx) {
   switch (G.roll) {
     case 1:
       backwards.forEach( (p) => {
-        if (G[`land_${p}`][5]) take(G, player, p, (G[`land_${p}`][1] ? 4 : 3)*G[`est_${p}`][15]) // sushi bar
+        if (G[`land_${p}`][5]) take(G, player, p, (G[`land_${p}`][1] ? 4 : 3)*G[`est_${p}`][15]); // sushi bar
       }); 
       forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][0])); // wheat field
       break;
@@ -94,7 +94,7 @@ function commitRoll(G, ctx) {
       forwards.forEach( (p) => earn(G, p, 1*G[`est_${p}`][5])); // forest
       break;
     case 6:
-      earn(G, player, (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][17]*G[`est_${player}`][16]) // flower shop
+      earn(G, player, (G[`land_${player}`][1] ? 2 : 1)*G[`est_${player}`][17]*G[`est_${player}`][16]); // flower shop
       if (G[`est_${player}`][6] > 0) backwards.forEach( (p) => take(G, p, player, 2)); // stadium
       if (G[`est_${player}`][7] > 0) G.doTV = true; // TV station
       if (G[`est_${player}`][8] > 0) G.doOffice = true; // office
@@ -133,16 +133,15 @@ function commitRoll(G, ctx) {
     case 14:
       forwards.forEach( (p) => {
         let amount = 0;
-        if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0) {
+        if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0 && G[`est_${p}`][23] > 0) {
           let roll = ctx.random.Die(6, 2).reduce( (a, b) => a+b );
           amount += roll*G[`est_${p}`][23]; // tuna boat
-          if (G[`est_${p}`][23] > 0) 
-            log(G, `\t(tuna boat roll: ${roll})`);
+          log(G, `\t(tuna boat roll: ${roll})`);
         }
-        if (p === player && [11, 12].includes(G.roll)) 
-          amount += 2*G[`est_${player}`][14]*countPlant(G, player) // produce market
-        if (p === player && [12, 13].includes(G.roll))
-          amount += 2*G[`est_${player}`][24]*countCup(G, player) // food warehouse
+        if ([11, 12].includes(G.roll) && p === player) 
+          amount += 2*G[`est_${player}`][14]*countPlant(G, player); // produce market
+        if ([12, 13].includes(G.roll) && p === player)
+          amount += 2*G[`est_${player}`][24]*countCup(G, player); // food warehouse
         earn(G, p, amount);
       });
       break;
@@ -238,7 +237,7 @@ export function canBuyEstQ(G, ctx, est) {
      (G[`land_${player}`][4] && G.money[player] === 0 && G.est_cost[est] === 1) // city hall
     ) 
   );
-  if ([6, 7, 8, 19, 22].includes(est)) {
+  if (deck3.includes(est)) {
     return (buyable && G[`est_${player}`][est] === 0);
   } else {
     return buyable;
@@ -307,7 +306,7 @@ export function canDoOffice1Q(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
   return (
     G.state === "office1" &&
-    ![6, 7, 8, 19, 22].includes(est) &&
+    !deck3.includes(est) &&
     G[`est_${player}`][est] > 0
   );
 }
@@ -327,7 +326,7 @@ export function canDoOffice2Q(G, ctx, p, est) {
   return (
     G.state === "office2" &&
     p !== player && 
-    ![6, 7, 8, 19, 22].includes(est) &&
+    !deck3.includes(est) &&
     G[`est_${p}`][est] > 0
   );
 }
@@ -387,18 +386,64 @@ function log(G, msg) {
   }
 }
 
-// --- Variable supply ---------------------------------------------------------
+// --- Supply replenishment ----------------------------------------------------
 
-function checkDrawEst(G, ctx) {
-  let count = 0;
-  G.est_supply.forEach( (x) => {if (x > 0) count++});
-  return count < G.numReplenish;
+function setupSupply(G, ctx, supplyVariant) {
+  if (supplyVariant === "total") {
+    // set all supply to total
+    for (let est=0; est<G.est_use.length; est++) {
+      if (G.est_use[est])
+        G.est_supply[est] = G.est_total[est];
+    }
+  } else if (supplyVariant === "variable") {
+    // fill deck with establishments and shuffle
+    for (let est=0; est<G.est_use.length; est++) {
+      if (G.est_use[est])
+        G.secret = G.secret.concat(Array(G.est_total[est]).fill(est));
+    }
+    G.secret = ctx.random.Shuffle(G.secret);
+  } else if (supplyVariant === "hybrid") {
+    // fill all three decks and shuffle
+    const deckList = [deck1, deck2, deck3];
+    for (let i=0; i<=2; i++) {
+      let deck = [];
+      for (let est of deckList[i]) {
+        deck = deck.concat(Array(G.est_total[est]).fill(est));
+      }
+      deck = ctx.random.Shuffle(deck);
+      G.secret.push(deck);
+    }
+  }
 }
 
 function replenishSupply(G, ctx) {
-  while (G.secret.length > 0 && checkDrawEst(G, ctx)) {
-    const est = G.secret.pop();
-    G.est_supply[est]++;
+  const { supplyVariant } = G;
+  if (supplyVariant === "variable") {
+    // if less than 10 unique establishments, draw from deck
+    const target = 10;
+    while (G.secret.length > 0) {
+      let count = 0;
+      G.est_supply.forEach( (x) => {if (x > 0) count++} );
+      if (count >= target)
+        break;
+      G.est_supply[G.secret.pop()]++;
+    }
+  } else if (supplyVariant === "hybrid") {
+    // for each deck want 5-5-2 establishments
+    const deckList = [deck1, deck2, deck3];
+    const targets = [5, 5, 2];
+    for (let i=0; i<=2; i++) {
+      while (G.secret[i].length > 0) {
+        let count = 0;
+        for (let est of deckList[i]) {
+          if (G.est_supply[est] > 0) 
+            count++;
+        }
+        if (count >= targets[i])
+          break;
+        G.est_supply[G.secret[i].pop()]++;
+      }
+    }
   }
 }
 
@@ -450,16 +495,9 @@ export const Machikoro = {
         G[`land_${p}`][4] = true; // each player starts with city hall
       }
     }
-    // shuffle deck; secret is stripped from the G given to players
-    G.secret = [];
-    for (let est=0; est<G.est_use.length; est++) {
-      if (G.est_use[est])
-        G.secret = G.secret.concat(Array(G.est_total[est]).fill(est));
-    }
-    G.secret = ctx.random.Shuffle(G.secret);
-    // supply variant
-    if (supplyVariant === "total") G.numReplenish = G.est_use.length + 1;
-    if (supplyVariant === "variable") G.numReplenish = 10;
+    G.secret = []; // secret is stripped from the G given to players
+    G.supplyVariant = supplyVariant;
+    setupSupply(G, ctx, supplyVariant);
 
     return G;
   },
@@ -468,7 +506,7 @@ export const Machikoro = {
     if (setupData) {
       const { expansion, supplyVariant, startCoins } = setupData;
       if (!["base", "harbor"].includes(expansion)) return false;
-      if (!["total", "variable"].includes(supplyVariant)) return false;
+      if (!["total", "variable", "hybrid"].includes(supplyVariant)) return false;
       if (startCoins !== 3) return false; 
     }
     if (numPlayers < 2) return false;
