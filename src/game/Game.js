@@ -306,6 +306,7 @@ export function canDoOffice1Q(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
   return (
     G.state === "office1" &&
+    G.est_use[est] && 
     !deck3.includes(est) &&
     G[`est_${player}`][est] > 0
   );
@@ -326,6 +327,7 @@ export function canDoOffice2Q(G, ctx, p, est) {
   return (
     G.state === "office2" &&
     p !== player && 
+    G.est_use[est] && 
     !deck3.includes(est) &&
     G[`est_${p}`][est] > 0
   );
@@ -381,7 +383,7 @@ function checkEndGame(G, ctx, p) {
 function log(G, msg) {
   G.log.push({id: G.log_i, msg});
   G.log_i++;
-  while (G.log.length > 200) {
+  while (G.log.length > 100) {
     G.log.shift();
   }
 }
@@ -408,7 +410,8 @@ function setupSupply(G, ctx, supplyVariant) {
     for (let i=0; i<=2; i++) {
       let deck = [];
       for (let est of deckList[i]) {
-        deck = deck.concat(Array(G.est_total[est]).fill(est));
+        if (G.est_use[est])
+          deck = deck.concat(Array(G.est_total[est]).fill(est));
       }
       deck = ctx.random.Shuffle(deck);
       G.secret.push(deck);

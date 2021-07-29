@@ -11,7 +11,7 @@ class Lobby extends React.Component {
       name: '',
       numPlayers: 4,
       matchList: null, // {matchID: string, currPlayers: number, numPlayers: number}
-      expansion: 'base',
+      expansion: 'harbor',
       supplyVariant: 'hybrid',
     };
     this.matchCounts = null; // number[]
@@ -235,7 +235,8 @@ class Lobby extends React.Component {
         <div className="padded_div">
           <select 
             id="input_numPlayers"
-            onChange={this.setNumPlayers}>
+            onChange={this.setNumPlayers}
+          >
             <option value="2">2 players</option>
             <option value="3">3 players</option>
             <option value="4">4 players</option>
@@ -244,9 +245,10 @@ class Lobby extends React.Component {
           &nbsp;
           <select 
             id="input_expansion"
-            onChange={this.setExpansion}>
-            <option value="base">Base Game</option>
+            onChange={this.setExpansion}
+          >
             <option value="harbor">Harbor Expansion</option>
+            <option value="base">Base Game</option>
           </select>
           &nbsp;
           <select 
