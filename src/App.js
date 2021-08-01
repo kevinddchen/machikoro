@@ -1,10 +1,10 @@
 import './App.css';
 import React from "react";
-import Matchmaker from './matchmaking/Matchmaker';
 import { Client } from "boardgame.io/react";
 import { SocketIO } from "boardgame.io/multiplayer"
 import { Machikoro } from "./game/Game";
-import MachikoroBoard  from "./game/Board";
+import Matchmaker from './matchmaking/Matchmaker'; // handles matchmaking
+import MachikoroBoard  from "./game/Board"; // hangles game
 
 class App extends React.Component {
   constructor(props) {
@@ -23,7 +23,7 @@ class App extends React.Component {
     this.setState({ matchID, playerID, credentials });
   };
 
-  startDebug = () => process.env.NODE_ENV === 'development' && this.setState({debug: true});
+  startDebug = () => this.setState({debug: true});
 
   componentDidMount() {
     console.log(`env: ${process.env.NODE_ENV}.`);
@@ -32,7 +32,7 @@ class App extends React.Component {
   render() {
     const { matchID, playerID, credentials, debug } = this.state;
 
-    if (matchID || debug) {
+    if (matchID || (debug && process.env.NODE_ENV === 'development')) {
 
       const MachikoroClient = Client({
         game: Machikoro,

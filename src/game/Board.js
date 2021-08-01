@@ -1,8 +1,8 @@
 import React from 'react';
-import Buttons from './Buttons';
-import Establishments from './Establishments';
-import PlayerInfo from './PlayerInfo';
-import Log from './Log';
+import Buttons from './Buttons'; // buttons on top of screen
+import Establishments from './Establishments'; // board where establishments are displayed
+import PlayerInfo from './PlayerInfo'; // information panels for each player
+import Log from './Log'; // game log display
 import { 
   canRollQ, 
   canCommitRollQ, 

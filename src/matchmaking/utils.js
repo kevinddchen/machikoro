@@ -1,3 +1,5 @@
+// This file contains some useful functions which are used in multiple places.
+
 export function checkDifferent(a, b) {
   if (!a || !b || a.length !== b.length) {
     return true;

@@ -1,4 +1,7 @@
-// class for managing tables with fixed number of columns but unfixed number of rows
+/**
+ * Tables with a fixed number of columns but unfixed number of rows
+ */
+
 export default class StackTable {
   constructor(columns) {
     this.columns = columns;

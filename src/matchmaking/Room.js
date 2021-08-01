@@ -1,8 +1,9 @@
 import './Room.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
-import { gameName } from '../game/Game';
 import { checkDifferent } from './utils';
+
+import { gameName } from '../game/Game';
 
 class Room extends React.Component {
   constructor(props) {

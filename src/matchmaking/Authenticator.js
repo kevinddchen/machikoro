@@ -1,5 +1,5 @@
 /**
- * Class that handles saving and fetching match credentials
+ * Handles match credentials via local storage
  */
 
 class Authenticator {

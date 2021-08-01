@@ -1,8 +1,9 @@
 import './Lobby.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
-import { gameName } from '../game/Game';
 import { checkDifferent } from './utils';
+
+import { gameName } from '../game/Game';
 
 class Lobby extends React.Component {
   constructor(props) {
@@ -11,7 +12,7 @@ class Lobby extends React.Component {
       name: '',
       numPlayers: 4,
       matchList: null, // {matchID: string, currPlayers: number, numPlayers: number}
-      expansion: 'harbor',
+      expansion: 'base',
       supplyVariant: 'hybrid',
     };
     this.matchCounts = null; // number[]
@@ -81,7 +82,6 @@ class Lobby extends React.Component {
       return;
     }
     try {
-      //const setupData = {supplyVariant: supplyVariant};
       const { matchID } = await this.props.lobbyClient.createMatch(gameName, {
         numPlayers,
         setupData: {expansion, supplyVariant, startCoins: 3},
@@ -96,7 +96,7 @@ class Lobby extends React.Component {
 
   joinMatch = async (matchID) => {
     try {
-      if (this.hasCredentials(matchID) || await this._joinWithoutCredentials(matchID)) {
+      if (this.Authenticator.hasCredentials(matchID) || await this._joinWithoutCredentials(matchID)) {
         this.props.joinRoom(matchID);
         console.log(`Joined match '${matchID}'.`);
       }
@@ -106,12 +106,9 @@ class Lobby extends React.Component {
     }
   };
 
-  hasCredentials = (matchID) => {
-    return this.Authenticator.hasCredentials(matchID);
-  };
-
   /**
-   * Returns true on success, false on failure.
+   * Tries to create new credentials to join match. Returns true on success,
+   * false on failure.
    */
   _joinWithoutCredentials = async (matchID) => {
     const { name } = this.state;
@@ -123,15 +120,16 @@ class Lobby extends React.Component {
 
     // find an open seat
     const match = await this.props.lobbyClient.getMatch(gameName, matchID);
-    let seat; // number
+    let seat; 
     for (let i=0; i<match.players.length; i++) {
-      if ("name" in match.players[i]) {
+      if ("name" in match.players[i]) { // check if seat is occupied
         if (match.players[i].name === name) {
           this.props.setErrorMessage("Name already taken.");
           return false;
         }
-      } else if (seat === undefined) {
-        seat = i.toString();
+      } else { // if seat is not occupied, then sit
+        seat = i;
+        break;
       }
     }
     if (seat === undefined) {
@@ -144,7 +142,7 @@ class Lobby extends React.Component {
       gameName,
       matchID,
       {
-        playerID: seat,
+        playerID: seat.toString(),
         playerName: name,
       }
     );
@@ -197,7 +195,7 @@ class Lobby extends React.Component {
       for (let i=0; i<matchList.length; i++) {
         const { matchID, currPlayers, numPlayers, setupData } = matchList[i];
         let button;
-        if (this.hasCredentials(matchID)) {
+        if (this.Authenticator.hasCredentials(matchID)) {
           button = <button onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
         } else if (currPlayers === numPlayers) {
           button = null;
@@ -247,8 +245,8 @@ class Lobby extends React.Component {
             id="input_expansion"
             onChange={this.setExpansion}
           >
-            <option value="harbor">Harbor Expansion</option>
             <option value="base">Base Game</option>
+            <option value="harbor">Harbor Expansion</option>
           </select>
           &nbsp;
           <select 

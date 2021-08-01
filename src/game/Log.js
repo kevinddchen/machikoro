@@ -15,8 +15,6 @@ class Log extends React.Component {
 
     const { log } = this.props;
 
-    
-    
     const logBody = [];
     for (let i=0; i<log.length; i++) {
       let { id, msg } = log[i];
