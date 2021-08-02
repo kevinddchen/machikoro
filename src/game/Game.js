@@ -1,7 +1,7 @@
-import { PlayerView, INVALID_MOVE } from 'boardgame.io/core';
+import { PlayerView, TurnOrder, INVALID_MOVE } from 'boardgame.io/core';
 import { est_names, land_names, deck1, deck2, deck3 } from './meta';
 
-// --- State: roll -------------------------------------------------------------
+// --- Roll dice ---------------------------------------------------------------
 
 export function canRollQ(G, ctx, n) {
   const player = parseInt(ctx.currentPlayer);
@@ -12,7 +12,9 @@ export function canRollQ(G, ctx, n) {
   );
 }
 
-// Roll one die
+/**
+ * Roll one die.
+ */
 function rollOne(G, ctx) {
   if (canRollQ(G, ctx, 1)) {
     G.roll = ctx.random.Die(6);
@@ -23,7 +25,9 @@ function rollOne(G, ctx) {
   }
 }
 
-// Roll two dice (train station)
+/**
+ * Roll two dice (train station).
+ */
 function rollTwo(G, ctx) {
   const player = parseInt(ctx.currentPlayer);
   if (canRollQ(G, ctx, 2)) {
@@ -38,7 +42,9 @@ function rollTwo(G, ctx) {
   }
 }
 
-// Force roll outcome; this move is removed in production.
+/**
+ * Force roll outcome; this move is removed in production.
+ */
 function debugRoll(G, ctx, roll) {
   G.roll = roll;
   G.numRolls++;
@@ -51,19 +57,17 @@ export function canCommitRollQ(G, ctx) {
   return G.numRolls > 0 && G.state === "roll";
 }
 
-// Commit roll and compute outcomes
+/**
+ * Evaluate outcome of roll
+ */
 function commitRoll(G, ctx) {
   if (!canCommitRollQ(G, ctx)) {
     return INVALID_MOVE;
   }
-  const player = parseInt(ctx.currentPlayer),
-        N = ctx.numPlayers,
-        backwards = [], // players in backward order, excluding current player
-        forwards = [player]; // players in forward order, starting with current player
-  for (let i=1; i<N; i++)  {
-      backwards.push(((player-i)%N + N)%N); // JS modulo is negative
-      forwards.push((player+i)%N);
-  }
+  // get list of players in forward/backward order. Forward order includes
+  // current player, backward order excludes current player.
+  const { forwards, backwards } = getForwardsBackwards(G, ctx);
+  const player = parseInt(ctx.currentPlayer);
 
   switch (G.roll) {
     case 1:
@@ -151,7 +155,21 @@ function commitRoll(G, ctx) {
   afterCommit(G);
 }
 
-// Player `to` gets coins from the bank
+function getForwardsBackwards(G, ctx) {
+  let current = ctx.playOrderPos,
+      N = ctx.numPlayers,
+      forwards = [ctx.playOrderPos],
+      backwards = []; 
+  for (let i=1; i<N; i++)  {
+    forwards.push((current+i)%N);
+    backwards.push(((current-i)%N + N)%N); // JS modulo is negative
+  }
+  forwards = forwards.map( (x) => parseInt(G.turn_order[x]) );
+  backwards = backwards.map( (x) => parseInt(G.turn_order[x]) );
+  return { forwards, backwards };
+}
+
+// `to` receives coins from the bank
 function earn(G, to, amount) {
   if (amount > 0) {
     G.money[to] += amount;
@@ -159,7 +177,7 @@ function earn(G, to, amount) {
   }
 }
 
-// Player `from` gives `to` coins
+// `from` gives coins to `to`
 function take(G, from, to, amount) {
   const max = Math.min(amount, G.money[from]);
   if (max > 0) {
@@ -194,7 +212,9 @@ function countPlant(G, p) {
   return ests[0] + ests[13] + ests[16];
 }
 
-// Do special purple establishments
+/**
+ * Check if any purple (major) establishments need to be performed.
+ */
 function afterCommit(G) {
   if (G.doTV) {
     G.state = "tv";
@@ -214,7 +234,9 @@ export function canAddTwoQ(G, ctx) {
   );
 }
 
-// Variant of `commitRoll` where add two to dice roll (harbor)
+/**
+ * Variant of `commitRoll` where 2 is added to dice roll (harbor).
+ */
 function addTwo(G, ctx) {
   if (canAddTwoQ(G, ctx)) {
     G.roll += 2;
@@ -225,7 +247,7 @@ function addTwo(G, ctx) {
   }
 }
 
-// --- State: buy --------------------------------------------------------------
+// --- Buy establishments/landmarks --------------------------------------------
 
 export function canBuyEstQ(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
@@ -244,7 +266,9 @@ export function canBuyEstQ(G, ctx, est) {
   }
 }
 
-// Buy an establishment
+/** 
+ * Buy an establishment.
+ */
 function buyEst(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
   if (canBuyEstQ(G, ctx, est)) {
@@ -269,7 +293,9 @@ export function canBuyLandQ(G, ctx, land) {
   );
 }
 
-// Buy a landmark
+/**
+ * Buy a landmark.
+ */
 function buyLand(G, ctx, land) {
   const player = parseInt(ctx.currentPlayer);
   if (canBuyLandQ(G, ctx, land)) {
@@ -290,7 +316,9 @@ export function canDoTVQ(G, ctx, p) {
   return G.state === "tv" && p !== player;
 }
 
-// Pick another player to take money from
+/**
+ * Pick another player to take money from.
+ */
 function doTV(G, ctx, p) {
   const player = parseInt(ctx.currentPlayer);
   if (canDoTVQ(G, ctx, p)) {
@@ -312,7 +340,9 @@ export function canDoOffice1Q(G, ctx, est) {
   );
 }
 
-// Pick your own establishment to trade
+/**
+ * Pick your own establishment to trade.
+ */
 function doOffice1(G, ctx, est) {
   if (canDoOffice1Q(G, ctx, est)) {
     G.officeEst = est;
@@ -333,7 +363,9 @@ export function canDoOffice2Q(G, ctx, p, est) {
   );
 }
 
-// Pick someone else's establishment to trade
+/** 
+ * Pick someone else's establishment to trade.
+ */
 function doOffice2(G, ctx, p, est) {
   const player = parseInt(ctx.currentPlayer);
   if (canDoOffice2Q(G, ctx, p, est)) {
@@ -370,7 +402,7 @@ function endTurn(G, ctx) {
   }
 }
 
-// end-of-game only checked in `buyLand`
+// end-of-game only checked in `buyLand` move.
 function checkEndGame(G, ctx, p) {
   for (let land=0; land<G.land_use.length; land++) {
     if (G.land_use[land] && !G[`land_${p}`][land])
@@ -380,6 +412,9 @@ function checkEndGame(G, ctx, p) {
   ctx.events.endGame();
 }
 
+/**
+ * Add entry to the log.
+ */
 function log(G, msg) {
   G.log.push({id: G.log_i, msg});
   G.log_i++;
@@ -390,6 +425,9 @@ function log(G, msg) {
 
 // --- Supply replenishment ----------------------------------------------------
 
+/**
+ * Set up establishment supply at start of game.
+ */
 function setupSupply(G, ctx, supplyVariant) {
   if (supplyVariant === "total") {
     // set all supply to total
@@ -419,6 +457,9 @@ function setupSupply(G, ctx, supplyVariant) {
   }
 }
 
+/**
+ * Replenish establishments at start of each turn.
+ */
 function replenishSupply(G, ctx) {
   const { supplyVariant } = G;
   if (supplyVariant === "variable") {
@@ -459,6 +500,7 @@ const debugSetupData = {
   expansion: "harbor",
   supplyVariant: "total",
   startCoins: 99,
+  randomizeTurnOrder: false,
 };
 
 export const Machikoro = {
@@ -467,10 +509,11 @@ export const Machikoro = {
 
   setup: (ctx, setupData) => {
     if (!setupData) setupData = debugSetupData;
-    const { expansion, supplyVariant, startCoins } = setupData;
+    const { expansion, supplyVariant, startCoins, randomizeTurnOrder } = setupData;
 
     const n = ctx.numPlayers;
     const G = {
+      turn_order: [...Array(n).keys()].map( (x) => x.toString() ),
       est_cost:   [1, 1, 1, 2, 2, 3, 6, 7, 8, 5, 3, 6, 3, 3, 2, // cost of each establishment
                    2, 2, 1, 1, 5, 2, 1, 4, 5, 2],
       est_supply: Array(25).fill(0), // number of each establishment available to buy
@@ -481,6 +524,9 @@ export const Machikoro = {
       log: [],
       log_i: 0,
     };
+    // shuffle play order?
+    if (randomizeTurnOrder) 
+      G.turn_order = ctx.random.Shuffle(G.turn_order);
     // starting establishments
     for (let p=0; p<n; p++) {
       G[`est_${p}`] =   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // each player's establishments
@@ -510,7 +556,7 @@ export const Machikoro = {
       const { expansion, supplyVariant, startCoins } = setupData;
       if (!["base", "harbor"].includes(expansion)) return false;
       if (!["total", "variable", "hybrid"].includes(supplyVariant)) return false;
-      if (startCoins !== 3) return false; 
+      if (!Number.isInteger(startCoins)) return false; 
     }
     if (numPlayers < 2) return false;
     if (numPlayers > 5) return false;
@@ -527,7 +573,8 @@ export const Machikoro = {
       G.officeEst = null;
       G.secondTurn = false;
       log(G, `Turn ${ctx.turn}: #${ctx.currentPlayer}`);
-    }
+    },
+    order: TurnOrder.CUSTOM_FROM('turn_order'),
   },
 
   moves: {

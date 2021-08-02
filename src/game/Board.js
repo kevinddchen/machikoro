@@ -55,7 +55,8 @@ class MachikoroBoard extends React.Component {
     }
   
     const playerInfoList = [];
-    for (let p=0; p<this.names.length; p++) {
+    for (let i=0; i<this.names.length; i++) {
+      const p = parseInt(G.turn_order[i]);
       playerInfoList.push(
         <PlayerInfo 
           key={p}

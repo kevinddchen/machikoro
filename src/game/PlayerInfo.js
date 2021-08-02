@@ -9,7 +9,7 @@ class PlayerInfo extends React.Component {
   render() {
 
     const {
-      playerID, 
+      playerID, // ID of player rendering the board
       p, 
       money, 
       name, 
