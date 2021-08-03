@@ -14,6 +14,7 @@ class Lobby extends React.Component {
       matchList: null, // {matchID: string, currPlayers: number, numPlayers: number}
       expansion: 'base',
       supplyVariant: 'hybrid',
+      fetchErrors: 0,
     };
     this.matchCounts = null; // number[]
     this.interval = null;
@@ -62,6 +63,8 @@ class Lobby extends React.Component {
         this.matchCounts = newMatchCounts;
       }
     } catch(e) {
+      const { fetchErrors } = this.state;
+      this.setState({fetchErrors: fetchErrors+1});
       console.error("(fetchMatches)", e);
     }
   };
@@ -173,13 +176,13 @@ class Lobby extends React.Component {
   // --- Render ----------------------------------------------------------------
 
   renderMatchList() {
-    const { matchList } = this.state;
+    const { matchList, fetchErrors } = this.state;
 
     const tbody = [];
     if (!matchList) {
-      tbody.push(
-        <tr key={0}><td>Fetching matches...</td></tr>
-      );
+      tbody.push(<tr key={0}><td>Fetching matches...</td></tr>);
+      if (fetchErrors > 3 && window.location.protocol === "https:")
+        tbody.push(<tr key={1}><td>(try connecting with http instead of https...)</td></tr>);
     } else if (matchList.length === 0) {
       tbody.push(
         <tr key={0}><td>No open matches.</td></tr>
