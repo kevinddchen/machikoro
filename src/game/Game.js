@@ -393,7 +393,7 @@ function endTurn(G, ctx) {
     if (G.state === "buy" && G[`land_${player}`][6]) 
       earn(G, player, 10); // airport
     if (G.secondTurn) {
-      ctx.events.endTurn({next: player}); // amusement park
+      ctx.events.endTurn({next: player.toString()}); // amusement park
     } else {
       ctx.events.endTurn();
     }
