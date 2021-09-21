@@ -135,13 +135,17 @@ function commitRoll(G, ctx) {
     case 12:
     case 13:
     case 14:
+      let doTunaRoll = [12, 13, 14].includes(G.roll) && forwards.some( (p) => G[`land_${p}`][5] > 0 && G[`est_${p}`][23] );
+      let tunaRoll;
+      if (doTunaRoll) {
+        // one roll for all players
+        tunaRoll = ctx.random.Die(6, 2).reduce( (a, b) => a+b );
+        log(G, `\t(tuna boat roll: ${tunaRoll})`);
+      }
       forwards.forEach( (p) => {
         let amount = 0;
-        if ([12, 13, 14].includes(G.roll) && G[`land_${p}`][5] > 0 && G[`est_${p}`][23] > 0) {
-          let roll = ctx.random.Die(6, 2).reduce( (a, b) => a+b );
-          amount += roll*G[`est_${p}`][23]; // tuna boat
-          log(G, `\t(tuna boat roll: ${roll})`);
-        }
+        if (doTunaRoll && G[`land_${p}`][5] > 0 && G[`est_${p}`][23] > 0)
+          amount += tunaRoll*G[`est_${p}`][23]; // tuna boat
         if ([11, 12].includes(G.roll) && p === player) 
           amount += 2*G[`est_${player}`][14]*countPlant(G, player); // produce market
         if ([12, 13].includes(G.roll) && p === player)
