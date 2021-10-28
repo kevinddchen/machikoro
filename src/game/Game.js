@@ -156,7 +156,7 @@ function commitRoll(G, ctx) {
     default:
       return INVALID_MOVE;
   }
-  afterCommit(G);
+  afterCommit(G, ctx);
 }
 
 function getForwardsBackwards(G, ctx) {
@@ -219,12 +219,18 @@ function countPlant(G, p) {
 /**
  * Check if any purple (major) establishments need to be performed.
  */
-function afterCommit(G) {
+function afterCommit(G, ctx) {
+  const player = parseInt(ctx.currentPlayer);
   if (G.doTV) {
     G.state = "tv";
   } else if (G.doOffice) {
     G.state = "office1";
   } else {
+    // city hall: if zero coins, get one coin.
+    if (G[`land_${player}`][4] && G.money[player] === 0) {
+      log(G, `\t#${player} earns 1 $ (city hall)`);
+      G.money[player] = 1;
+    }
     G.state = "buy";
   }
 }
@@ -259,9 +265,7 @@ export function canBuyEstQ(G, ctx, est) {
     G.state === "buy" && 
     G.est_use[est] && 
     G.est_supply[est] > 0 && 
-    ((G.money[player] >= G.est_cost[est]) || 
-     (G[`land_${player}`][4] && G.money[player] === 0 && G.est_cost[est] === 1) // city hall
-    ) 
+    G.money[player] >= G.est_cost[est]
   );
   if (deck3.includes(est)) {
     return (buyable && G[`est_${player}`][est] === 0);
@@ -276,7 +280,7 @@ export function canBuyEstQ(G, ctx, est) {
 function buyEst(G, ctx, est) {
   const player = parseInt(ctx.currentPlayer);
   if (canBuyEstQ(G, ctx, est)) {
-    G.money[player] = Math.max(G.money[player] - G.est_cost[est], 0); // prevent go below 0
+    G.money[player] -= G.est_cost[est];
     G.est_supply[est]--;
     G.est_total[est]--;
     G[`est_${player}`][est]++;
