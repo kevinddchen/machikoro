@@ -332,7 +332,7 @@ function doTV(G, ctx, p) {
   if (canDoTVQ(G, ctx, p)) {
     take(G, p, player, 5);
     G.doTV = false;
-    afterCommit(G);
+    afterCommit(G, ctx);
   } else {
     return INVALID_MOVE;
   }
@@ -383,7 +383,7 @@ function doOffice2(G, ctx, p, est) {
     G[`est_${p}`][G.officeEst]++;
     G.doOffice = false;
     log(G, `\ttrade ${est_names[G.officeEst]} for ${est_names[est]} with #${p}`);
-    afterCommit(G);
+    afterCommit(G, ctx);
   } else {
     return INVALID_MOVE;
   }
