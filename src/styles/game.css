@@ -1,3 +1,4 @@
+/* GLOBAL */
 .active {
   background-color: red;
   cursor: pointer;
@@ -6,6 +7,65 @@
 .inactive {
   filter: grayscale(1);
 }
+
+/* BUTTONS */
+
+.button_active {
+  background-color: red;
+}
+
+.button_hide {
+  display: none;
+}
+
+.button_button {
+  width: 72px;
+}
+
+.button_td {
+  width: 72px;
+  padding: 3px;
+}
+
+/* ESTABLISHMENTS */
+
+.est_td {
+  padding: 3px;
+  position: relative;
+}
+
+.est_img {
+  width: 114px;
+  height: 182px;
+  display: block;
+}
+
+.est_num {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  color: white;
+  font-size: 14px;
+}
+
+/* LOGS */
+
+.log_box {
+  height: 700px;
+  width: 250px;
+  border: double;
+  overflow: auto;
+  font-size: 12px;
+}
+
+.log_div {
+  white-space: pre;
+  max-height: 15px;
+  display: flex;
+  align-items: center;
+}
+
+/* PLAYER INFO */
 
 .coin_td {
   position: relative;

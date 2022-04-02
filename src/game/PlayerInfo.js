@@ -1,4 +1,4 @@
-import './PlayerInfo.css';
+import '../styles/game.css';
 import React from 'react';
 import classNames from 'classnames';
 import StackTable from './StackTable';
