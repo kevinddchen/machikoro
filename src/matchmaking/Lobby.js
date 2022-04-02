@@ -1,4 +1,4 @@
-import './Lobby.css';
+import '../styles/matchmaking.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
 import { checkDifferent } from './utils';
@@ -225,6 +225,7 @@ class Lobby extends React.Component {
         <div className="padded_div">
           Name:&nbsp;
           <input
+            class="input-box"
             id="input_name"
             type="text"
             maxLength={16}
@@ -264,7 +265,9 @@ class Lobby extends React.Component {
           <button onClick={this.createMatch}>Create Match</button>
         </div>
         <div className="padded_div">
-          <table><tbody>{this.renderMatchList()}</tbody></table>
+          <table align="center">
+            <tbody>{this.renderMatchList()}</tbody>
+          </table>
         </div>
       </div>
     );

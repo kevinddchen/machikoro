@@ -1,0 +1,41 @@
+.col_matchid {
+  min-width: 12ch;
+  text-align: center;
+}
+
+.col_seats {
+  min-width: 5ch;
+  text-align: center;
+}
+
+.col_setup {
+  min-width: 12ch;
+  text-align: center;
+}
+
+.errorMessage {
+  color: red;
+  padding: 3px;
+}
+
+.input-box{
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #00acdd;
+  border-radius: 10px;
+}
+
+.padded_div {
+  font-size: 20px;
+  padding: 3px;
+  text-align: center;
+}
+
+.title {
+  background-color: #00acdd;
+  color: white;
+  font-family: cursive;
+  font-size: 40pt;
+  font-weight: bolder;
+  text-align: center;
+}
