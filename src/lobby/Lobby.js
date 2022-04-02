@@ -1,4 +1,4 @@
-import '../styles/matchmaking.css';
+import '../styles/lobby.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
 import { checkDifferent } from './utils';
