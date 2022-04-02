@@ -79,39 +79,39 @@ class MachikoroBoard extends React.Component {
 
     return (
       <div>
-        <table><tbody>
-          <tr valign="top">
-            <td>
-              <Buttons 
-                canRoll={canRoll}
-                rollOne={() => moves.rollOne()}
-                rollTwo={() => moves.rollTwo()}
-                roll={G.roll}
-                canKeep={canKeep}
-                keep={() => moves.commitRoll()}
-                canAddTwoKeep={canAddTwoKeep}
-                addTwoKeep={() => moves.addTwo()}
-                canEnd={canEnd}
-                endTurn={() => moves.endTurn()}
-                undo={() => this.props.undo()}
-              />
-              <Establishments 
-                est_use={G.est_use}
-                est_supply={G.est_supply}
-                est_total={G.est_total}
-                canBuyEst={canBuyEst}
-                buyEst={(est) => moves.buyEst(est)}
-              />
-            </td>
-            {playerInfoList}
-            <td>
-              <Log 
-                log={G.log}
-                names={this.names}
-              />
-            </td>
-          </tr>
-        </tbody></table>
+        <div class="div-column">
+          <div class="div-row">
+            <Buttons 
+              canRoll={canRoll}
+              rollOne={() => moves.rollOne()}
+              rollTwo={() => moves.rollTwo()}
+              roll={G.roll}
+              canKeep={canKeep}
+              keep={() => moves.commitRoll()}
+              canAddTwoKeep={canAddTwoKeep}
+              addTwoKeep={() => moves.addTwo()}
+              canEnd={canEnd}
+              endTurn={() => moves.endTurn()}
+              undo={() => this.props.undo()}
+            />
+          </div>
+          <div class="div-row">
+            <Establishments 
+              est_use={G.est_use}
+              est_supply={G.est_supply}
+              est_total={G.est_total}
+              canBuyEst={canBuyEst}
+              buyEst={(est) => moves.buyEst(est)}
+            />
+          </div>
+        </div>
+        <div class="div-column">{playerInfoList}</div>
+        <div class="div-column">
+          <Log
+            log={G.log}
+            names={this.names}
+          />
+        </div>
       </div>
     );
 

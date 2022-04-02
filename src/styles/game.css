@@ -8,23 +8,91 @@
   filter: grayscale(1);
 }
 
+.div-row {
+    display: table;
+    width: 100%;
+}
+
+.div-column {
+    display: table-cell;
+}
+
 /* BUTTONS */
 
-.button_active {
+/* From cssbuttons.io */
+.button {
+ appearance: button;
+ background-color: #0083B1;    /* Machi Koro Dark Blue */
+ border: solid transparent;
+ border-radius: 16px;
+ border-width: 0 0 4px;
+ box-sizing: border-box;
+ color: #FFFFFF;
+ cursor: pointer;
+ display: inline-block;
+ font-size: 15px;
+ font-weight: 700;
+ letter-spacing: .8px;
+ line-height: 20px;
+ margin-left: 3px;
+ margin-right: 3px;
+ outline: none;
+ overflow: visible;
+ padding: 7px 15px;   /* affects button:active */
+ text-align: center;
+ text-transform: uppercase;
+ touch-action: manipulation;
+ transform: translateZ(0);
+ transition: filter .2s;
+ user-select: none;
+ -webkit-user-select: none;
+ vertical-align: middle;
+ white-space: nowrap;
+}
+
+.button:after {
+ background-clip: padding-box;
+ background-color: #00ACDE;    /* Machi Koro Blue */
+ border: solid transparent;
+ border-radius: 16px;
+ border-width: 0 0 4px;
+ bottom: -4px;
+ content: "";
+ left: 0;
+ position: absolute;
+ right: 0;
+ top: 0;
+ z-index: -1;
+}
+
+.button:main, .button:focus {
+ user-select: auto;
+}
+
+.button:hover:not(:disabled) {
+ filter: brightness(1.1);
+}
+
+.button:disabled {
+ cursor: auto;
+}
+
+.button:active:after {
+ border-width: 0 0 0px;
+}
+
+.button:active {
+ padding-bottom: 3px;   /* change if adjust padding */
+}
+
+/* End imported button code */
+
+.button_active:after {
   background-color: red;
 }
 
 .button_hide {
   display: none;
-}
-
-.button_button {
-  width: 72px;
-}
-
-.button_td {
-  width: 72px;
-  padding: 3px;
 }
 
 /* ESTABLISHMENTS */
@@ -35,8 +103,8 @@
 }
 
 .est_img {
-  width: 114px;
-  height: 182px;
+  width: 125px;
+  height: 200px;
   display: block;
 }
 
