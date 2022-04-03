@@ -34,10 +34,10 @@ class PlayerInfo extends React.Component {
       if (land_use[land])
         Table.push(
           <td key={i} 
-            className={classNames("land_td", {"active": canBuyLand(p, land)})} 
+            class={classNames("land_td", {"active": canBuyLand(p, land)})} 
             onClick={() => buyLand(p, land)}
           >
-            <img className={classNames(land_img, {"inactive": !land_p[land]})} 
+            <img class={classNames(land_img, {"inactive": !land_p[land]})} 
               src={`./assets/${img_path}`}
               alt=""
             />
@@ -46,31 +46,53 @@ class PlayerInfo extends React.Component {
     }
 
     // establishment miniatures
-    const minis = []
+    const minis = [];
+
+    // determine est index of the last displayed establishment 
     for (let i=0; i<est_order.length; i++) {
-      const { est, mini_path } = est_order[i];
+      const { est } = est_order[est_order.length-i-1];
+      if (est_p[est] > 0) {
+        var last_est_id = est;
+        break;
+      }
+    }
+
+    for (let i=0; i<est_order.length; i++) {
+      const { est, img_path, mini_path } = est_order[i];
       for (let count=0; count<est_p[est]; count++) {
-        minis.push(
-          <div key={`${i}_${count}`} 
-            className={classNames(estmini_div, {"active": canDoOffice(p, est)})}
-            onClick={() => doOffice(p, est)}
-          >
-            <img className="estmini_img" src={`./assets/${mini_path}`} alt=""/>
-          </div>
-        );
+        if (est == last_est_id && count == est_p[est]-1) {
+          // show the last card in full
+          minis.push(
+            <div key={`${i}_${count}`} 
+              class={classNames(estmini_div, {"active": canDoOffice(p, est)})}
+              onClick={() => doOffice(p, est)}
+            >
+              <img class="estmini_img" src={`./assets/${img_path}`} alt=""/>
+            </div>
+          );
+        } else {
+          minis.push(
+            <div key={`${i}_${count}`} 
+              class={classNames(estmini_div, {"active": canDoOffice(p, est)})}
+              onClick={() => doOffice(p, est)}
+            >
+              <img class="estmini_img" src={`./assets/${mini_path}`} alt=""/>
+            </div>
+          );
+        }
       }
     }
 
     return (
       <td>
-        <div className="coin_td">
-          <img className="coin_img" src="./assets/coin.png" alt=""/>
-          <div className="coin_num">{money}</div>
+        <div class="coin_td">
+          <img class="coin_img" src="./assets/coin.png" alt=""/>
+          <div class="coin_num">{money}</div>
         </div>
-        <div className={classNames("name_div", {"active": canDoTV(p)})} onClick={() => doTV(p)}>
-          <div className="name_text">{name}</div>
+        <div class={classNames("name_div", {"active": canDoTV(p)})} onClick={() => doTV(p)}>
+          <div class="name_text">{name}</div>
         </div>
-        {Table.render()}
+        <div>{Table.render()}</div>
         <div>{minis}</div>
       </td>
     );
