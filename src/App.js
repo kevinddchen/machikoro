@@ -1,4 +1,4 @@
-import './styles/lobby.css';
+import './styles/main.css';
 import React from "react";
 import { Client } from "boardgame.io/react";
 import { SocketIO } from "boardgame.io/multiplayer"

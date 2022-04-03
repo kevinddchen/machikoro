@@ -1,12 +1,17 @@
-/* GLOBAL */
-.active {
-  background-color: red;
-  cursor: pointer;
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+     GLOBAL CSS CODES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+*/
+
+/* COLOR CODES */
+
+:root{
+  --primary: #00ACDE;         /* Machi Koro Blue */
+  --primary-dark: #0083B1;    /* Machi Koro Dark Blue */
 }
 
-.inactive {
-  filter: grayscale(1);
-}
+/* DIV FORMATTING */
 
 .div-row {
     display: table;
@@ -17,12 +22,19 @@
     display: table-cell;
 }
 
-/* BUTTONS */
+/* FONTS */
 
-/* From cssbuttons.io */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=Sigmar+One');
+
+/* 
+   BUTTONS
+   (Used in both the lobby and the game)
+   This one is from cssbuttons.io 
+*/
+
 .button {
  appearance: button;
- background-color: #0083B1;    /* Machi Koro Dark Blue */
+ background-color: var(--primary-dark);
  border: solid transparent;
  border-radius: 16px;
  border-width: 0 0 4px;
@@ -52,7 +64,7 @@
 
 .button:after {
  background-clip: padding-box;
- background-color: #00ACDE;    /* Machi Koro Blue */
+ background-color: var(--primary);
  border: solid transparent;
  border-radius: 16px;
  border-width: 0 0 4px;
@@ -84,8 +96,84 @@
 .button:active {
  padding-bottom: 3px;   /* change if adjust padding */
 }
-
 /* End imported button code */
+
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+     LOBBY SPECIFIC CSS CODES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+*/
+
+/* TITLES */
+
+.title {
+  background-color: var(--primary);   
+  color: white;
+  font-family: "Kanit", "Sigmar One", cursive;
+  font-size: 40pt;
+  font-weight: bold;
+  text-align: center;
+}
+
+.subtitle {
+  color: black;
+  font-family: sans-serif;
+  font-size: 20pt;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* CREATE ROOM */
+
+.input-box{
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #00acdd;
+  border-radius: 10px;
+}
+
+.padded_div {
+  font-size: 20px;
+  padding: 3px;
+  text-align: center;
+}
+
+.col_matchid {
+  min-width: 12ch;
+  text-align: center;
+}
+
+.col_seats {
+  min-width: 5ch;
+  text-align: center;
+}
+
+.col_setup {
+  min-width: 12ch;
+  text-align: center;
+}
+
+.errorMessage {
+  color: red;
+  padding: 3px;
+}
+
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+     GAME SPECIFIC CSS CODES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+*/
+
+/* ACTIONS & ITEM SELECTION */
+
+.active {
+  background-color: red;
+  cursor: pointer;
+}
+
+.inactive {
+  filter: grayscale(1);
+}
 
 .button_active:after {
   background-color: red;

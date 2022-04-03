@@ -1,4 +1,4 @@
-import '../styles/lobby.css';
+import '../styles/main.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
 import { checkDifferent } from './utils';
@@ -223,7 +223,7 @@ class Lobby extends React.Component {
     return (
       <div>
         <div className="padded_div">
-          Name:&nbsp;
+          <span>Enter Player Name: </span>
           <input
             class="input-box"
             id="input_name"
@@ -234,21 +234,15 @@ class Lobby extends React.Component {
             onChange={this.setName}
           />
         </div>
-        <div className="padded_div">
-          <select 
-            id="input_numPlayers"
-            onChange={this.setNumPlayers}
-          >
-            <option value="2">2 players</option>
-            <option value="3">3 players</option>
-            <option value="4">4 players</option>
-            <option value="5">5 players</option>
+        <div class="padded_div">
+          <span className="subtitle">Create Room</span><br/>
+          <select id="input_numPlayers" onChange={this.setNumPlayers}>
+            <option value="2">2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4">4 Players</option>
+            <option value="5">5 Players</option>
           </select>
-          &nbsp;
-          <select 
-            id="input_expansion"
-            onChange={this.setExpansion}
-          >
+          <select id="input_expansion" onChange={this.setExpansion}>
             <option value="base">Base Game</option>
             <option value="harbor">Harbor Expansion</option>
           </select>
@@ -262,12 +256,13 @@ class Lobby extends React.Component {
             <option value="total">Total Supply</option>
           </select>
           &nbsp;
-          <button onClick={this.createMatch}>Create Match</button>
+          <button className="button" onClick={this.createMatch}>
+            Create Room
+          </button>
         </div>
         <div className="padded_div">
-          <table align="center">
-            <tbody>{this.renderMatchList()}</tbody>
-          </table>
+          <span className="subtitle">Lobby</span>
+          <div align="center">{this.renderMatchList()}</div>
         </div>
       </div>
     );
