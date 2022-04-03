@@ -7,8 +7,10 @@
 /* COLOR CODES */
 
 :root{
-  --primary: #00ACDE;         /* Machi Koro Blue */
-  --primary-dark: #0083B1;    /* Machi Koro Dark Blue */
+  --primary: #00ACDE;         /* Blue */
+  --primary-dark: #0083B1;    /* Dark Blue */
+  --secondary: #FDD1A2;       /* Sand */
+  --secondary-dark: #BDAC92;  /* Dark Sand */
 }
 
 /* DIV FORMATTING */
@@ -117,26 +119,39 @@
 
 .subtitle {
   color: black;
+  display: inline-block;
   font-family: sans-serif;
-  font-size: 20pt;
+  font-size: 25pt;
   font-weight: bold;
+  margin: 20px 0 10px;
   text-align: center;
 }
 
-/* CREATE ROOM */
-
-.input-box{
-  margin: 8px 0;
-  box-sizing: border-box;
-  border: 2px solid #00acdd;
-  border-radius: 10px;
-}
+/* PLAYER NAME ENTRY */
 
 .padded_div {
   font-size: 20px;
   padding: 3px;
   text-align: center;
 }
+
+/* CREATE ROOM */
+
+.input-box{
+  border-radius: 10px;
+  border: 2px solid #00acdd;
+  box-sizing: border-box;
+  font-size: 20px;
+  margin: 8px 0;
+}
+
+select {
+  font-size: 20px;
+  margin: 2px;
+  padding: 6px;
+}
+
+/* LOBBY */
 
 .col_matchid {
   min-width: 12ch;
