@@ -1,4 +1,4 @@
-import './Establishments.css';
+import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 import StackTable from './StackTable';

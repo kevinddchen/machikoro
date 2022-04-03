@@ -1,9 +1,9 @@
-import './App.css';
+import './styles/main.css';
 import React from "react";
 import { Client } from "boardgame.io/react";
 import { SocketIO } from "boardgame.io/multiplayer"
 import { Machikoro } from "./game/Game";
-import Matchmaker from './matchmaking/Matchmaker'; // handles matchmaking
+import Matchmaker from './lobby/Matchmaker'; // handles matchmaking
 import MachikoroBoard  from "./game/Board"; // hangles game
 
 class App extends React.Component {
@@ -60,9 +60,7 @@ class App extends React.Component {
             : 
             null
           }
-          <div className="title">
-            Machikoro
-          </div>
+          <div className="title">MACHI KORO</div>
           <Matchmaker 
             serverOrigin={this.serverOrigin}
             start={this.startMatch}/>

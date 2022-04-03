@@ -1,0 +1,307 @@
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+     GLOBAL CSS CODES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+*/
+
+/* COLOR CODES */
+
+:root{
+  --primary: #00ACDE;         /* Blue */
+  --primary-dark: #0083B1;    /* Dark Blue */
+  --secondary: #FDD1A2;       /* Sand */
+  --secondary-dark: #BDAC92;  /* Dark Sand */
+}
+
+/* DIV FORMATTING */
+
+.div-row {
+    display: table;
+    width: 100%;
+}
+
+.div-column {
+    display: table-cell;
+}
+
+/* FONTS */
+
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=Sigmar+One');
+
+/* 
+   BUTTONS
+   (Used in both the lobby and the game)
+   This one is from cssbuttons.io 
+*/
+
+.button {
+ appearance: button;
+ background-color: var(--primary-dark);
+ border: solid transparent;
+ border-radius: 16px;
+ border-width: 0 0 4px;
+ box-sizing: border-box;
+ color: #FFFFFF;
+ cursor: pointer;
+ display: inline-block;
+ font-size: 15px;
+ font-weight: 700;
+ letter-spacing: .8px;
+ line-height: 20px;
+ margin-left: 3px;
+ margin-right: 3px;
+ outline: none;
+ overflow: visible;
+ padding: 7px 15px;   /* affects button:active */
+ text-align: center;
+ text-transform: uppercase;
+ touch-action: manipulation;
+ transform: translateZ(0);
+ transition: filter .2s;
+ user-select: none;
+ -webkit-user-select: none;
+ vertical-align: middle;
+ white-space: nowrap;
+}
+
+.button:after {
+ background-clip: padding-box;
+ background-color: var(--primary);
+ border: solid transparent;
+ border-radius: 16px;
+ border-width: 0 0 4px;
+ bottom: -4px;
+ content: "";
+ left: 0;
+ position: absolute;
+ right: 0;
+ top: 0;
+ z-index: -1;
+}
+
+.button:main, .button:focus {
+ user-select: auto;
+}
+
+.button:hover:not(:disabled) {
+ filter: brightness(1.1);
+}
+
+.button:disabled {
+ cursor: auto;
+}
+
+.button:active:after {
+ border-width: 0 0 0px;
+}
+
+.button:active {
+ padding-bottom: 3px;   /* change if adjust padding */
+}
+/* End imported button code */
+
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+     LOBBY SPECIFIC CSS CODES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+*/
+
+/* TITLES */
+
+.title {
+  background-color: var(--primary);   
+  color: white;
+  font-family: "Kanit", "Sigmar One", cursive;
+  font-size: 40pt;
+  font-weight: bold;
+  text-align: center;
+}
+
+.subtitle {
+  color: black;
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 25pt;
+  font-weight: bold;
+  margin: 20px 0 10px;
+  text-align: center;
+}
+
+/* PLAYER NAME ENTRY */
+
+.padded_div {
+  font-size: 20px;
+  padding: 3px;
+  text-align: center;
+}
+
+/* CREATE ROOM */
+
+.input-box{
+  border-radius: 10px;
+  border: 2px solid #00acdd;
+  box-sizing: border-box;
+  font-size: 20px;
+  margin: 8px 0;
+}
+
+select {
+  font-size: 20px;
+  margin: 2px;
+  padding: 6px;
+}
+
+/* LOBBY */
+
+.col_matchid {
+  min-width: 12ch;
+  text-align: center;
+}
+
+.col_seats {
+  min-width: 5ch;
+  text-align: center;
+}
+
+.col_setup {
+  min-width: 12ch;
+  text-align: center;
+}
+
+.errorMessage {
+  color: red;
+  padding: 3px;
+}
+
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+     GAME SPECIFIC CSS CODES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+*/
+
+/* ACTIONS & ITEM SELECTION */
+
+.active {
+  background-color: red;
+  cursor: pointer;
+}
+
+.inactive {
+  filter: grayscale(1);
+}
+
+.button_active:after {
+  background-color: red;
+}
+
+.button_hide {
+  display: none;
+}
+
+/* ESTABLISHMENTS */
+
+.est_td {
+  padding: 3px;
+  position: relative;
+}
+
+.est_img {
+  width: 125px;
+  height: 200px;
+  display: block;
+}
+
+.est_num {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  color: white;
+  font-size: 14px;
+}
+
+/* LOGS */
+
+.log_box {
+  height: 700px;
+  width: 250px;
+  border: double;
+  overflow: auto;
+  font-size: 12px;
+}
+
+.log_div {
+  white-space: pre;
+  max-height: 15px;
+  display: flex;
+  align-items: center;
+}
+
+/* PLAYER INFO */
+
+.coin_td {
+  position: relative;
+}
+
+.coin_img {
+  width: 25px;
+}
+
+.coin_num {
+  position: absolute;
+  text-align: center;
+  top: 5px;
+  width: 25px;
+  color: white;
+  font-size: 14px;
+}
+
+.land_td {
+  padding: 3px;
+}
+
+.name_div {
+  padding: 3px;
+}
+
+.name_text {
+  width: 80px;
+  background: white;
+  overflow: hidden;
+  font-size: 10pt;
+}
+
+.land_img_self {
+  width: 70px;
+  height: 112px;
+  display: block;
+}
+
+.land_img {
+  width: 35px;
+  height: 56px;
+  display: block;
+}
+
+.estmini_div_self {
+  width: 100px;
+  margin: 0 auto;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.estmini_div {
+  width: 80px;
+  margin: 0 auto;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.estmini_img_self {
+  width: 100%;
+  display: block;
+}
+
+.estmini_img {
+  width: 100%;
+  display: block;
+}

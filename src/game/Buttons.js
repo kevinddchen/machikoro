@@ -1,4 +1,4 @@
-import './Buttons.css';
+import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 
@@ -21,47 +21,43 @@ class Buttons extends React.Component {
     } = this.props;
 
     const tbody = 
-      <tr>
-        <td className={classNames("buttons_td", {"active": canRoll(1)})}>
-          <button className="buttons_button" onClick={rollOne}>
+      <div class="div-row">
+        <div class="div-column">
+          <button className={classNames("button", {"button_active": canRoll(1)})} onClick={rollOne}>
             Roll 1
           </button>
-        </td>
-        <td className={classNames("buttons_td", {"active": canRoll(2)})}>
-          <button className="buttons_button" onClick={rollTwo}>
+
+          <button className={classNames("button", {"button_active": canRoll(2)})} onClick={rollTwo}>
             Roll 2
           </button>
-        </td>
-        <td className={classNames("buttons_td", {"active": canKeep()})}>
-          <button className={classNames("buttons_button", {"hide": !canKeep()})}
+
+          <button className={classNames("button", {"button_active": canKeep()}, 
+            {"button_hide": !canKeep()})}
             onClick={keep}
           >
-            Keep({roll})
+            Keep ({roll})
           </button>
-        </td>
-        <td className={classNames("buttons_td", {"active": canAddTwoKeep()})}>
-          <button className={classNames("buttons_button", {"hide": !canAddTwoKeep()})}
+
+          <button className={classNames("button", {"button_active": canAddTwoKeep()},
+            {"button_hide": !canAddTwoKeep()})} 
             onClick={addTwoKeep}
           >
-            Keep({roll+2})
+            Keep ({roll+2})
           </button>
-        </td>
-        <td className={classNames("buttons_td", {"active": canEnd()})}>
-          <button className="buttons_button" onClick={endTurn}>
+        </div>
+        <div class="div-column" align="right">
+          <button className={classNames("button", {"button_active": canEnd()})} onClick={endTurn}>
             End Turn
           </button>
-        </td>
-        <td>
-          <button className="buttons_button" onClick={undo}>
+
+          <button className="button" onClick={undo}>
             Undo
           </button>
-        </td>
-      </tr>;
+        </div>
+      </div>;
 
     return (
-      <div>
-        <table><tbody>{tbody}</tbody></table>
-      </div>
+      <div>{tbody}</div>
     );
 
   }

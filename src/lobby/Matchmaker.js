@@ -1,4 +1,4 @@
-import './Matchmaker.css';
+import '../styles/main.css';
 import React from 'react';
 import { LobbyClient } from 'boardgame.io/client';
 import Lobby from './Lobby'; // manages game creation and joining
