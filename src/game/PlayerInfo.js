@@ -71,7 +71,7 @@ class PlayerInfo extends React.Component {
             class={classNames(estmini_div, {"active": canDoOffice(p, est)})}
             onClick={() => doOffice(p, est)}
           >
-          <img class="estmini_img" src={`./assets/${which_path}`} alt=""/>
+            <img class="estmini_img" src={`./assets/${which_path}`} alt=""/>
           </div>
         );
       }

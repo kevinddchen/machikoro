@@ -35,68 +35,68 @@
 */
 
 .button {
- appearance: button;
- background-color: var(--primary-dark);
- border: solid transparent;
- border-radius: 16px;
- border-width: 0 0 4px;
- box-sizing: border-box;
- color: #FFFFFF;
- cursor: pointer;
- display: inline-block;
- font-size: 15px;
- font-weight: 700;
- letter-spacing: .8px;
- line-height: 20px;
- margin-left: 3px;
- margin-right: 3px;
- outline: none;
- overflow: visible;
- padding: 7px 15px;   /* affects button:active */
- text-align: center;
- text-transform: uppercase;
- touch-action: manipulation;
- transform: translateZ(0);
- transition: filter .2s;
- user-select: none;
- -webkit-user-select: none;
- vertical-align: middle;
- white-space: nowrap;
+  appearance: button;
+  background-color: var(--primary-dark);
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  line-height: 20px;
+  margin-left: 3px;
+  margin-right: 3px;
+  outline: none;
+  overflow: visible;
+  padding: 7px 15px;   /* affects button:active */
+  text-align: center;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  transform: translateZ(0);
+  transition: filter .2s;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .button:after {
- background-clip: padding-box;
- background-color: var(--primary);
- border: solid transparent;
- border-radius: 16px;
- border-width: 0 0 4px;
- bottom: -4px;
- content: "";
- left: 0;
- position: absolute;
- right: 0;
- top: 0;
- z-index: -1;
+  background-clip: padding-box;
+  background-color: var(--primary);
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  bottom: -4px;
+  content: "";
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: -1;
 }
 
 .button:main, .button:focus {
- user-select: auto;
+  user-select: auto;
 }
 
 .button:hover:not(:disabled) {
- filter: brightness(1.1);
+  filter: brightness(1.1);
 }
 
 .button:disabled {
- cursor: auto;
+  cursor: auto;
 }
 
 .button:active:after {
- border-width: 0 0 0px;
+  border-width: 0 0 0px;
 }
 
 .button:active {
- padding-bottom: 3px;   /* change if adjust padding */
+  padding-bottom: 3px;   /* change if adjust padding */
 }
 /* End imported button code */
 
@@ -206,34 +206,34 @@ select {
 }
 
 .est_img {
-  width: 125px;
-  height: 200px;
   display: block;
+  height: 200px;
+  width: 125px;
 }
 
 .est_num {
-  position: absolute;
-  top: 5px;
-  left: 5px;
   color: white;
   font-size: 14px;
+  left: 5px;
+  position: absolute;
+  top: 5px;
 }
 
 /* LOGS */
 
 .log_box {
-  height: 700px;
-  width: 250px;
   border: double;
-  overflow: auto;
   font-size: 12px;
+  height: 700px;
+  overflow: auto;
+  width: 250px;
 }
 
 .log_div {
-  white-space: pre;
-  max-height: 15px;
-  display: flex;
   align-items: center;
+  display: flex;
+  max-height: 15px;
+  white-space: pre;
 }
 
 /* PLAYER INFO */
@@ -247,12 +247,12 @@ select {
 }
 
 .coin_num {
+  color: white;
+  font-size: 14px;
   position: absolute;
   text-align: center;
   top: 5px;
   width: 25px;
-  color: white;
-  font-size: 14px;
 }
 
 .land_td {
@@ -264,44 +264,44 @@ select {
 }
 
 .name_text {
-  width: 80px;
   background: white;
+  font-size: 12pt;
   overflow: hidden;
-  font-size: 10pt;
+  width: 80px;
 }
 
 .land_img_self {
-  width: 70px;
-  height: 112px;
   display: block;
+  height: 112px;
+  width: 70px;
 }
 
 .land_img {
-  width: 35px;
-  height: 56px;
   display: block;
+  height: 56px;
+  width: 35px;
 }
 
 .estmini_div_self {
-  width: 100px;
   margin: 0 auto;
   padding-left: 5px;
   padding-right: 5px;
+  width: 100px;
 }
 
 .estmini_div {
-  width: 80px;
   margin: 0 auto;
   padding-left: 5px;
   padding-right: 5px;
+  width: 80px;
 }
 
 .estmini_img_self {
-  width: 100%;
   display: block;
+  width: 100%;
 }
 
 .estmini_img {
-  width: 100%;
   display: block;
+  width: 100%;
 }
