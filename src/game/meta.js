@@ -1,3 +1,7 @@
+/**
+ * Various metadata
+ */
+
 export const est_names = [
   "Wheat Field",          // 0
   "Livestock Farm",       // 1

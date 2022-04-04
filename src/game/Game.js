@@ -1,6 +1,21 @@
 import { PlayerView, TurnOrder, INVALID_MOVE } from 'boardgame.io/core';
 import { est_names, land_names, deck1, deck2, deck3 } from './meta';
 
+/**
+ * Machikoro core game logic
+ * 
+ * We use the `boardgame.io` framework: https://boardgame.io/. It handles all 
+ * interactions between the client and the server. All what we have to do is 
+ * define the `Machikoro` object.
+ * 
+ * `G` is an object that represents the game state.
+ * `ctx` is a read-only object that contains some useful metadata.
+ * 
+ * Functions that have the name `can___Q` are queries whether a move is legal or 
+ * not, and return boolean values. These used internally and are also passed to 
+ * the client to render things correctly.
+ */
+
 // --- Roll dice ---------------------------------------------------------------
 
 export function canRollQ(G, ctx, n) {
@@ -159,11 +174,12 @@ function commitRoll(G, ctx) {
   afterCommit(G, ctx);
 }
 
+// get next player and previous player
 function getForwardsBackwards(G, ctx) {
   let current = ctx.playOrderPos,
-      N = ctx.numPlayers,
-      forwards = [ctx.playOrderPos],
-      backwards = []; 
+    N = ctx.numPlayers,
+    forwards = [ctx.playOrderPos],
+    backwards = []; 
   for (let i=1; i<N; i++)  {
     forwards.push((current+i)%N);
     backwards.push(((current-i)%N + N)%N); // JS modulo is negative
@@ -515,6 +531,7 @@ export const Machikoro = {
 
   name: gameName,
 
+  // `setupData` is set in src/lobby/Lobby.js
   setup: (ctx, setupData) => {
     if (!setupData) setupData = debugSetupData;
     const { expansion, supplyVariant, startCoins, randomizeTurnOrder } = setupData;

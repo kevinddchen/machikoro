@@ -4,12 +4,16 @@ import { LobbyClient } from 'boardgame.io/client';
 import Lobby from './Lobby'; // manages game creation and joining
 import Room from './Room'; // manages pre-match waiting room
 
+/**
+ * Switches between `Lobby` and `Room`
+ */
+
 class Matchmaker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      matchID: '',
-      errorMessage: '',
+      matchID: '',  // this property is populated when we enter a match
+      errorMessage: '',  // any error message to display at the bottom of the page
     }
     this.lobbyClient = new LobbyClient({ server: props.serverOrigin });
   }

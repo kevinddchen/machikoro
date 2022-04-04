@@ -4,6 +4,9 @@ import classNames from 'classnames';
 import StackTable from './StackTable';
 import { est_order } from './meta';
 
+/**
+ * Establishment board, where players see and buy cards
+ */
 class Establishments extends React.Component {
 
   render() {

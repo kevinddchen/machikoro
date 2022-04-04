@@ -4,6 +4,11 @@ import classNames from 'classnames';
 import StackTable from './StackTable';
 import { est_order, land_order } from './meta';
 
+/**
+ * Information panels for a player, displaying name, money, purchased landmarks 
+ * and establishments, etc.
+ */
+
 class PlayerInfo extends React.Component {
 
   render() {
@@ -60,11 +65,12 @@ class PlayerInfo extends React.Component {
     for (let i=0; i<est_order.length; i++) {
       const { est, img_path, mini_path } = est_order[i];
       for (let count=0; count<est_p[est]; count++) {
+        var which_path
         if (est === last_est_id && count === est_p[est]-1) {
           // show the last card in full
-          var which_path = img_path;
+          which_path = img_path;
         } else {
-          var which_path = mini_path;
+          which_path = mini_path;
         }
         minis.push(
           <div key={`${i}_${count}`} 

@@ -1,6 +1,6 @@
 # Machikoro
 
-I do not own a license to the game.
+We do not own a license to the game.
 Images were taken without permission from <a href="https://www.yucata.de/en">yucata.de</a> and <a href="https://machi-koro.fandom.com/">machi-koro.fandom.com</a>.
 
 Developed using React and <a href="https://boardgame.io/">boardgame.io</a>.
