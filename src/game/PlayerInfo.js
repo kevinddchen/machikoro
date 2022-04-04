@@ -60,26 +60,20 @@ class PlayerInfo extends React.Component {
     for (let i=0; i<est_order.length; i++) {
       const { est, img_path, mini_path } = est_order[i];
       for (let count=0; count<est_p[est]; count++) {
-        if (est == last_est_id && count == est_p[est]-1) {
+        if (est === last_est_id && count === est_p[est]-1) {
           // show the last card in full
-          minis.push(
-            <div key={`${i}_${count}`} 
-              class={classNames(estmini_div, {"active": canDoOffice(p, est)})}
-              onClick={() => doOffice(p, est)}
-            >
-              <img class="estmini_img" src={`./assets/${img_path}`} alt=""/>
-            </div>
-          );
+          var which_path = img_path;
         } else {
-          minis.push(
-            <div key={`${i}_${count}`} 
-              class={classNames(estmini_div, {"active": canDoOffice(p, est)})}
-              onClick={() => doOffice(p, est)}
-            >
-              <img class="estmini_img" src={`./assets/${mini_path}`} alt=""/>
-            </div>
-          );
+          var which_path = mini_path;
         }
+        minis.push(
+          <div key={`${i}_${count}`} 
+            class={classNames(estmini_div, {"active": canDoOffice(p, est)})}
+            onClick={() => doOffice(p, est)}
+          >
+          <img class="estmini_img" src={`./assets/${which_path}`} alt=""/>
+          </div>
+        );
       }
     }
 
