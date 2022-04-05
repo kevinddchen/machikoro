@@ -1,6 +1,10 @@
 import '../styles/main.css';
 import React from 'react';
 
+/**
+ * Player-viewable game log
+ */
+
 class Log extends React.Component {
 
   parseName = (x) => this.props.names[x[1]];

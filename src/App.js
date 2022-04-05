@@ -4,16 +4,20 @@ import { Client } from "boardgame.io/react";
 import { SocketIO } from "boardgame.io/multiplayer"
 import { Machikoro } from "./game/Game";
 import Matchmaker from './lobby/Matchmaker'; // handles matchmaking
-import MachikoroBoard  from "./game/Board"; // hangles game
+import MachikoroBoard  from "./game/Board"; // handles game
+
+/**
+ * Switches between `Matchmaker` and the Machikoro client
+ */
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      matchID: '',
+      matchID: '',  // these properties are populated when we join a match
       playerID: '',
       credentials: '',
-      debug: false,
+      debug: false,  // debug mode for the game
     };
     const port = process.env.PORT || 80;
     this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${port}`;
@@ -25,9 +29,13 @@ class App extends React.Component {
 
   startDebug = () => this.setState({debug: true});
 
+  // --- React -----------------------------------------------------------------
+
   componentDidMount() {
     console.log(`env: ${process.env.NODE_ENV}.`);
   }
+
+  // --- Render ----------------------------------------------------------------
 
   render() {
     const { matchID, playerID, credentials, debug } = this.state;

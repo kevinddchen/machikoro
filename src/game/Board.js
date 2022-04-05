@@ -13,7 +13,11 @@ import {
   canDoOffice1Q, 
   canDoOffice2Q,
   canEndQ, 
-} from './Game';
+} from './Game'; // actual logic of the game
+
+/**
+ * Handles all game components
+ */
 
 class MachikoroBoard extends React.Component {
   constructor(props) {
@@ -29,8 +33,6 @@ class MachikoroBoard extends React.Component {
       moves.commitRoll();
     }
   }
-
-  // --- Render ----------------------------------------------------------------
 
   render() {
 

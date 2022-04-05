@@ -2,8 +2,11 @@ import '../styles/main.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
 import { checkDifferent } from './utils';
-
 import { gameName } from '../game/Game';
+
+/**
+ * Pre-match waiting room
+ */
 
 class Room extends React.Component {
   constructor(props) {

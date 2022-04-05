@@ -2,8 +2,11 @@ import '../styles/main.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
 import { checkDifferent } from './utils';
-
 import { gameName } from '../game/Game';
+
+/**
+ * Handles match creation and joining matches
+ */
 
 class Lobby extends React.Component {
   constructor(props) {
@@ -11,12 +14,12 @@ class Lobby extends React.Component {
     this.state = {
       name: '',
       numPlayers: 4,
-      matchList: null, // {matchID: string, currPlayers: number, numPlayers: number}
+      matchList: null, // type: {matchID: string, currPlayers: number, numPlayers: number}
       expansion: 'base',
       supplyVariant: 'hybrid',
       fetchErrors: 0,
     };
-    this.matchCounts = null; // number[]
+    this.matchCounts = null; // type: number[]
     this.interval = null;
     this.Authenticator = new Authenticator();
   }
@@ -77,6 +80,9 @@ class Lobby extends React.Component {
 
   // --- Match management ------------------------------------------------------
 
+  /**
+   * Create a match based on the selected options.
+   */
   createMatch = async () => {
     const { name, numPlayers, expansion, supplyVariant } = this.state;
 
@@ -97,6 +103,9 @@ class Lobby extends React.Component {
     }
   };
 
+  /**
+   * Join a match given the internal `matchID`.
+   */
   joinMatch = async (matchID) => {
     try {
       if (this.Authenticator.hasCredentials(matchID) || await this._joinWithoutCredentials(matchID)) {

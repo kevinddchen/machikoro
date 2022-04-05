@@ -2,6 +2,10 @@ import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 
+/**
+ * Buttons on top of the screen, i.e. Rolling, End Turn, and Undo.
+ */
+
 class Buttons extends React.Component {
 
   render() {
