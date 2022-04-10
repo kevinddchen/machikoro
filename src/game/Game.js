@@ -2,11 +2,11 @@ import { PlayerView, TurnOrder, INVALID_MOVE } from 'boardgame.io/core';
 import { est_names, land_names, deck1, deck2, deck3 } from './meta';
 
 /**
- * Machikoro core game logic
+ * === Machikoro core game logic ===
  * 
  * We use the `boardgame.io` framework: https://boardgame.io/. It handles all 
  * interactions between the client and the server. All what we have to do is 
- * define the `Machikoro` object.
+ * define the `Machikoro` object at the bottom on this file.
  * 
  * `G` is an object that represents the game state.
  * `ctx` is a read-only object that contains some useful metadata.
@@ -14,10 +14,23 @@ import { est_names, land_names, deck1, deck2, deck3 } from './meta';
  * Functions that have the name `can___Q` are queries whether a move is legal or 
  * not, and return boolean values. These used internally and are also passed to 
  * the client to render things correctly.
+ * 
+ * === Internal ===
+ * 
+ * `G.state` tracks the player's internal state. The possible values are
+ *    roll: rolling dice
+ *    tv: doing tv action
+ *    office1: doing office action, picking own establishment
+ *    office2: doing office action, picking opponent establishment
+ *    buy: buy an establishment
+ *    end: player is done everything, but can undo if they wish
  */
 
 // --- Roll dice ---------------------------------------------------------------
 
+/**
+ * Query if current player can roll `n` dice.
+ */
 export function canRollQ(G, ctx, n) {
   const player = parseInt(ctx.currentPlayer);
   return (
@@ -35,6 +48,7 @@ function rollOne(G, ctx) {
     G.roll = ctx.random.Die(6);
     G.numRolls++;
     log(G, `\troll ${G.roll}`);
+    afterRoll(G, ctx);
   } else {
     return INVALID_MOVE;
   }
@@ -52,6 +66,7 @@ function rollTwo(G, ctx) {
     G.roll = dice.reduce( (a, b) => a+b );
     G.numRolls++;
     log(G, `\troll ${G.roll} (${dice})`);
+    afterRoll(G, ctx);
   } else {
     return INVALID_MOVE;
   }
@@ -64,6 +79,16 @@ function debugRoll(G, ctx, roll) {
   G.roll = roll;
   G.numRolls++;
   log(G, `\tdebug roll ${G.roll}`);
+  afterRoll(G, ctx);
+}
+
+/**
+ * After a roll, decide whether to commit the roll or wait for player input.
+ */
+function afterRoll(G, ctx) {
+  if (!canAddTwoQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
+    commitRoll(G, ctx);
+  }
 }
 
 // --- Commit roll -------------------------------------------------------------
@@ -73,12 +98,21 @@ export function canCommitRollQ(G, ctx) {
 }
 
 /**
+ * Player move that just calls `commitRoll`.
+ */
+function keepRoll(G, ctx) {
+  if (canCommitRollQ(G, ctx)) {
+    commitRoll(G, ctx);
+  } else {
+    return INVALID_MOVE;
+  }
+}
+
+/**
  * Evaluate outcome of roll
  */
 function commitRoll(G, ctx) {
-  if (!canCommitRollQ(G, ctx)) {
-    return INVALID_MOVE;
-  }
+  // Note: this is no longer a player move, and should only be called internally.
   // get list of players in forward/backward order. Forward order includes
   // current player, backward order excludes current player.
   const { forwards, backwards } = getForwardsBackwards(G, ctx);
@@ -615,8 +649,8 @@ export const Machikoro = {
       move: debugRoll,
       redact: true,
     },
-    commitRoll: {
-      move: commitRoll,
+    keepRoll: {
+      move: keepRoll,
       undoable: false,
     },
     addTwo: {

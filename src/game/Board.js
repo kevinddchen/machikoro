@@ -25,15 +25,6 @@ class MachikoroBoard extends React.Component {
     this.names = props.matchData.map( (x) => x.name ? x.name : `player_${x.id}` );
   }
 
-  componentDidUpdate() {
-    const { G, ctx, moves, isActive } = this.props;
-
-    // auto commitRoll
-    if (isActive && canCommitRollQ(G, ctx) && !canAddTwoQ(G, ctx) && !canRollQ(G, ctx, 1) && !canRollQ(G, ctx, 2)) {
-      moves.commitRoll();
-    }
-  }
-
   render() {
 
     const { G, ctx, moves, isActive } = this.props;
@@ -89,7 +80,7 @@ class MachikoroBoard extends React.Component {
               rollTwo={() => moves.rollTwo()}
               roll={G.roll}
               canKeep={canKeep}
-              keep={() => moves.commitRoll()}
+              keep={() => moves.keepRoll()}
               canAddTwoKeep={canAddTwoKeep}
               addTwoKeep={() => moves.addTwo()}
               canEnd={canEnd}
