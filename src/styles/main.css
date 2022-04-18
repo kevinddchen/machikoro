@@ -1,16 +1,21 @@
 /* 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      GLOBAL CSS CODES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
 /* COLOR CODES */
 
 :root{
-  --primary: #00ACDE;         /* Blue */
-  --primary-dark: #0083B1;    /* Dark Blue */
-  --secondary: #FDD1A2;       /* Sand */
-  --secondary-dark: #BDAC92;  /* Dark Sand */
+  --primary: #00ACDE;           /* Blue */
+  --primary-dark: #0083B1;      /* Dark Blue */
+
+  --est-pri: #3B73B9;           /* Primary Industry (Base) */
+  --est-pri-light: #7AB8DF;     /* Primary Industry (Alt) */
+  --est-sec: #477F39;           /* Secondary Industry (Base) */
+  --est-sec-light: #88B86E;     /* Secondary Industry (Alt) */
+  --est-res: #9C213A;           /* Restaurants (Base) */
+  --est-res-light: #BE6C7C;     /* Restaurants (Alt) */
 }
 
 /* DIV FORMATTING */
@@ -101,9 +106,9 @@
 /* End imported button code */
 
 /* 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      LOBBY SPECIFIC CSS CODES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
 /* TITLES */
@@ -174,9 +179,9 @@ select {
 }
 
 /* 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      GAME SPECIFIC CSS CODES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
 /* ACTIONS & ITEM SELECTION */
@@ -197,6 +202,26 @@ select {
 .button_hide {
   display: none;
 }
+
+/* STATUS BAR */
+.status-bar{
+  background-color: var(--primary);
+  color: white;
+  font-size: 18px;
+  margin: 5px;
+  padding: 2px;
+  text-align: center;
+}
+
+.status-bar-active{
+  background-color: var(--est-res-light);
+  /*animation: change-color 5s ease-in-out infinite alternate;*/
+}
+
+/*@keyframes change-color {
+  from {background-color: var(--primary);}
+  to {background-color: var(--primary-dark);}
+}*/
 
 /* ESTABLISHMENTS */
 

@@ -3,6 +3,7 @@ import Buttons from './Buttons'; // buttons on top of screen
 import Establishments from './Establishments'; // board where establishments are displayed
 import PlayerInfo from './PlayerInfo'; // information panels for each player
 import Log from './Log'; // game log display
+import StatusBar from './StatusBar'; // game status display
 import { 
   canRollQ, 
   canCommitRollQ, 
@@ -86,6 +87,14 @@ class MachikoroBoard extends React.Component {
               canEnd={canEnd}
               endTurn={() => moves.endTurn()}
               undo={() => this.props.undo()}
+            />
+          </div>
+          <div class="div-row">
+            <StatusBar 
+              currentPlayer={this.names[ctx.currentPlayer]}
+              state={G.state}
+              isActive={isActive}
+              isGameOver={ctx.gameover}
             />
           </div>
           <div class="div-row">
