@@ -152,8 +152,8 @@
 .mm-container{
   border-radius: 16px;
   border: solid var(--primary-dark);
+  max-width: 800px;
   text-align: center;
-  width: 40%;
 }
 
 .mm-div-row {
