@@ -72,7 +72,12 @@ class App extends React.Component {
           <Matchmaker 
             serverOrigin={this.serverOrigin}
             start={this.startMatch}/>
+          <footer class="footer">
+            <a href="https://github.com/kevinddchen/machikoro" target="_blank">
+            <img src="./GitHub-Mark-Light-32px.png" /></a>
+          </footer>
         </div>
+
       );
 
     }
