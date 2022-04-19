@@ -90,27 +90,17 @@ class Room extends React.Component {
     const { playerList } = this.state;
 
     const tbody = [];
-    tbody.push(
-      <tr key={-1}>
-        <th className="col_ind"></th>
-        <th className="col_playerid">Seat</th>
-        <th className="col_name">Name</th>
-      </tr>
-    );
     for (let i=0; i<playerList.length; i++) {
-      let indicator,
-          button;
+      let button,
+          addclass = "mm-td";
       if (i === parseInt(this.playerID)) {
-        indicator = '-->';
-        button = <button onClick={this.leaveMatch}>Leave</button>
+        addclass = "mm-td mm-td-active";    /* use css as indicator */
+        button = <button class="button" onClick={this.leaveMatch}>Leave</button>
       }
       tbody.push(
-        <tr key={i}>
-          <td>{indicator}</td>
-          <td>{i+1}</td>
-          <td>{playerList[i]}</td>
-          <td>{button}</td>
-        </tr>
+        <td class={addclass} key={i}>
+          {i+1}: {playerList[i]} <br/> {button}
+        </td>
       );
     }
     return tbody;
@@ -120,16 +110,46 @@ class Room extends React.Component {
     const { matchID } = this.props;
     const { expansion, supplyVariant } = this.state;
 
+    let text_expansion = '',
+        text_supplyVariant = '';
+
+    switch (expansion) {
+      case 'base':
+        text_expansion = 'Base Game';
+        break;
+      case 'harbor':
+        text_expansion = 'Harbor Expansion';
+        break;
+      default:
+        text_expansion = '??? Expansion';
+    }
+
+    switch (supplyVariant) {
+      case 'hybrid':
+        text_supplyVariant = 'Hybrid Supply';
+        break;
+      case 'variable':
+        text_supplyVariant = 'Variable Supply';
+        break;
+      case 'total':
+        text_supplyVariant = 'Total Supply';
+        break;
+      default:
+        text_supplyVariant = '??? Supply Variant';
+    }
+
     return (
-      <div>
-        <div className="padded_div">
-          <div>In match ({matchID}).</div>
-          <div>- Expansion: {expansion}</div>
-          <div>- Supply variant: {supplyVariant}</div>
-          <div>Game will start when seats are filled.</div>
-        </div>
-        <div className="padded_div">
-          <table><tbody>{this.renderPlayerList()}</tbody></table>
+      <div align="center"><br/>
+        <div class="mm-container">
+          <div class="mm-div-row">
+            <div class="mm-div-cell"><b>Room ID:</b> {matchID}</div>
+            <div class="mm-div-cell"><b>{text_expansion}</b></div>
+            <div class="mm-div-cell"><b>{text_supplyVariant}</b></div>
+          </div>
+          <div class="mm-div-row">Game will start when all seats are filled.</div>
+          <div class="mm-div-row"><div class="mm-div-cell">
+            <b>Players</b><br/> <table class="mm-table">{this.renderPlayerList()}</table>
+          </div></div>
         </div>
       </div>
     );

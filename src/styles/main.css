@@ -21,12 +21,12 @@
 /* DIV FORMATTING */
 
 .div-row {
-    display: table;
-    width: 100%;
+  display: table;
+  width: 100%;
 }
 
 .div-column {
-    display: table-cell;
+  display: table-cell; 
 }
 
 /* FONTS */
@@ -145,6 +145,51 @@
   position: fixed;
   text-align: center;
   width: 100%;
+}
+
+/* MATCHMAKING */
+
+.mm-container{
+  border-radius: 16px;
+  border: solid var(--primary-dark);
+  text-align: center;
+  width: 40%;
+}
+
+.mm-div-row {
+  display: table;
+  font-size: 18px;
+  text-align: center;
+  width: 100%;
+}
+
+.mm-div-cell {
+  background-color: var(--primary);
+  border-radius: 16px;
+  border: solid white;
+  color: white;
+  display: table-cell;
+  padding: 1px 10px;
+}
+
+.mm-table {
+  font-size: 20px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.mm-td {
+  background-color: white;
+  border-radius: 16px;
+  border: solid var(--primary) 2px;
+  color: black;
+  overflow-wrap: break-word;
+  padding: 5px 10px;
+  width: 20%;
+}
+
+.mm-td-active {
+  border: solid red 4px;
 }
 
 /* PLAYER NAME ENTRY */
