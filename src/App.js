@@ -73,8 +73,8 @@ class App extends React.Component {
             serverOrigin={this.serverOrigin}
             start={this.startMatch}/>
           <footer class="footer">
-            <a href="https://github.com/kevinddchen/machikoro" target="_blank">
-            <img src="./GitHub-Mark-Light-32px.png" /></a>
+            <a href="https://github.com/kevinddchen/machikoro" target="_blank"
+             rel="noreferrer"><img src="./GitHub-Mark-Light-32px.png" alt="GitHub logo"/></a>
           </footer>
         </div>
 
