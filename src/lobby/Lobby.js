@@ -208,11 +208,11 @@ class Lobby extends React.Component {
         const { matchID, currPlayers, numPlayers, setupData } = matchList[i];
         let button;
         if (this.Authenticator.hasCredentials(matchID)) {
-          button = <button onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
+          button = <button class="button" onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
         } else if (currPlayers === numPlayers) {
           button = null;
         } else {
-          button = <button onClick={() => this.joinMatch(matchID)}>Join</button>;
+          button = <button class="button" onClick={() => this.joinMatch(matchID)}>Join</button>;
         }
         tbody.push(
           <tr key={i}>
