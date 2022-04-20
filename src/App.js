@@ -5,6 +5,7 @@ import { SocketIO } from "boardgame.io/multiplayer"
 import { Machikoro } from "./game/Game";
 import Matchmaker from './lobby/Matchmaker'; // handles matchmaking
 import MachikoroBoard  from "./game/Board"; // handles game
+import { PORT, IN_PROD } from './config';
 
 /**
  * Switches between `Matchmaker` and the Machikoro client
@@ -19,8 +20,7 @@ class App extends React.Component {
       credentials: '',
       debug: false,  // debug mode for the game
     };
-    const port = process.env.PORT || 80;
-    this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${port}`;
+    this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
   }
 
   startMatch = (matchID, playerID, credentials) => {
@@ -40,7 +40,7 @@ class App extends React.Component {
   render() {
     const { matchID, playerID, credentials, debug } = this.state;
 
-    if (matchID || (debug && process.env.NODE_ENV === 'development')) {
+    if (matchID || (debug && !IN_PROD)) {
 
       const MachikoroClient = Client({
         game: Machikoro,
@@ -59,7 +59,7 @@ class App extends React.Component {
     
       return (
         <div>
-          { process.env.NODE_ENV === 'development' ?
+          { !IN_PROD ?
             <div className="padded_div">
               <button onClick={this.startDebug}>
                 DEBUG

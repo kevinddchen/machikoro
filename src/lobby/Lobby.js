@@ -2,7 +2,8 @@ import '../styles/main.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
 import { checkDifferent } from './utils';
-import { gameName } from '../game/Game';
+import { GAME_NAME } from '../game/Game';
+import { UPDATE_INTERVAL } from '../config';
 
 /**
  * Handles match creation and joining matches
@@ -48,7 +49,7 @@ class Lobby extends React.Component {
     const { lobbyClient } = this.props;
 
     try {
-      const { matches } = await lobbyClient.listMatches(gameName);
+      const { matches } = await lobbyClient.listMatches(GAME_NAME);
       const newMatchCounts = matches.map(this._countPlayers);
       // if number of current players do not agree, update
       if (checkDifferent(newMatchCounts, this.matchCounts)) {
@@ -91,7 +92,7 @@ class Lobby extends React.Component {
       return;
     }
     try {
-      const { matchID } = await this.props.lobbyClient.createMatch(gameName, {
+      const { matchID } = await this.props.lobbyClient.createMatch(GAME_NAME, {
         numPlayers,
         setupData: {expansion, supplyVariant, startCoins: 3, randomizeTurnOrder: true},
       });
@@ -131,7 +132,7 @@ class Lobby extends React.Component {
     }
 
     // find an open seat
-    const match = await this.props.lobbyClient.getMatch(gameName, matchID);
+    const match = await this.props.lobbyClient.getMatch(GAME_NAME, matchID);
     let seat; 
     for (let i=0; i<match.players.length; i++) {
       if ("name" in match.players[i]) { // check if seat is occupied
@@ -151,7 +152,7 @@ class Lobby extends React.Component {
 
     // try to join match
     const { playerCredentials } = await this.props.lobbyClient.joinMatch(
-      gameName,
+      GAME_NAME,
       matchID,
       {
         playerID: seat.toString(),
@@ -166,11 +167,10 @@ class Lobby extends React.Component {
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const { updateInterval } = this.props;
     const { name, numPlayers, expansion, supplyVariant } = this.state;
 
     this.fetchMatches();
-    this.interval = setInterval(this.fetchMatches, updateInterval); 
+    this.interval = setInterval(this.fetchMatches, UPDATE_INTERVAL); 
     // set default values
     document.getElementById("input_name").value = name;
     document.getElementById("input_numPlayers").value = numPlayers;

@@ -58,14 +58,12 @@ class Matchmaker extends React.Component {
           <Room
             lobbyClient={this.lobbyClient}
             matchID={matchID}
-            updateInterval={1000}
             setErrorMessage={this.setErrorMessage}
             leaveRoom={this.leaveRoom}
             start={this.props.start}/>
           :
           <Lobby 
             lobbyClient={this.lobbyClient}
-            updateInterval={1000}
             setErrorMessage={this.setErrorMessage}
             joinRoom={this.joinRoom}/>
         }

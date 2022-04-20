@@ -2,7 +2,8 @@ import '../styles/main.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
 import { checkDifferent } from './utils';
-import { gameName } from '../game/Game';
+import { GAME_NAME } from '../game/Game';
+import { UPDATE_INTERVAL } from '../config';
 
 /**
  * Pre-match waiting room
@@ -29,7 +30,7 @@ class Room extends React.Component {
     const { matchID, lobbyClient } = this.props;
 
     try {
-      const match = await lobbyClient.getMatch(gameName, matchID);
+      const match = await lobbyClient.getMatch(GAME_NAME, matchID);
       let count = 0;
       const newPlayerList = match.players.map( (x) => {
         if (x.name) {
@@ -62,7 +63,7 @@ class Room extends React.Component {
     const { playerID, credentials } = this;
 
     try {
-      await this.props.lobbyClient.leaveMatch(gameName, matchID, { playerID, credentials });
+      await this.props.lobbyClient.leaveMatch(GAME_NAME, matchID, { playerID, credentials });
       this.Authenticator.deleteCredentials(matchID);
       this.props.leaveRoom();
       console.log("Left match.");
@@ -75,9 +76,8 @@ class Room extends React.Component {
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const { updateInterval } = this.props;
     this.fetchMatch();
-    this.interval = setInterval(this.fetchMatch, updateInterval); 
+    this.interval = setInterval(this.fetchMatch, UPDATE_INTERVAL); 
   }
 
   componentWillUnmount() {
