@@ -1,7 +1,7 @@
 import '../styles/main.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
-import { checkDifferent } from './utils';
+import { checkDifferent, expansion_name, supplyVariant_name } from './utils';
 import { gameName } from '../game/Game';
 
 /**
@@ -110,41 +110,13 @@ class Room extends React.Component {
     const { matchID } = this.props;
     const { expansion, supplyVariant } = this.state;
 
-    let text_expansion = '',
-        text_supplyVariant = '';
-
-    switch (expansion) {
-      case 'base':
-        text_expansion = 'Base Game';
-        break;
-      case 'harbor':
-        text_expansion = 'Harbor Expansion';
-        break;
-      default:
-        text_expansion = '??? Expansion';
-    }
-
-    switch (supplyVariant) {
-      case 'hybrid':
-        text_supplyVariant = 'Hybrid Supply';
-        break;
-      case 'variable':
-        text_supplyVariant = 'Variable Supply';
-        break;
-      case 'total':
-        text_supplyVariant = 'Total Supply';
-        break;
-      default:
-        text_supplyVariant = '??? Supply Variant';
-    }
-
     return (
       <div align="center"><br/>
         <div class="mm-container">
           <div class="mm-div-row">
             <div class="mm-div-cell"><b>Room ID:</b> {matchID}</div>
-            <div class="mm-div-cell"><b>{text_expansion}</b></div>
-            <div class="mm-div-cell"><b>{text_supplyVariant}</b></div>
+            <div class="mm-div-cell"><b>{expansion_name(expansion)}</b></div>
+            <div class="mm-div-cell"><b>{supplyVariant_name(supplyVariant)}</b></div>
           </div>
           <div class="mm-div-row">Game will start when all seats are filled.</div>
           <div class="mm-div-row"><div class="mm-div-cell">

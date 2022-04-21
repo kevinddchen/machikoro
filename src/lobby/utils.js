@@ -11,3 +11,29 @@ export function checkDifferent(a, b) {
   }
   return false;
 };
+
+/* Name generating fuctions */
+
+export function expansion_name(expr) {
+  switch (expr) {
+    case 'base':
+      return 'Base Game';
+    case 'harbor':
+      return 'Harbor Expansion';
+    default:
+      return '??? Expansion';
+  }
+}
+
+export function supplyVariant_name(expr) {
+  switch (expr) {
+    case 'hybrid':
+      return 'Hybrid Supply';
+    case 'variable':
+      return 'Variable Supply';
+    case 'total':
+      return 'Total Supply';
+    default:
+      return '??? Supply Variant';
+  }
+}
