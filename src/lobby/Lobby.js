@@ -1,32 +1,55 @@
 import '../styles/main.css';
 import React from 'react';
-import Authenticator from './Authenticator'; // manages match credentials
-import { checkDifferent } from './utils';
+import _ from 'lodash';
+import Authenticator from './Authenticator';
+import { countPlayers } from './utils';
 import { GAME_NAME } from '../game/Game';
 import { UPDATE_INTERVAL } from '../config';
 
-/**
- * Handles match creation and joining matches
- */
+/*
 
+Since `Lobby` makes API requests, here are some notes on the objects that we 
+receive and send:
+
+The `match` object has the following interface:
+- createdAt: number
+- gameName: string that probably equals "machikoro"
+- matchID: string that uniquely identifies the match
+- players: array of `player` objects
+- setupData: object containing setup data that we set in `createMatch`
+- unlisted: boolean
+- updatedAt: number
+
+A `player` object has the following interface:
+- id: number. 0, 1, 2, ...
+- name: string. This is only populated if a player occupies the seat.
+
+Other pieces of metadata that we communicate with the server:
+- playerID: string that equals the player's id (see above)
+- credentials: string that acts like a player's password and authenticates
+    all interactions with the server (e.g. leaving match, game moves)
+
+*/
+
+
+/**
+ * Handles match creation and joining.
+ */
 class Lobby extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
       numPlayers: 4,
-      matchList: null, // type: {matchID: string, currPlayers: number, numPlayers: number}
       expansion: 'base',
       supplyVariant: 'hybrid',
-      fetchErrors: 0,
+      matchList: null,  // array of `match` objects
     };
-    this.matchCounts = null; // type: number[]
-    this.interval = null;
-    this.Authenticator = new Authenticator();
+    this.fetchInterval = null;
+    this.authenticator = new Authenticator();
   }
 
   setName = (e) => {
-    this.setState({name: e.target.value});
+    this.props.setName(e.target.value);
   };
 
   setNumPlayers = (e) => {
@@ -41,175 +64,188 @@ class Lobby extends React.Component {
     this.setState({supplyVariant: e.target.value});
   }
 
+  // --- Fetch matches --------------------------------------------------------
+
   /**
-   * Periodically fetches list of matches from server. Updates render only when
-   * list changes.
+   * Fetch available matches from the server via API call.
    */
   fetchMatches = async () => {
     const { lobbyClient } = this.props;
+    const { matchList } = this.state;
 
     try {
       const { matches } = await lobbyClient.listMatches(GAME_NAME);
-      const newMatchCounts = matches.map(this._countPlayers);
-      // if number of current players do not agree, update
-      if (checkDifferent(newMatchCounts, this.matchCounts)) {
-        const newMatchList = [];
-        for (let i=0; i<matches.length; i++) {
-          const { matchID, players, setupData } = matches[i]
-          newMatchList.push({
-            matchID, 
-            currPlayers: newMatchCounts[i],
-            numPlayers: players.length,
-            setupData,
-          });
-        }
-        this.setState({matchList: newMatchList});
-        this.matchCounts = newMatchCounts;
-      }
+      if (!_.isEqual(matches, matchList))
+        this.setState({matchList: matches});
     } catch(e) {
-      const { fetchErrors } = this.state;
-      this.setState({fetchErrors: fetchErrors+1});
-      console.error("(fetchMatches)", e);
+      // The game currently does not allow https connections
+      if (window.location.protocol === "https:")
+        this.props.setErrorMessage("You must connect with `http` instead of `https`.");
+      console.error("(fetchMatch)", e);
     }
   };
 
-  _countPlayers(match) {
-    let count = 0;
-    match.players.forEach( (x) => {if ("name" in x) count++});
-    return count;
-  }
-
-  // --- Match management ------------------------------------------------------
+  // --- Match management -----------------------------------------------------
 
   /**
    * Create a match based on the selected options.
    */
   createMatch = async () => {
-    const { name, numPlayers, expansion, supplyVariant } = this.state;
+    const { lobbyClient } = this.props;
+    const { numPlayers, expansion, supplyVariant } = this.state;
 
-    if (name.length === 0) {
-      this.props.setErrorMessage("Please enter a name.");
+    if (!this.validateName()) 
       return;
-    }
+
     try {
-      const { matchID } = await this.props.lobbyClient.createMatch(GAME_NAME, {
+      // create match
+      const { matchID } = await lobbyClient.createMatch(GAME_NAME, {
         numPlayers,
         setupData: {expansion, supplyVariant, startCoins: 3, randomizeTurnOrder: true},
       });
       console.log(`Created match '${matchID}'.`);
+      // after creating the match, try to join
       await this.joinMatch(matchID);
     } catch(e) {
-      this.props.setErrorMessage("Error in creating match.");
+      this.props.setErrorMessage("Error when creating match. Try again.");
       console.error("(createMatch)", e);
     }
   };
 
   /**
    * Join a match given the internal `matchID`.
+   * @param {string} matchID 
    */
   joinMatch = async (matchID) => {
     try {
-      if (this.Authenticator.hasCredentials(matchID) || await this._joinWithoutCredentials(matchID)) {
-        this.props.joinRoom(matchID);
-        console.log(`Joined match '${matchID}'.`);
+      if (this.authenticator.hasCredentials(matchID) || await this.joinMatchNoCredentials(matchID)) {
+        const { playerID, credentials } = this.authenticator.fetchCredentials(matchID);
+        this.props.setMatchInfo(matchID, playerID, credentials);
+        // this will trigger `Matchmaker` to switch to the waiting room
+      } else {
+        // specific error messages should have been displayed, so no feedback is needed here
       }
     } catch(e) {
-      this.props.setErrorMessage("Error in joining match.");
+      this.props.setErrorMessage("Error when joining match. Try again.");
       console.error("(joinMatch)", e);
     }
   };
 
   /**
-   * Tries to create new credentials to join match. Returns true on success,
-   * false on failure.
+   * Join a match by creating new credentials.
+   * @param {string} matchID
+   * @returns {boolean} true on success, false on failure.
    */
-  _joinWithoutCredentials = async (matchID) => {
-    const { name } = this.state;
+  joinMatchNoCredentials = async (matchID) => {
+    const { name, lobbyClient } = this.props;
 
-    if (name.length === 0) {
-      this.props.setErrorMessage("Please enter a name.");
+    if (!this.validateName()) 
       return false;
-    }
 
-    // find an open seat
-    const match = await this.props.lobbyClient.getMatch(GAME_NAME, matchID);
-    let seat; 
-    for (let i=0; i<match.players.length; i++) {
-      if ("name" in match.players[i]) { // check if seat is occupied
-        if (match.players[i].name === name) {
+    const match = await lobbyClient.getMatch(GAME_NAME, matchID);
+    let playerID; 
+    // look for an available seat
+    for (let seat=0; seat<match.players.length; seat++) {
+      if ("name" in match.players[seat]) { 
+        // if seat is occupied, check the player does not share same name
+        if (match.players[seat].name === name) {
           this.props.setErrorMessage("Name already taken.");
           return false;
         }
-      } else { // if seat is not occupied, then sit
-        seat = i;
-        break;
+      } else if (playerID === undefined) { 
+        // if haven't already found a seat, sit
+        playerID = seat.toString();
       }
     }
-    if (seat === undefined) {
+
+    // check if could not find a seat
+    if (playerID === undefined) {
       this.props.setErrorMessage("No free seats available.");
       return false;
     }
 
     // try to join match
-    const { playerCredentials } = await this.props.lobbyClient.joinMatch(
+    const { playerCredentials } = await lobbyClient.joinMatch(
       GAME_NAME,
       matchID,
-      {
-        playerID: seat.toString(),
-        playerName: name,
-      }
+      { playerID, playerName: name }
     );
-    this.Authenticator.saveCredentials(matchID, seat, playerCredentials);
-    console.log(`Obtained credentials for match '${matchID}', seat ${seat}.`);
+    this.authenticator.saveCredentials(matchID, playerID, playerCredentials);
+    console.log(`Saved credentials for match '${matchID}', seat ${playerID}.`);
     return true;
   };
+
+  // --- Helper ----------------------------------------------------------------
+
+  /**
+   * Returns true if `name` is OK.
+   * @returns {boolean}
+   */
+  validateName = () => {
+    const { name } = this.props;
+    if (name.length === 0) {
+      this.props.setErrorMessage("Please enter a name.");
+      return false;
+    }
+    if (name.length > 16) {
+      this.props.setErrorMessage("Name is too long.");
+      return false;
+    }
+    return true;
+  }
+
 
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const { name, numPlayers, expansion, supplyVariant } = this.state;
+    const { name } = this.props;
+    const { numPlayers, expansion, supplyVariant } = this.state;
 
-    this.fetchMatches();
-    this.interval = setInterval(this.fetchMatches, UPDATE_INTERVAL); 
+    console.log('Joined lobby.');
+    this.props.clearErrorMessage();
+
     // set default values
     document.getElementById("input_name").value = name;
     document.getElementById("input_numPlayers").value = numPlayers;
     document.getElementById("input_expansion").value = expansion;
     document.getElementById("input_supplyVariant").value = supplyVariant;
+
+    this.fetchMatches();
+    this.fetchInterval = setInterval(this.fetchMatches, UPDATE_INTERVAL); 
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    clearInterval(this.fetchInterval);
   }
 
   // --- Render ----------------------------------------------------------------
 
   renderMatchList() {
-    const { matchList, fetchErrors } = this.state;
+    const { matchList } = this.state;
 
     const tbody = [];
     if (!matchList) {
       tbody.push(<tr key={0}><td>Fetching matches...</td></tr>);
-      if (fetchErrors > 3 && window.location.protocol === "https:")
-        tbody.push(<tr key={1}><td>(try connecting with http instead of https...)</td></tr>);
     } else if (matchList.length === 0) {
-      tbody.push(
-        <tr key={0}><td>No open matches.</td></tr>
-      );
+      tbody.push(<tr key={0}><td>No open matches.</td></tr>);
     } else {
       tbody.push(
         <tr key={-1}>
-          <th class="col_matchid">Match ID</th>
-          <th class="col_seats">Seats</th>
-          <th class="col_setup">Setup</th>
+          <th className="col_matchid">Match ID</th>
+          <th className="col_seats">Seats</th>
+          <th className="col_setup">Setup</th>
         </tr>
       );
       for (let i=0; i<matchList.length; i++) {
-        const { matchID, currPlayers, numPlayers, setupData } = matchList[i];
+        const { matchID, players, setupData } = matchList[i];
+        const numActivePlayers = countPlayers(players);
+        const numPlayers = players.length;
         let button;
-        if (this.Authenticator.hasCredentials(matchID)) {
+        if (this.authenticator.hasCredentials(matchID)) {
+          /// Able to automatically join the room (e.g. joined before, but closed browser)
           button = <button onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
-        } else if (currPlayers === numPlayers) {
+        } else if (numActivePlayers === numPlayers) {
+          // Room is full
           button = null;
         } else {
           button = <button onClick={() => this.joinMatch(matchID)}>Join</button>;
@@ -217,7 +253,7 @@ class Lobby extends React.Component {
         tbody.push(
           <tr key={i}>
             <td>{matchID}</td>
-            <td>{currPlayers}/{numPlayers}</td>
+            <td>{numActivePlayers}/{numPlayers}</td>
             <td>({setupData.expansion}, {setupData.supplyVariant})</td>
             <td>{button}</td>
           </tr>
@@ -231,10 +267,10 @@ class Lobby extends React.Component {
 
     return (
       <div>
-        <div class="padded_div">
+        <div className="padded_div">
           <span>Enter Player Name: </span>
           <input
-            class="input-box"
+            className="input-box"
             id="input_name"
             type="text"
             maxLength={16}
@@ -243,8 +279,8 @@ class Lobby extends React.Component {
             onChange={this.setName}
           />
         </div>
-        <div class="padded_div">
-          <span class="subtitle">Create Room</span>
+        <div className="padded_div">
+          <span className="subtitle">Create Room</span>
           <br/>
           <select id="input_numPlayers" onChange={this.setNumPlayers}>
             <option value="2">2 Players</option>
@@ -261,13 +297,15 @@ class Lobby extends React.Component {
             <option value="variable">Variable Supply</option>
             <option value="total">Total Supply</option>
           </select>
-          <button class="button" onClick={this.createMatch}>
+          <button className="button" onClick={this.createMatch}>
             Create Room
           </button>
         </div>
-        <div class="padded_div">
-          <span class="subtitle">Lobby</span>
-          <div align="center">{this.renderMatchList()}</div>
+        <div className="padded_div">
+          <span className="subtitle">Lobby</span>
+          <div align="center">
+            <table><tbody>{this.renderMatchList()}</tbody></table>
+          </div>
         </div>
       </div>
     );
