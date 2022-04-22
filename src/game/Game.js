@@ -551,7 +551,7 @@ function replenishSupply(G, ctx) {
 
 // --- Game --------------------------------------------------------------------
 
-export const gameName = "machikoro";
+export const GAME_NAME = "machikoro";
 
 // set-up to use in debug mode
 const debugSetupData = {
@@ -563,7 +563,7 @@ const debugSetupData = {
 
 export const Machikoro = {
 
-  name: gameName,
+  name: GAME_NAME,
 
   // `setupData` is set in src/lobby/Lobby.js
   setup: (ctx, setupData) => {

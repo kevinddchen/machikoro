@@ -1,73 +1,65 @@
 import '../styles/main.css';
 import React from 'react';
 import { LobbyClient } from 'boardgame.io/client';
-import Lobby from './Lobby'; // manages game creation and joining
-import Room from './Room'; // manages pre-match waiting room
+import Lobby from './Lobby';
+import Room from './Room';
+
 
 /**
- * Switches between `Lobby` and `Room`
+ * Manages match creation and joining via the `Lobby` component, and the
+ * pre-match waiting room via the `Room` component. Also handles match
+ * credentials and authentication via the `Authenticator` class.
  */
-
 class Matchmaker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      matchID: '',  // this property is populated when we enter a match
+      name: '',  // persists across leaving / entering lobby
       errorMessage: '',  // any error message to display at the bottom of the page
-    }
+    };
     this.lobbyClient = new LobbyClient({ server: props.serverOrigin });
   }
 
-  setErrorMessage = (msg) => {
-    this.setState({errorMessage: msg});
-  };
+  setName = (name) => this.setState({name});
 
+  setErrorMessage = (errorMessage) => this.setState({errorMessage});
+
+  /**
+   * Clear the error message. The render will only be updated if the error 
+   * message was not empty.
+   */
   clearErrorMessage = () => {
-    this.setState({errorMessage: ''});
+    const { errorMessage } = this.state;
+    if (errorMessage)
+      this.setState({errorMessage: ''});
   };
-
-  joinRoom = (matchID) => {
-    this.setState({matchID});
-    this.clearErrorMessage();
-  };
-
-  leaveRoom = () => {
-    this.setState({matchID: ''});
-    this.clearErrorMessage();
-  };
-
-  // --- React -----------------------------------------------------------------
-
-  async componentDidMount() {
-    try {
-      await this.lobbyClient.listGames();
-      console.log("Lobby client connected");
-    } catch(e) {
-      console.error(e);
-    }
-  }
 
   // --- Render ----------------------------------------------------------------
 
   render() {
-    const { matchID, errorMessage } = this.state;
+    const { matchID, playerID, credentials } = this.props;
+    const { name, errorMessage } = this.state;
 
     return (
       <div>
-        { matchID ? 
+        { matchID ? // when `matchID` is not an empty string, we are in a room
           <Room
-            lobbyClient={this.lobbyClient}
             matchID={matchID}
-            updateInterval={1000}
-            setErrorMessage={this.setErrorMessage}
-            leaveRoom={this.leaveRoom}
-            start={this.props.start}/>
-          :
-          <Lobby 
+            playerID={playerID}
+            credentials={credentials}
             lobbyClient={this.lobbyClient}
-            updateInterval={1000}
             setErrorMessage={this.setErrorMessage}
-            joinRoom={this.joinRoom}/>
+            clearErrorMessage={this.clearErrorMessage}
+            clearMatchInfo={this.props.clearMatchInfo}
+            startMatch={this.props.startMatch}/>
+          : // otherwise we are in a lobby
+          <Lobby 
+            name={name}
+            lobbyClient={this.lobbyClient}
+            setName={this.setName}
+            setErrorMessage={this.setErrorMessage}
+            clearErrorMessage={this.clearErrorMessage}
+            setMatchInfo={this.props.setMatchInfo}/>
         }
         <div className="errorMessage">{errorMessage}</div>
       </div>

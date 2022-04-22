@@ -1,46 +1,50 @@
 import './styles/main.css';
-import React from "react";
-import { Client } from "boardgame.io/react";
-import { SocketIO } from "boardgame.io/multiplayer"
-import { Machikoro } from "./game/Game";
-import Matchmaker from './lobby/Matchmaker'; // handles matchmaking
-import MachikoroBoard  from "./game/Board"; // handles game
+import React from 'react';
+import { Client } from 'boardgame.io/react';
+import { SocketIO } from 'boardgame.io/multiplayer';
+import { Machikoro } from './game/Game';  // core game logic
+import Matchmaker from './lobby/Matchmaker';  // handles matchmaking
+import MachikoroBoard  from './game/Board';  // handles game
+import { PORT, IN_PROD } from './config';
+
 
 /**
- * Switches between `Matchmaker` and the Machikoro client
+ * Main web app. Switches between `Matchmaker`, which manages the game lobby
+ * and waiting room, and `MachikoroClient`, which manages the game itself.
  */
-
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      matchID: '',  // these properties are populated when we join a match
+      matchID: '',  // these are populated when we are in a room / match
       playerID: '',
       credentials: '',
-      debug: false,  // debug mode for the game
+      play: false,
     };
-    const port = process.env.PORT || 80;
-    this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${port}`;
+    this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
   }
 
-  startMatch = (matchID, playerID, credentials) => {
+  setMatchInfo = (matchID, playerID, credentials) => {
     this.setState({ matchID, playerID, credentials });
   };
 
-  startDebug = () => this.setState({debug: true});
+  clearMatchInfo = () => {
+    this.setState({ matchID: '', playerID: '', credentials: '' });
+  };
 
-  // --- React -----------------------------------------------------------------
+  startMatch = () => this.setState({play: true});
 
-  componentDidMount() {
-    console.log(`env: ${process.env.NODE_ENV}.`);
+  startDebug = () => {
+    this.clearMatchInfo();
+    this.startMatch();
   }
 
   // --- Render ----------------------------------------------------------------
 
   render() {
-    const { matchID, playerID, credentials, debug } = this.state;
+    const { matchID, playerID, credentials, play } = this.state;
 
-    if (matchID || (debug && process.env.NODE_ENV === 'development')) {
+    if (play) {
 
       const MachikoroClient = Client({
         game: Machikoro,
@@ -59,11 +63,9 @@ class App extends React.Component {
     
       return (
         <div>
-          { process.env.NODE_ENV === 'development' ?
+          { !IN_PROD ? // only show debug button in development
             <div className="padded_div">
-              <button onClick={this.startDebug}>
-                DEBUG
-              </button>
+              <button onClick={this.startDebug}>DEBUG</button>
             </div>
             : 
             null
@@ -71,7 +73,12 @@ class App extends React.Component {
           <div className="title">MACHI KORO</div>
           <Matchmaker 
             serverOrigin={this.serverOrigin}
-            start={this.startMatch}/>
+            matchID={matchID}
+            playerID={playerID}
+            credentials={credentials}
+            setMatchInfo={this.setMatchInfo}
+            clearMatchInfo={this.clearMatchInfo}
+            startMatch={this.startMatch}/>
           <footer className="footer">
             <a href="https://github.com/kevinddchen/machikoro" target="_blank"
              rel="noreferrer"><img src="./GitHub-Mark-Light-32px.png" alt="GitHub logo"/></a>
