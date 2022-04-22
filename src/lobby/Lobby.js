@@ -199,37 +199,37 @@ class Lobby extends React.Component {
     } else {
       // tbody.push(
       //   <tr key={-1}>
-      //     <th class="col_matchid">Match ID</th>
-      //     <th class="col_seats">Seats</th>
-      //     <th class="col_setup">Setup</th>
+      //     <th className="col_matchid">Match ID</th>
+      //     <th className="col_seats">Seats</th>
+      //     <th className="col_setup">Setup</th>
       //   </tr>
       // );
       for (let i=0; i<matchList.length; i++) {
         const { matchID, currPlayers, numPlayers, setupData } = matchList[i];
         let button;
         if (this.Authenticator.hasCredentials(matchID)) {
-          button = <button class="button" onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
+          button = <button className="button" onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
         } else if (currPlayers === numPlayers) {
           button = null;
         } else {
-          button = <button class="button" onClick={() => this.joinMatch(matchID)}>Join</button>;
+          button = <button className="button" onClick={() => this.joinMatch(matchID)}>Join</button>;
         }
         tbody.push(
-          <div class="lobby-container" key={i}>
-              <div class="lobby-div-col lobby-div-col-width">
-                <div class="lobby-div-row"><b>Room ID:</b> {matchID}</div>
+          <div className="lobby-container" key={i}>
+              <div className="lobby-div-col lobby-div-col-width">
+                <div className="lobby-div-row"><b>Room ID:</b> {matchID}</div>
               </div>
-              <div class="lobby-div-col lobby-div-col-width">
-                <div class="lobby-div-row">{expansion_name(setupData.expansion)}</div>
-                <div class="lobby-div-row">{supplyVariant_name(setupData.supplyVariant)}</div>
+              <div className="lobby-div-col lobby-div-col-width">
+                <div className="lobby-div-row">{expansion_name(setupData.expansion)}</div>
+                <div className="lobby-div-row">{supplyVariant_name(setupData.supplyVariant)}</div>
               </div>
-              <div class="lobby-div-col lobby-div-col-width">
-                <div class="lobby-div-row">{currPlayers} / {numPlayers} players</div>
-                <div class="lobby-div-row">
+              <div className="lobby-div-col lobby-div-col-width">
+                <div className="lobby-div-row">{currPlayers} / {numPlayers} players</div>
+                <div className="lobby-div-row">
                   {Array(currPlayers).fill('X')}{Array(numPlayers-currPlayers).fill('O')}
                 </div>
               </div>
-              <div class="lobby-div-col">{button}</div>
+              <div className="lobby-div-col">{button}</div>
           </div>
         );
       }
@@ -241,10 +241,10 @@ class Lobby extends React.Component {
 
     return (
       <div>
-        <div class="padded_div">
+        <div className="padded_div">
           <span>Enter Player Name: </span>
           <input
-            class="input-box"
+            className="input-box"
             id="input_name"
             type="text"
             maxLength={16}
@@ -253,8 +253,8 @@ class Lobby extends React.Component {
             onChange={this.setName}
           />
         </div>
-        <div class="padded_div">
-          <span class="subtitle">Create Room</span>
+        <div className="padded_div">
+          <span className="subtitle">Create Room</span>
           <br/>
           <select id="input_numPlayers" onChange={this.setNumPlayers}>
             <option value="2">2 Players</option>
@@ -271,12 +271,12 @@ class Lobby extends React.Component {
             <option value="variable">Variable Supply</option>
             <option value="total">Total Supply</option>
           </select>
-          <button class="button" onClick={this.createMatch}>
+          <button className="button" onClick={this.createMatch}>
             Create Room
           </button>
         </div>
-        <div class="padded_div">
-          <span class="subtitle">Lobby</span>
+        <div className="padded_div">
+          <span className="subtitle">Lobby</span>
           <div align="center">{this.renderMatchList()}</div>
         </div>
       </div>

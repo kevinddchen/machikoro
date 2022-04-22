@@ -95,10 +95,10 @@ class Room extends React.Component {
           addclass = "mm-td";
       if (i === parseInt(this.playerID)) {
         addclass = "mm-td mm-td-active";    /* use css as indicator */
-        button = <button class="button" onClick={this.leaveMatch}>Leave</button>
+        button = <button className="button" onClick={this.leaveMatch}>Leave</button>
       }
       tbody.push(
-        <td class={addclass} key={i}>
+        <td className={addclass} key={i}>
           {i+1}: {playerList[i]} <br/> {button}
         </td>
       );
@@ -112,15 +112,15 @@ class Room extends React.Component {
 
     return (
       <div align="center"><br/>
-        <div class="mm-container">
-          <div class="mm-div-row">
-            <div class="mm-div-cell"><b>Room ID:</b> {matchID}</div>
-            <div class="mm-div-cell"><b>{expansion_name(expansion)}</b></div>
-            <div class="mm-div-cell"><b>{supplyVariant_name(supplyVariant)}</b></div>
+        <div className="mm-container">
+          <div className="mm-div-row">
+            <div className="mm-div-cell"><b>Room ID:</b> {matchID}</div>
+            <div className="mm-div-cell"><b>{expansion_name(expansion)}</b></div>
+            <div className="mm-div-cell"><b>{supplyVariant_name(supplyVariant)}</b></div>
           </div>
-          <div class="mm-div-row">Game will start when all seats are filled.</div>
-          <div class="mm-div-row"><div class="mm-div-cell">
-            <b>Players</b><br/> <table class="mm-table">{this.renderPlayerList()}</table>
+          <div className="mm-div-row">Game will start when all seats are filled.</div>
+          <div className="mm-div-row"><div className="mm-div-cell">
+            <b>Players</b><br/> <table className="mm-table">{this.renderPlayerList()}</table>
           </div></div>
         </div>
       </div>
