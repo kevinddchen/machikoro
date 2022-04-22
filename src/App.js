@@ -79,7 +79,12 @@ class App extends React.Component {
             setMatchInfo={this.setMatchInfo}
             clearMatchInfo={this.clearMatchInfo}
             startMatch={this.startMatch}/>
+          <footer className="footer">
+            <a href="https://github.com/kevinddchen/machikoro" target="_blank"
+             rel="noreferrer"><img src="./GitHub-Mark-Light-32px.png" alt="GitHub logo"/></a>
+          </footer>
         </div>
+
       );
 
     }

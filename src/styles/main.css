@@ -21,17 +21,21 @@
 /* DIV FORMATTING */
 
 .div-row {
-    display: table;
-    width: 100%;
+  display: table;
+  width: 100%;
 }
 
 .div-column {
-    display: table-cell;
+  display: table-cell; 
 }
 
 /* FONTS */
 
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=Sigmar+One');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=KoHo:wght@500&family=Sigmar+One&display=swap');
+
+* {
+  font-family: 'KoHo', sans-serif;
+}
 
 /* 
    BUTTONS
@@ -125,11 +129,71 @@
 .subtitle {
   color: black;
   display: inline-block;
-  font-family: sans-serif;
   font-size: 25pt;
   font-weight: bold;
   margin: 20px 0 10px;
+  padding: 0 20px;
   text-align: center;
+}
+
+/* FOOTER */
+
+.footer {
+  background-color: var(--primary);
+  bottom: 0;
+  color: white;
+  font-size: 20px;
+  height: 32px;    /* image height */
+  left: 0;
+  padding: 5px;
+  position: fixed;
+  text-align: center;
+  width: 100%;
+}
+
+/* MATCHMAKING */
+
+.mm-container{
+  border-radius: 16px;
+  border: solid var(--primary-dark);
+  max-width: 800px;
+  text-align: center;
+}
+
+.mm-div-row {
+  display: table;
+  font-size: 18px;
+  text-align: center;
+  width: 100%;
+}
+
+.mm-div-cell {
+  background-color: var(--primary);
+  border-radius: 16px;
+  border: solid white;
+  color: white;
+  display: table-cell;
+  padding: 1px 10px;
+}
+
+.mm-table {
+  font-size: 20px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.mm-td {
+  background-color: white;
+  border-radius: 16px;
+  border: solid var(--primary) 2px;
+  color: black;
+  overflow-wrap: break-word;
+  padding: 5px 10px;
+  width: 20%;
+}
+
+.mm-td-active {
+  border: solid red 4px;
 }
 
 /* PLAYER NAME ENTRY */
@@ -176,6 +240,37 @@ select {
 .errorMessage {
   color: red;
   padding: 3px;
+  text-align: center;
+}
+
+.lobby-container{
+  border-radius: 16px;
+  border: solid var(--primary);
+  margin: 2px;
+  max-width: 600px;
+}
+
+.lobby-div-col {
+  display: table-cell;
+  max-width: 150px;
+  padding: 1px 10px;
+  vertical-align: middle;
+}
+
+.lobby-div-col-width {
+  width: 25vw;
+}
+
+.lobby-div-row {
+  background-color: var(--primary);
+  border-radius: 16px;
+  color: white;
+  display: table;
+  font-size: 18px;
+  margin: 5px;
+  padding: 1px 5px;
+  text-align: center;
+  width: 100%;
 }
 
 /* 
