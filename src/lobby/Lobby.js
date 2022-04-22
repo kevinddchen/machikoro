@@ -248,7 +248,7 @@ class Lobby extends React.Component {
         tbody.push(
           <div className='lobby-container' key={i}>
             <div className='lobby-div-col lobby-div-col-width'>
-              <div className='lobby-div-row'><b>Room ID:</b> {matchID}</div>
+              <div className='lobby-div-row'><b>Room ID: </b>{matchID}</div>
             </div>
             <div className='lobby-div-col lobby-div-col-width'>
               <div className='lobby-div-row'>{expansionName(setupData.expansion)}</div>
