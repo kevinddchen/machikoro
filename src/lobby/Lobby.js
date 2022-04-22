@@ -1,7 +1,7 @@
 import '../styles/main.css';
 import React from 'react';
 import Authenticator from './Authenticator'; // manages match credentials
-import { checkDifferent } from './utils';
+import { checkDifferent, expansion_name, supplyVariant_name } from './utils';
 import { gameName } from '../game/Game';
 
 /**
@@ -197,13 +197,13 @@ class Lobby extends React.Component {
         <tr key={0}><td>No open matches.</td></tr>
       );
     } else {
-      tbody.push(
-        <tr key={-1}>
-          <th class="col_matchid">Match ID</th>
-          <th class="col_seats">Seats</th>
-          <th class="col_setup">Setup</th>
-        </tr>
-      );
+      // tbody.push(
+      //   <tr key={-1}>
+      //     <th class="col_matchid">Match ID</th>
+      //     <th class="col_seats">Seats</th>
+      //     <th class="col_setup">Setup</th>
+      //   </tr>
+      // );
       for (let i=0; i<matchList.length; i++) {
         const { matchID, currPlayers, numPlayers, setupData } = matchList[i];
         let button;
@@ -215,12 +215,22 @@ class Lobby extends React.Component {
           button = <button class="button" onClick={() => this.joinMatch(matchID)}>Join</button>;
         }
         tbody.push(
-          <tr key={i}>
-            <td>{matchID}</td>
-            <td>{currPlayers}/{numPlayers}</td>
-            <td>({setupData.expansion}, {setupData.supplyVariant})</td>
-            <td>{button}</td>
-          </tr>
+          <div class="lobby-container" key={i}>
+              <div class="lobby-div-col lobby-div-col-width">
+                <div class="lobby-div-row"><b>Room ID:</b> {matchID}</div>
+              </div>
+              <div class="lobby-div-col lobby-div-col-width">
+                <div class="lobby-div-row">{expansion_name(setupData.expansion)}</div>
+                <div class="lobby-div-row">{supplyVariant_name(setupData.supplyVariant)}</div>
+              </div>
+              <div class="lobby-div-col lobby-div-col-width">
+                <div class="lobby-div-row">{currPlayers} / {numPlayers} players</div>
+                <div class="lobby-div-row">
+                  {Array(currPlayers).fill('X')}{Array(numPlayers-currPlayers).fill('O')}
+                </div>
+              </div>
+              <div class="lobby-div-col">{button}</div>
+          </div>
         );
       }
     }

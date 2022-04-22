@@ -31,7 +31,11 @@
 
 /* FONTS */
 
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=Sigmar+One');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=KoHo:wght@500&family=Sigmar+One&display=swap');
+
+* {
+  font-family: 'KoHo', sans-serif;
+}
 
 /* 
    BUTTONS
@@ -125,10 +129,10 @@
 .subtitle {
   color: black;
   display: inline-block;
-  font-family: sans-serif;
   font-size: 25pt;
   font-weight: bold;
   margin: 20px 0 10px;
+  padding: 0 20px;
   text-align: center;
 }
 
@@ -236,6 +240,37 @@ select {
 .errorMessage {
   color: red;
   padding: 3px;
+  text-align: center;
+}
+
+.lobby-container{
+  border-radius: 16px;
+  border: solid var(--primary);
+  margin: 2px;
+  max-width: 600px;
+}
+
+.lobby-div-col {
+  display: table-cell;
+  max-width: 150px;
+  padding: 1px 10px;
+  vertical-align: middle;
+}
+
+.lobby-div-col-width {
+  width: 25vw;
+}
+
+.lobby-div-row {
+  background-color: var(--primary);
+  border-radius: 16px;
+  color: white;
+  display: table;
+  font-size: 18px;
+  margin: 5px;
+  padding: 1px 5px;
+  text-align: center;
+  width: 100%;
 }
 
 /* 
