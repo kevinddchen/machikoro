@@ -1,73 +1,63 @@
 import '../styles/main.css';
 import React from 'react';
-import Authenticator from './Authenticator'; // manages match credentials
-import { checkDifferent } from './utils';
-import { gameName } from '../game/Game';
+import _ from 'lodash';
+import Authenticator from './Authenticator';
+import { countPlayers } from './utils';
+import { GAME_NAME } from '../game/Game';
+import { UPDATE_INTERVAL } from '../config';
+
 
 /**
  * Pre-match waiting room
  */
-
 class Room extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      playerList: [], // string[]
+      playerList: [], // array of `player` objects
       expansion: '',
       supplyVariant: '',
-    }
-    this.interval = null;
-    this.Authenticator = new Authenticator();
-    ({playerID: this.playerID, credentials: this.credentials } = this.Authenticator.fetchCredentials(props.matchID));
+    };
+    this.fetchInterval = null;
+    this.authenticator = new Authenticator();
   }
 
   /**
-   * Periodically fetches list of players from server. Updates render only when
-   * list changes.
+   * Fetches list of players from the server via API call. Also automatically
+   * starts the game when there are enough people.
    */
   fetchMatch = async () => {
     const { matchID, lobbyClient } = this.props;
+    const { playerList } = this.state;
 
     try {
-      const match = await lobbyClient.getMatch(gameName, matchID);
-      let count = 0;
-      const newPlayerList = match.players.map( (x) => {
-        if (x.name) {
-          count++;
-          return x.name;
-        } else {
-          return '';
-        }
-      });
-      // if seats are all full, start match now
-      if (count === match.players.length) {
-        this.props.start(matchID, this.playerID, this.credentials);
-        return;
-      }
-      if (checkDifferent(newPlayerList, this.state.playerList)) {
-        const { expansion, supplyVariant } = match.setupData;
-        this.setState({
-          playerList: newPlayerList,
-          expansion,
-          supplyVariant,
-        });
+      const match = await lobbyClient.getMatch(GAME_NAME, matchID);
+      if (!_.isEqual(match.players, playerList)) {
+        const { expansion, supplyVariant } = match.setupData
+        this.setState({playerList: match.players, expansion, supplyVariant});
+        // if seats are all full, start match now
+        if (countPlayers(match.players) === match.players.length)
+          this.props.startMatch();
       }
     } catch(e) {
+      // TODO: do we need to display "Cannot fetch Matches" like in the Lobby?
       console.error("(fetchMatch)", e);
     }
   };
 
+  /**
+   * Leave the match and delete credentials.
+   */
   leaveMatch = async () => {
-    const { matchID } = this.props;
-    const { playerID, credentials } = this;
+    const { matchID, playerID, credentials, lobbyClient } = this.props;
 
     try {
-      await this.props.lobbyClient.leaveMatch(gameName, matchID, { playerID, credentials });
-      this.Authenticator.deleteCredentials(matchID);
-      this.props.leaveRoom();
-      console.log("Left match.");
+      await lobbyClient.leaveMatch(GAME_NAME, matchID, { playerID, credentials });
+      this.authenticator.deleteCredentials(matchID);
+      this.props.clearMatchInfo();
+      // this will trigger `Matchmaker` to switch to the lobby
     } catch(e) {
-      this.props.setErrorMessage("Error in leaving match.");
+      this.props.setErrorMessage("Error when leaving match. Try again.");
       console.error("(leaveMatch)", e);
     }
   };
@@ -75,18 +65,23 @@ class Room extends React.Component {
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const { updateInterval } = this.props;
+    const { matchID } = this.props;
+
+    console.log(`Joined room for match '${matchID}'.`);
+    this.props.clearErrorMessage();
+
     this.fetchMatch();
-    this.interval = setInterval(this.fetchMatch, updateInterval); 
+    this.fetchInterval = setInterval(this.fetchMatch, UPDATE_INTERVAL); 
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    clearInterval(this.fetchInterval);
   }
 
   // --- Render ----------------------------------------------------------------
 
   renderPlayerList() {
+    const { playerID } = this.props;
     const { playerList } = this.state;
 
     const tbody = [];
@@ -97,18 +92,18 @@ class Room extends React.Component {
         <th className="col_name">Name</th>
       </tr>
     );
-    for (let i=0; i<playerList.length; i++) {
-      let indicator,
-          button;
-      if (i === parseInt(this.playerID)) {
+    for (let seat=0; seat<playerList.length; seat++) {
+      const { id, name } = playerList[seat];
+      let indicator, button;
+      if (id.toString() === playerID) {
         indicator = '-->';
         button = <button onClick={this.leaveMatch}>Leave</button>
       }
       tbody.push(
-        <tr key={i}>
+        <tr key={seat}>
           <td>{indicator}</td>
-          <td>{i+1}</td>
-          <td>{playerList[i]}</td>
+          <td>{seat+1}</td>
+          <td>{name}</td>
           <td>{button}</td>
         </tr>
       );
