@@ -5,15 +5,15 @@
  * @param {Array} players An array of `player` objects.
  * @returns {number}
  */
-export function countPlayers(players) {
+export function countPlayers (players) {
   let count = 0;
-  players.forEach( (x) => {if ("name" in x) count++} );
+  players.forEach((x) => { if ('name' in x) count++ });
   return count;
 }
 
 /* Name generating fuctions */
 
-export function expansion_name(expr) {
+export function expansionName (expr) {
   switch (expr) {
     case 'base':
       return 'Base Game';
@@ -24,7 +24,7 @@ export function expansion_name(expr) {
   }
 }
 
-export function supplyVariant_name(expr) {
+export function supplyVariantName (expr) {
   switch (expr) {
     case 'hybrid':
       return 'Hybrid Supply';
