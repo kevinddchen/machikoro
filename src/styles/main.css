@@ -157,6 +157,7 @@
   border-radius: 16px;
   border: solid var(--primary-dark);
   max-width: 800px;
+  margin: 2px auto;
   text-align: center;
 }
 
@@ -246,7 +247,7 @@ select {
 .lobby-container{
   border-radius: 16px;
   border: solid var(--primary);
-  margin: 2px;
+  margin: 2px auto;
   max-width: 600px;
 }
 

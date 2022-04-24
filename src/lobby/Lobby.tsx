@@ -2,71 +2,83 @@ import '../styles/main.css';
 import React from 'react';
 import _ from 'lodash';
 import Authenticator from './Authenticator';
-import { countPlayers, expansionName, supplyVariantName } from './utils';
+import { seatIsOccupied, countPlayers, expansionName, supplyVariantName } from './utils';
 import { GAME_NAME } from '../game/Game';
 import { UPDATE_INTERVAL } from '../config';
+import type { LobbyAPI } from 'boardgame.io';
+import type { LobbyClient } from 'boardgame.io/client';
+import type { ClientInfo } from '../App';
 
-/*
-
-Since `Lobby` makes API requests, here are some notes on the objects that we
-receive and send:
-
-The `match` object has the following interface:
-- createdAt: number
-- gameName: string that probably equals "machikoro"
-- matchID: string that uniquely identifies the match
-- players: array of `player` objects
-- setupData: object containing setup data that we set in `createMatch`
-- unlisted: boolean
-- updatedAt: number
-
-A `player` object has the following interface:
-- id: number. 0, 1, 2, ...
-- name: string. This is only populated if a player occupies the seat.
-
-Other pieces of metadata that we communicate with the server:
-- playerID: string that equals the player's id (see above)
-- credentials: string that acts like a player's password and authenticates
-    all interactions with the server (e.g. leaving match, game moves)
-
-*/
+interface LobbyProps {
+  name: string;
+  lobbyClient: LobbyClient;
+  setClientInfo: (clientInfo: ClientInfo) => void; 
+  setName: (name: string) => void;
+  setErrorMessage: (errorMessage: string) => void;
+  clearErrorMessage: () => void;
+}
 
 /**
- * Handles match creation and joining.
+ * @param numPlayers - Maximum number of players in the match.
+ * @param expansion - Expansion to play.
+ * @param supplyVariant - Supply variant to use.
+ * @param matchList - Array of matches to display.
  */
-class Lobby extends React.Component {
-  constructor (props) {
+interface LobbyState {
+  numPlayers: number;
+  expansion: string;
+  supplyVariant: string;
+  matchList?: LobbyAPI.Match[];
+}
+
+/**
+ * Create game lobby. Handles match creation and joining.
+ */
+export default class Lobby extends React.Component<LobbyProps, LobbyState> {
+
+  private fetchInterval?: NodeJS.Timeout;
+  private authenticator: Authenticator;
+
+  private nameRef: React.RefObject<HTMLInputElement>;
+  private numPlayersRef: React.RefObject<HTMLSelectElement>;
+  private expansionRef: React.RefObject<HTMLSelectElement>;
+  private supplyVariantRef: React.RefObject<HTMLSelectElement>;
+
+  constructor (props: LobbyProps) {
     super(props);
     this.state = {
       numPlayers: 4,
       expansion: 'base',
       supplyVariant: 'hybrid',
-      matchList: null // array of `match` objects
     };
-    this.fetchInterval = null;
     this.authenticator = new Authenticator();
+    this.nameRef = React.createRef();
+    this.numPlayersRef = React.createRef();
+    this.expansionRef = React.createRef();
+    this.supplyVariantRef = React.createRef();
   }
 
-  setName = (e) => {
+  setName = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.props.setName(e.target.value);
   };
 
-  setNumPlayers = (e) => {
+  setNumPlayers = (e: React.ChangeEvent<HTMLSelectElement>) => {
     this.setState({ numPlayers: parseInt(e.target.value) });
   };
 
-  setExpansion = (e) => {
+  setExpansion = (e: React.ChangeEvent<HTMLSelectElement>) => {
     this.setState({ expansion: e.target.value });
-  }
+  };
 
-  setSupplyVariant = (e) => {
+  setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>) => {
     this.setState({ supplyVariant: e.target.value });
-  }
+  };
 
   // --- Fetch matches --------------------------------------------------------
 
   /**
-   * Fetch available matches from the server via API call.
+   * Fetch available matches from the server. Updates render if the fetched
+   * list differes from the list currently displayed.
    */
   fetchMatches = async () => {
     const { lobbyClient } = this.props;
@@ -78,7 +90,7 @@ class Lobby extends React.Component {
         this.setState({ matchList: matches });
       }
     } catch (e) {
-      // The game currently does not allow https connections
+      // The server currently does not allow https connections
       if (window.location.protocol === 'https:') {
         this.props.setErrorMessage('You must connect with `http` instead of `https`.');
       }
@@ -101,10 +113,13 @@ class Lobby extends React.Component {
 
     try {
       // create match
-      const { matchID } = await lobbyClient.createMatch(GAME_NAME, {
-        numPlayers,
-        setupData: { expansion, supplyVariant, startCoins: 3, randomizeTurnOrder: true }
-      });
+      const { matchID } = await lobbyClient.createMatch(
+        GAME_NAME, 
+        {
+          numPlayers,
+          setupData: { expansion, supplyVariant, startCoins: 3, randomizeTurnOrder: true }
+        },
+      );
       console.log(`Created match '${matchID}'.`);
       // after creating the match, try to join
       await this.joinMatch(matchID);
@@ -115,14 +130,16 @@ class Lobby extends React.Component {
   };
 
   /**
-   * Join a match given the internal `matchID`.
-   * @param {string} matchID
+   * Join the match corresponding to `matchID`.
+   * @param matchID
    */
-  joinMatch = async (matchID) => {
+  joinMatch = async (matchID: string) => {
     try {
       if (this.authenticator.hasCredentials(matchID) || await this.joinMatchNoCredentials(matchID)) {
         const { playerID, credentials } = this.authenticator.fetchCredentials(matchID);
-        this.props.setMatchInfo(matchID, playerID, credentials);
+        if (playerID && credentials)
+          this.props.setClientInfo({matchID, playerID, credentials});
+        // TODO: what happens if credentials are no good?
         // this will trigger `Matchmaker` to switch to the waiting room
       } else {
         // specific error messages should have been displayed, so no feedback is needed here
@@ -135,10 +152,10 @@ class Lobby extends React.Component {
 
   /**
    * Join a match by creating new credentials.
-   * @param {string} matchID
-   * @returns {boolean} true on success, false on failure.
+   * @param matchID
+   * @returns True on success, false on failure.
    */
-  joinMatchNoCredentials = async (matchID) => {
+  joinMatchNoCredentials = async (matchID: string): Promise<boolean> => {
     const { name, lobbyClient } = this.props;
 
     if (!this.validateName()) {
@@ -146,23 +163,23 @@ class Lobby extends React.Component {
     }
 
     const match = await lobbyClient.getMatch(GAME_NAME, matchID);
-    let playerID;
+    let playerID: string | null = null;
     // look for an available seat
     for (let seat = 0; seat < match.players.length; seat++) {
-      if ('name' in match.players[seat]) {
+      if (seatIsOccupied(match.players[seat])) {
         // if seat is occupied, check the player does not share same name
         if (match.players[seat].name === name) {
           this.props.setErrorMessage('Name already taken.');
           return false;
         }
-      } else if (playerID === undefined) {
+      } else if (!playerID) {
         // if haven't already found a seat, sit
         playerID = seat.toString();
       }
     }
 
     // check if could not find a seat
-    if (playerID === undefined) {
+    if (!playerID) {
       this.props.setErrorMessage('No free seats available.');
       return false;
     }
@@ -181,10 +198,10 @@ class Lobby extends React.Component {
   // --- Helper ----------------------------------------------------------------
 
   /**
-   * Returns true if `name` is OK.
-   * @returns {boolean}
+   * Check if entered name is valid. Sets error message if not.
+   * @returns True if `this.props.name` is OK.
    */
-  validateName = () => {
+  validateName = (): boolean => {
     const { name } = this.props;
     if (name.length === 0) {
       this.props.setErrorMessage('Please enter a name.');
@@ -207,35 +224,41 @@ class Lobby extends React.Component {
     this.props.clearErrorMessage();
 
     // set default values
-    document.getElementById('input_name').value = name;
-    document.getElementById('input_numPlayers').value = numPlayers;
-    document.getElementById('input_expansion').value = expansion;
-    document.getElementById('input_supplyVariant').value = supplyVariant;
+    if (this.nameRef.current)
+      this.nameRef.current.value = name;
+    if (this.numPlayersRef.current)
+      this.numPlayersRef.current.value = numPlayers.toString();
+    if (this.expansionRef.current)
+      this.expansionRef.current.value = expansion;
+    if (this.supplyVariantRef.current)
+      this.supplyVariantRef.current.value = supplyVariant;
 
     this.fetchMatches();
     this.fetchInterval = setInterval(this.fetchMatches, UPDATE_INTERVAL);
   }
 
   componentWillUnmount () {
-    clearInterval(this.fetchInterval);
+    console.log('Leaving lobby...');
+    if (this.fetchInterval)
+      clearInterval(this.fetchInterval);
   }
 
   // --- Render ----------------------------------------------------------------
 
-  renderMatchList () {
+  renderMatchList (): JSX.Element[] {
     const { matchList } = this.state;
 
-    const tbody = [];
+    const tbody: JSX.Element[] = [];
     if (!matchList) {
-      tbody.push(<tr key={0}><td>Fetching matches...</td></tr>);
+      tbody.push(<div key={0}>Fetching matches...</div>);
     } else if (matchList.length === 0) {
-      tbody.push(<tr key={0}><td>No open matches.</td></tr>);
+      tbody.push(<div key={0}>No open matches.</div>);
     } else {
       for (let i = 0; i < matchList.length; i++) {
         const { matchID, players, setupData } = matchList[i];
         const numActivePlayers = countPlayers(players);
         const numPlayers = players.length;
-        let button;
+        let button: any;
         if (this.authenticator.hasCredentials(matchID)) {
           /// Able to automatically join the room (e.g. joined before, but closed browser)
           button = <button className='button' onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
@@ -275,7 +298,7 @@ class Lobby extends React.Component {
           <span>Enter Player Name: </span>
           <input
             className='input-box'
-            id='input_name'
+            ref={this.nameRef}
             type='text'
             maxLength={16}
             spellCheck='false'
@@ -286,17 +309,17 @@ class Lobby extends React.Component {
         <div className='padded_div'>
           <span className='subtitle'>Create Room</span>
           <br />
-          <select id='input_numPlayers' onChange={this.setNumPlayers}>
+          <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
             <option value='2'>2 Players</option>
             <option value='3'>3 Players</option>
             <option value='4'>4 Players</option>
             <option value='5'>5 Players</option>
           </select>
-          <select id='input_expansion' onChange={this.setExpansion}>
+          <select ref={this.expansionRef} onChange={this.setExpansion}>
             <option value='base'>Base Game</option>
             <option value='harbor'>Harbor Expansion</option>
           </select>
-          <select id='input_supplyVariant' onChange={this.setSupplyVariant}>
+          <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
             <option value='hybrid'>Hybrid Supply</option>
             <option value='variable'>Variable Supply</option>
             <option value='total'>Total Supply</option>
@@ -307,11 +330,9 @@ class Lobby extends React.Component {
         </div>
         <div className='padded_div'>
           <span className='subtitle'>Lobby</span>
-          <div align='center'>{this.renderMatchList()}</div>
+          <div>{this.renderMatchList()}</div>
         </div>
       </div>
     );
   }
 }
-
-export default Lobby;
