@@ -2,9 +2,9 @@ import './styles/main.css';
 import React from 'react';
 import { Client } from 'boardgame.io/react';
 import { SocketIO } from 'boardgame.io/multiplayer';
-import { Machikoro } from './game/Game';
+import { MachikoroBoard }  from './board';
+import { Machikoro } from './game';
 import { Matchmaker } from './lobby';
-import MachikoroBoard  from './game/Board';
 import { PORT, IN_PROD } from './config';
 
 /**

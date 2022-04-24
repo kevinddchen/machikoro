@@ -14,7 +14,7 @@ import {
   canDoOffice1Q, 
   canDoOffice2Q,
   canEndQ, 
-} from './Game'; // actual logic of the game
+} from '../game/Game'; // actual logic of the game
 
 /**
  * Handles all game components

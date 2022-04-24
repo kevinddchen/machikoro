@@ -2,7 +2,7 @@ import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 import StackTable from './StackTable';
-import { est_order } from './meta';
+import { est_order } from '../game/meta';
 
 /**
  * Establishment board, where players see and buy cards

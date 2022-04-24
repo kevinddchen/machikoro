@@ -2,7 +2,7 @@ import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 import StackTable from './StackTable';
-import { est_order, land_order } from './meta';
+import { est_order, land_order } from '../game/meta';
 
 /**
  * Information panels for a player, displaying name, money, purchased landmarks 
