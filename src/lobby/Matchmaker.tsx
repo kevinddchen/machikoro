@@ -3,25 +3,45 @@ import React from 'react';
 import { LobbyClient } from 'boardgame.io/client';
 import Lobby from './Lobby';
 import Room from './Room';
+import type { ClientInfo } from '../App';
+
+interface MatchmakerProps extends ClientInfo {
+  serverOrigin: string;
+  setClientInfo: (clientInfo: ClientInfo) => void;
+  clearClientInfo: () => void;
+  startMatch: () => void;
+}
 
 /**
- * Manages match creation and joining via the `Lobby` component, and the
- * pre-match waiting room via the `Room` component. Also handles match
- * credentials and authentication via the `Authenticator` class.
+ * @param name - Name of the player.
+ * @param errorMessage - Error message to display.
  */
-class Matchmaker extends React.Component {
-  constructor (props) {
+interface MatchmakerState {
+  name: string;
+  errorMessage: string;
+}
+
+/**
+ * Handles match creation and joining via the `Lobby` component, and the
+ * pre-match waiting room via the `Room` component. Also handles match
+ * credential storage and retrieval via the `Authenticator` class.
+ */
+export default class Matchmaker extends React.Component<MatchmakerProps, MatchmakerState> {
+
+  private lobbyClient: LobbyClient;
+
+  constructor (props: MatchmakerProps) {
     super(props);
     this.state = {
-      name: '', // persists across leaving / entering lobby
-      errorMessage: '' // any error message to display at the bottom of the page
+      name: '',
+      errorMessage: '',
     };
     this.lobbyClient = new LobbyClient({ server: props.serverOrigin });
   }
 
-  setName = (name) => this.setState({ name });
+  setName = (name: string) => this.setState({ name });
 
-  setErrorMessage = (errorMessage) => this.setState({ errorMessage });
+  setErrorMessage = (errorMessage: string) => this.setState({ errorMessage });
 
   /**
    * Clear the error message. The render will only be updated if the error
@@ -48,19 +68,19 @@ class Matchmaker extends React.Component {
             playerID={playerID}
             credentials={credentials}
             lobbyClient={this.lobbyClient}
+            clearClientInfo={this.props.clearClientInfo}
+            startMatch={this.props.startMatch}
             setErrorMessage={this.setErrorMessage}
             clearErrorMessage={this.clearErrorMessage}
-            clearMatchInfo={this.props.clearMatchInfo}
-            startMatch={this.props.startMatch}
           />
           : // otherwise we are in a lobby
           <Lobby
             name={name}
             lobbyClient={this.lobbyClient}
+            setClientInfo={this.props.setClientInfo}
             setName={this.setName}
             setErrorMessage={this.setErrorMessage}
             clearErrorMessage={this.clearErrorMessage}
-            setMatchInfo={this.props.setMatchInfo}
           />
         }
         <div className='errorMessage'>{errorMessage}</div>
@@ -68,5 +88,3 @@ class Matchmaker extends React.Component {
     );
   }
 }
-
-export default Matchmaker;

@@ -613,12 +613,12 @@ export const Machikoro = {
   validateSetupData: (setupData, numPlayers) => {
     if (setupData) {
       const { expansion, supplyVariant, startCoins } = setupData;
-      if (!["base", "harbor"].includes(expansion)) return false;
-      if (!["total", "variable", "hybrid"].includes(supplyVariant)) return false;
-      if (!Number.isInteger(startCoins)) return false; 
+      if (!["base", "harbor"].includes(expansion)) return 'expansion not valid';
+      if (!["total", "variable", "hybrid"].includes(supplyVariant)) return 'supply variant not valid';
+      if (!Number.isInteger(startCoins)) return 'number of starting coins not integer'; 
     }
-    if (numPlayers < 2) return false;
-    if (numPlayers > 5) return false;
+    if (numPlayers < 2) return 'too few players';
+    if (numPlayers > 5) return 'too many players';
   },
 
   turn: {
