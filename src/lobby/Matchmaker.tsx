@@ -67,6 +67,7 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
             matchID={matchID}
             playerID={playerID}
             credentials={credentials}
+            name={name}
             lobbyClient={this.lobbyClient}
             clearClientInfo={this.props.clearClientInfo}
             startMatch={this.props.startMatch}

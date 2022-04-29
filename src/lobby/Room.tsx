@@ -10,6 +10,7 @@ import type { LobbyClient } from 'boardgame.io/client';
 import type { ClientInfo } from '../App';
 
 interface RoomProps extends ClientInfo {
+  name: string;
   lobbyClient: LobbyClient;
   clearClientInfo: () => void;
   startMatch: () => void;
