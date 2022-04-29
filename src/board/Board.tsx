@@ -4,26 +4,20 @@ import Establishments from './Establishments'; // board where establishments are
 import PlayerInfo from './PlayerInfo'; // information panels for each player
 import Log from './Log'; // game log display
 import StatusBar from './StatusBar'; // game status display
-import { 
-  canRollQ, 
-  canCommitRollQ, 
-  canAddTwoQ,
-  canBuyEstQ, 
-  canBuyLandQ, 
-  canDoTVQ, 
-  canDoOffice1Q, 
-  canDoOffice2Q,
-  canEndQ, 
-} from '../game/Game'; // actual logic of the game
+import * as game from '../game';
+import type { BoardProps } from 'boardgame.io/react';
+
 
 /**
  * Handles all game components
  */
+export default class MachikoroBoard extends React.Component<BoardProps<game.MachikoroG>, {}> {
 
-class MachikoroBoard extends React.Component {
-  constructor(props) {
+  private names: string[];
+
+  constructor(props: BoardProps) {
     super(props);
-    this.names = props.matchData.map( (x) => x.name ? x.name : `player_${x.id}` );
+    this.names = props.matchData!.map( (x) => x.name ? x.name : `player_${x.id}` );
   }
 
   render() {
@@ -31,21 +25,21 @@ class MachikoroBoard extends React.Component {
     const { G, ctx, moves, isActive } = this.props;
     const player = parseInt(ctx.currentPlayer);
 
-    const canRoll = (n) => isActive && canRollQ(G, ctx, n);
-    const canKeep = () => isActive && canCommitRollQ(G, ctx);
-    const canAddTwoKeep = () => isActive && canAddTwoQ(G, ctx);
-    const canEnd = () => isActive && canEndQ(G, ctx);
-    const canBuyEst = (est) => isActive && canBuyEstQ(G, ctx, est);
-    const canBuyLand = (p, land) => isActive && p === player && canBuyLandQ(G, ctx, land);
-    const canDoTV = (p) => isActive && canDoTVQ(G, ctx, p);
-    let canDoOffice,
-        doOffice;
+    const canRoll = (n: number): boolean => isActive && game.canRoll(G, ctx, n);
+    const canKeep = (): boolean => isActive && game.canCommitRoll(G);
+    const canAddTwoKeep = (): boolean => isActive && game.canAddTwo(G, ctx);
+    const canEndTurn = (): boolean => isActive && game.canEndTurn(G);
+    const canBuyEst = (est: number) => isActive && game.canBuyEst(G, ctx, est);
+    const canBuyLand = (p: number, land: number) => isActive && p === player && game.canBuyLand(G, ctx, land);
+    const canDoTV = (p: number) => isActive && game.canDoTV(G, ctx, p);
+    let canDoOffice: (p: number, est: number) => boolean;
+    let doOffice: (p: number, est: number) => void;
     if (G.state !== "office2") {
-      canDoOffice = (p, est) => isActive && p === player && canDoOffice1Q(G, ctx, est);
-      doOffice = (p, est) => p === player && moves.doOffice1(est);
+      canDoOffice = (p: number, est: number) => isActive && p === player && game.canDoOfficePhase1(G, ctx, est);
+      doOffice = (p: number, est: number) => p === player && moves.doOffice1(est);
     } else {
-      canDoOffice = (p, est) => isActive && canDoOffice2Q(G, ctx, p, est);
-      doOffice = (p, est) => moves.doOffice2(p, est);
+      canDoOffice = (p: number, est: number) => isActive && game.canDoOfficePhase2(G, ctx, p, est);
+      doOffice = (p: number, est: number) => moves.doOffice2(p, est);
     }
   
     const playerInfoList = [];
@@ -54,17 +48,17 @@ class MachikoroBoard extends React.Component {
       playerInfoList.push(
         <PlayerInfo 
           key={p}
-          playerID={parseInt(this.props.playerID)}
+          playerID={parseInt(this.props.playerID!)}
           p={p}
           money={G.money[p]}
           name={this.names[p]}
           land_use={G.land_use}
-          land_p={G[`land_${p}`]}
-          est_p={G[`est_${p}`]}
+          land_p={G.land[p]}
+          est_p={G.est[p]}
           canBuyLand={canBuyLand}
-          buyLand={(p, land) => p === player && moves.buyLand(land)}
+          buyLand={(p: number, land: number) => p === player && moves.buyLand(land)}
           canDoTV={canDoTV}
-          doTV={(p) => moves.doTV(p)}
+          doTV={(p: number) => moves.doTV(p)}
           canDoOffice={canDoOffice}
           doOffice={doOffice}
         />
@@ -73,8 +67,8 @@ class MachikoroBoard extends React.Component {
 
     return (
       <div>
-        <div class="div-column">
-          <div class="div-row">
+        <div className="div-column">
+          <div className="div-row">
             <Buttons 
               canRoll={canRoll}
               rollOne={() => moves.rollOne()}
@@ -84,31 +78,31 @@ class MachikoroBoard extends React.Component {
               keep={() => moves.keepRoll()}
               canAddTwoKeep={canAddTwoKeep}
               addTwoKeep={() => moves.addTwo()}
-              canEnd={canEnd}
+              canEndTurn={canEndTurn}
               endTurn={() => moves.endTurn()}
               undo={() => this.props.undo()}
             />
           </div>
-          <div class="div-row">
+          <div className="div-row">
             <StatusBar 
-              currentPlayer={this.names[ctx.currentPlayer]}
+              currentPlayer={this.names[parseInt(ctx.currentPlayer)]}
               state={G.state}
               isActive={isActive}
               isGameOver={ctx.gameover}
             />
           </div>
-          <div class="div-row">
+          <div className="div-row">
             <Establishments 
               est_use={G.est_use}
               est_supply={G.est_supply}
               est_total={G.est_total}
               canBuyEst={canBuyEst}
-              buyEst={(est) => moves.buyEst(est)}
+              buyEst={(est: number) => moves.buyEst(est)}
             />
           </div>
         </div>
-        <div class="div-column">{playerInfoList}</div>
-        <div class="div-column">
+        <div className="div-column">{playerInfoList}</div>
+        <div className="div-column">
           <Log
             log={G.log}
             names={this.names}
@@ -119,5 +113,3 @@ class MachikoroBoard extends React.Component {
 
   }
 }
-
-export default MachikoroBoard;

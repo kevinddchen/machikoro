@@ -2,14 +2,14 @@ import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 import StackTable from './StackTable';
-import { est_order, land_order } from '../game/meta';
+import { est_order, land_order } from '../game';
 
 /**
  * Information panels for a player, displaying name, money, purchased landmarks 
  * and establishments, etc.
  */
 
-class PlayerInfo extends React.Component {
+class PlayerInfo extends React.Component<any, {}> {
 
   render() {
 
@@ -39,10 +39,10 @@ class PlayerInfo extends React.Component {
       if (land_use[land])
         Table.push(
           <td key={i} 
-            class={classNames("land_td", {"active": canBuyLand(p, land)})} 
+            className={classNames("land_td", {"active": canBuyLand(p, land)})} 
             onClick={() => buyLand(p, land)}
           >
-            <img class={classNames(land_img, {"inactive": !land_p[land]})} 
+            <img className={classNames(land_img, {"inactive": !land_p[land]})} 
               src={`./assets/${img_path}`}
               alt=""
             />
@@ -53,11 +53,12 @@ class PlayerInfo extends React.Component {
     // establishment miniatures
     const minis = [];
 
-    // determine est index of the last displayed establishment 
+    // determine est index of the last displayed establishment
+    let last_est_id;
     for (let i=0; i<est_order.length; i++) {
       const { est } = est_order[est_order.length-i-1];
       if (est_p[est] > 0) {
-        var last_est_id = est;
+        last_est_id = est;
         break;
       }
     }
@@ -74,10 +75,10 @@ class PlayerInfo extends React.Component {
         }
         minis.push(
           <div key={`${i}_${count}`} 
-            class={classNames(estmini_div, {"active": canDoOffice(p, est)})}
+            className={classNames(estmini_div, {"active": canDoOffice(p, est)})}
             onClick={() => doOffice(p, est)}
           >
-            <img class="estmini_img" src={`./assets/${which_path}`} alt=""/>
+            <img className="estmini_img" src={`./assets/${which_path}`} alt=""/>
           </div>
         );
       }
@@ -85,12 +86,12 @@ class PlayerInfo extends React.Component {
 
     return (
       <td>
-        <div class="coin_td">
-          <img class="coin_img" src="./assets/coin.png" alt=""/>
-          <div class="coin_num">{money}</div>
+        <div className="coin_td">
+          <img className="coin_img" src="./assets/coin.png" alt=""/>
+          <div className="coin_num">{money}</div>
         </div>
-        <div class={classNames("name_div", {"active": canDoTV(p)})} onClick={() => doTV(p)}>
-          <div class="name_text">{name}</div>
+        <div className={classNames("name_div", {"active": canDoTV(p)})} onClick={() => doTV(p)}>
+          <div className="name_text">{name}</div>
         </div>
         <div>{Table.render()}</div>
         <div>{minis}</div>

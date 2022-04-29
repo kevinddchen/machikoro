@@ -3,7 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 import Authenticator from './Authenticator';
 import { countPlayers, expansionName, supplyVariantName } from './utils';
-import { GAME_NAME } from '../game/Game';
+import { GAME_NAME } from '../game';
 import { UPDATE_INTERVAL } from '../config';
 import type { Server } from 'boardgame.io';
 import type { LobbyClient } from 'boardgame.io/client';

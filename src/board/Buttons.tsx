@@ -2,11 +2,24 @@ import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 
+interface ButtonsProps {
+  canRoll: (n: number) => boolean;
+  rollOne: () => void;
+  rollTwo: () => void;
+  roll: number;
+  canKeep: () => boolean; 
+  keep: () => void; 
+  canAddTwoKeep: () => boolean;
+  addTwoKeep: () => void;
+  canEndTurn: () => boolean;
+  endTurn: () => void;
+  undo: () => void;
+}
+
 /**
  * Buttons on top of the screen, i.e. Rolling, End Turn, and Undo.
  */
-
-class Buttons extends React.Component {
+export default class Buttons extends React.Component<ButtonsProps, {}> {
 
   render() {
 
@@ -19,14 +32,14 @@ class Buttons extends React.Component {
       keep, 
       canAddTwoKeep,
       addTwoKeep,
-      canEnd, 
+      canEndTurn, 
       endTurn, 
       undo 
     } = this.props;
 
     const tbody = 
-      <div class="div-row">
-        <div class="div-column">
+      <div className="div-row">
+        <div className="div-column">
           <button className={classNames("button", {"button_active": canRoll(1)})} onClick={rollOne}>
             Roll 1
           </button>
@@ -49,8 +62,8 @@ class Buttons extends React.Component {
             Keep ({roll+2})
           </button>
         </div>
-        <div class="div-column" align="right">
-          <button className={classNames("button", {"button_active": canEnd()})} onClick={endTurn}>
+        <div className="div-column"> align="right" TODO: Fix
+          <button className={classNames("button", {"button_active": canEndTurn()})} onClick={endTurn}>
             End Turn
           </button>
 
@@ -67,5 +80,3 @@ class Buttons extends React.Component {
   }
   
 }
-
-export default Buttons;

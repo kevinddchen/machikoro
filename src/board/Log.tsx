@@ -5,14 +5,14 @@ import React from 'react';
  * Player-viewable game log
  */
 
-class Log extends React.Component {
+class Log extends React.Component<any, {}> {
 
-  parseName = (x) => this.props.names[x[1]];
+  parseName = (x: any) => this.props.names[x[1]];
 
   componentDidUpdate() {
     // scroll log box to bottom
     let log = document.getElementById("log");
-    log.scrollTop = log.scrollHeight;
+    log!.scrollTop = log!.scrollHeight;
   }
 
   render() {

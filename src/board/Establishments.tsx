@@ -2,12 +2,12 @@ import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 import StackTable from './StackTable';
-import { est_order } from '../game/meta';
+import { est_order } from '../game';
 
 /**
  * Establishment board, where players see and buy cards
  */
-class Establishments extends React.Component {
+class Establishments extends React.Component<any, {}> {
 
   render() {
 

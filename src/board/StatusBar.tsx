@@ -5,8 +5,7 @@ import classNames from 'classnames';
 /**
  * Single-line message bar indicating current turn status.
  */
-
-class StatusBar extends React.Component {
+class StatusBar extends React.Component<any, {}> {
 
   render() {
 
@@ -70,7 +69,7 @@ class StatusBar extends React.Component {
     }
 
     return (
-      <div class={classNames("status-bar", {"status-bar-active":isActive})}>{msg}</div>
+      <div className={classNames("status-bar", {"status-bar-active":isActive})}>{msg}</div>
     );
 
   }

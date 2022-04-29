@@ -1,20 +1,29 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "allowJs": true,
     "jsx": "react-jsx",
+    "allowJs": true,
+    "checkJs": true,
+    "baseUrl": "./src",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "removeComments": true,
   },
-  "include": [
-    "./src/**/*"
-  ]
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
+  "include": ["./src/**/*", "./server/**/*"],
+  "exclude": ["node_modules"]
 }

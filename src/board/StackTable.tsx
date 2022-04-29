@@ -3,13 +3,18 @@
  */
 
 export default class StackTable {
-  constructor(columns) {
+
+  private columns: any;
+  private tbody: any;
+  private tr: any;
+
+  constructor(columns: any) {
     this.columns = columns;
     this.tbody = [];
     this.tr = [];
   }
 
-  push(td) {
+  push(td: any) {
     this.tr.push(td);
     if (this.tr.length === this.columns) {
       this._pushRow();
