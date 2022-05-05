@@ -1,13 +1,15 @@
-import '../styles/main.css';
-import React from 'react';
+import 'styles/main.css';
+
 import _ from 'lodash';
+import React from 'react';
+import { LobbyAPI } from 'boardgame.io';
+import { LobbyClient } from 'boardgame.io/client';
+
 import Authenticator from './Authenticator';
+import { UPDATE_INTERVAL } from 'config';
+import { GAME_NAME, Expansion, SupplyVariant } from 'game';
+import { ClientInfo } from './types';
 import { seatIsOccupied, countPlayers, expansionName, supplyVariantName } from './utils';
-import { GAME_NAME } from '../game';
-import { UPDATE_INTERVAL } from '../config';
-import type { LobbyAPI } from 'boardgame.io';
-import type { LobbyClient } from 'boardgame.io/client';
-import type { ClientInfo } from '../App';
 
 interface LobbyProps {
   name: string;
@@ -19,15 +21,15 @@ interface LobbyProps {
 }
 
 /**
- * @param numPlayers - Maximum number of players in the match.
- * @param expansion - Expansion to play.
- * @param supplyVariant - Supply variant to use.
- * @param matchList - Array of matches to display.
+ * @param numPlayers Maximum number of players in the match.
+ * @param expansion Expansion to play.
+ * @param supplyVariant Supply variant to use.
+ * @param matchList Array of matches to display.
  */
 interface LobbyState {
   numPlayers: number;
-  expansion: string;
-  supplyVariant: string;
+  expansion: Expansion;
+  supplyVariant: SupplyVariant;
   matchList?: LobbyAPI.Match[];
 }
 
@@ -48,8 +50,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     super(props);
     this.state = {
       numPlayers: 4,
-      expansion: 'base',
-      supplyVariant: 'hybrid',
+      expansion: Expansion.Base,
+      supplyVariant: SupplyVariant.Hybrid,
     };
     this.authenticator = new Authenticator();
     this.nameRef = React.createRef();
@@ -67,11 +69,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   };
 
   setExpansion = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    this.setState({ expansion: e.target.value });
+    this.setState({ expansion: parseInt(e.target.value) });
   };
 
   setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    this.setState({ supplyVariant: e.target.value });
+    this.setState({ supplyVariant: parseInt(e.target.value) });
   };
 
   // --- Fetch matches --------------------------------------------------------
@@ -138,7 +140,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       if (this.authenticator.hasCredentials(matchID) || await this.joinMatchNoCredentials(matchID)) {
         const { playerID, credentials } = this.authenticator.fetchCredentials(matchID);
         if (playerID && credentials)
-          this.props.setClientInfo({matchID, playerID, credentials});
+          this.props.setClientInfo({ matchID, playerID, credentials });
         // TODO: what happens if credentials are no good?
         // this will trigger `Matchmaker` to switch to the waiting room
       } else {
@@ -195,7 +197,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     return true;
   };
 
-  // --- Helper ----------------------------------------------------------------
+  // --- Helper ---------------------------------------------------------------
 
   /**
    * Check if entered name is valid. Sets error message if not.
@@ -214,7 +216,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     return true;
   }
 
-  // --- React -----------------------------------------------------------------
+  // --- React ----------------------------------------------------------------
 
   componentDidMount () {
     const { name } = this.props;
@@ -229,9 +231,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     if (this.numPlayersRef.current)
       this.numPlayersRef.current.value = numPlayers.toString();
     if (this.expansionRef.current)
-      this.expansionRef.current.value = expansion;
+      this.expansionRef.current.value = expansion.toString();
     if (this.supplyVariantRef.current)
-      this.supplyVariantRef.current.value = supplyVariant;
+      this.supplyVariantRef.current.value = supplyVariant.toString();
 
     this.fetchMatches();
     this.fetchInterval = setInterval(this.fetchMatches, UPDATE_INTERVAL);
@@ -243,7 +245,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       clearInterval(this.fetchInterval);
   }
 
-  // --- Render ----------------------------------------------------------------
+  // --- Render ---------------------------------------------------------------
 
   renderMatchList (): JSX.Element[] {
     const { matchList } = this.state;
@@ -316,13 +318,13 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
             <option value='5'>5 Players</option>
           </select>
           <select ref={this.expansionRef} onChange={this.setExpansion}>
-            <option value='base'>Base Game</option>
-            <option value='harbor'>Harbor Expansion</option>
+            <option value={Expansion.Base}>{expansionName(Expansion.Base)}</option>
+            <option value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>
           </select>
           <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
-            <option value='hybrid'>Hybrid Supply</option>
-            <option value='variable'>Variable Supply</option>
-            <option value='total'>Total Supply</option>
+            <option value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>
+            <option value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>
+            <option value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
           </select>
           <button className='button' onClick={this.createMatch}>
             Create Room

@@ -1,7 +1,6 @@
 /**
  * Tables with a fixed number of columns but unfixed number of rows
  */
-
 export default class StackTable {
 
   private columns: any;

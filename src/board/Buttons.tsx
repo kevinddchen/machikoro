@@ -1,18 +1,22 @@
-import '../styles/main.css';
-import React from 'react';
+import 'styles/main.css';
 import classNames from 'classnames';
+import React from 'react';
+
+import { 
+  MachikoroG, 
+  Ctx, 
+  Moves,
+  canRoll,
+  canCommitRoll,
+  canAddTwo,
+  canEndTurn,
+} from 'game';
 
 interface ButtonsProps {
-  canRoll: (n: number) => boolean;
-  rollOne: () => void;
-  rollTwo: () => void;
-  roll: number;
-  canKeep: () => boolean; 
-  keep: () => void; 
-  canAddTwoKeep: () => boolean;
-  addTwoKeep: () => void;
-  canEndTurn: () => boolean;
-  endTurn: () => void;
+  G: MachikoroG;
+  ctx: Ctx;
+  moves: Moves;
+  isActive: boolean;
   undo: () => void;
 }
 
@@ -23,51 +27,54 @@ export default class Buttons extends React.Component<ButtonsProps, {}> {
 
   render() {
 
-    const { 
-      canRoll, 
-      rollOne, 
-      rollTwo, 
-      roll, 
-      canKeep, 
-      keep, 
-      canAddTwoKeep,
-      addTwoKeep,
-      canEndTurn, 
-      endTurn, 
-      undo 
-    } = this.props;
+    const { G, ctx, moves, isActive, undo } = this.props;
+
+    const _canRoll1 = isActive && canRoll(G, ctx, 1);
+    const _canRoll2 = isActive && canRoll(G, ctx, 2);
+    const _canCommitRoll = isActive && canCommitRoll(G);
+    const _canAddTwo = isActive && canAddTwo(G, ctx);
+    const _canEndTurn = isActive && canEndTurn(G);
 
     const tbody = 
       <div className="div-row">
         <div className="div-column">
-          <button className={classNames("button", {"button_active": canRoll(1)})} onClick={rollOne}>
+          <button 
+            className={classNames("button", {"button_active": _canRoll1})} 
+            onClick={() => moves.rollOne()}
+          >
             Roll 1
           </button>
 
-          <button className={classNames("button", {"button_active": canRoll(2)})} onClick={rollTwo}>
+          <button 
+            className={classNames("button", {"button_active": _canRoll2})} 
+            onClick={() => moves.rollTwo()}
+          >
             Roll 2
           </button>
 
-          <button className={classNames("button", {"button_active": canKeep()}, 
-            {"button_hide": !canKeep()})}
-            onClick={keep}
+          <button 
+            className={classNames("button", {"button_active": _canCommitRoll}, {"button_hide": !_canCommitRoll})}
+            onClick={() => moves.keepRoll()}
           >
-            Keep ({roll})
+            Keep ({G.roll})
           </button>
 
-          <button className={classNames("button", {"button_active": canAddTwoKeep()},
-            {"button_hide": !canAddTwoKeep()})} 
-            onClick={addTwoKeep}
+          <button 
+            className={classNames("button", {"button_active": _canAddTwo}, {"button_hide": !_canAddTwo})} 
+            onClick={() => moves.addTwo()}
           >
-            Keep ({roll+2})
+            Keep ({G.roll+2})
           </button>
         </div>
         <div className="div-column"> align="right" TODO: Fix
-          <button className={classNames("button", {"button_active": canEndTurn()})} onClick={endTurn}>
+          <button 
+            className={classNames("button", {"button_active": _canEndTurn})} 
+            onClick={() => moves.endTurn()}
+          >
             End Turn
           </button>
 
-          <button className="button" onClick={undo}>
+          <button className="button" onClick={() => undo()}>
             Undo
           </button>
         </div>

@@ -1,9 +1,11 @@
-import '../styles/main.css';
+import 'styles/main.css';
+
 import React from 'react';
 import { LobbyClient } from 'boardgame.io/client';
+
 import Lobby from './Lobby';
 import Room from './Room';
-import type { ClientInfo } from '../App';
+import { ClientInfo } from './types';
 
 interface MatchmakerProps extends ClientInfo {
   serverOrigin: string;
@@ -13,8 +15,8 @@ interface MatchmakerProps extends ClientInfo {
 }
 
 /**
- * @param name - Name of the player.
- * @param errorMessage - Error message to display.
+ * @param name Name of the player.
+ * @param errorMessage Error message to display.
  */
 interface MatchmakerState {
   name: string;

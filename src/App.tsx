@@ -1,23 +1,13 @@
-import './styles/main.css';
-import React from 'react';
-import { Client } from 'boardgame.io/react';
-import { SocketIO } from 'boardgame.io/multiplayer';
-import { MachikoroBoard }  from './board';
-import { Machikoro } from './game';
-import { Matchmaker } from './lobby';
-import { PORT, IN_PROD } from './config';
+import 'styles/main.css';
 
-/**
- * Information needed by the client to authenticate API calls with server.
- * @param matchID - Internal random string identifier for the match.
- * @param playerID - Seat of the player, taking values '0', '1', '2', ...
- * @param credentials - Authentication token.
- */
-export interface ClientInfo {
-  matchID: string;
-  playerID: string;
-  credentials: string;
-}
+import React from 'react';
+import { SocketIO } from 'boardgame.io/multiplayer';
+import { Client } from 'boardgame.io/react';
+
+import { MachikoroBoard }  from 'board';
+import { PORT, IN_PROD } from 'config';
+import { Machikoro } from 'game';
+import { ClientInfo, Matchmaker } from 'lobby';
 
 const defaultClientInfo: ClientInfo = {
   matchID: '',
@@ -26,7 +16,7 @@ const defaultClientInfo: ClientInfo = {
 };
 
 /**
- * @param play - If true, start the game.
+ * @param play If true, start the game.
  */
 interface AppState extends ClientInfo {
   play: boolean;
@@ -57,7 +47,7 @@ class App extends React.Component<{}, AppState> {
     this.setState(defaultClientInfo);
   };
 
-  startMatch = () => this.setState({play: true});
+  startMatch = () => this.setState({ play: true });
 
   startDebug = () => {
     this.clearClientInfo();

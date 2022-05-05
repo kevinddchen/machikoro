@@ -1,8 +1,8 @@
-import path from 'path';
 import serve from 'koa-static';
+import path from 'path';
 import { Server, Origins } from 'boardgame.io/server';
-import { Machikoro } from '../src/game';
 import { PORT } from '../src/config';
+import { Machikoro } from '../src/game';
 
 // game server
 const server = Server({

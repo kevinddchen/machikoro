@@ -1,82 +1,119 @@
-import '../styles/main.css';
+import 'styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
+
+import { 
+  MachikoroG, 
+  Ctx, 
+  Moves,
+  Est,
+  Establishment,
+  Land,
+  Landmark,
+  canBuyLand,
+  canDoTV,
+  canDoOfficePhase1,
+  canDoOfficePhase2,
+} from 'game';
 import StackTable from './StackTable';
-import { est_order, land_order } from '../game';
+
+interface PlayerInfoProps {
+  G: MachikoroG;
+  ctx: Ctx;
+  moves: Moves;
+  isActive: boolean;
+  player: number;
+  name: string;
+}
 
 /**
  * Information panels for a player, displaying name, money, purchased landmarks 
  * and establishments, etc.
  */
+class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
 
-class PlayerInfo extends React.Component<any, {}> {
+  private landmarks: Landmark[];
+  private establishments: Establishment[];
+
+  constructor(props: PlayerInfoProps) {
+    super(props);
+    const { G } = this.props;
+    this.establishments = Est.getAllInUse(G.est_data)
+    this.landmarks = Land.getAllInUse(G.land_data);
+    // TODO: sort establishments and landmarks
+  }
 
   render() {
 
-    const {
-      playerID, // ID of player rendering the board
-      p, 
-      money, 
-      name, 
-      land_use,
-      land_p, 
-      est_p, 
-      canBuyLand, 
-      buyLand, 
-      canDoTV,
-      doTV,
-      canDoOffice,
-      doOffice,
-    } = this.props;
-
-    const land_img = "land_img" + (p === playerID ? "_self" : "");
-    const estmini_div = "estmini_div" + (p === playerID ? "_self" : "");
+    const { G, ctx, moves, isActive, player, name } = this.props;
+    const currentPlayer = parseInt(ctx.currentPlayer);
+    const money = G.money[player];
+    const _canDoTV = isActive && canDoTV(G, ctx, player);
+    
+    const land_img = "land_img" + (player === currentPlayer ? "_self" : "");
+    const estmini_div = "estmini_div" + (player === currentPlayer ? "_self" : "");
 
     // landmarks
     const Table = new StackTable(2);
-    for (let i=0; i<land_order.length; i++) {
-      const { land, img_path } = land_order[i];
-      if (land_use[land])
-        Table.push(
-          <td key={i} 
-            className={classNames("land_td", {"active": canBuyLand(p, land)})} 
-            onClick={() => buyLand(p, land)}
-          >
-            <img className={classNames(land_img, {"inactive": !land_p[land]})} 
-              src={`./assets/${img_path}`}
-              alt=""
-            />
-          </td>
-        ); 
+    for (const land of this.landmarks) {
+
+      const _canBuyLand = isActive && (player === currentPlayer) && canBuyLand(G, ctx, land);
+      const _owned = Land.isOwned(G.land_data, player, land);
+
+      Table.push(
+        <td 
+          key={land._id} 
+          className={classNames("land_td", {"active": _canBuyLand})} 
+          onClick={() => moves.buyLand(land)}
+        >
+          <img 
+            className={classNames(land_img, {"inactive": !_owned})} 
+            src={`./assets/${land.image_filename}`}
+            alt=""
+          />
+        </td>
+      ); 
     }
 
     // establishment miniatures
     const minis = [];
 
     // determine est index of the last displayed establishment
-    let last_est_id;
-    for (let i=0; i<est_order.length; i++) {
-      const { est } = est_order[est_order.length-i-1];
-      if (est_p[est] > 0) {
-        last_est_id = est;
-        break;
-      }
-    }
+    // let last_est_id;
+    // for (let i=0; i<est_order.length; i++) {
+    //   const { est } = est_order[est_order.length-i-1];
+    //   if (est_p[est] > 0) {
+    //     last_est_id = est;
+    //     break;
+    //   }
+    // }
 
-    for (let i=0; i<est_order.length; i++) {
-      const { est, img_path, mini_path } = est_order[i];
-      for (let count=0; count<est_p[est]; count++) {
-        var which_path
-        if (est === last_est_id && count === est_p[est]-1) {
-          // show the last card in full
-          which_path = img_path;
-        } else {
-          which_path = mini_path;
-        }
+    for (const est of this.establishments) {
+
+      let _canDoOffice: boolean;
+      let _doOffice: (est: Establishment) => void;
+      if (player === currentPlayer) {
+        _canDoOffice = isActive && canDoOfficePhase1(G, ctx, est);
+        _doOffice = (est) => moves.doOfficePhase1(est);
+      } else {
+        _canDoOffice = isActive && canDoOfficePhase2(G, ctx, player, est);
+        _doOffice = (est) => moves.doOfficePhase2(player, est);
+      }
+      const count = Est.countOwned(G.est_data, player, est);
+
+      for (let i = 0; i < count; i++) {
+        // var which_path
+        // if (est === last_est_id && count === est_p[est]-1) {
+        //   // show the last card in full
+        //   which_path = img_path;
+        // } else {
+        let which_path = est.mini_filename;
+
         minis.push(
-          <div key={`${i}_${count}`} 
-            className={classNames(estmini_div, {"active": canDoOffice(p, est)})}
-            onClick={() => doOffice(p, est)}
+          <div 
+            key={`${est._id}_${i}`} 
+            className={classNames(estmini_div, {"active": _canDoOffice})}
+            onClick={() => _doOffice(est)}
           >
             <img className="estmini_img" src={`./assets/${which_path}`} alt=""/>
           </div>
@@ -90,7 +127,7 @@ class PlayerInfo extends React.Component<any, {}> {
           <img className="coin_img" src="./assets/coin.png" alt=""/>
           <div className="coin_num">{money}</div>
         </div>
-        <div className={classNames("name_div", {"active": canDoTV(p)})} onClick={() => doTV(p)}>
+        <div className={classNames("name_div", {"active": _canDoTV})} onClick={() => moves.doTV(player)}>
           <div className="name_text">{name}</div>
         </div>
         <div>{Table.render()}</div>

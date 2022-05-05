@@ -1,13 +1,15 @@
-import '../styles/main.css';
-import React from 'react';
+import 'styles/main.css';
+
 import _ from 'lodash';
-import Authenticator from './Authenticator';
-import { countPlayers, expansionName, supplyVariantName } from './utils';
-import { GAME_NAME } from '../game';
-import { UPDATE_INTERVAL } from '../config';
+import React from 'react';
 import type { Server } from 'boardgame.io';
 import type { LobbyClient } from 'boardgame.io/client';
-import type { ClientInfo } from '../App';
+
+import Authenticator from './Authenticator';
+import { UPDATE_INTERVAL } from 'config';
+import { GAME_NAME, Expansion, SupplyVariant } from 'game';
+import { ClientInfo } from './types';
+import { countPlayers, expansionName, supplyVariantName } from './utils';
 
 interface RoomProps extends ClientInfo {
   name: string;
@@ -19,14 +21,14 @@ interface RoomProps extends ClientInfo {
 }
 
 /**
- * @param playerList - List of metadata for players in the room.
- * @param expansion - Expansion to play.
- * @param supplyVariant - Supply variant to use.
+ * @param playerList List of metadata for players in the room.
+ * @param expansion Expansion to play.
+ * @param supplyVariant Supply variant to use.
  */
 interface RoomState {
   playerList: Server.PlayerMetadata[];
-  expansion: string;
-  supplyVariant: string;
+  expansion?: Expansion;
+  supplyVariant?: SupplyVariant;
 }
 
 /**
@@ -41,8 +43,6 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     super(props);
     this.state = {
       playerList: [], // array of `player` objects
-      expansion: '',
-      supplyVariant: ''
     };
     this.authenticator = new Authenticator();
   }
