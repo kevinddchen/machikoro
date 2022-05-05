@@ -29,6 +29,11 @@
   display: table-cell; 
 }
 
+.div-column-right {
+  display: table-cell; 
+  text-align: right;
+}
+
 /* FONTS */
 
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=KoHo:wght@500&family=Sigmar+One&display=swap');

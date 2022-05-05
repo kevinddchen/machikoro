@@ -66,7 +66,7 @@ export default class Buttons extends React.Component<ButtonsProps, {}> {
             Keep ({G.roll+2})
           </button>
         </div>
-        <div className="div-column"> align="right" TODO: Fix
+        <div className="div-column-right">
           <button 
             className={classNames("button", {"button_active": _canEndTurn})} 
             onClick={() => moves.endTurn()}
