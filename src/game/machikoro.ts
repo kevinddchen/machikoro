@@ -3,7 +3,7 @@ import { PlayerView, TurnOrder, INVALID_MOVE } from 'boardgame.io/core';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
-import { State, Color, CardType } from './enums';
+import { State, Color, CardType, Expansion, SupplyVariant } from './enums';
 import { MachikoroG, Establishment, Landmark } from './types';
 
 /**
@@ -779,8 +779,8 @@ const log = (G: MachikoroG, msg: string): void => {
 
 // set-up to use in debug mode
 const debugSetupData = {
-  expansion: "harbor",
-  supplyVariant: "total",
+  expansion: Expansion.Harbor,
+  supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,
 };
@@ -823,17 +823,20 @@ export const Machikoro: Game<MachikoroG> = {
     return G;
   },
 
-  // validateSetupData: (setupData, numPlayers) => {
-  //   if (setupData) {
-  //     const { expansion, supplyVariant, startCoins } = setupData;
-  //     if (!["base", "harbor"].includes(expansion)) return 'expansion not valid';
-  //     if (!["total", "variable", "hybrid"].includes(supplyVariant)) return 'supply variant not valid';
-  //     if (!Number.isInteger(startCoins)) return 'number of starting coins not integer'; 
-  //   }
-  //   if (numPlayers < 2) return 'too few players';
-  //   if (numPlayers > 5) return 'too many players';
-  //   return;
-  // },
+  validateSetupData: (setupData, numPlayers) => {
+    if (setupData) {
+      const { expansion, supplyVariant, startCoins } = setupData;
+      if (!Object.values(Expansion).includes(expansion))
+        return 'Expansion not valid';
+      if (!Object.values(SupplyVariant).includes(supplyVariant)) 
+        return 'Supply variant not valid';
+      if (!Number.isInteger(startCoins)) 
+        return 'Number of starting coins not integer'; 
+    }
+    if (numPlayers < 2) return 'Too few players';
+    if (numPlayers > 5) return 'Too many players';
+    return;
+  },
 
   turn: {
     onBegin: (G, ctx) => {
