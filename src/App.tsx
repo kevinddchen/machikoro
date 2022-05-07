@@ -16,6 +16,7 @@ const defaultClientInfo: ClientInfo = {
 };
 
 /**
+ * @extends ClientInfo
  * @param play If true, start the game.
  */
 interface AppState extends ClientInfo {
@@ -25,10 +26,9 @@ interface AppState extends ClientInfo {
 /**
  * Create Machi Koro application.
  */
-class App extends React.Component<{}, AppState> {
+export default class App extends React.Component<{}, AppState> {
 
-  // URL and port of the server.
-  private serverOrigin: string;
+  private serverOrigin: string; // URL and port of the server.
 
   constructor(props: any) {
     super(props);
@@ -39,17 +39,17 @@ class App extends React.Component<{}, AppState> {
     this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
   }
 
-  setClientInfo = (clientInfo: ClientInfo) => {
+  setClientInfo = (clientInfo: ClientInfo): void => {
     this.setState(clientInfo);
   };
 
-  clearClientInfo = () => {
+  clearClientInfo = (): void => {
     this.setState(defaultClientInfo);
   };
 
-  startMatch = () => this.setState({ play: true });
+  startMatch = (): void => this.setState({ play: true });
 
-  startDebug = () => {
+  startDebug = (): void => {
     this.clearClientInfo();
     this.startMatch();
   };
@@ -104,5 +104,3 @@ class App extends React.Component<{}, AppState> {
     }
   }
 }
-
-export default App;

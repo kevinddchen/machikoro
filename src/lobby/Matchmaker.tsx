@@ -7,6 +7,13 @@ import Lobby from './Lobby';
 import Room from './Room';
 import { ClientInfo } from './types';
 
+/**
+ * @extends ClientInfo
+ * @param serverOrigin URL and port of the server.
+ * @param setClientInfo Callback to set client info.
+ * @param clearClientInfo Callback to clear client info.
+ * @param startMatch Callback to start match.
+ */
 interface MatchmakerProps extends ClientInfo {
   serverOrigin: string;
   setClientInfo: (clientInfo: ClientInfo) => void;
@@ -25,12 +32,11 @@ interface MatchmakerState {
 
 /**
  * Handles match creation and joining via the `Lobby` component, and the
- * pre-match waiting room via the `Room` component. Also handles match
- * credential storage and retrieval via the `Authenticator` class.
+ * pre-match waiting room via the `Room` component.
  */
 export default class Matchmaker extends React.Component<MatchmakerProps, MatchmakerState> {
 
-  private lobbyClient: LobbyClient;
+  private lobbyClient: LobbyClient; // interacts with server match management API
 
   constructor (props: MatchmakerProps) {
     super(props);
@@ -41,15 +47,15 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
     this.lobbyClient = new LobbyClient({ server: props.serverOrigin });
   }
 
-  setName = (name: string) => this.setState({ name });
+  setName = (name: string): void => this.setState({ name });
 
-  setErrorMessage = (errorMessage: string) => this.setState({ errorMessage });
+  setErrorMessage = (errorMessage: string): void => this.setState({ errorMessage });
 
   /**
    * Clear the error message. The render will only be updated if the error
    * message was not empty.
    */
-  clearErrorMessage = () => {
+  clearErrorMessage = (): void => {
     const { errorMessage } = this.state;
     if (errorMessage) {
       this.setState({ errorMessage: '' });

@@ -11,6 +11,14 @@ import { GAME_NAME, Expansion, SupplyVariant } from 'game';
 import { ClientInfo } from './types';
 import { seatIsOccupied, countPlayers, expansionName, supplyVariantName } from './utils';
 
+/**
+ * @param name Name of the player.
+ * @param lobbyClient LobbyClient instance used to interact with server match management API
+ * @param setClientInfo Callback to set client info.
+ * @param setName Callback to set name.
+ * @param setErrorMessage Callback to set error message.
+ * @param clearErrorMessage Callback to clear error message.
+ */
 interface LobbyProps {
   name: string;
   lobbyClient: LobbyClient;
@@ -21,10 +29,10 @@ interface LobbyProps {
 }
 
 /**
- * @param numPlayers Maximum number of players in the match.
+ * @param numPlayers Number of players for the match.
  * @param expansion Expansion to play.
  * @param supplyVariant Supply variant to use.
- * @param matchList Array of matches to display.
+ * @param matchList List of current matches hosted on the server.
  */
 interface LobbyState {
   numPlayers: number;
@@ -39,7 +47,7 @@ interface LobbyState {
 export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   private fetchInterval?: NodeJS.Timeout;
-  private authenticator: Authenticator;
+  private authenticator: Authenticator; // manages local credential storage and retrieval
 
   private nameRef: React.RefObject<HTMLInputElement>;
   private numPlayersRef: React.RefObject<HTMLSelectElement>;
@@ -48,7 +56,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   constructor (props: LobbyProps) {
     super(props);
-    this.state = {
+    this.state = { // default values we start with
       numPlayers: 4,
       expansion: Expansion.Base,
       supplyVariant: SupplyVariant.Hybrid,
@@ -60,19 +68,19 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     this.supplyVariantRef = React.createRef();
   }
 
-  setName = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setName = (e: React.ChangeEvent<HTMLInputElement>): void => {
     this.props.setName(e.target.value);
   };
 
-  setNumPlayers = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  setNumPlayers = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     this.setState({ numPlayers: parseInt(e.target.value) });
   };
 
-  setExpansion = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     this.setState({ expansion: parseInt(e.target.value) });
   };
 
-  setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     this.setState({ supplyVariant: parseInt(e.target.value) });
   };
 
@@ -82,7 +90,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * Fetch available matches from the server. Updates render if the fetched
    * list differes from the list currently displayed.
    */
-  fetchMatches = async () => {
+  fetchMatches = async (): Promise<void> => {
     const { lobbyClient } = this.props;
     const { matchList } = this.state;
 
@@ -105,7 +113,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * Create a match based on the selected options.
    */
-  createMatch = async () => {
+  createMatch = async (): Promise<void> => {
     const { lobbyClient } = this.props;
     const { numPlayers, expansion, supplyVariant } = this.state;
 
@@ -135,7 +143,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * Join the match corresponding to `matchID`.
    * @param matchID
    */
-  joinMatch = async (matchID: string) => {
+  joinMatch = async (matchID: string): Promise<void> => {
     try {
       if (this.authenticator.hasCredentials(matchID) || await this.joinMatchNoCredentials(matchID)) {
         const { playerID, credentials } = this.authenticator.fetchCredentials(matchID);

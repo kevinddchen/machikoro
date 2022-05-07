@@ -11,6 +11,15 @@ import { GAME_NAME, Expansion, SupplyVariant } from 'game';
 import { ClientInfo } from './types';
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 
+/**
+ * @extends ClientInfo
+ * @param name Name of the player.
+ * @param lobbyClient LobbyClient instance used to interact with server match management API
+ * @param clearClientInfo Callback to clear client info.
+ * @param startMatch Callback to start match.
+ * @param setErrorMessage Callback to set error message.
+ * @param clearErrorMessage Callback to clear error message.
+ */
 interface RoomProps extends ClientInfo {
   name: string;
   lobbyClient: LobbyClient;
@@ -37,7 +46,7 @@ interface RoomState {
 export default class Room extends React.Component<RoomProps, RoomState> {
 
   private fetchInterval?: NodeJS.Timeout;
-  private authenticator: Authenticator;
+  private authenticator: Authenticator; // manages local credential storage and retrieval
 
   constructor (props: RoomProps) {
     super(props);
@@ -51,7 +60,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
    * Fetches list of players from the server. Also automatically starts the 
    * game when there are enough people.
    */
-  fetchMatch = async () => {
+  fetchMatch = async (): Promise<void> => {
     const { matchID, lobbyClient } = this.props;
     const { playerList } = this.state;
 
@@ -74,7 +83,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   /**
    * Leave the match and delete credentials.
    */
-  leaveMatch = async () => {
+  leaveMatch = async (): Promise<void> => {
     const { matchID, playerID, credentials, lobbyClient } = this.props;
 
     try {

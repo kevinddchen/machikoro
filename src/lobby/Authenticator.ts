@@ -5,11 +5,11 @@ export default class Authenticator {
 
   /**
    * Save credentials for a match to local storage.
-   * @param matchID - Must be unique.
-   * @param playerID - Must be a single character.
+   * @param matchID Must be unique.
+   * @param playerID Must be a single character.
    * @param credentials
    */
-  saveCredentials (matchID: string, playerID: string, credentials: string) {
+  saveCredentials (matchID: string, playerID: string, credentials: string): void {
     const storageString = playerID + credentials;
     localStorage.setItem(matchID, storageString);
   }
@@ -43,7 +43,7 @@ export default class Authenticator {
    * Delete credentials for a match from local storage.
    * @param matchID
    */
-  deleteCredentials (matchID: string) {
+  deleteCredentials (matchID: string): void {
     localStorage.removeItem(matchID);
   }
 

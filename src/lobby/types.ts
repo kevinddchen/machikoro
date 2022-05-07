@@ -4,9 +4,9 @@
 
 /**
  * Information needed by the client to authenticate API calls with server.
- * @param matchID Internal random string identifier for the match.
- * @param playerID Seat of the player, taking values '0', '1', '2', ...
- * @param credentials Authentication token.
+ * @param matchID Random string that identifies the match the client is in.
+ * @param playerID Player number of the client in the match. Takes values '0', '1', '2', ...
+ * @param credentials Random string that authenticates client interactions with the server.
  */
 export type ClientInfo = {
   matchID: string;
