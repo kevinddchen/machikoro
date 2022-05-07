@@ -46,7 +46,8 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
     for (let i=0; i<this.names.length; i++) {
       const player = parseInt(G.turn_order[i]);
       playerInfoList.push(
-        <PlayerInfo 
+        <PlayerInfo
+          key={i}
           G={G}
           ctx={ctx}
           moves={moves}

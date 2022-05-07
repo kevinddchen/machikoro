@@ -38,7 +38,8 @@ export default class Supply extends React.Component<SupplyProps, {}> {
     const { G, ctx, moves, isActive } = this.props;
     const Table = new StackTable(5);
 
-    for (const est of this.establishments) {
+    for (let i = 0; i < this.establishments.length; i++) {
+      const est = this.establishments[i];
 
       const _canBuyEst = isActive && canBuyEst(G, ctx, est);
       const available = Est.countAvailable(G.est_data, est);
@@ -46,7 +47,7 @@ export default class Supply extends React.Component<SupplyProps, {}> {
 
       Table.push(
         <td 
-          key={est._id} 
+          key={i} 
           className={classNames("est_td", {"active": _canBuyEst})} 
           onClick={() => moves.buyEst(est)}
         >

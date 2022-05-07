@@ -55,14 +55,14 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
 
     // landmarks
     const Table = new StackTable(2);
-    for (const land of this.landmarks) {
-
+    for (let i = 0; i < this.landmarks.length; i++){ 
+      const land = this.landmarks[i];
       const _canBuyLand = isActive && (player === currentPlayer) && canBuyLand(G, ctx, land);
       const _owned = Land.isOwned(G.land_data, player, land);
 
       Table.push(
         <td 
-          key={land._id} 
+          key={i}
           className={classNames("land_td", {"active": _canBuyLand})} 
           onClick={() => moves.buyLand(land)}
         >
@@ -88,7 +88,9 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
     //   }
     // }
 
-    for (const est of this.establishments) {
+    for (let i = 0; i < this.establishments.length; i++) {
+      const est = this.establishments[i];
+      const count = Est.countOwned(G.est_data, player, est);
 
       let _canDoOffice: boolean;
       let _doOffice: (est: Establishment) => void;
@@ -99,9 +101,8 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
         _canDoOffice = isActive && canDoOfficePhase2(G, ctx, player, est);
         _doOffice = (est) => moves.doOfficePhase2(player, est);
       }
-      const count = Est.countOwned(G.est_data, player, est);
-
-      for (let i = 0; i < count; i++) {
+      
+      for (let j = 0; j < count; j++) {
         // var which_path
         // if (est === last_est_id && count === est_p[est]-1) {
         //   // show the last card in full
@@ -111,7 +112,7 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
 
         minis.push(
           <div 
-            key={`${est._id}_${i}`} 
+            key={`${i}_${j}`} 
             className={classNames(estmini_div, {"active": _canDoOffice})}
             onClick={() => _doOffice(est)}
           >
@@ -122,7 +123,7 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
     }
 
     return (
-      <td>
+      <div className='div-column'>
         <div className="coin_td">
           <img className="coin_img" src="./assets/coin.png" alt=""/>
           <div className="coin_num">{money}</div>
@@ -132,7 +133,7 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
         </div>
         <div>{Table.render()}</div>
         <div>{minis}</div>
-      </td>
+      </div>
     );
 
   }
