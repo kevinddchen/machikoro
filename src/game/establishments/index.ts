@@ -171,20 +171,20 @@ export const replenishSupply = (G: MachikoroG): void => {
       break;
 
     default:
-      throw new Error(`Unknown supply variant: ${supplyVariant}`);
+      throw new Error(`Supply variant "${SupplyVariant[supplyVariant]}" not implemented.`);
   }
 };
 
 /**
  * Initialize the establishment data for a game.
  * @param expansion Expansion.
- * @param variant Supply variant.
+ * @param supplyVariant Supply variant.
  * @param numPlayers Number of players.
  * @returns The `EstablishmentData` for the game, which is an object that is
  *  passed between the client and server, and the unshuffled establishment 
  *  decks, which is hidden from the client.
  */
-export const initialize = (expansion: Expansion, variant: SupplyVariant, numPlayers: number): 
+export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, numPlayers: number): 
   { data: EstablishmentData, decks: Establishment[][] } => {
 
   // declare empty data structure
@@ -209,7 +209,7 @@ export const initialize = (expansion: Expansion, variant: SupplyVariant, numPlay
       break;
 
     default:
-      throw new Error(`Unknown expansion: ${expansion}`);
+      throw new Error(`Expansion "${Expansion[expansion]}" not implemented.`);
   }
 
   // populate `EstablishmentData`
@@ -223,7 +223,7 @@ export const initialize = (expansion: Expansion, variant: SupplyVariant, numPlay
 
   // prepare decks
   let decks: Establishment[][];
-  switch (variant) {
+  switch (supplyVariant) {
 
     case (SupplyVariant.Total):
     case (SupplyVariant.Variable):
@@ -250,7 +250,7 @@ export const initialize = (expansion: Expansion, variant: SupplyVariant, numPlay
       break;
 
     default:
-      throw new Error(`Unknown supply variant: ${variant}`);
+      throw new Error(`Supply variant "${SupplyVariant[supplyVariant]}" not implemented.`);
   }
   return { data, decks };
 };

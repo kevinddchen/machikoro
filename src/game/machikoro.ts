@@ -795,18 +795,18 @@ export const Machikoro: Game<MachikoroG> = {
     if (!setupData) 
       setupData = debugSetupData;
     const { expansion, supplyVariant, startCoins, randomizeTurnOrder } = setupData;
-    const n = ctx.numPlayers;
-    const { data: est_data, decks } = Est.initialize(expansion, supplyVariant, n);
-    const land_data = Land.initialize(expansion, n);
+    const { numPlayers } = ctx;
+    const { data: est_data, decks } = Est.initialize(expansion, supplyVariant, numPlayers);
+    const land_data = Land.initialize(expansion, numPlayers);
     const G: MachikoroG = {
       state: State.Roll,
       roll: 0,
       numRolls: 0,
-      money: Array(n).fill(startCoins),
+      money: Array(numPlayers).fill(startCoins),
       est_data,
       land_data,
       supplyVariant,
-      turn_order: [...Array(n).keys()].map(x => x.toString()),
+      turn_order: [...Array(numPlayers).keys()].map(x => x.toString()),
       secret: { decks },
       log: [],
       log_i: 0,
@@ -827,14 +827,14 @@ export const Machikoro: Game<MachikoroG> = {
     if (setupData) {
       const { expansion, supplyVariant, startCoins } = setupData;
       if (!Object.values(Expansion).includes(expansion))
-        return 'Expansion not valid';
+        return `Unknown expansion: ${expansion}`;
       if (!Object.values(SupplyVariant).includes(supplyVariant)) 
-        return 'Supply variant not valid';
+        return `Unknown supply variant: ${supplyVariant}`;
       if (!Number.isInteger(startCoins)) 
-        return 'Number of starting coins not integer'; 
+        return `Number of starting coins, ${startCoins}, must be an integer`; 
     }
-    if (numPlayers < 2) return 'Too few players';
-    if (numPlayers > 5) return 'Too many players';
+    if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5))
+      return `Number of players, ${numPlayers}, must be an integer between 2 to 5.`
     return;
   },
 

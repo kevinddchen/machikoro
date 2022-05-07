@@ -104,7 +104,7 @@ export const initialize = (expansion: Expansion, numPlayers: number): LandmarkDa
       break;
 
     default:
-      throw new Error(`Unknown expansion: ${expansion}`);
+      throw new Error(`Expansion "${Expansion[expansion]}" not implemented.`);
   }
 
   // populate `LandmarkData`
