@@ -2,10 +2,12 @@ import '../styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 
+import { State } from 'game';
+
 /**
  * Single-line message bar indicating current turn status.
  */
-class StatusBar extends React.Component<any, {}> {
+export default class StatusBar extends React.Component<any, {}> {
 
   render() {
 
@@ -18,16 +20,16 @@ class StatusBar extends React.Component<any, {}> {
 
     var msg = '';
 
-    /* Check Game.js for various possible states */
+    /* Check `game/machikoro.ts` for various possible states */
     switch (state) {
-      case "roll":
+      case State.Roll:
         if (isActive) {
           msg = "It is your turn. Select a roll option from above.";
         } else {
           msg = "It is " + currentPlayer + "'s turn to roll.";
         }
         break;
-      case "buy":
+      case State.Buy:
         if (isActive) {
           /* to do: write function to check if landmarks can be built? */
           msg = "Purchase an establishment, build a landmark or end your turn.";
@@ -35,16 +37,17 @@ class StatusBar extends React.Component<any, {}> {
           msg = currentPlayer + " is making a move...";
         }
         break;
-      case "tv":
+      case State.TV:
         if (isActive) {
           msg = "TV station: Choose a player who has to give you 5 coins.";
         } else {
           msg = currentPlayer + " is making a move: TV station";
         }
         break;
-      case "office1": case "office2":
+      case State.OfficePhase1: 
+      case State.OfficePhase2:
         if (isActive) {
-          if (state === "office1") {
+          if (state === State.OfficePhase1) {
             msg = "Office: Select an establishment to exchange with another player.";
           } else {
             msg = "Office: Select an opposing establishment to exchange.";
@@ -53,7 +56,7 @@ class StatusBar extends React.Component<any, {}> {
           msg = currentPlayer + " is making a move: Office";
         }
         break;
-      case "end":
+      case State.End:
         if (isActive) {
           msg = "No actions left. End turn?";
         } else {
@@ -75,5 +78,3 @@ class StatusBar extends React.Component<any, {}> {
   }
   
 }
-
-export default StatusBar;
