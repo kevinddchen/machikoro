@@ -23,28 +23,12 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
 
   render() {
 
-    const { G, ctx, moves, isActive, undo } = this.props;
+    const { G, ctx, moves, isActive, playerID, undo } = this.props;
+    const playerInfoList: JSX.Element[] = [];
 
-    // const canRoll = (n: number): boolean => isActive && game.canRoll(G, ctx, n);
-    // const canKeep = (): boolean => isActive && game.canCommitRoll(G);
-    // const canAddTwoKeep = (): boolean => isActive && game.canAddTwo(G, ctx);
-    // const canEndTurn = (): boolean => isActive && game.canEndTurn(G);
-    // const canBuyEst = (est: number) => isActive && game.canBuyEst(G, ctx, est);
-    // const canBuyLand = (p: number, land: number) => isActive && p === player && game.canBuyLand(G, ctx, land);
-    // const canDoTV = (p: number) => isActive && game.canDoTV(G, ctx, p);
-    // let canDoOffice: (p: number, est: number) => boolean;
-    // let doOffice: (p: number, est: number) => void;
-    // if (G.state !== game.State.OfficePhase2) {
-    //   canDoOffice = (p: number, est: number) => isActive && p === player && game.canDoOfficePhase1(G, ctx, est);
-    //   doOffice = (p: number, est: number) => p === player && moves.doOffice1(est);
-    // } else {
-    //   canDoOffice = (p: number, est: number) => isActive && game.canDoOfficePhase2(G, ctx, p, est);
-    //   doOffice = (p: number, est: number) => moves.doOffice2(p, est);
-    // }
-  
-    const playerInfoList = [];
-    for (let i=0; i<this.names.length; i++) {
+    for (let i = 0; i < this.names.length; i++) {
       const player = parseInt(G.turn_order[i]);
+      const isSelf = (!!playerID && (player === parseInt(playerID))) // true if `player` is the client's player number
       playerInfoList.push(
         <PlayerInfo
           key={i}
@@ -52,6 +36,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
           ctx={ctx}
           moves={moves}
           isActive={isActive}
+          isSelf={isSelf}
           player={player}
           name={this.names[player]}
         />
@@ -72,10 +57,10 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
           </div>
           <div className="div-row">
             <StatusBar 
-              currentPlayer={this.names[parseInt(ctx.currentPlayer)]}
-              state={G.state}
+              G={G}
+              ctx={ctx}
+              names={this.names}
               isActive={isActive}
-              isGameOver={ctx.gameover}
             />
           </div>
           <div className="div-row">

@@ -17,11 +17,21 @@ import {
 } from 'game';
 import StackTable from './StackTable';
 
+/**
+ * @param G
+ * @param ctx
+ * @param moves List of moves.
+ * @param isActive True if it is the client's turn.
+ * @param isSelf True if `player` is the client's player number.
+ * @param player Player number (not necessarily the client's player number).
+ * @param name Player name (not necessarily the client's name).
+ */
 interface PlayerInfoProps {
   G: MachikoroG;
   ctx: Ctx;
   moves: Moves;
   isActive: boolean;
+  isSelf: boolean;
   player: number;
   name: string;
 }
@@ -45,13 +55,13 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
 
   render() {
 
-    const { G, ctx, moves, isActive, player, name } = this.props;
+    const { G, ctx, moves, isActive, isSelf, player, name } = this.props;
     const currentPlayer = parseInt(ctx.currentPlayer);
     const money = G.money[player];
     const _canDoTV = isActive && canDoTV(G, ctx, player);
     
-    const land_img = "land_img" + (player === currentPlayer ? "_self" : "");
-    const estmini_div = "estmini_div" + (player === currentPlayer ? "_self" : "");
+    const land_img = "land_img" + (isSelf ? "_self" : "");
+    const estmini_div = "estmini_div" + (isSelf ? "_self" : "");
 
     // landmarks
     const Table = new StackTable(2);

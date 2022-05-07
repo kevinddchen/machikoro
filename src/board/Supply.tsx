@@ -12,6 +12,12 @@ import {
 } from 'game';
 import StackTable from './StackTable';
 
+/**
+ * @param G
+ * @param ctx
+ * @param moves List of moves.
+ * @param isActive True if it is the client's turn.
+ */
 interface SupplyProps {
   G: MachikoroG;
   ctx: Ctx;

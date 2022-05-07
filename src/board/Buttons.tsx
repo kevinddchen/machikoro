@@ -12,6 +12,13 @@ import {
   canEndTurn,
 } from 'game';
 
+/**
+ * @param G
+ * @param ctx
+ * @param moves List of moves.
+ * @param isActive True if it is the client's turn.
+ * @param undo Callback to undo move.
+ */
 interface ButtonsProps {
   G: MachikoroG;
   ctx: Ctx;
