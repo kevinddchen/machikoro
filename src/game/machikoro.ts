@@ -48,7 +48,7 @@ export const canRoll = (G: MachikoroG, ctx: Ctx, n: number): boolean => {
   return (
     G.state === State.Roll && 
     (n === 1 || (n === 2 && Land.isOwned(G.land_data, player, Land.TrainStation))) &&
-    (G.numRolls === 0 || (G.numRolls === 1 && Land.isOwned(G.land_data, player, Land.TrainStation)))
+    (G.numRolls === 0 || (G.numRolls === 1 && Land.isOwned(G.land_data, player, Land.RadioTower)))
   );
 };
 
