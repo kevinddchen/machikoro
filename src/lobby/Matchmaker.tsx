@@ -3,7 +3,7 @@ import 'styles/main.css';
 import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 
-import { ClientInfo } from './types';
+import type { ClientInfo } from './types';
 import Lobby from './Lobby';
 import Room from './Room';
 
@@ -35,10 +35,9 @@ interface MatchmakerState {
  * pre-match waiting room via the `Room` component.
  */
 export default class Matchmaker extends React.Component<MatchmakerProps, MatchmakerState> {
-
   private lobbyClient: LobbyClient; // interacts with server match management API
 
-  constructor (props: MatchmakerProps) {
+  constructor(props: MatchmakerProps) {
     super(props);
     this.state = {
       name: '',
@@ -64,13 +63,13 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
 
   // --- Render --------------------------------------------------------------
 
-  render () {
+  render() {
     const { matchID, playerID, credentials } = this.props;
     const { name, errorMessage } = this.state;
 
     return (
       <div>
-        {matchID ? // when `matchID` is not an empty string, we are in a room
+        {matchID ? ( // when `matchID` is not an empty string, we are in a room
           <Room
             matchID={matchID}
             playerID={playerID}
@@ -82,7 +81,8 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
             setErrorMessage={this.setErrorMessage}
             clearErrorMessage={this.clearErrorMessage}
           />
-          : // otherwise we are in a lobby
+        ) : (
+          // otherwise we are in a lobby
           <Lobby
             name={name}
             lobbyClient={this.lobbyClient}
@@ -91,7 +91,7 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
             setErrorMessage={this.setErrorMessage}
             clearErrorMessage={this.clearErrorMessage}
           />
-        }
+        )}
         <div className='errorMessage'>{errorMessage}</div>
       </div>
     );

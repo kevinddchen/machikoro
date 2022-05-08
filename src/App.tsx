@@ -6,11 +6,10 @@ import { SocketIO } from 'boardgame.io/multiplayer';
 
 import { ClientInfo, Matchmaker } from 'lobby';
 import { Machikoro } from 'game';
-import { MachikoroBoard }  from 'board';
+import { MachikoroBoard } from 'board';
 import { PORT } from './config';
 
-// true if we are in production
-const IN_PROD = process.env.NODE_ENV === 'production';
+const IN_PROD = process.env.NODE_ENV === 'production'; // true if we are in production
 
 const defaultClientInfo: ClientInfo = {
   matchID: '',
@@ -30,7 +29,6 @@ interface AppState extends ClientInfo {
  * Create Machi Koro application.
  */
 export default class App extends React.Component<object, AppState> {
-
   private serverOrigin: string; // URL and port of the server.
 
   constructor(props: object) {
@@ -63,47 +61,38 @@ export default class App extends React.Component<object, AppState> {
     const { matchID, playerID, credentials, play } = this.state;
 
     if (play) {
-
       const MachikoroClient = Client({
         game: Machikoro,
         board: MachikoroBoard,
         multiplayer: SocketIO({ server: this.serverOrigin }),
       });
 
-      return (
-        <MachikoroClient
-          matchID={matchID}
-          playerID={playerID}
-          credentials={credentials}/>
-      );
-
+      return <MachikoroClient matchID={matchID} playerID={playerID} credentials={credentials} />;
     } else {
-    
       return (
         <div>
-          { !IN_PROD ? // only show debug button in development
-            <div className="padded_div">
+          {!IN_PROD ? ( // only show debug button in development
+            <div className='padded_div'>
               <button onClick={this.startDebug}>DEBUG</button>
             </div>
-            : 
-            null
-          }
-          <div className="title">MACHI KORO</div>
-          <Matchmaker 
+          ) : null}
+          <div className='title'>MACHI KORO</div>
+          <Matchmaker
             matchID={matchID}
             playerID={playerID}
             credentials={credentials}
             serverOrigin={this.serverOrigin}
             setClientInfo={this.setClientInfo}
             clearClientInfo={this.clearClientInfo}
-            startMatch={this.startMatch}/>
-          <footer className="footer">
-            <a href="https://github.com/kevinddchen/machikoro" target="_blank"
-             rel="noreferrer"><img src="./GitHub-Mark-Light-32px.png" alt="GitHub logo"/></a>
+            startMatch={this.startMatch}
+          />
+          <footer className='footer'>
+            <a href='https://github.com/kevinddchen/machikoro' target='_blank' rel='noreferrer'>
+              <img src='./GitHub-Mark-Light-32px.png' alt='GitHub logo' />
+            </a>
           </footer>
         </div>
       );
-
     }
   }
 }

@@ -8,10 +8,9 @@ import _ from 'lodash';
 import { Expansion, GAME_NAME, SupplyVariant } from 'game';
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
-import { ClientInfo } from './types';
+import type { ClientInfo } from './types';
 
-// fetch request timer, in milliseconds
-const UPDATE_INTERVAL = 1000;
+const UPDATE_INTERVAL = 1000; // fetch request timer, in milliseconds
 
 /**
  * @extends ClientInfo
@@ -46,11 +45,10 @@ interface RoomState {
  * Create pre-match waiting room.
  */
 export default class Room extends React.Component<RoomProps, RoomState> {
-
   private fetchInterval?: NodeJS.Timeout;
   private authenticator: Authenticator; // manages local credential storage and retrieval
 
-  constructor (props: RoomProps) {
+  constructor(props: RoomProps) {
     super(props);
     this.state = {
       playerList: [], // array of `player` objects
@@ -59,7 +57,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   }
 
   /**
-   * Fetches list of players from the server. Also automatically starts the 
+   * Fetches list of players from the server. Also automatically starts the
    * game when there are enough people.
    */
   fetchMatch = async (): Promise<void> => {
@@ -69,7 +67,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     try {
       const match = await lobbyClient.getMatch(GAME_NAME, matchID);
       if (!_.isEqual(match.players, playerList)) {
-        const { expansion, supplyVariant } = match.setupData
+        const { expansion, supplyVariant } = match.setupData;
         this.setState({ playerList: match.players, expansion, supplyVariant });
         // if seats are all full, start match now
         if (countPlayers(match.players) === match.players.length) {
@@ -89,7 +87,10 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     const { matchID, playerID, credentials, lobbyClient } = this.props;
 
     try {
-      await lobbyClient.leaveMatch(GAME_NAME, matchID, { playerID, credentials });
+      await lobbyClient.leaveMatch(GAME_NAME, matchID, {
+        playerID,
+        credentials,
+      });
       this.authenticator.deleteCredentials(matchID);
       console.log(`Deleted credentials for match '${matchID}', seat ${playerID}.`);
       this.props.clearClientInfo();
@@ -102,7 +103,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
   // --- React -----------------------------------------------------------------
 
-  componentDidMount () {
+  componentDidMount() {
     const { matchID } = this.props;
 
     console.log(`Joined room for match '${matchID}'.`);
@@ -112,15 +113,14 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     this.fetchInterval = setInterval(this.fetchMatch, UPDATE_INTERVAL);
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     console.log('Leaving room...');
-    if (this.fetchInterval)
-      clearInterval(this.fetchInterval);
+    if (this.fetchInterval) clearInterval(this.fetchInterval);
   }
 
   // --- Render ----------------------------------------------------------------
 
-  renderPlayerList (): JSX.Element[] {
+  renderPlayerList(): JSX.Element[] {
     const { playerID } = this.props;
     const { playerList } = this.state;
 
@@ -131,36 +131,54 @@ export default class Room extends React.Component<RoomProps, RoomState> {
       let button: JSX.Element | null;
       if (id.toString() === playerID) {
         indicator = 'mm-td mm-td-active'; /* use css as indicator */
-        button = <button className='button' onClick={this.leaveMatch}>Leave</button>
+        button = (
+          <button className='button' onClick={this.leaveMatch}>
+            Leave
+          </button>
+        );
       } else {
         button = null;
       }
       tbody.push(
         <td className={indicator} key={seat}>
-          {seat + 1}: {name} <br/> {button}
+          {seat + 1}: {name} <br /> {button}
         </td>
       );
     }
     return tbody;
   }
 
-  render () {
+  render() {
     const { matchID } = this.props;
     const { expansion, supplyVariant } = this.state;
 
     return (
-      <div><br />
+      <div>
+        <br />
         <div className='mm-container'>
           <div className='mm-div-row'>
-            <div className='mm-div-cell'><b>Room ID:</b> {matchID}</div>
-            <div className='mm-div-cell'><b>{expansionName(expansion)}</b></div>
-            <div className='mm-div-cell'><b>{supplyVariantName(supplyVariant)}</b></div>
+            <div className='mm-div-cell'>
+              <b>Room ID:</b> {matchID}
+            </div>
+            <div className='mm-div-cell'>
+              <b>{expansionName(expansion)}</b>
+            </div>
+            <div className='mm-div-cell'>
+              <b>{supplyVariantName(supplyVariant)}</b>
+            </div>
           </div>
           <div className='mm-div-row'>Game will start when all seats are filled.</div>
-          <div className='mm-div-row'><div className='mm-div-cell'>
-            <b>Players</b><br/> 
-            <table className='mm-table'><tbody><tr>{this.renderPlayerList()}</tr></tbody></table>
-          </div></div>
+          <div className='mm-div-row'>
+            <div className='mm-div-cell'>
+              <b>Players</b>
+              <br />
+              <table className='mm-table'>
+                <tbody>
+                  <tr>{this.renderPlayerList()}</tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     );

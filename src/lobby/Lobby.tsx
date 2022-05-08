@@ -1,17 +1,16 @@
 import 'styles/main.css';
 
-import { LobbyAPI } from 'boardgame.io';
-import { LobbyClient } from 'boardgame.io/client';
+import type { LobbyAPI } from 'boardgame.io';
+import type { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 import _ from 'lodash';
 
 import { Expansion, GAME_NAME, SupplyVariant } from 'game';
 import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
-import { ClientInfo } from './types';
+import type { ClientInfo } from './types';
 
-// fetch request timer, in milliseconds
-const UPDATE_INTERVAL = 1000;
+const UPDATE_INTERVAL = 1000; // fetch request timer, in milliseconds
 
 /**
  * @param name Name of the player.
@@ -24,7 +23,7 @@ const UPDATE_INTERVAL = 1000;
 interface LobbyProps {
   name: string;
   lobbyClient: LobbyClient;
-  setClientInfo: (clientInfo: ClientInfo) => void; 
+  setClientInfo: (clientInfo: ClientInfo) => void;
   setName: (name: string) => void;
   setErrorMessage: (errorMessage: string) => void;
   clearErrorMessage: () => void;
@@ -47,7 +46,6 @@ interface LobbyState {
  * Create game lobby. Handles match creation and joining.
  */
 export default class Lobby extends React.Component<LobbyProps, LobbyState> {
-
   private fetchInterval?: NodeJS.Timeout;
   private authenticator: Authenticator; // manages local credential storage and retrieval
 
@@ -56,9 +54,10 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   private expansionRef: React.RefObject<HTMLSelectElement>;
   private supplyVariantRef: React.RefObject<HTMLSelectElement>;
 
-  constructor (props: LobbyProps) {
+  constructor(props: LobbyProps) {
     super(props);
-    this.state = { // default values we start with
+    this.state = {
+      // default values we start with
       numPlayers: 4,
       expansion: Expansion.Harbor,
       supplyVariant: SupplyVariant.Hybrid,
@@ -125,13 +124,15 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     try {
       // create match
-      const { matchID } = await lobbyClient.createMatch(
-        GAME_NAME, 
-        {
-          numPlayers,
-          setupData: { expansion, supplyVariant, startCoins: 3, randomizeTurnOrder: true }
+      const { matchID } = await lobbyClient.createMatch(GAME_NAME, {
+        numPlayers,
+        setupData: {
+          expansion,
+          supplyVariant,
+          startCoins: 3,
+          randomizeTurnOrder: true,
         },
-      );
+      });
       console.log(`Created match '${matchID}'.`);
       // after creating the match, try to join
       await this.joinMatch(matchID);
@@ -147,10 +148,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    */
   joinMatch = async (matchID: string): Promise<void> => {
     try {
-      if (this.authenticator.hasCredentials(matchID) || await this.joinMatchNoCredentials(matchID)) {
+      if (this.authenticator.hasCredentials(matchID) || (await this.joinMatchNoCredentials(matchID))) {
         const { playerID, credentials } = this.authenticator.fetchCredentials(matchID);
-        if (playerID && credentials)
-          this.props.setClientInfo({ matchID, playerID, credentials });
+        if (playerID && credentials) this.props.setClientInfo({ matchID, playerID, credentials });
         // TODO: what happens if credentials are no good?
         // this will trigger `Matchmaker` to switch to the waiting room
       } else {
@@ -197,11 +197,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     }
 
     // try to join match
-    const { playerCredentials } = await lobbyClient.joinMatch(
-      GAME_NAME,
-      matchID,
-      { playerID, playerName: name }
-    );
+    const { playerCredentials } = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerID, playerName: name });
     this.authenticator.saveCredentials(matchID, playerID, playerCredentials);
     console.log(`Saved credentials for match '${matchID}', seat ${playerID}.`);
     return true;
@@ -224,11 +220,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       return false;
     }
     return true;
-  }
+  };
 
   // --- React ----------------------------------------------------------------
 
-  componentDidMount () {
+  componentDidMount() {
     const { name } = this.props;
     const { numPlayers, expansion, supplyVariant } = this.state;
 
@@ -236,28 +232,23 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     this.props.clearErrorMessage();
 
     // set default values
-    if (this.nameRef.current)
-      this.nameRef.current.value = name;
-    if (this.numPlayersRef.current)
-      this.numPlayersRef.current.value = numPlayers.toString();
-    if (this.expansionRef.current)
-      this.expansionRef.current.value = expansion.toString();
-    if (this.supplyVariantRef.current)
-      this.supplyVariantRef.current.value = supplyVariant.toString();
+    if (this.nameRef.current) this.nameRef.current.value = name;
+    if (this.numPlayersRef.current) this.numPlayersRef.current.value = numPlayers.toString();
+    if (this.expansionRef.current) this.expansionRef.current.value = expansion.toString();
+    if (this.supplyVariantRef.current) this.supplyVariantRef.current.value = supplyVariant.toString();
 
     this.fetchMatches();
     this.fetchInterval = setInterval(this.fetchMatches, UPDATE_INTERVAL);
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     console.log('Leaving lobby...');
-    if (this.fetchInterval)
-      clearInterval(this.fetchInterval);
+    if (this.fetchInterval) clearInterval(this.fetchInterval);
   }
 
   // --- Render ---------------------------------------------------------------
 
-  renderMatchList (): JSX.Element[] {
+  renderMatchList(): JSX.Element[] {
     const { matchList } = this.state;
 
     const tbody: JSX.Element[] = [];
@@ -273,26 +264,40 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         let button: JSX.Element | null;
         if (this.authenticator.hasCredentials(matchID)) {
           /// Able to automatically join the room (e.g. joined before, but closed browser)
-          button = <button className='button' onClick={() => this.joinMatch(matchID)}>Rejoin</button>;
+          button = (
+            <button className='button' onClick={() => this.joinMatch(matchID)}>
+              Rejoin
+            </button>
+          );
         } else if (numActivePlayers === numPlayers) {
           // Room is full
           button = null;
         } else {
-          button = <button className='button' onClick={() => this.joinMatch(matchID)}>Join</button>;
+          button = (
+            <button className='button' onClick={() => this.joinMatch(matchID)}>
+              Join
+            </button>
+          );
         }
         tbody.push(
           <div className='lobby-container' key={i}>
             <div className='lobby-div-col lobby-div-col-width'>
-              <div className='lobby-div-row'><b>Room ID: </b>{matchID}</div>
+              <div className='lobby-div-row'>
+                <b>Room ID: </b>
+                {matchID}
+              </div>
             </div>
             <div className='lobby-div-col lobby-div-col-width'>
               <div className='lobby-div-row'>{expansionName(setupData.expansion)}</div>
               <div className='lobby-div-row'>{supplyVariantName(setupData.supplyVariant)}</div>
             </div>
             <div className='lobby-div-col lobby-div-col-width'>
-              <div className='lobby-div-row'>{numActivePlayers} / {numPlayers} players</div>
               <div className='lobby-div-row'>
-                {Array(numActivePlayers).fill('X')}{Array(numPlayers - numActivePlayers).fill('O')}
+                {numActivePlayers} / {numPlayers} players
+              </div>
+              <div className='lobby-div-row'>
+                {Array(numActivePlayers).fill('X')}
+                {Array(numPlayers - numActivePlayers).fill('O')}
               </div>
             </div>
             <div className='lobby-div-col'>{button}</div>
@@ -303,7 +308,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     return tbody;
   }
 
-  render () {
+  render() {
     return (
       <div>
         <div className='padded_div'>

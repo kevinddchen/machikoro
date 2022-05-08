@@ -1,6 +1,6 @@
-/** 
+/**
  * Information needed by the client to authenticate API calls with server.
- */ 
+ */
 
 /**
  * Information needed by the client to authenticate API calls with server.
@@ -12,4 +12,4 @@ export type ClientInfo = {
   matchID: string;
   playerID: string;
   credentials: string;
-}
+};

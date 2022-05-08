@@ -6,14 +6,14 @@ export enum State {
   Buy,
   End,
 }
-  
+
 export enum Color {
   Blue = 1,
   Green,
   Purple,
   Red,
 }
-  
+
 export enum CardType {
   Animal = 1,
   Cup,
@@ -21,15 +21,14 @@ export enum CardType {
   Shop,
   Wheat,
 }
-  
+
 export enum Expansion {
   Base = 1,
   Harbor,
 }
-  
+
 export enum SupplyVariant {
   Variable = 1,
   Hybrid,
   Total,
 }
-  

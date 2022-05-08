@@ -1,11 +1,11 @@
 import { CardType, Color, State, SupplyVariant } from './enums';
 
 export type MachikoroG = {
-  state: State, // tracks game state
-  roll: number, // player roll
+  state: State; // tracks game state
+  roll: number; // player roll
   numRolls: number; // number of rolls made
   money: number[];
-  est_data: EstablishmentData; 
+  est_data: EstablishmentData;
   land_data: LandmarkData;
   supplyVariant: SupplyVariant;
   turn_order: string[];

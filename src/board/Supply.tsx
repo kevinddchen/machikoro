@@ -3,15 +3,7 @@ import 'styles/main.css';
 import React from 'react';
 import classNames from 'classnames';
 
-import {
-  Ctx,
-  Est,
-  Establishment,
-  MachikoroG,
-  Moves,
-  SupplyVariant,
-  canBuyEst,
-} from 'game';
+import { Ctx, Est, Establishment, MachikoroG, Moves, SupplyVariant, canBuyEst } from 'game';
 import StackTable from './StackTable';
 
 /**
@@ -31,7 +23,6 @@ interface SupplyProps {
  * Supply area, where players see and buy establishments
  */
 export default class Supply extends React.Component<SupplyProps, object> {
-
   private establishments: Establishment[];
 
   constructor(props: SupplyProps) {
@@ -41,7 +32,6 @@ export default class Supply extends React.Component<SupplyProps, object> {
   }
 
   render() {
-
     const { G, ctx, moves, isActive } = this.props;
     const Table = new StackTable(5);
 
@@ -52,42 +42,30 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const available = Est.countAvailable(G.est_data, est);
       const remaining = Est.countRemaining(G.est_data, est);
 
-      // display the establishment on the board if 
+      // display the establishment on the board if
       // (i) it is available, or
-      // (ii) it was just bought, or 
+      // (ii) it was just bought, or
       // (iii) we are using total supply
       if (
-        available > 0 
-        || (!!G.justBought && Est.isEqual(est, G.justBought)) 
-        || G.supplyVariant === SupplyVariant.Total
+        available > 0 ||
+        (!!G.justBought && Est.isEqual(est, G.justBought)) ||
+        G.supplyVariant === SupplyVariant.Total
       ) {
-
         Table.push(
-          <td 
-            key={i} 
-            className={classNames("est_td", {"active": _canBuyEst})} 
-            onClick={() => moves.buyEst(est)}
-          >
-            <img 
-              className={classNames("est_img", {"inactive": available === 0})} 
-              src={`./assets/${est.image_filename}`} 
-              alt=""
+          <td key={i} className={classNames('est_td', { active: _canBuyEst })} onClick={() => moves.buyEst(est)}>
+            <img
+              className={classNames('est_img', { inactive: available === 0 })}
+              src={`./assets/${est.image_filename}`}
+              alt=''
             />
-            <div className="est_num">
+            <div className='est_num'>
               {available}/{remaining}
             </div>
           </td>
         );
-
       }
     }
 
-    return (
-      <div>
-        {Table.render()}
-      </div>
-    );
-
+    return <div>{Table.render()}</div>;
   }
-  
 }

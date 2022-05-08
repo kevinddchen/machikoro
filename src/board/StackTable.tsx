@@ -1,9 +1,8 @@
 /**
  * Tables with a fixed number of columns but unfixed number of rows.
- * @oaram columns Number of columns
+ * @param columns Number of columns
  */
 export default class StackTable {
-
   private numColumns: number;
   private tbody: JSX.Element[];
   private tr: JSX.Element[];
@@ -27,7 +26,7 @@ export default class StackTable {
 
   _pushRow(): void {
     this.tbody.push(<tr key={this.tbody.length}>{this.tr}</tr>);
-    this.tr = []
+    this.tr = [];
   }
 
   /**
@@ -36,7 +35,10 @@ export default class StackTable {
    */
   render(): JSX.Element {
     this._pushRow();
-    return <table><tbody>{this.tbody}</tbody></table>;
+    return (
+      <table>
+        <tbody>{this.tbody}</tbody>
+      </table>
+    );
   }
-
 }

@@ -1,5 +1,5 @@
 import * as metadata from './metadata';
-import { Landmark, LandmarkData } from '../types';
+import type { Landmark, LandmarkData } from '../types';
 import { Expansion } from '../enums';
 
 export * from './metadata';
@@ -18,12 +18,12 @@ Abstraction for landmarks.
  * @param b
  * @returns True if the landmarks are the same.
  */
- export const isEqual = (a: Landmark, b: Landmark): boolean => {
+export const isEqual = (a: Landmark, b: Landmark): boolean => {
   return a._id === b._id;
 };
 
 /**
- * @param data 
+ * @param data
  * @param land Landmark.
  * @returns True if the landmark is in use for this game.
  */
@@ -32,8 +32,8 @@ export const isInUse = (data: LandmarkData, land: Landmark): boolean => {
 };
 
 /**
- * @param data 
- * @param player Player ID. 
+ * @param data
+ * @param player Player ID.
  * @param land Landmark.
  * @returns True if this landmark is owned by this player.
  */
@@ -42,33 +42,29 @@ export const isOwned = (data: LandmarkData, player: number, land: Landmark): boo
 };
 
 /**
- * @param data 
- * @returns All landmarks that are in use for this game. 
+ * @param data
+ * @returns All landmarks that are in use for this game.
  */
 export const getAllInUse = (data: LandmarkData): Landmark[] => {
   const all: Landmark[] = [];
-  for (const land of metadata.all_landmarks)
-    if (data._in_use[land._id])
-      all.push(land);
+  for (const land of metadata.all_landmarks) if (data._in_use[land._id]) all.push(land);
   return all;
 };
 
 /**
- * @param data 
- * @param player Player ID. 
+ * @param data
+ * @param player Player ID.
  * @returns All landmarks owned by this player.
  */
 export const getAllOwned = (data: LandmarkData, player: number): Landmark[] => {
   const all: Landmark[] = [];
-  for (const land of metadata.all_landmarks)
-    if (data._owned[player][land._id])
-      all.push(land);
+  for (const land of metadata.all_landmarks) if (data._owned[player][land._id]) all.push(land);
   return all;
 };
 
 /**
  * Update `LandmarkData` for a player buying an landmark.
- * @param data 
+ * @param data
  * @param player Player ID.
  * @param land Landmark.
  */
@@ -86,12 +82,11 @@ export const buy = (data: LandmarkData, player: number, land: Landmark): void =>
  *  passed between the client and server.
  */
 export const initialize = (expansion: Expansion, numPlayers: number): LandmarkData => {
-
   // declare empty data structure
   const total_count = metadata.all_landmarks.length;
   const data: LandmarkData = {
     _in_use: Array(total_count).fill(false),
-    _owned: Array(numPlayers).fill(Array(total_count).fill(false)), 
+    _owned: Array(numPlayers).fill(Array(total_count).fill(false)),
   };
 
   // get landmarks in use
@@ -110,8 +105,7 @@ export const initialize = (expansion: Expansion, numPlayers: number): LandmarkDa
   }
 
   // populate `LandmarkData`
-  for (const id of in_use_ids) 
-    data._in_use[id] = true;
+  for (const id of in_use_ids) data._in_use[id] = true;
 
   return data;
 };

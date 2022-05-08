@@ -2,14 +2,13 @@
  * Handles match credentials storage and retrieval on client browser.
  */
 export default class Authenticator {
-
   /**
    * Save credentials for a match to local storage.
    * @param matchID Must be unique.
    * @param playerID Must be a single character.
    * @param credentials
    */
-  saveCredentials (matchID: string, playerID: string, credentials: string): void {
+  saveCredentials(matchID: string, playerID: string, credentials: string): void {
     const storageString = playerID + credentials;
     localStorage.setItem(matchID, storageString);
   }
@@ -19,7 +18,7 @@ export default class Authenticator {
    * @param matchID
    * @returns True if credentials are stored.
    */
-  hasCredentials (matchID: string): boolean {
+  hasCredentials(matchID: string): boolean {
     return localStorage.getItem(matchID) ? true : false;
   }
 
@@ -28,7 +27,10 @@ export default class Authenticator {
    * @param matchID
    * @returns
    */
-  fetchCredentials (matchID: string): { playerID?: string, credentials?: string } {
+  fetchCredentials(matchID: string): {
+    playerID?: string;
+    credentials?: string;
+  } {
     const storageString = localStorage.getItem(matchID);
     if (!storageString) {
       return {};
@@ -43,8 +45,7 @@ export default class Authenticator {
    * Delete credentials for a match from local storage.
    * @param matchID
    */
-  deleteCredentials (matchID: string): void {
+  deleteCredentials(matchID: string): void {
     localStorage.removeItem(matchID);
   }
-
 }

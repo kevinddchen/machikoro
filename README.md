@@ -31,7 +31,7 @@ If any changes are made to the source code, re-run the `npm run serve` command t
 
 First, install the Heroku CLI and log in by running `heroku login`.
 From the project root directory, run `heroku git:remote -a playmachikoro` to add the Heroku remote to Git.
-To deploy your local app, run 
+To deploy your local app, run
 
 ```bash
 git push heroku master
