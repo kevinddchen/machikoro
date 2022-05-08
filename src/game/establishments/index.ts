@@ -251,11 +251,11 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
       for (const id of in_use_ids) {
         const est = all_establishments_by_id[id];
         if (isLower(est))
-          decks[0].push(est);
+          decks[0].push(...Array<Establishment>(data._remaining_count[id]).fill(est));
         else if (isUpper(est))
-          decks[1].push(est);
+          decks[1].push(...Array<Establishment>(data._remaining_count[id]).fill(est));
         else
-          decks[2].push(est);
+          decks[2].push(...Array<Establishment>(data._remaining_count[id]).fill(est));
       }
       break;
 

@@ -655,20 +655,28 @@ export const Machikoro: Game<MachikoroG> = {
     const { numPlayers } = ctx;
     const { data: est_data, decks } = Est.initialize(expansion, supplyVariant, numPlayers);
     const land_data = Land.initialize(expansion, numPlayers);
+
+    // initial coins
+    const money = Array(numPlayers).fill(startCoins);
+
+    // shuffle deck and play order
+    for (let i = 0; i < decks.length; i++)
+      decks[i] = ctx.random!.Shuffle(decks[i]);
+    let turn_order = [...Array(numPlayers).keys()].map(x => x.toString());
+    if (randomizeTurnOrder)
+      turn_order = ctx.random!.Shuffle(turn_order);
+
     const G: MachikoroG = {
       ...newTurnG,
-      money: Array(numPlayers).fill(startCoins),
+      money,
       est_data,
       land_data,
       supplyVariant,
-      turn_order: [...Array(numPlayers).keys()].map(x => x.toString()),
+      turn_order,
       secret: { decks },
       log: [],
       log_i: 0,
     };
-    // shuffle play order?
-    if (randomizeTurnOrder) 
-      G.turn_order = ctx.random!.Shuffle(G.turn_order);
     Est.replenishSupply(G);
     return G;
   },
