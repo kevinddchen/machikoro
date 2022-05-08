@@ -58,12 +58,12 @@ export default class Supply extends React.Component<SupplyProps, {}> {
           onClick={() => moves.buyEst(est)}
         >
           <img 
-            className={classNames("est_img",{"inactive": remaining === 0})} 
+            className={classNames("est_img", {"inactive": available === 0})} 
             src={`./assets/${est.image_filename}`} 
             alt=""
           />
           <div className="est_num">
-            {available}({remaining})
+            {available}/{remaining}
           </div>
         </td>
       );

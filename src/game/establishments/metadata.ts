@@ -360,3 +360,5 @@ export const all_establishments: Establishment[] = [
 export const _base_establishment_ids: number[] = [...Array(15).keys()]; // 0, 1, ..., 14
 
 export const _harbor_establishment_ids: number[] = [...Array(25).keys()]; // 0, 1, ..., 24
+
+export const _starting_establishment_ids: number[] = [0, 2];

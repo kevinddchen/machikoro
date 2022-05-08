@@ -193,8 +193,10 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
     _in_use: Array(total_count).fill(false),
     _remaining_count: Array(total_count).fill(0),
     _available_count: Array(total_count).fill(0),
-    _owned_count: Array(numPlayers).fill(Array(total_count).fill(0)), 
+    _owned_count: Array(numPlayers), 
   };
+  for (let i = 0; i < numPlayers; i++)
+    data._owned_count[i] = Array(total_count).fill(0);
 
   // get establishments in use
   let in_use_ids: number[];
@@ -220,6 +222,11 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
     // which have the same number of copies as the number of players.
     data._remaining_count[id] = est.color === Color.Purple ? numPlayers : 6;
   }
+
+  // give each player their starting establishments
+  for (const id of metadata._starting_establishment_ids)
+    for (const player_owned of data._owned_count)
+      player_owned[id]++;
 
   // prepare decks
   let decks: Establishment[][];

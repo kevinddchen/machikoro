@@ -24,7 +24,7 @@ export type Secrets = {
 };
 
 export type Establishment = {
-  readonly _id: number; // internal id used to enumerate establishments
+  readonly _id: number; // unique internal id used to enumerate establishments
   readonly name: string; // display name
   readonly description: string; // tooltip text
   readonly image_filename: string; // filename of full-sized image

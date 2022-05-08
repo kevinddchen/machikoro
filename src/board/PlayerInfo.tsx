@@ -88,16 +88,6 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
     // establishment miniatures
     const minis = [];
 
-    // determine est index of the last displayed establishment
-    // let last_est_id;
-    // for (let i=0; i<est_order.length; i++) {
-    //   const { est } = est_order[est_order.length-i-1];
-    //   if (est_p[est] > 0) {
-    //     last_est_id = est;
-    //     break;
-    //   }
-    // }
-
     for (let i = 0; i < this.establishments.length; i++) {
       const est = this.establishments[i];
       const count = Est.countOwned(G.est_data, player, est);

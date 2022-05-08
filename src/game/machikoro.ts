@@ -399,7 +399,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
   const currentPlayer = parseInt(ctx.currentPlayer);
   
   // Do Red establishments.
-  let ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Red && G.roll in est.activation);
+  let ests = Est.getAllInUse(G.est_data).filter(est => (est.color === Color.Red) && (est.activation.includes(G.roll)));
   for (const opponent of getPreviousPlayers(G, ctx)) {
     for (const est of ests) {
       // normal: Cafe, Restaurant, PizzaJoint, HamburgerStand
@@ -419,10 +419,8 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
     }
   }
 
-  // log(G, `\t#${from} pays #${to} ${max} $`);
-
   // Do Green establishments.
-  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Green && G.roll in est.activation);
+  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Green && est.activation.includes(G.roll));
   for (const est of ests) {
     // normal: Bakery, ConvenienceStore
     // special: CheeseFactory, FurnitureFactory, ProduceMarket, FlowerShop, FoodWarehouse
@@ -450,7 +448,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
   }
 
   // Do Blue establishments.
-  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Blue && G.roll in est.activation);
+  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Blue && est.activation.includes(G.roll));
   for (const player of getNextPlayers(G, ctx)) {
     for (const est of ests) {
       // normal: WheatField, LivestockFarm, Forest, Mine, AppleOrchard, FlowerOrchard,
@@ -469,13 +467,12 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
       if (Est.isEqual(est, Est.TunaBoat))
         base = getTunaRoll(G, ctx);
       
-      earn(G, {to: currentPlayer, amount: base * count});
+      earn(G, {to: player, amount: base * count});
     }
   }
-  // log(G, `\t#${to} earns ${amount} $`);
 
   // Do Purple establishments.
-  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Purple && G.roll in est.activation);
+  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Purple && est.activation.includes(G.roll));
   for (const est of ests) {
     // normal: -
     // special: Stadium, TVStation, Office, Publisher, TaxOffice
@@ -503,94 +500,6 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
 
   switchState(G, ctx);
 };
-
-//   switch (G.roll) {
-//     case 1:
-//       backwards.forEach( (p) => {
-//         if (G.land[p][5]) take(G, {from: player, to: p, amount: (G.land[p][1] ? 4 : 3)*G.est[p][15]}); // sushi bar
-//       }); 
-//       forwards.forEach( (p) => earn(G, {to: p, amount: 1*G.est[p][0]})); // wheat field
-//       break;
-//     case 2:
-//       forwards.forEach( (p) => {
-//         let amount = 1*G.est[p][1]; // livestock farm
-//         if (p === player) amount += (G.land[player][1] ? 2 : 1)*G.est[player][2]; // bakery
-//         earn(G, {to: p, amount});
-//       });
-//       break;
-//     case 3:
-//       backwards.forEach( (p) => take(G, {from: player, to: p, amount: (G.land[p][1] ? 2 : 1)*G.est[p][3]})); // cafe
-//       earn(G, {to: player, amount: (G.land[player][1] ? 2 : 1)*G.est[player][2]}); // bakery
-//       break;
-//     case 4:
-//       forwards.forEach( (p) => {
-//         let amount = 1*G.est[p][16]; // flower orchard
-//         if (p === player) amount += (G.land[player][1] ? 4 : 3)*G.est[player][4]; // convenience store
-//         earn(G, {to: p, amount});
-//       });
-//       break;
-//     case 5:
-//       forwards.forEach( (p) => earn(G, {to: p, amount: 1*G.est[p][5]})); // forest
-//       break;
-//     case 6:
-//       earn(G, {to: player, amount: (G.land[player][1] ? 2 : 1)*G.est[player][17]*G.est[player][16]}); // flower shop
-//       if (G.est[player][6] > 0) backwards.forEach( (p) => take(G, {from: p, to: player, amount: 2})); // stadium
-//       if (G.est[player][7] > 0) G.doTV = true; // TV station
-//       if (G.est[player][8] > 0) G.doOffice = true; // office
-//       break;
-//     case 7:
-//       backwards.forEach( (p) => take(G, {from: player, to: p, amount: (G.land[p][1] ? 2 : 1)*G.est[p][18]})); // pizza joint
-//       earn(G, {to: player, amount: 3*G.est[player][9]*countAnimal(G, player)}); // cheese factory
-//       if (G.est[player][19] > 0) 
-//         backwards.forEach( (p) => take(G, {from: p, to: player, amount: countCup(G, p)+countHouse(G, p)})); // publisher
-//       break;
-//     case 8:
-//       backwards.forEach( (p) => take(G, {from: player, to: p, amount: (G.land[p][1] ? 2 : 1)*G.est[p][21]})); // hamburger stand
-//       forwards.forEach( (p) => {
-//         let amount = (G.land[p][5] ? 3 : 0)*G.est[p][20]; // mackerel boat
-//         if (p === player) amount += 3*G.est[player][10]*countGear(G, player); // furniture factory
-//         earn(G, {to: p, amount});
-//       });
-//       if (G.est[player][22] > 0) backwards.forEach( (p) => {
-//         if (G.money[p] >= 10) take(G, {from: p, to: player, amount: Math.floor(G.money[p]/2)}); // tax office
-//       });
-//       break;
-//     case 9:
-//       backwards.forEach( (p) => take(G, {from: player, to: p, amount: (G.land[p][1] ? 3 : 2)*G.est[p][12]})); // restaurant
-//       forwards.forEach( (p) => earn(G, {to: p, amount: 5*G.est[p][11]})); // mine
-//       if (G.est[player][22] > 0) backwards.forEach( (p) => {
-//         if (G.money[p] >= 10) take(G, {from: p, to: player, amount: Math.floor(G.money[p]/2)}); // tax office
-//       });
-//       break;
-//     case 10:
-//       backwards.forEach( (p) => take(G, {from: player, to: p, amount: (G.land[p][1] ? 3 : 2)*G.est[p][12]})); // restaurant
-//       forwards.forEach( (p) => earn(G, {to: p, amount: 3*G.est[p][13]})); // apple orchard
-//       break;
-//     case 11:
-//     case 12:
-//     case 13:
-//     case 14:
-//       let doTunaRoll = [12, 13, 14].includes(G.roll) && forwards.some( (p) => G.land[p][5] && G.est[p][23] );
-//       let tunaRoll: number;
-//       if (doTunaRoll) {
-//         // one roll for all players
-//         tunaRoll = ctx.random!.Die(6, 2).reduce( (a, b) => a+b );
-//         log(G, `\t(tuna boat roll: ${tunaRoll})`);
-//       }
-//       forwards.forEach( (p) => {
-//         let amount = 0;
-//         if (doTunaRoll && G.land[p][5] && G.est[p][23] > 0)
-//           amount += tunaRoll*G.est[p][23]; // tuna boat
-//         if ([11, 12].includes(G.roll) && p === player) 
-//           amount += 2*G.est[player][14]*countPlant(G, player); // produce market
-//         if ([12, 13].includes(G.roll) && p === player)
-//           amount += 2*G.est[player][24]*countCup(G, player); // food warehouse
-//         earn(G, {to: p, amount});
-//       });
-//       break;
-//   }
-//   switchState(G, ctx);
-// }
 
 /**
  * Return the next players (including self) in the order that the Blue 
@@ -708,72 +617,6 @@ const log = (G: MachikoroG, msg: string): void => {
   while (G.log.length > 200)
     G.log.shift();
 };
-
-/**
- * Set up establishment supply at start of game.
- */
-// const setupSupply = (G: MachikoroG, ctx: Ctx, supplyVariant: string): void => {
-//   if (supplyVariant === "total") {
-//     // set all supply to total
-//     for (let est = 0; est < G.est_use.length; est++) {
-//       if (G.est_use[est])
-//         G.est_supply[est] = G.est_total[est];
-//     }
-//   } else if (supplyVariant === "variable") {
-//     // fill deck with establishments and shuffle
-//     for (let est = 0; est < G.est_use.length; est++) {
-//       if (G.est_use[est])
-//         G.secret = G.secret.concat(Array(G.est_total[est]).fill(est));
-//     }
-//     G.secret = ctx.random!.Shuffle(G.secret);
-//   } else if (supplyVariant === "hybrid") {
-//     // fill all three decks and shuffle
-//     const deckList = [deck1, deck2, deck3];
-//     for (let i = 0; i <= 2; i++) {
-//       let deck: number[] = [];
-//       for (let est of deckList[i]) {
-//         if (G.est_use[est])
-//           deck = deck.concat(Array(G.est_total[est]).fill(est));
-//       }
-//       deck = ctx.random!.Shuffle(deck);
-//       G.secret.push(deck);
-//     }
-//   }
-// }
-
-// /**
-//  * Replenish establishments at start of each turn.
-//  */
-// const replenishSupply = (G: MachikoroG): void => {
-//   const { supplyVariant } = G;
-//   if (supplyVariant === "variable") {
-//     // if less than 10 unique establishments, draw from deck
-//     const target = 10;
-//     while (G.secret.length > 0) {
-//       let count = 0;
-//       G.est_supply.forEach( (x) => {if (x > 0) count++} );
-//       if (count >= target)
-//         break;
-//       G.est_supply[G.secret.pop()]++;
-//     }
-//   } else if (supplyVariant === "hybrid") {
-//     // for each deck want 5-5-2 establishments
-//     const deckList = [deck1, deck2, deck3];
-//     const targets = [5, 5, 2];
-//     for (let i=0; i<=2; i++) {
-//       while (G.secret[i].length > 0) {
-//         let count = 0;
-//         for (let est of deckList[i]) {
-//           if (G.est_supply[est] > 0) 
-//             count++;
-//         }
-//         if (count >= targets[i])
-//           break;
-//         G.est_supply[G.secret[i].pop()]++;
-//       }
-//     }
-//   }
-// }
 
 // --- Game -------------------------------------------------------------------
 
