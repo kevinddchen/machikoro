@@ -8,6 +8,7 @@ import {
   Moves,
   Est,
   Establishment,
+  SupplyVariant,
   canBuyEst,
 } from 'game';
 import StackTable from './StackTable';
@@ -36,7 +37,6 @@ export default class Supply extends React.Component<SupplyProps, {}> {
     super(props);
     const { G } = this.props;
     this.establishments = Est.getAllInUse(G.est_data);
-    // TODO: sort establishments
   }
 
   render() {
@@ -51,22 +51,34 @@ export default class Supply extends React.Component<SupplyProps, {}> {
       const available = Est.countAvailable(G.est_data, est);
       const remaining = Est.countRemaining(G.est_data, est);
 
-      Table.push(
-        <td 
-          key={i} 
-          className={classNames("est_td", {"active": _canBuyEst})} 
-          onClick={() => moves.buyEst(est)}
-        >
-          <img 
-            className={classNames("est_img", {"inactive": available === 0})} 
-            src={`./assets/${est.image_filename}`} 
-            alt=""
-          />
-          <div className="est_num">
-            {available}/{remaining}
-          </div>
-        </td>
-      );
+      // display the establishment on the board if 
+      // (i) it is available, or
+      // (ii) it was just bought, or 
+      // (iii) we are using total supply
+      if (
+        available > 0 
+        || (!!G.justBought && Est.isEqual(est, G.justBought)) 
+        || G.supplyVariant === SupplyVariant.Total
+      ) {
+
+        Table.push(
+          <td 
+            key={i} 
+            className={classNames("est_td", {"active": _canBuyEst})} 
+            onClick={() => moves.buyEst(est)}
+          >
+            <img 
+              className={classNames("est_img", {"inactive": available === 0})} 
+              src={`./assets/${est.image_filename}`} 
+              alt=""
+            />
+            <div className="est_num">
+              {available}/{remaining}
+            </div>
+          </td>
+        );
+
+      }
     }
 
     return (

@@ -10,6 +10,9 @@ Abstraction for landmarks.
 
 */
 
+// this array is used for id -> landmark lookup
+// const all_landmarks_by_id = [...metadata.all_landmarks].sort((a, b) => a._id - b._id);
+
 /**
  * @param a
  * @param b
@@ -96,11 +99,11 @@ export const initialize = (expansion: Expansion, numPlayers: number): LandmarkDa
   switch (expansion) {
 
     case Expansion.Base:
-      in_use_ids = metadata._base_landmark_ids;
+      in_use_ids = metadata.base_landmark_ids;
       break;
 
     case Expansion.Harbor:
-      in_use_ids = metadata._harbor_landmark_ids;
+      in_use_ids = metadata.harbor_landmark_ids;
       break;
 
     default:

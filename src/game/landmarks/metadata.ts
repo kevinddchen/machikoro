@@ -48,15 +48,18 @@ export const Airport: Landmark = {
   image_filename: "land6.png", 
 };
 
+// this array also sets the order landmarks are displayed
 export const all_landmarks: Landmark[] = [
+  Harbor,
   TrainStation,
   ShoppingMall,
   AmusementPark,
   RadioTower,
-  Harbor,
   Airport,
 ];
 
-export const _base_landmark_ids: number[] = [0, 1, 2, 3];
+// ids of landmarks used in base game
+export const base_landmark_ids: number[] = [0, 1, 2, 3];
 
-export const _harbor_landmark_ids: number[] = [0, 1, 2, 3, 4, 5];
+// ids of landmarks used in harbor expansion
+export const harbor_landmark_ids: number[] = [0, 1, 2, 3, 4, 5];

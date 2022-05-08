@@ -58,7 +58,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     super(props);
     this.state = { // default values we start with
       numPlayers: 4,
-      expansion: Expansion.Base,
+      expansion: Expansion.Harbor,
       supplyVariant: SupplyVariant.Hybrid,
     };
     this.authenticator = new Authenticator();
@@ -326,8 +326,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
             <option value='5'>5 Players</option>
           </select>
           <select ref={this.expansionRef} onChange={this.setExpansion}>
-            <option value={Expansion.Base}>{expansionName(Expansion.Base)}</option>
             <option value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>
+            <option value={Expansion.Base}>{expansionName(Expansion.Base)}</option>
           </select>
           <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
             <option value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>

@@ -50,7 +50,6 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
     const { G } = this.props;
     this.establishments = Est.getAllInUse(G.est_data)
     this.landmarks = Land.getAllInUse(G.land_data);
-    // TODO: sort establishments and landmarks
   }
 
   render() {
@@ -88,8 +87,13 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
     // establishment miniatures
     const minis = [];
 
-    for (let i = 0; i < this.establishments.length; i++) {
-      const est = this.establishments[i];
+    const ownedEstablishments: Establishment[] = [];
+    for (const est of this.establishments)
+      if (Est.countOwned(G.est_data, player, est) > 0)
+        ownedEstablishments.push(est);
+
+    for (let i = 0; i < ownedEstablishments.length; i++) {
+      const est = ownedEstablishments[i];
       const count = Est.countOwned(G.est_data, player, est);
 
       let _canDoOffice: boolean;
@@ -103,12 +107,10 @@ class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
       }
       
       for (let j = 0; j < count; j++) {
-        // var which_path
-        // if (est === last_est_id && count === est_p[est]-1) {
-        //   // show the last card in full
-        //   which_path = img_path;
-        // } else {
-        let which_path = est.mini_filename;
+
+        const which_path = (i === ownedEstablishments.length-1 && j === count-1) 
+          ? est.image_filename 
+          : est.mini_filename;
 
         minis.push(
           <div 

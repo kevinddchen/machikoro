@@ -285,6 +285,7 @@ const buyEst: Move<MachikoroG> = (G, ctx, est: Establishment) => {
   Est.buy(G.est_data, player, est);
   G.money[player] -= est.cost;
   G.state = State.End;
+  G.justBought = est;
 
   log(G, `\tbuy ${est.name}`);
   return;
@@ -419,6 +420,30 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
     }
   }
 
+  // Do Blue establishments.
+  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Blue && est.activation.includes(G.roll));
+  for (const player of getNextPlayers(G, ctx)) {
+    for (const est of ests) {
+      // normal: WheatField, LivestockFarm, Forest, Mine, AppleOrchard, FlowerOrchard,
+      // special: MackerelBoat, TunaBoat
+      if (
+        (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) &&
+        !Land.isOwned(G.land_data, player, Land.Harbor)
+      )
+        continue;
+
+      const count = Est.countOwned(G.est_data, player, est);
+      if (count === 0)
+        continue;
+
+      let base = est.base;
+      if (Est.isEqual(est, Est.TunaBoat))
+        base = getTunaRoll(G, ctx);
+      
+      earn(G, {to: player, amount: base * count});
+    }
+  }
+
   // Do Green establishments.
   ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Green && est.activation.includes(G.roll));
   for (const est of ests) {
@@ -445,30 +470,6 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
       multiplier = Est.countTypeOwned(G.est_data, currentPlayer, CardType.Cup);
 
     earn(G, {to: currentPlayer, amount: base * multiplier * count});
-  }
-
-  // Do Blue establishments.
-  ests = Est.getAllInUse(G.est_data).filter(est => est.color === Color.Blue && est.activation.includes(G.roll));
-  for (const player of getNextPlayers(G, ctx)) {
-    for (const est of ests) {
-      // normal: WheatField, LivestockFarm, Forest, Mine, AppleOrchard, FlowerOrchard,
-      // special: MackerelBoat, TunaBoat
-      if (
-        (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) &&
-        !Land.isOwned(G.land_data, player, Land.Harbor)
-      )
-        continue;
-
-      const count = Est.countOwned(G.est_data, player, est);
-      if (count === 0)
-        continue;
-
-      let base = est.base;
-      if (Est.isEqual(est, Est.TunaBoat))
-        base = getTunaRoll(G, ctx);
-      
-      earn(G, {to: player, amount: base * count});
-    }
   }
 
   // Do Purple establishments.
@@ -628,6 +629,19 @@ const debugSetupData = {
   randomizeTurnOrder: false,
 };
 
+// properties of G for a new turn
+const newTurnG = {
+  state: State.Roll,
+  roll: 0,
+  numRolls: 0,
+  secondTurn: false,
+  doTV: false,
+  doOffice: false,
+  officeEst: null,
+  tunaRoll: null,
+  justBought: null,
+}
+
 export const Machikoro: Game<MachikoroG> = {
 
   name: GAME_NAME,
@@ -642,9 +656,7 @@ export const Machikoro: Game<MachikoroG> = {
     const { data: est_data, decks } = Est.initialize(expansion, supplyVariant, numPlayers);
     const land_data = Land.initialize(expansion, numPlayers);
     const G: MachikoroG = {
-      state: State.Roll,
-      roll: 0,
-      numRolls: 0,
+      ...newTurnG,
       money: Array(numPlayers).fill(startCoins),
       est_data,
       land_data,
@@ -653,11 +665,6 @@ export const Machikoro: Game<MachikoroG> = {
       secret: { decks },
       log: [],
       log_i: 0,
-      secondTurn: false,
-      doTV: false,
-      doOffice: false,
-      tunaRoll: null,
-      officeEst: null,
     };
     // shuffle play order?
     if (randomizeTurnOrder) 
@@ -684,14 +691,8 @@ export const Machikoro: Game<MachikoroG> = {
   turn: {
     onBegin: (G, ctx) => {
       Est.replenishSupply(G);
+      Object.assign(G, newTurnG);
       G.state = State.Roll;
-      G.roll = 0;
-      G.numRolls = 0;
-      G.secondTurn = false;
-      G.doTV = false;
-      G.doOffice = false;
-      G.tunaRoll = null;
-      G.officeEst = null;
       log(G, `Turn ${ctx.turn}: #${ctx.currentPlayer}`);
     },
     order: TurnOrder.CUSTOM_FROM('turn_order'),

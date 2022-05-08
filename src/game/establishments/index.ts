@@ -15,6 +15,9 @@ const HYBRID_SUPPY_LIMIT_LOWER = 5;
 const HYBRID_SUPPY_LIMIT_UPPER = 5;
 const HYBRID_SUPPY_LIMIT_PURPLE = 2;
 
+// this array is used for id -> establishment lookup
+const all_establishments_by_id = [...metadata.all_establishments].sort((a, b) => a._id - b._id);
+
 /**
  * @param a
  * @param b
@@ -142,8 +145,8 @@ export const replenishSupply = (G: MachikoroG): void => {
 
       // put all establishments into the supply
       while (decks[0].length > 0) {
-        const est = decks[0].pop();
-        est_data._available_count[est!._id]++;
+        const est = decks[0].pop()!;
+        est_data._available_count[est._id]++;
       }
       break;
 
@@ -151,8 +154,8 @@ export const replenishSupply = (G: MachikoroG): void => {
 
       // put establishments into the supply until there are 10 unique establishments
       while (decks[0].length > 0 && est_data._available_count.filter(count => count > 0).length < VARIABLE_SUPPLY_LIMIT) {
-        const est = decks[0].pop();
-        est_data._available_count[est!._id]++;
+        const est = decks[0].pop()!;
+        est_data._available_count[est._id]++;
       }
       break;
 
@@ -165,8 +168,8 @@ export const replenishSupply = (G: MachikoroG): void => {
       const funcs = [countUniqueLower, countUniqueUpper, countUniquePurple];
       for (let i = 0; i < 3; i++)
         while (decks[i].length > 0 && funcs[i](est_data) < limits[i]) {
-          const est = decks[i].pop();
-          est_data._available_count[est!._id]++;
+          const est = decks[i].pop()!;
+          est_data._available_count[est._id]++;
         }
       break;
 
@@ -195,19 +198,19 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
     _available_count: Array(total_count).fill(0),
     _owned_count: Array(numPlayers), 
   };
-  for (let i = 0; i < numPlayers; i++)
-    data._owned_count[i] = Array(total_count).fill(0);
+  for (let id = 0; id < numPlayers; id++)
+    data._owned_count[id] = Array(total_count).fill(0);
 
   // get establishments in use
   let in_use_ids: number[];
   switch (expansion) {
 
     case Expansion.Base:
-      in_use_ids = metadata._base_establishment_ids;
+      in_use_ids = metadata.base_establishment_ids;
       break;
 
     case Expansion.Harbor:
-      in_use_ids = metadata._harbor_establishment_ids;
+      in_use_ids = metadata.harbor_establishment_ids;
       break;
 
     default:
@@ -216,7 +219,7 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
 
   // populate `EstablishmentData`
   for (const id of in_use_ids) {
-    const est = metadata.all_establishments[id];
+    const est = all_establishments_by_id[id];
     data._in_use[id] = true;
     // all establishments have 6 copies except for purple establishments,
     // which have the same number of copies as the number of players.
@@ -224,7 +227,7 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
   }
 
   // give each player their starting establishments
-  for (const id of metadata._starting_establishment_ids)
+  for (const id of metadata.starting_establishment_ids)
     for (const player_owned of data._owned_count)
       player_owned[id]++;
 
@@ -237,7 +240,7 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
       // put all cards into one deck
       decks = [[]];
       for (const id of in_use_ids) {
-        const est = metadata.all_establishments[id];
+        const est = all_establishments_by_id[id];
         decks[0].push(...Array<Establishment>(data._remaining_count[id]).fill(est));
       }
       break;
@@ -246,7 +249,7 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
       // put all cards into three decks: activation <= 6, activation >= 7, and purple.
       decks = [[], [], []];
       for (const id of in_use_ids) {
-        const est = metadata.all_establishments[id];
+        const est = all_establishments_by_id[id];
         if (isLower(est))
           decks[0].push(est);
         else if (isUpper(est))

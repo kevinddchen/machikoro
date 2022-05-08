@@ -329,36 +329,40 @@ export const FoodWarehouse: Establishment = {
   type: null,
 };
 
+// this array also sets the order establishments are displayed
 export const all_establishments: Establishment[] = [
+  SushiBar,
   WheatField,
   LivestockFarm,
   Bakery,
   Cafe,
+  FlowerOrchard,
   ConvenienceStore,
   Forest,
-  Stadium,
-  TVStation,
-  Office,
+  FlowerShop,
+  PizzaJoint,
   CheeseFactory,
+  HamburgerStand,
+  MackerelBoat,
   FurnitureFactory,
   Mine,
   Restaurant,
   AppleOrchard,
   ProduceMarket,
-  SushiBar,
-  FlowerOrchard,
-  FlowerShop,
-  PizzaJoint,
-  Publisher,
-  MackerelBoat,
-  HamburgerStand,
-  TaxOffice,
+  FoodWarehouse,
   TunaBoat,
-  FoodWarehouse
+  Stadium,
+  TVStation,
+  Office,
+  Publisher,
+  TaxOffice,
 ];
 
-export const _base_establishment_ids: number[] = [...Array(15).keys()]; // 0, 1, ..., 14
+// ids of establishments used in base game
+export const base_establishment_ids = [...Array(15).keys()]; // 0, 1, ..., 14
 
-export const _harbor_establishment_ids: number[] = [...Array(25).keys()]; // 0, 1, ..., 24
+// ids of establishments used in harbor expansion
+export const harbor_establishment_ids = [...Array(25).keys()]; // 0, 1, ..., 24
 
-export const _starting_establishment_ids: number[] = [0, 2];
+// ids of establishments that the players start with
+export const starting_establishment_ids = [0, 2];

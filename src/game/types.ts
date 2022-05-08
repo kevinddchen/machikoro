@@ -1,22 +1,23 @@
 import { State, Color, CardType, SupplyVariant } from './enums';
 
 export type MachikoroG = {
-  state: State,
-  roll: number,
-  numRolls: number;
+  state: State, // tracks game state
+  roll: number, // player roll
+  numRolls: number; // number of rolls made
   money: number[];
-  est_data: EstablishmentData;
+  est_data: EstablishmentData; 
   land_data: LandmarkData;
   supplyVariant: SupplyVariant;
   turn_order: string[];
-  secret: Secrets;
+  secret: Secrets; // not passed to clients
   log: any[];
   log_i: number;
-  secondTurn: boolean;
-  doTV: boolean;
-  doOffice: boolean;
-  tunaRoll: number | null;
-  officeEst: Establishment | null;
+  secondTurn: boolean; // true if player can make another turn
+  doTV: boolean; // true if player will activate TV
+  doOffice: boolean; // true if player will activate office
+  officeEst: Establishment | null; // establishment picked for office
+  tunaRoll: number | null; // roll made for tuna boat
+  justBought: Establishment | null; // establishment just bought (for prettier rendering)
 };
 
 export type Secrets = {
