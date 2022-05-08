@@ -1,4 +1,4 @@
-import { Color, CardType } from '../enums';
+import { CardType, Color } from '../enums';
 import { Establishment } from '../types';
 
 export const WheatField: Establishment = {

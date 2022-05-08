@@ -1,6 +1,6 @@
 import * as metadata from './metadata';
-import { Expansion } from '../enums';
 import { Landmark, LandmarkData } from '../types';
+import { Expansion } from '../enums';
 
 export * from './metadata';
 
@@ -89,7 +89,7 @@ export const initialize = (expansion: Expansion, numPlayers: number): LandmarkDa
 
   // declare empty data structure
   const total_count = metadata.all_landmarks.length;
-  let data: LandmarkData = {
+  const data: LandmarkData = {
     _in_use: Array(total_count).fill(false),
     _owned: Array(numPlayers).fill(Array(total_count).fill(false)), 
   };
@@ -97,15 +97,14 @@ export const initialize = (expansion: Expansion, numPlayers: number): LandmarkDa
   // get landmarks in use
   let in_use_ids: number[];
   switch (expansion) {
-
-    case Expansion.Base:
+    case Expansion.Base: {
       in_use_ids = metadata.base_landmark_ids;
       break;
-
-    case Expansion.Harbor:
+    }
+    case Expansion.Harbor: {
       in_use_ids = metadata.harbor_landmark_ids;
       break;
-
+    }
     default:
       throw new Error(`Expansion "${Expansion[expansion]}" not implemented.`);
   }

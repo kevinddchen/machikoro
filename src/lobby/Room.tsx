@@ -1,15 +1,17 @@
 import 'styles/main.css';
 
-import _ from 'lodash';
+import type { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 import type { Server } from 'boardgame.io';
-import type { LobbyClient } from 'boardgame.io/client';
+import _ from 'lodash';
 
-import Authenticator from './Authenticator';
-import { UPDATE_INTERVAL } from 'config';
-import { GAME_NAME, Expansion, SupplyVariant } from 'game';
-import { ClientInfo } from './types';
+import { Expansion, GAME_NAME, SupplyVariant } from 'game';
 import { countPlayers, expansionName, supplyVariantName } from './utils';
+import Authenticator from './Authenticator';
+import { ClientInfo } from './types';
+
+// fetch request timer, in milliseconds
+const UPDATE_INTERVAL = 1000;
 
 /**
  * @extends ClientInfo
@@ -126,10 +128,12 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     for (let seat = 0; seat < playerList.length; seat++) {
       const { id, name } = playerList[seat];
       let indicator = 'mm-td';
-      let button: any;
+      let button: JSX.Element | null;
       if (id.toString() === playerID) {
         indicator = 'mm-td mm-td-active'; /* use css as indicator */
         button = <button className='button' onClick={this.leaveMatch}>Leave</button>
+      } else {
+        button = null;
       }
       tbody.push(
         <td className={indicator} key={seat}>

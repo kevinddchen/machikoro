@@ -1,30 +1,45 @@
-import '../styles/main.css';
+import 'styles/main.css';
+
 import React from 'react';
+
+import type { MachikoroG } from 'game';
+
+interface LogProps {
+  G: MachikoroG;
+  names: string[];
+}
 
 /**
  * Player-viewable game log
  */
+class Log extends React.Component<LogProps, object> {
 
-class Log extends React.Component<any, {}> {
+  private logRef: React.RefObject<HTMLDivElement>;
 
-  parseName = (x: any) => this.props.names[x[1]];
+  constructor (props: LogProps) {
+    super(props);
+    this.logRef = React.createRef();
+  }
+
+  parseName = (x: string): string => this.props.names[parseInt(x[1])];
 
   componentDidUpdate() {
     // scroll log box to bottom
-    let log = document.getElementById("log");
-    log!.scrollTop = log!.scrollHeight;
+    if (this.logRef.current)
+      this.logRef.current.scrollTop = this.logRef.current.scrollHeight;
   }
 
   render() {
 
-    const { log } = this.props;
+    const { G } = this.props;
 
-    const logBody = [];
-    for (let i=0; i<log.length; i++) {
-      let { id, msg } = log[i];
-      msg = msg.replace(/\$/g, "\uD83D\uDFE4"); // replace '$' with coin emoji
-      msg = msg.replace(/#./g, this.parseName); // parse player names, which are searched by a '#'
-      logBody.push(<div key={id} className="log_div">{msg}</div>);
+    const logBody: JSX.Element[] = [];
+    for (let i = 0; i < G.log.length; i++) {
+      const { id } = G.log[i];
+      let { line } = G.log[i];
+      line = line.replace(/\$/g, "\uD83D\uDFE4"); // replace '$' with coin emoji
+      line = line.replace(/#\d+/g, this.parseName); // parse player names, searched by '#N' where N is the playerID
+      logBody.push(<div key={id} className="log_div">{line}</div>);
     }
 
     return (

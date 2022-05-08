@@ -1,13 +1,14 @@
 import 'styles/main.css';
+
 import React from 'react';
 import classNames from 'classnames';
 
 import {
-  MachikoroG,
   Ctx,
-  Moves,
   Est,
   Establishment,
+  MachikoroG,
+  Moves,
   SupplyVariant,
   canBuyEst,
 } from 'game';
@@ -29,7 +30,7 @@ interface SupplyProps {
 /**
  * Supply area, where players see and buy establishments
  */
-export default class Supply extends React.Component<SupplyProps, {}> {
+export default class Supply extends React.Component<SupplyProps, object> {
 
   private establishments: Establishment[];
 

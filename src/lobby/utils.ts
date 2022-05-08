@@ -1,4 +1,5 @@
 import { Server } from 'boardgame.io';
+
 import { Expansion, SupplyVariant } from 'game';
 
 // This file contains some useful functions which are used in multiple places.

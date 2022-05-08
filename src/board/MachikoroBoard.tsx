@@ -1,24 +1,24 @@
-import React from 'react';
 import { BoardProps } from 'boardgame.io/react';
+import React from 'react';
 
+import * as game from 'game';
 import Buttons from './Buttons';
-import PlayerInfo from './PlayerInfo';
 import Log from './Log';
+import PlayerInfo from './PlayerInfo';
 import StatusBar from './StatusBar';
 import Supply from './Supply';
-import * as game from 'game';
 
 /**
  * Handles all game components
  */
-export default class MachikoroBoard extends React.Component<BoardProps<game.MachikoroG>, {}> {
+export default class MachikoroBoard extends React.Component<BoardProps<game.MachikoroG>, object> {
 
   private names: string[];
 
   constructor(props: BoardProps) {
     super(props);
     const { matchData } = props;
-    this.names = matchData!.map( (x) => x.name ? x.name : `player_${x.id}` );
+    this.names = matchData!.map( (x) => x.name ? x.name : `player_${x.id}` ); // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   render() {
@@ -75,7 +75,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
         <div className="div-column">{playerInfoList}</div>
         <div className="div-column">
           <Log
-            log={G.log}
+            G={G}
             names={this.names}
           />
         </div>

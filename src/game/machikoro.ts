@@ -1,10 +1,10 @@
 import { Ctx, Game, Move } from 'boardgame.io';
-import { PlayerView, TurnOrder, INVALID_MOVE } from 'boardgame.io/core';
+import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
-import { State, Color, CardType, Expansion, SupplyVariant } from './enums';
-import { MachikoroG, Establishment, Landmark } from './types';
+import { CardType, Color, Expansion, State, SupplyVariant } from './enums';
+import { Establishment, Landmark, MachikoroG } from './types';
 
 /**
  * === Machikoro core game logic ===
@@ -32,6 +32,7 @@ import { MachikoroG, Establishment, Landmark } from './types';
  */
 
 export const GAME_NAME = "machikoro";
+const MAX_LOG_LENGTH = 200;
 
 // --- Queries ----------------------------------------------------------------
 // These functions are used to internally to check whether a move is legal or 
@@ -196,7 +197,7 @@ const rollOne: Move<MachikoroG> = (G, ctx) => {
   if (!canRoll(G, ctx, 1))
     return INVALID_MOVE;
 
-  G.roll = ctx.random!.Die(6);
+  G.roll = ctx.random!.Die(6); // eslint-disable-line @typescript-eslint/no-non-null-assertion
   G.numRolls++;
 
   log(G, `\troll ${G.roll}`);
@@ -215,7 +216,7 @@ const rollTwo: Move<MachikoroG> = (G, ctx) => {
     return INVALID_MOVE;
 
   const player = parseInt(ctx.currentPlayer);
-  const dice = ctx.random!.Die(6, 2);
+  const dice = ctx.random!.Die(6, 2); // eslint-disable-line @typescript-eslint/no-non-null-assertion
   if (Land.isOwned(G.land_data, player, Land.AmusementPark))
     G.secondTurn = (dice[0] === dice[1]);
   G.roll = dice[0] + dice[1];
@@ -358,12 +359,15 @@ const doOfficePhase2: Move<MachikoroG> = (G, ctx, opponent: number, est: Establi
     return INVALID_MOVE;
 
   const player = parseInt(ctx.currentPlayer);
-  const officeEst = G.officeEst!;
-  Est.transfer(G.est_data, {from: player, to: opponent, est: officeEst});
-  Est.transfer(G.est_data, {from: opponent, to: player, est: est});
-  G.doOffice = false;
+  if (G.officeEst) {
+    Est.transfer(G.est_data, {from: player, to: opponent, est: G.officeEst});
+    Est.transfer(G.est_data, {from: opponent, to: player, est: est});
+    G.doOffice = false;
 
-  log(G, `\ttrade ${officeEst.name} for ${est.name} with #${opponent}`);
+    log(G, `\ttrade ${G.officeEst.name} for ${est.name} with #${opponent}`);
+  } else {
+    throw Error ("Unexpected error: `officeEst` is not set.");
+  }
   switchState(G, ctx);
   return;
 };
@@ -380,9 +384,9 @@ const endTurn: Move<MachikoroG> = (G, ctx) => {
   if (G.state === State.Buy && Land.isOwned(G.land_data, player, Land.Airport))
     earn(G, {to: player, amount: 10});
   if (G.secondTurn)
-    ctx.events!.endTurn({next: player.toString()});
+    ctx.events!.endTurn({next: player.toString()}); // eslint-disable-line @typescript-eslint/no-non-null-assertion
   else
-    ctx.events!.endTurn();
+    ctx.events!.endTurn(); // eslint-disable-line @typescript-eslint/no-non-null-assertion
   return;
 };
 
@@ -510,11 +514,11 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
  * @returns Array of player IDs.
  */
 const getNextPlayers = (G: MachikoroG, ctx: Ctx): number[] => {
-  let current = ctx.playOrderPos;
-  let N = ctx.numPlayers;
-  let forwards: number[] = [];
+  const current = ctx.playOrderPos;
+  const N = ctx.numPlayers;
+  const forwards: number[] = [];
   for (let i = 0; i < N; i++) {
-    let shifted_i = (current + i) % N;
+    const shifted_i = (current + i) % N;
     forwards.push(parseInt(G.turn_order[shifted_i]));
   }
   return forwards;
@@ -528,11 +532,11 @@ const getNextPlayers = (G: MachikoroG, ctx: Ctx): number[] => {
  * @returns Array of player IDs.
  */
  const getPreviousPlayers = (G: MachikoroG, ctx: Ctx): number[] => {
-  let current = ctx.playOrderPos;
-  let N = ctx.numPlayers;
-  let backwards: number[] = []; 
+  const current = ctx.playOrderPos;
+  const N = ctx.numPlayers;
+  const backwards: number[] = []; 
   for (let i = 1; i < N; i++)  {
-    let shifted_i = ((current - i) % N + N) % N; // JS modulo is negative
+    const shifted_i = ((current - i) % N + N) % N; // JS modulo is negative
     backwards.push(parseInt(G.turn_order[shifted_i])); 
   }
   return backwards;
@@ -570,7 +574,7 @@ const take = (G: MachikoroG, obj: {from: number, to: number, amount: number}): v
  */
 const getTunaRoll = (G: MachikoroG, ctx: Ctx): number => {
   if (!G.tunaRoll) {
-    const dice = ctx.random!.Die(6, 2);
+    const dice = ctx.random!.Die(6, 2); // eslint-disable-line @typescript-eslint/no-non-null-assertion
     G.tunaRoll = dice[0] + dice[1];
     log(G, `\t(tuna boat roll: ${G.tunaRoll})`);
   }
@@ -606,16 +610,16 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
  */
 const endGame = (G: MachikoroG, ctx: Ctx, winner: number): void => {
   log(G, `Game over. Winner: #${winner}`);
-  ctx.events!.endGame();
+  ctx.events!.endGame(); // eslint-disable-line @typescript-eslint/no-non-null-assertion
 }
 
 /**
  * Add entry to the log.
  */
-const log = (G: MachikoroG, msg: string): void => {
-  G.log.push({id: G.log_i, msg});
+const log = (G: MachikoroG, line: string): void => {
+  G.log.push({id: G.log_i, line});
   G.log_i++;
-  while (G.log.length > 200)
+  while (G.log.length > MAX_LOG_LENGTH)
     G.log.shift();
 };
 
@@ -661,10 +665,10 @@ export const Machikoro: Game<MachikoroG> = {
 
     // shuffle deck and play order
     for (let i = 0; i < decks.length; i++)
-      decks[i] = ctx.random!.Shuffle(decks[i]);
+      decks[i] = ctx.random!.Shuffle(decks[i]); // eslint-disable-line @typescript-eslint/no-non-null-assertion
     let turn_order = [...Array(numPlayers).keys()].map(x => x.toString());
     if (randomizeTurnOrder)
-      turn_order = ctx.random!.Shuffle(turn_order);
+      turn_order = ctx.random!.Shuffle(turn_order); // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
     const G: MachikoroG = {
       ...newTurnG,

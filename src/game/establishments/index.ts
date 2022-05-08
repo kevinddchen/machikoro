@@ -1,6 +1,6 @@
 import * as metadata from './metadata';
-import { Color, CardType, Expansion, SupplyVariant } from '../enums';
-import { MachikoroG, Establishment, EstablishmentData } from '../types';
+import { CardType, Color, Expansion, SupplyVariant } from '../enums';
+import { Establishment, EstablishmentData, MachikoroG } from '../types';
 
 export * from './metadata';
 
@@ -141,26 +141,23 @@ export const replenishSupply = (G: MachikoroG): void => {
   const { decks } = G.secret;
 
   switch (supplyVariant) {
-    case SupplyVariant.Total:
-
+    case SupplyVariant.Total: {
       // put all establishments into the supply
       while (decks[0].length > 0) {
-        const est = decks[0].pop()!;
+        const est = decks[0].pop()!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
         est_data._available_count[est._id]++;
       }
       break;
-
-    case SupplyVariant.Variable:
-
+    }
+    case SupplyVariant.Variable: {
       // put establishments into the supply until there are 10 unique establishments
       while (decks[0].length > 0 && est_data._available_count.filter(count => count > 0).length < VARIABLE_SUPPLY_LIMIT) {
-        const est = decks[0].pop()!;
+        const est = decks[0].pop()!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
         est_data._available_count[est._id]++;
       }
       break;
-
-    case SupplyVariant.Hybrid:
-
+    }
+    case SupplyVariant.Hybrid: {
       // put establishments into the supply until there are five unique 
       // establishments with activation <= 6, five establishments with activation 
       // >= 7, and 2 purple establishments (this requires three decks).
@@ -168,11 +165,11 @@ export const replenishSupply = (G: MachikoroG): void => {
       const funcs = [countUniqueLower, countUniqueUpper, countUniquePurple];
       for (let i = 0; i < 3; i++)
         while (decks[i].length > 0 && funcs[i](est_data) < limits[i]) {
-          const est = decks[i].pop()!;
+          const est = decks[i].pop()!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
           est_data._available_count[est._id]++;
         }
       break;
-
+    }
     default:
       throw new Error(`Supply variant "${SupplyVariant[supplyVariant]}" not implemented.`);
   }
@@ -192,7 +189,7 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
 
   // declare empty data structure
   const total_count = metadata.all_establishments.length;
-  let data: EstablishmentData = {
+  const data: EstablishmentData = {
     _in_use: Array(total_count).fill(false),
     _remaining_count: Array(total_count).fill(0),
     _available_count: Array(total_count).fill(0),
@@ -204,15 +201,14 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
   // get establishments in use
   let in_use_ids: number[];
   switch (expansion) {
-
-    case Expansion.Base:
+    case Expansion.Base: {
       in_use_ids = metadata.base_establishment_ids;
       break;
-
-    case Expansion.Harbor:
+    }
+    case Expansion.Harbor: {
       in_use_ids = metadata.harbor_establishment_ids;
       break;
-
+    }
     default:
       throw new Error(`Expansion "${Expansion[expansion]}" not implemented.`);
   }
@@ -234,9 +230,8 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
   // prepare decks
   let decks: Establishment[][];
   switch (supplyVariant) {
-
-    case (SupplyVariant.Total):
-    case (SupplyVariant.Variable):
+    case SupplyVariant.Total:
+    case SupplyVariant.Variable: {
       // put all cards into one deck
       decks = [[]];
       for (const id of in_use_ids) {
@@ -244,8 +239,8 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
         decks[0].push(...Array<Establishment>(data._remaining_count[id]).fill(est));
       }
       break;
-  
-    case (SupplyVariant.Hybrid):
+    }
+    case SupplyVariant.Hybrid: {
       // put all cards into three decks: activation <= 6, activation >= 7, and purple.
       decks = [[], [], []];
       for (const id of in_use_ids) {
@@ -258,7 +253,7 @@ export const initialize = (expansion: Expansion, supplyVariant: SupplyVariant, n
           decks[2].push(...Array<Establishment>(data._remaining_count[id]).fill(est));
       }
       break;
-
+    }
     default:
       throw new Error(`Supply variant "${SupplyVariant[supplyVariant]}" not implemented.`);
   }

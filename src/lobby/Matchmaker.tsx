@@ -1,11 +1,11 @@
 import 'styles/main.css';
 
-import React from 'react';
 import { LobbyClient } from 'boardgame.io/client';
+import React from 'react';
 
+import { ClientInfo } from './types';
 import Lobby from './Lobby';
 import Room from './Room';
-import { ClientInfo } from './types';
 
 /**
  * @extends ClientInfo

@@ -1,13 +1,16 @@
 import 'styles/main.css';
 
+import { Client } from 'boardgame.io/react';
 import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
-import { Client } from 'boardgame.io/react';
 
-import { MachikoroBoard }  from 'board';
-import { PORT, IN_PROD } from 'config';
-import { Machikoro } from 'game';
 import { ClientInfo, Matchmaker } from 'lobby';
+import { Machikoro } from 'game';
+import { MachikoroBoard }  from 'board';
+import { PORT } from './config';
+
+// true if we are in production
+const IN_PROD = process.env.NODE_ENV === 'production';
 
 const defaultClientInfo: ClientInfo = {
   matchID: '',
@@ -26,11 +29,11 @@ interface AppState extends ClientInfo {
 /**
  * Create Machi Koro application.
  */
-export default class App extends React.Component<{}, AppState> {
+export default class App extends React.Component<object, AppState> {
 
   private serverOrigin: string; // URL and port of the server.
 
-  constructor(props: any) {
+  constructor(props: object) {
     super(props);
     this.state = {
       ...defaultClientInfo,

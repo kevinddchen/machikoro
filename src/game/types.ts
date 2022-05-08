@@ -1,4 +1,4 @@
-import { State, Color, CardType, SupplyVariant } from './enums';
+import { CardType, Color, State, SupplyVariant } from './enums';
 
 export type MachikoroG = {
   state: State, // tracks game state
@@ -10,7 +10,7 @@ export type MachikoroG = {
   supplyVariant: SupplyVariant;
   turn_order: string[];
   secret: Secrets; // not passed to clients
-  log: any[];
+  log: LogLine[];
   log_i: number;
   secondTurn: boolean; // true if player can make another turn
   doTV: boolean; // true if player will activate TV
@@ -18,6 +18,11 @@ export type MachikoroG = {
   officeEst: Establishment | null; // establishment picked for office
   tunaRoll: number | null; // roll made for tuna boat
   justBought: Establishment | null; // establishment just bought (for prettier rendering)
+};
+
+export type LogLine = {
+  id: number;
+  line: string;
 };
 
 export type Secrets = {

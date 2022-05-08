@@ -1,15 +1,17 @@
 import 'styles/main.css';
 
-import _ from 'lodash';
-import React from 'react';
 import { LobbyAPI } from 'boardgame.io';
 import { LobbyClient } from 'boardgame.io/client';
+import React from 'react';
+import _ from 'lodash';
 
+import { Expansion, GAME_NAME, SupplyVariant } from 'game';
+import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
-import { UPDATE_INTERVAL } from 'config';
-import { GAME_NAME, Expansion, SupplyVariant } from 'game';
 import { ClientInfo } from './types';
-import { seatIsOccupied, countPlayers, expansionName, supplyVariantName } from './utils';
+
+// fetch request timer, in milliseconds
+const UPDATE_INTERVAL = 1000;
 
 /**
  * @param name Name of the player.
@@ -268,7 +270,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         const { matchID, players, setupData } = matchList[i];
         const numActivePlayers = countPlayers(players);
         const numPlayers = players.length;
-        let button: any;
+        let button: JSX.Element | null;
         if (this.authenticator.hasCredentials(matchID)) {
           /// Able to automatically join the room (e.g. joined before, but closed browser)
           button = <button className='button' onClick={() => this.joinMatch(matchID)}>Rejoin</button>;

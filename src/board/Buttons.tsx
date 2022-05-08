@@ -1,15 +1,16 @@
 import 'styles/main.css';
-import classNames from 'classnames';
+
 import React from 'react';
+import classNames from 'classnames';
 
 import { 
-  MachikoroG, 
   Ctx, 
+  MachikoroG, 
   Moves,
-  canRoll,
-  canCommitRoll,
   canAddTwo,
+  canCommitRoll,
   canEndTurn,
+  canRoll,
 } from 'game';
 
 /**
@@ -30,7 +31,7 @@ interface ButtonsProps {
 /**
  * Buttons on top of the screen, i.e. Rolling, End Turn, and Undo.
  */
-export default class Buttons extends React.Component<ButtonsProps, {}> {
+export default class Buttons extends React.Component<ButtonsProps, object> {
 
   render() {
 

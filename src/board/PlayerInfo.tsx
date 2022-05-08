@@ -1,19 +1,20 @@
 import 'styles/main.css';
+
 import React from 'react';
 import classNames from 'classnames';
 
 import { 
-  MachikoroG, 
   Ctx, 
-  Moves,
-  Est,
+  Est, 
   Establishment,
   Land,
   Landmark,
+  MachikoroG,
+  Moves,
   canBuyLand,
-  canDoTV,
   canDoOfficePhase1,
   canDoOfficePhase2,
+  canDoTV,
 } from 'game';
 import StackTable from './StackTable';
 
@@ -40,7 +41,7 @@ interface PlayerInfoProps {
  * Information panels for a player, displaying name, money, purchased landmarks 
  * and establishments, etc.
  */
-class PlayerInfo extends React.Component<PlayerInfoProps, {}> {
+class PlayerInfo extends React.Component<PlayerInfoProps, object> {
 
   private landmarks: Landmark[];
   private establishments: Establishment[];
