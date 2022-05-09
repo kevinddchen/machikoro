@@ -44,7 +44,7 @@ export default class Log extends React.Component<LogProps, object> {
     }
 
     return (
-      <div id='log' className='log_box'>
+      <div ref={this.logRef} id='log' className='log_box'>
         {logBody}
       </div>
     );
