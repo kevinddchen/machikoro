@@ -6,16 +6,16 @@
 
 /* COLOR CODES */
 
-:root{
-  --primary: #00ACDE;           /* Blue */
-  --primary-dark: #0083B1;      /* Dark Blue */
+:root {
+  --primary: #00acde; /* Blue */
+  --primary-dark: #0083b1; /* Dark Blue */
 
-  --est-pri: #3B73B9;           /* Primary Industry (Base) */
-  --est-pri-light: #7AB8DF;     /* Primary Industry (Alt) */
-  --est-sec: #477F39;           /* Secondary Industry (Base) */
-  --est-sec-light: #88B86E;     /* Secondary Industry (Alt) */
-  --est-res: #9C213A;           /* Restaurants (Base) */
-  --est-res-light: #BE6C7C;     /* Restaurants (Alt) */
+  --est-pri: #3b73b9; /* Primary Industry (Base) */
+  --est-pri-light: #7ab8df; /* Primary Industry (Alt) */
+  --est-sec: #477f39; /* Secondary Industry (Base) */
+  --est-sec-light: #88b86e; /* Secondary Industry (Alt) */
+  --est-res: #9c213a; /* Restaurants (Base) */
+  --est-res-light: #be6c7c; /* Restaurants (Alt) */
 }
 
 /* DIV FORMATTING */
@@ -26,7 +26,12 @@
 }
 
 .div-column {
-  display: table-cell; 
+  display: table-cell;
+}
+
+.div-column-right {
+  display: table-cell;
+  text-align: right;
 }
 
 /* FONTS */
@@ -50,23 +55,23 @@
   border-radius: 16px;
   border-width: 0 0 4px;
   box-sizing: border-box;
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
   display: inline-block;
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: .8px;
+  letter-spacing: 0.8px;
   line-height: 20px;
   margin-left: 3px;
   margin-right: 3px;
   outline: none;
   overflow: visible;
-  padding: 7px 15px;   /* affects button:active */
+  padding: 7px 15px; /* affects button:active */
   text-align: center;
   text-transform: uppercase;
   touch-action: manipulation;
   transform: translateZ(0);
-  transition: filter .2s;
+  transition: filter 0.2s;
   user-select: none;
   -webkit-user-select: none;
   vertical-align: middle;
@@ -80,7 +85,7 @@
   border-radius: 16px;
   border-width: 0 0 4px;
   bottom: -4px;
-  content: "";
+  content: '';
   left: 0;
   position: absolute;
   right: 0;
@@ -88,7 +93,8 @@
   z-index: -1;
 }
 
-.button:main, .button:focus {
+.button:main,
+.button:focus {
   user-select: auto;
 }
 
@@ -105,7 +111,7 @@
 }
 
 .button:active {
-  padding-bottom: 3px;   /* change if adjust padding */
+  padding-bottom: 3px; /* change if adjust padding */
 }
 /* End imported button code */
 
@@ -118,9 +124,9 @@
 /* TITLES */
 
 .title {
-  background-color: var(--primary);   
+  background-color: var(--primary);
   color: white;
-  font-family: "Kanit", "Sigmar One", cursive;
+  font-family: 'Kanit', 'Sigmar One', cursive;
   font-size: 40pt;
   font-weight: bold;
   text-align: center;
@@ -143,7 +149,7 @@
   bottom: 0;
   color: white;
   font-size: 20px;
-  height: 32px;    /* image height */
+  height: 32px; /* image height */
   left: 0;
   padding: 5px;
   position: fixed;
@@ -153,7 +159,7 @@
 
 /* MATCHMAKING */
 
-.mm-container{
+.mm-container {
   border-radius: 16px;
   border: solid var(--primary-dark);
   max-width: 800px;
@@ -207,7 +213,7 @@
 
 /* CREATE ROOM */
 
-.input-box{
+.input-box {
   border-radius: 10px;
   border: 2px solid #00acdd;
   box-sizing: border-box;
@@ -244,7 +250,7 @@ select {
   text-align: center;
 }
 
-.lobby-container{
+.lobby-container {
   border-radius: 16px;
   border: solid var(--primary);
   margin: 2px auto;
@@ -300,7 +306,7 @@ select {
 }
 
 /* STATUS BAR */
-.status-bar{
+.status-bar {
   background-color: var(--primary);
   color: white;
   font-size: 18px;
@@ -309,7 +315,7 @@ select {
   text-align: center;
 }
 
-.status-bar-active{
+.status-bar-active {
   background-color: var(--est-res-light);
   /*animation: change-color 5s ease-in-out infinite alternate;*/
 }

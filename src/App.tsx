@@ -1,23 +1,15 @@
-import './styles/main.css';
-import React from 'react';
-import { Client } from 'boardgame.io/react';
-import { SocketIO } from 'boardgame.io/multiplayer';
-import { MachikoroBoard }  from './board';
-import { Machikoro } from './game';
-import { Matchmaker } from './lobby';
-import { PORT, IN_PROD } from './config';
+import 'styles/main.css';
 
-/**
- * Information needed by the client to authenticate API calls with server.
- * @param matchID - Internal random string identifier for the match.
- * @param playerID - Seat of the player, taking values '0', '1', '2', ...
- * @param credentials - Authentication token.
- */
-export interface ClientInfo {
-  matchID: string;
-  playerID: string;
-  credentials: string;
-}
+import { Client } from 'boardgame.io/react';
+import React from 'react';
+import { SocketIO } from 'boardgame.io/multiplayer';
+
+import { ClientInfo, Matchmaker } from 'lobby';
+import { Machikoro } from 'game';
+import { MachikoroBoard } from 'board';
+import { PORT } from './config';
+
+const IN_PROD = process.env.NODE_ENV === 'production'; // true if we are in production
 
 const defaultClientInfo: ClientInfo = {
   matchID: '',
@@ -26,7 +18,8 @@ const defaultClientInfo: ClientInfo = {
 };
 
 /**
- * @param play - If true, start the game.
+ * @extends ClientInfo
+ * @param play If true, start the game.
  */
 interface AppState extends ClientInfo {
   play: boolean;
@@ -35,12 +28,10 @@ interface AppState extends ClientInfo {
 /**
  * Create Machi Koro application.
  */
-class App extends React.Component<{}, AppState> {
+export default class App extends React.Component<object, AppState> {
+  private serverOrigin: string; // URL and port of the server.
 
-  // URL and port of the server.
-  private serverOrigin: string;
-
-  constructor(props: any) {
+  constructor(props: object) {
     super(props);
     this.state = {
       ...defaultClientInfo,
@@ -49,17 +40,17 @@ class App extends React.Component<{}, AppState> {
     this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
   }
 
-  setClientInfo = (clientInfo: ClientInfo) => {
+  setClientInfo = (clientInfo: ClientInfo): void => {
     this.setState(clientInfo);
   };
 
-  clearClientInfo = () => {
+  clearClientInfo = (): void => {
     this.setState(defaultClientInfo);
   };
 
-  startMatch = () => this.setState({play: true});
+  startMatch = (): void => this.setState({ play: true });
 
-  startDebug = () => {
+  startDebug = (): void => {
     this.clearClientInfo();
     this.startMatch();
   };
@@ -70,49 +61,38 @@ class App extends React.Component<{}, AppState> {
     const { matchID, playerID, credentials, play } = this.state;
 
     if (play) {
-
       const MachikoroClient = Client({
         game: Machikoro,
         board: MachikoroBoard,
         multiplayer: SocketIO({ server: this.serverOrigin }),
       });
 
-      return (
-        <MachikoroClient
-          matchID={matchID}
-          playerID={playerID}
-          credentials={credentials}/>
-      );
-
+      return <MachikoroClient matchID={matchID} playerID={playerID} credentials={credentials} />;
     } else {
-    
       return (
         <div>
-          { !IN_PROD ? // only show debug button in development
-            <div className="padded_div">
+          {!IN_PROD ? ( // only show debug button in development
+            <div className='padded_div'>
               <button onClick={this.startDebug}>DEBUG</button>
             </div>
-            : 
-            null
-          }
-          <div className="title">MACHI KORO</div>
-          <Matchmaker 
+          ) : null}
+          <div className='title'>MACHI KORO</div>
+          <Matchmaker
             matchID={matchID}
             playerID={playerID}
             credentials={credentials}
             serverOrigin={this.serverOrigin}
             setClientInfo={this.setClientInfo}
             clearClientInfo={this.clearClientInfo}
-            startMatch={this.startMatch}/>
-          <footer className="footer">
-            <a href="https://github.com/kevinddchen/machikoro" target="_blank"
-             rel="noreferrer"><img src="./GitHub-Mark-Light-32px.png" alt="GitHub logo"/></a>
+            startMatch={this.startMatch}
+          />
+          <footer className='footer'>
+            <a href='https://github.com/kevinddchen/machikoro' target='_blank' rel='noreferrer'>
+              <img src='./GitHub-Mark-Light-32px.png' alt='GitHub logo' />
+            </a>
           </footer>
         </div>
       );
-
     }
   }
 }
-
-export default App;

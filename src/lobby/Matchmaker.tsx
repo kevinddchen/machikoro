@@ -1,10 +1,19 @@
-import '../styles/main.css';
-import React from 'react';
+import 'styles/main.css';
+
 import { LobbyClient } from 'boardgame.io/client';
+import React from 'react';
+
+import type { ClientInfo } from './types';
 import Lobby from './Lobby';
 import Room from './Room';
-import type { ClientInfo } from '../App';
 
+/**
+ * @extends ClientInfo
+ * @param serverOrigin URL and port of the server.
+ * @param setClientInfo Callback to set client info.
+ * @param clearClientInfo Callback to clear client info.
+ * @param startMatch Callback to start match.
+ */
 interface MatchmakerProps extends ClientInfo {
   serverOrigin: string;
   setClientInfo: (clientInfo: ClientInfo) => void;
@@ -13,8 +22,8 @@ interface MatchmakerProps extends ClientInfo {
 }
 
 /**
- * @param name - Name of the player.
- * @param errorMessage - Error message to display.
+ * @param name Name of the player.
+ * @param errorMessage Error message to display.
  */
 interface MatchmakerState {
   name: string;
@@ -23,14 +32,12 @@ interface MatchmakerState {
 
 /**
  * Handles match creation and joining via the `Lobby` component, and the
- * pre-match waiting room via the `Room` component. Also handles match
- * credential storage and retrieval via the `Authenticator` class.
+ * pre-match waiting room via the `Room` component.
  */
 export default class Matchmaker extends React.Component<MatchmakerProps, MatchmakerState> {
+  private lobbyClient: LobbyClient; // interacts with server match management API
 
-  private lobbyClient: LobbyClient;
-
-  constructor (props: MatchmakerProps) {
+  constructor(props: MatchmakerProps) {
     super(props);
     this.state = {
       name: '',
@@ -39,15 +46,15 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
     this.lobbyClient = new LobbyClient({ server: props.serverOrigin });
   }
 
-  setName = (name: string) => this.setState({ name });
+  setName = (name: string): void => this.setState({ name });
 
-  setErrorMessage = (errorMessage: string) => this.setState({ errorMessage });
+  setErrorMessage = (errorMessage: string): void => this.setState({ errorMessage });
 
   /**
    * Clear the error message. The render will only be updated if the error
    * message was not empty.
    */
-  clearErrorMessage = () => {
+  clearErrorMessage = (): void => {
     const { errorMessage } = this.state;
     if (errorMessage) {
       this.setState({ errorMessage: '' });
@@ -56,24 +63,26 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
 
   // --- Render --------------------------------------------------------------
 
-  render () {
+  render() {
     const { matchID, playerID, credentials } = this.props;
     const { name, errorMessage } = this.state;
 
     return (
       <div>
-        {matchID ? // when `matchID` is not an empty string, we are in a room
+        {matchID ? ( // when `matchID` is not an empty string, we are in a room
           <Room
             matchID={matchID}
             playerID={playerID}
             credentials={credentials}
+            name={name}
             lobbyClient={this.lobbyClient}
             clearClientInfo={this.props.clearClientInfo}
             startMatch={this.props.startMatch}
             setErrorMessage={this.setErrorMessage}
             clearErrorMessage={this.clearErrorMessage}
           />
-          : // otherwise we are in a lobby
+        ) : (
+          // otherwise we are in a lobby
           <Lobby
             name={name}
             lobbyClient={this.lobbyClient}
@@ -82,7 +91,7 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
             setErrorMessage={this.setErrorMessage}
             clearErrorMessage={this.clearErrorMessage}
           />
-        }
+        )}
         <div className='errorMessage'>{errorMessage}</div>
       </div>
     );
