@@ -24,6 +24,5 @@
       "module": "CommonJS"
     }
   },
-  "include": ["./src/**/*", "./server/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["./src/**/*", "./server/**/*"]
 }

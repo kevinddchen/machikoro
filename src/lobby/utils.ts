@@ -2,8 +2,6 @@ import { Server } from 'boardgame.io';
 
 import { Expansion, SupplyVariant } from 'game';
 
-// This file contains some useful functions which are used in multiple places.
-
 /**
  * Currently, the most reliable way to check if a seat is occupied is to check
  * if the `PlayerMetadata` object contains the field 'name'. If yes, then it is
