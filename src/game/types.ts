@@ -1,28 +1,22 @@
-import { CardType, Color, State, SupplyVariant } from './enums';
+import { CardType, Color, State, SupplyVariant, LogEvent } from './enums';
 
 export type MachikoroG = {
   state: State; // tracks game state
   roll: number; // player roll
   numRolls: number; // number of rolls made
-  money: number[];
+  money: number[]; // money for each player
   est_data: EstablishmentData;
   land_data: LandmarkData;
-  supplyVariant: SupplyVariant;
-  turn_order: string[];
-  secret: Secrets; // not passed to clients
-  log: LogLine[];
-  log_i: number;
+  readonly supplyVariant: SupplyVariant;
+  readonly turn_order: string[];
+  secret: Secrets; // not passed to clients (e.g. establishment deck)
+  log_buffer: LogLine[]; // temporarily stores `LogLine` objects for each move
   secondTurn: boolean; // true if player can make another turn
   doTV: boolean; // true if player will activate TV
   doOffice: boolean; // true if player will activate office
   officeEst: Establishment | null; // establishment picked for office
   tunaRoll: number | null; // roll made for tuna boat
-  justBought: Establishment | null; // establishment just bought (for prettier rendering)
-};
-
-export type LogLine = {
-  id: number;
-  line: string;
+  justBoughtEst: Establishment | null; // establishment just bought (for prettier rendering)
 };
 
 export type Secrets = {
@@ -61,3 +55,18 @@ export type LandmarkData = {
   _in_use: boolean[];
   _owned: boolean[][];
 };
+
+/**
+ * A `LogLine` is an object that is created during a move that stores a 
+ * `LogEvent` describing the type of event that needs to be logged and any
+ * relevant metadata, such as the dice roll or money earned. Over the course of 
+ * a move, these `LogLine` objects are gathered in an array. At the end of the 
+ * move, the array of `LogLine` objects is passed to `ctx.log.setMetadata`. 
+ * 
+ * On the client, these `LogLine` objects are retrieved from `ctx.log` where it 
+ * is parsed by the `Logger` component.
+ */
+ export interface LogLine {
+  readonly event: LogEvent;
+  [key: string]: any;
+}
