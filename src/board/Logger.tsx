@@ -62,33 +62,33 @@ export default class Logger extends React.Component<LogProps, object> {
 
     switch (event) {
       case LogEvent.RollOne: {
-        return `\troll ${logLine.roll}`;
+        return `\trolled ${logLine.roll}`;
       }
       case LogEvent.RollTwo: {
         const { dice } = logLine;
         const roll = dice[0] + dice[1];
-        return `\troll ${roll} (${dice})`;
+        return `\trolled ${roll} (${dice})`;
       }
       case LogEvent.AddTwo: {
-        return `\tchange roll to ${logLine.roll}`;
+        return `\tchanged roll to ${logLine.roll}`;
       }
       case LogEvent.Earn: {
         const { to, amount, name } = logLine;
-        return `\t${names[to]} earns ${amount} ${COIN}  (${name})`;
+        return `\t${names[to]} earned ${amount} ${COIN}  (${name})`;
       }
       case LogEvent.Take: {
         const { from, to, amount, name } = logLine;
-        return `\t${names[from]} pays ${names[to]} ${amount} ${COIN}  (${name})`;
+        return `\t${names[from]} paid ${names[to]} ${amount} ${COIN}  (${name})`;
       }
       case LogEvent.Buy: {
-        return `\tbuy ${logLine.name}`;
+        return `\tbought ${logLine.name}`;
       }
       case LogEvent.Office: {
         const { player_est_name, opponent_est_name, opponent } = logLine;
-        return `\ttrade ${player_est_name} for ${opponent_est_name} with ${names[opponent]}`;
+        return `\ttraded ${player_est_name} for ${opponent_est_name} with ${names[opponent]}`;
       }
       case LogEvent.TunaRoll: {
-        return `\t(tuna boat roll: ${logLine.roll})`;
+        return `\t(Tuna boat roll: ${logLine.roll})`;
       }
       case LogEvent.EndGame: {
         return `Game over! Winner: ${names[logLine.winner]}`;
@@ -97,8 +97,6 @@ export default class Logger extends React.Component<LogProps, object> {
         return null;
     }
   };
-
-  parseName = (x: string): string => this.props.names[parseInt(x[1])];
 
   componentDidUpdate() {
     // scroll log box to bottom
