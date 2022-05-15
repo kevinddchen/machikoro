@@ -3,12 +3,12 @@ import 'styles/main.css';
 import { LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { LogEvent, LogLine, MachikoroG } from 'game';
+import { LogEvent, LogLine, Ctx } from 'game';
 
 const COIN = '\uD83D\uDFE4';
 
 interface LogProps {
-  G: MachikoroG;
+  ctx: Ctx;
   log: LogEntry[];
   names: string[];
 }
@@ -25,8 +25,8 @@ export default class Logger extends React.Component<LogProps, object> {
   }
 
   logStartTurn = (turn: number): string => {
-    const { G, names } = this.props;
-    const player = G.turn_order[turn % names.length];
+    const { ctx, names } = this.props;
+    const player = ctx.playOrder[turn % names.length];
     const name = names[parseInt(player)];
     return `Turn ${turn+1}: ${name}`;
   }

@@ -8,8 +8,8 @@ export type MachikoroG = {
   est_data: EstablishmentData;
   land_data: LandmarkData;
   readonly supplyVariant: SupplyVariant;
-  readonly turn_order: string[];
-  secret: Secrets; // not passed to clients (e.g. establishment deck)
+  readonly _playOrder: string[];
+  secret: Secrets; // game state that is not passed to clients (e.g. establishment deck)
   log_buffer: LogLine[]; // temporarily stores `LogLine` objects for each move
   secondTurn: boolean; // true if player can make another turn
   doTV: boolean; // true if player will activate TV

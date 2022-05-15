@@ -25,7 +25,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
     const playerInfoList: JSX.Element[] = [];
 
     for (let i = 0; i < this.names.length; i++) {
-      const player = parseInt(G.turn_order[i]);
+      const player = parseInt(ctx.playOrder[i]);
       const isSelf = !!playerID && player === parseInt(playerID); // true if `player` is the client's player number
       playerInfoList.push(
         <PlayerInfo
@@ -56,7 +56,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
         </div>
         <div className='div-column'>{playerInfoList}</div>
         <div className='div-column'>
-          <Logger G={G} log={log} names={this.names} />
+          <Logger ctx={ctx} log={log} names={this.names} />
         </div>
       </div>
     );

@@ -404,7 +404,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
 
   // Do Red establishments.
   let ests = Est.getAllInUse(G.est_data).filter((est) => est.color === Color.Red && est.activation.includes(G.roll));
-  for (const opponent of getPreviousPlayers(G, ctx)) {
+  for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of ests) {
       // normal: Cafe, Restaurant, PizzaJoint, HamburgerStand
       // special: SushiBar
@@ -422,7 +422,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
 
   // Do Blue establishments.
   ests = Est.getAllInUse(G.est_data).filter((est) => est.color === Color.Blue && est.activation.includes(G.roll));
-  for (const player of getNextPlayers(G, ctx)) {
+  for (const player of getNextPlayers(ctx)) {
     for (const est of ests) {
       // normal: WheatField, LivestockFarm, Forest, Mine, AppleOrchard, FlowerOrchard,
       // special: MackerelBoat, TunaBoat
@@ -476,12 +476,12 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
     if (Est.countOwned(G.est_data, currentPlayer, est) === 0) continue;
 
     if (Est.isEqual(est, Est.Stadium))
-      for (const opponent of getPreviousPlayers(G, ctx))
+      for (const opponent of getPreviousPlayers(ctx))
         take(G, { from: opponent, to: currentPlayer, amount: est.base }, est.name);
     else if (Est.isEqual(est, Est.TVStation)) G.doTV = true;
     else if (Est.isEqual(est, Est.Office)) G.doOffice = true;
     else if (Est.isEqual(est, Est.Publisher))
-      for (const opponent of getPreviousPlayers(G, ctx)) {
+      for (const opponent of getPreviousPlayers(ctx)) {
         const count =
           Est.countTypeOwned(G.est_data, opponent, CardType.Cup) +
           Est.countTypeOwned(G.est_data, opponent, CardType.Shop);
@@ -492,7 +492,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
         }, est.name);
       }
     else if (Est.isEqual(est, Est.TaxOffice))
-      for (const opponent of getPreviousPlayers(G, ctx))
+      for (const opponent of getPreviousPlayers(ctx))
         if (G.money[opponent] >= Est.TAX_OFFICE_THRESHOLD)
           take(G, {
             from: opponent,
@@ -507,17 +507,16 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
 /**
  * Return the next players (including self) in the order that the Blue
  * establishments are evaluated.
- * @param G
  * @param ctx
  * @returns Array of player IDs.
  */
-const getNextPlayers = (G: MachikoroG, ctx: Ctx): number[] => {
+const getNextPlayers = (ctx: Ctx): number[] => {
   const current = ctx.playOrderPos;
   const N = ctx.numPlayers;
   const forwards: number[] = [];
   for (let i = 0; i < N; i++) {
     const shifted_i = (current + i) % N;
-    forwards.push(parseInt(G.turn_order[shifted_i]));
+    forwards.push(parseInt(ctx.playOrder[shifted_i]));
   }
   return forwards;
 };
@@ -525,17 +524,16 @@ const getNextPlayers = (G: MachikoroG, ctx: Ctx): number[] => {
 /**
  * Return the previous players (excluding self) in the order that the Red
  * establishments are evaluated.
- * @param G
  * @param ctx
  * @returns Array of player IDs.
  */
-const getPreviousPlayers = (G: MachikoroG, ctx: Ctx): number[] => {
+const getPreviousPlayers = (ctx: Ctx): number[] => {
   const current = ctx.playOrderPos;
   const N = ctx.numPlayers;
   const backwards: number[] = [];
   for (let i = 1; i < N; i++) {
     const shifted_i = (((current - i) % N) + N) % N; // JS modulo is negative
-    backwards.push(parseInt(G.turn_order[shifted_i]));
+    backwards.push(parseInt(ctx.playOrder[shifted_i]));
   }
   return backwards;
 };
@@ -648,8 +646,8 @@ export const Machikoro: Game<MachikoroG> = {
 
     // shuffle deck and play order
     for (let i = 0; i < decks.length; i++) decks[i] = ctx.random!.Shuffle(decks[i]);
-    let turn_order = [...Array(numPlayers).keys()].map((x) => x.toString());
-    if (randomizeTurnOrder) turn_order = ctx.random!.Shuffle(turn_order);
+    let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
+    if (randomizeTurnOrder) _playOrder = ctx.random!.Shuffle(_playOrder);
 
     const G: MachikoroG = {
       ...newTurnG,
@@ -657,7 +655,7 @@ export const Machikoro: Game<MachikoroG> = {
       est_data,
       land_data,
       supplyVariant,
-      turn_order,
+      _playOrder,
       secret: { decks },
       log_buffer: [],
     };
@@ -682,7 +680,7 @@ export const Machikoro: Game<MachikoroG> = {
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
     },
-    order: TurnOrder.CUSTOM_FROM('turn_order'),
+    order: TurnOrder.CUSTOM_FROM('_playOrder'),
   },
 
   moves: {
