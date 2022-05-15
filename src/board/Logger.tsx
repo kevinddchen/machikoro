@@ -34,11 +34,11 @@ export default class Logger extends React.Component<LogProps, object> {
   /**
    * Take a `LogEntry` and parse its array of `LogLines` into strings.
    * @param entry 
-   * @returns List of strings to display on the log.
+   * @param lines List of strings to append to.
+   * @returns 
    */
-  parseLogEntry = (entry: LogEntry): string[] => {
+  parseLogEntry = (entry: LogEntry, lines: string[]): void => {
     const { metadata } = entry;
-    const lines: string[] = [];
     if (metadata) {
       try {
         for (const logLine of metadata as LogLine[]) {
@@ -49,7 +49,6 @@ export default class Logger extends React.Component<LogProps, object> {
         console.error(e);
       }
     }
-    return lines;
   }
 
   /**
@@ -108,7 +107,15 @@ export default class Logger extends React.Component<LogProps, object> {
 
   render() {
     const { log } = this.props;
-    console.log(log); // TODO: delete
+
+    // parse log and remove undos
+    const clean_log: LogEntry[] = [];
+    for (const entry of log) {
+      if (entry.action.type === "UNDO")
+        clean_log.pop();
+      else
+        clean_log.push(entry);
+    }
 
     const logBody: JSX.Element[] = [];
     let turn = 0;
@@ -116,15 +123,15 @@ export default class Logger extends React.Component<LogProps, object> {
     // since there is no entry in the log for the first turn, we need to manually add it
     logBody.push(<div key={0}>{this.logStartTurn(turn)}</div>);
 
-    for (let i = 0; i < log.length; i++) {
-      const entry = log[i];
-      let lines: string[];
-      if (entry.action.type == "GAME_EVENT" && entry.action.payload.type == "endTurn" ) {
+    for (let i = 0; i < clean_log.length; i++) {
+      const entry = clean_log[i];
+      const lines: string[] = [];
+      if (entry.action.type === "GAME_EVENT" && entry.action.payload.type === "endTurn" ) {
         // special case for start of new turn
         turn++;
-        lines = [this.logStartTurn(entry.turn)];
-      } else {
-        lines = this.parseLogEntry(entry);
+        lines.push(this.logStartTurn(entry.turn));
+      } else if (entry.action.type === "MAKE_MOVE") {
+        this.parseLogEntry(entry, lines);
       }
       for (let j = 0; j < lines.length; j++) {
         const line = lines[j];
