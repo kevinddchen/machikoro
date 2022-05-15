@@ -32,3 +32,15 @@ export enum SupplyVariant {
   Hybrid,
   Total,
 }
+
+export enum LogEvent {
+  RollOne = 1,
+  RollTwo,
+  AddTwo,
+  Earn,
+  Take,
+  Buy,
+  Office,
+  TunaRoll,
+  EndGame,
+}

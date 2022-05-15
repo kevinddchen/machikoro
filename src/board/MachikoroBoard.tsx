@@ -3,7 +3,7 @@ import React from 'react';
 
 import * as game from 'game';
 import Buttons from './Buttons';
-import Log from './Log';
+import Logger from './Logger';
 import PlayerInfo from './PlayerInfo';
 import StatusBar from './StatusBar';
 import Supply from './Supply';
@@ -17,15 +17,15 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
   constructor(props: BoardProps) {
     super(props);
     const { matchData } = props;
-    this.names = matchData!.map((x) => (x.name ? x.name : `player_${x.id}`)); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.names = matchData!.map((x) => (x.name ? x.name : `player_${x.id}`));
   }
 
   render() {
-    const { G, ctx, moves, isActive, playerID, undo } = this.props;
+    const { G, ctx, moves, log, isActive, playerID, undo } = this.props;
     const playerInfoList: JSX.Element[] = [];
 
     for (let i = 0; i < this.names.length; i++) {
-      const player = parseInt(G.turn_order[i]);
+      const player = parseInt(ctx.playOrder[i]);
       const isSelf = !!playerID && player === parseInt(playerID); // true if `player` is the client's player number
       playerInfoList.push(
         <PlayerInfo
@@ -56,7 +56,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<game.Mach
         </div>
         <div className='div-column'>{playerInfoList}</div>
         <div className='div-column'>
-          <Log G={G} names={this.names} />
+          <Logger ctx={ctx} log={log} names={this.names} />
         </div>
       </div>
     );

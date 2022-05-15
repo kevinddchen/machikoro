@@ -5,11 +5,9 @@ import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 
 import { ClientInfo, Matchmaker } from 'lobby';
+import { IN_PROD, PORT } from './config';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';
-import { PORT } from './config';
-
-const IN_PROD = process.env.NODE_ENV === 'production'; // true if we are in production
 
 const defaultClientInfo: ClientInfo = {
   matchID: '',

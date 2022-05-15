@@ -138,7 +138,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     case SupplyVariant.Total: {
       // put all establishments into the supply
       while (decks[0].length > 0) {
-        const est = decks[0].pop()!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        const est = decks[0].pop()!;
         est_data._available_count[est._id]++;
       }
       break;
@@ -149,7 +149,7 @@ export const replenishSupply = (G: MachikoroG): void => {
         decks[0].length > 0 &&
         est_data._available_count.filter((count) => count > 0).length < VARIABLE_SUPPLY_LIMIT
       ) {
-        const est = decks[0].pop()!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        const est = decks[0].pop()!;
         est_data._available_count[est._id]++;
       }
       break;
@@ -162,7 +162,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       const funcs = [countUniqueLower, countUniqueUpper, countUniquePurple];
       for (let i = 0; i < 3; i++)
         while (decks[i].length > 0 && funcs[i](est_data) < limits[i]) {
-          const est = decks[i].pop()!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          const est = decks[i].pop()!;
           est_data._available_count[est._id]++;
         }
       break;

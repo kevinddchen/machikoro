@@ -31,8 +31,11 @@ interface MatchmakerState {
 }
 
 /**
- * Handles match creation and joining via the `Lobby` component, and the
- * pre-match waiting room via the `Room` component.
+ * Component that handles match creation and joining via the `Lobby` component,
+ * and the pre-match waiting room via the `Room` component. A client starts
+ * in the `Lobby`. If they successfully create or join a match, then the prop
+ * `matchID` is populated. The client is then directed to the `Room`, where
+ * they wait for the match to start.
  */
 export default class Matchmaker extends React.Component<MatchmakerProps, MatchmakerState> {
   private lobbyClient: LobbyClient; // interacts with server match management API

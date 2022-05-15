@@ -48,7 +48,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
       // (iii) we are using total supply
       if (
         available > 0 ||
-        (!!G.justBought && Est.isEqual(est, G.justBought)) ||
+        (!!G.justBoughtEst && Est.isEqual(est, G.justBoughtEst)) ||
         G.supplyVariant === SupplyVariant.Total
       ) {
         Table.push(
