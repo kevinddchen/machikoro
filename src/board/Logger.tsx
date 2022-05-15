@@ -3,7 +3,7 @@ import 'styles/main.css';
 import { LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { LogEvent, LogLine, Ctx } from 'game';
+import { Ctx, LogEvent, LogLine } from 'game';
 
 const COIN = '\uD83D\uDFE4';
 
@@ -28,14 +28,14 @@ export default class Logger extends React.Component<LogProps, object> {
     const { ctx, names } = this.props;
     const player = ctx.playOrder[turn % names.length];
     const name = names[parseInt(player)];
-    return `Turn ${turn+1}: ${name}`;
-  }
+    return `Turn ${turn + 1}: ${name}`;
+  };
 
   /**
    * Take a `LogEntry` and parse its array of `LogLines` into strings.
-   * @param entry 
+   * @param entry
    * @param lines List of strings to append to.
-   * @returns 
+   * @returns
    */
   parseLogEntry = (entry: LogEntry, lines: string[]): void => {
     const { metadata } = entry;
@@ -49,17 +49,17 @@ export default class Logger extends React.Component<LogProps, object> {
         console.error(e);
       }
     }
-  }
+  };
 
   /**
    * Parse a single `LogLine` to its string.
-   * @param logLine 
-   * @returns 
+   * @param logLine
+   * @returns
    */
   parseLogLine = (logLine: LogLine): string | null => {
     const { names } = this.props;
     const { event } = logLine;
-    
+
     switch (event) {
       case LogEvent.RollOne: {
         return `\troll ${logLine.roll}`;
@@ -96,7 +96,7 @@ export default class Logger extends React.Component<LogProps, object> {
       default:
         return null;
     }
-  }
+  };
 
   parseName = (x: string): string => this.props.names[parseInt(x[1])];
 
@@ -111,10 +111,8 @@ export default class Logger extends React.Component<LogProps, object> {
     // parse log and remove undos
     const clean_log: LogEntry[] = [];
     for (const entry of log) {
-      if (entry.action.type === "UNDO")
-        clean_log.pop();
-      else
-        clean_log.push(entry);
+      if (entry.action.type === 'UNDO') clean_log.pop();
+      else clean_log.push(entry);
     }
 
     const logBody: JSX.Element[] = [];
@@ -126,11 +124,11 @@ export default class Logger extends React.Component<LogProps, object> {
     for (let i = 0; i < clean_log.length; i++) {
       const entry = clean_log[i];
       const lines: string[] = [];
-      if (entry.action.type === "GAME_EVENT" && entry.action.payload.type === "endTurn" ) {
+      if (entry.action.type === 'GAME_EVENT' && entry.action.payload.type === 'endTurn') {
         // special case for start of new turn
         turn++;
         lines.push(this.logStartTurn(entry.turn));
-      } else if (entry.action.type === "MAKE_MOVE") {
+      } else if (entry.action.type === 'MAKE_MOVE') {
         this.parseLogEntry(entry, lines);
       }
       for (let j = 0; j < lines.length; j++) {

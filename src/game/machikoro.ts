@@ -225,7 +225,7 @@ const rollTwo: Move<MachikoroG> = (G, ctx) => {
  */
 const debugRoll: Move<MachikoroG> = (G, ctx, roll: number) => {
   G.log_buffer = [];
-  
+
   G.roll = roll;
   G.numRolls++;
   G.log_buffer.push(Log.rollOne(roll));
@@ -317,7 +317,7 @@ const buyLand: Move<MachikoroG> = (G, ctx, land: Landmark) => {
  */
 const doTV: Move<MachikoroG> = (G, ctx, opponent: number) => {
   if (!canDoTV(G, ctx, opponent)) return INVALID_MOVE;
-  G.log_buffer = []
+  G.log_buffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   take(G, { from: opponent, to: player, amount: 5 }, Est.TVStation.name);
@@ -363,7 +363,7 @@ const doOfficePhase2: Move<MachikoroG> = (G, ctx, opponent: number, est: Establi
     Est.transfer(G.est_data, { from: player, to: opponent, est: G.officeEst });
     Est.transfer(G.est_data, { from: opponent, to: player, est: est });
     G.doOffice = false;
-    G.log_buffer.push(Log.office({player_est_name: G.officeEst.name, opponent_est_name: est.name}, opponent));
+    G.log_buffer.push(Log.office({ player_est_name: G.officeEst.name, opponent_est_name: est.name }, opponent));
   } else {
     throw Error('Unexpected error: `G.officeEst` is not set.');
   }
@@ -383,9 +383,9 @@ const endTurn: Move<MachikoroG> = (G, ctx) => {
   G.log_buffer = [];
 
   const player = parseInt(ctx.currentPlayer);
-  if (G.state === State.Buy && Land.isOwned(G.land_data, player, Land.Airport)) earn(G, { to: player, amount: 10 }, Land.Airport.name);
-  if (G.secondTurn)
-    ctx.events!.endTurn({ next: player.toString() });
+  if (G.state === State.Buy && Land.isOwned(G.land_data, player, Land.Airport))
+    earn(G, { to: player, amount: 10 }, Land.Airport.name);
+  if (G.secondTurn) ctx.events!.endTurn({ next: player.toString() });
   else ctx.events!.endTurn();
 
   ctx.log?.setMetadata(G.log_buffer);
@@ -485,20 +485,28 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
         const count =
           Est.countTypeOwned(G.est_data, opponent, CardType.Cup) +
           Est.countTypeOwned(G.est_data, opponent, CardType.Shop);
-        take(G, {
-          from: opponent,
-          to: currentPlayer,
-          amount: est.base * count,
-        }, est.name);
+        take(
+          G,
+          {
+            from: opponent,
+            to: currentPlayer,
+            amount: est.base * count,
+          },
+          est.name
+        );
       }
     else if (Est.isEqual(est, Est.TaxOffice))
       for (const opponent of getPreviousPlayers(ctx))
         if (G.money[opponent] >= Est.TAX_OFFICE_THRESHOLD)
-          take(G, {
-            from: opponent,
-            to: currentPlayer,
-            amount: Math.floor(G.money[opponent] / 2),
-          }, est.name);
+          take(
+            G,
+            {
+              from: opponent,
+              to: currentPlayer,
+              amount: Math.floor(G.money[opponent] / 2),
+            },
+            est.name
+          );
   }
 
   switchState(G, ctx);

@@ -1,4 +1,4 @@
-import { CardType, Color, State, SupplyVariant, LogEvent } from './enums';
+import { CardType, Color, LogEvent, State, SupplyVariant } from './enums';
 
 export type MachikoroG = {
   state: State; // tracks game state
@@ -57,16 +57,16 @@ export type LandmarkData = {
 };
 
 /**
- * A `LogLine` is an object that is created during a move that stores a 
+ * A `LogLine` is an object that is created during a move that stores a
  * `LogEvent` describing the type of event that needs to be logged and any
- * relevant metadata, such as the dice roll or money earned. Over the course of 
- * a move, these `LogLine` objects are gathered in an array. At the end of the 
- * move, the array of `LogLine` objects is passed to `ctx.log.setMetadata`. 
- * 
- * On the client, these `LogLine` objects are retrieved from `ctx.log` where it 
+ * relevant metadata, such as the dice roll or money earned. Over the course of
+ * a move, these `LogLine` objects are gathered in an array. At the end of the
+ * move, the array of `LogLine` objects is passed to `ctx.log.setMetadata`.
+ *
+ * On the client, these `LogLine` objects are retrieved from `ctx.log` where it
  * is parsed by the `Logger` component.
  */
- export interface LogLine {
+export interface LogLine {
   readonly event: LogEvent;
   [key: string]: any;
 }

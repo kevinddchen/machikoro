@@ -5,9 +5,9 @@ import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 
 import { ClientInfo, Matchmaker } from 'lobby';
+import { IN_PROD, PORT } from './config';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';
-import { IN_PROD, PORT } from './config';
 
 const defaultClientInfo: ClientInfo = {
   matchID: '',
