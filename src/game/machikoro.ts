@@ -567,6 +567,7 @@ const take = (G: MachikoroG, obj: { from: number; to: number; amount: number }, 
   const min = Math.min(amount, G.money[from]);
   G.money[from] -= min;
   G.money[to] += min;
+  obj.amount = min; // so that log shows correct amount exchanged
   if (min > 0) G.log_buffer.push(Log.take(obj, name));
 };
 
