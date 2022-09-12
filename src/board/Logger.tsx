@@ -28,7 +28,7 @@ export default class Logger extends React.Component<LogProps, object> {
    * Returns a string that indicates the start of a turn for a given player
    * @param turn Turn number
    * @param repeated_turns Total number of repeated turns so far
-   * @returns 
+   * @returns
    */
   logStartTurn = (turn: number, repeated_turns: number): string => {
     const { ctx, names } = this.props;
@@ -133,8 +133,7 @@ export default class Logger extends React.Component<LogProps, object> {
         // special case for start of new turn
         turn++;
         // if a 'next' player is specified, then a turn was repeated
-        if (entry.action.payload.args && 'next' in entry.action.payload.args)
-          repeated_turns++;
+        if (entry.action.payload.args && 'next' in entry.action.payload.args) repeated_turns++;
         lines.push(this.logStartTurn(turn, repeated_turns));
       } else if (entry.action.type === 'MAKE_MOVE') {
         this.parseLogEntry(entry, lines);
