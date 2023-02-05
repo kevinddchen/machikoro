@@ -1,5 +1,7 @@
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
+import { EventsAPI } from 'boardgame.io/dist/types/src/plugins/plugin-events';
+import { RandomAPI } from 'boardgame.io/dist/types/src/plugins/random/random';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
@@ -183,16 +185,16 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
  * @param G
  * @param ctx
  */
-const rollOne: Move<MachikoroG> = (G, ctx) => {
+const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canRoll(G, ctx, 1)) return INVALID_MOVE;
   G.log_buffer = [];
 
-  G.roll = ctx.random!.Die(6);
+  G.roll = random.Die(6);
   G.numRolls++;
   G.log_buffer.push(Log.rollOne(G.roll));
-  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx);
+  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx, random);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -201,19 +203,19 @@ const rollOne: Move<MachikoroG> = (G, ctx) => {
  * @param G
  * @param ctx
  */
-const rollTwo: Move<MachikoroG> = (G, ctx) => {
+const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canRoll(G, ctx, 2)) return INVALID_MOVE;
   G.log_buffer = [];
 
   const player = parseInt(ctx.currentPlayer);
-  const dice = ctx.random!.Die(6, 2);
+  const dice = random.Die(6, 2);
   if (Land.isOwned(G.land_data, player, Land.AmusementPark)) G.secondTurn = dice[0] === dice[1];
   G.roll = dice[0] + dice[1];
   G.numRolls++;
   G.log_buffer.push(Log.rollTwo(dice));
-  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx);
+  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx, random);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -223,15 +225,15 @@ const rollTwo: Move<MachikoroG> = (G, ctx) => {
  * @param ctx
  * @param roll Forced outcome of the dice.
  */
-const debugRoll: Move<MachikoroG> = (G, ctx, roll: number) => {
+const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
   G.log_buffer = [];
 
   G.roll = roll;
   G.numRolls++;
   G.log_buffer.push(Log.rollOne(roll));
-  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx);
+  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx, random);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -240,13 +242,13 @@ const debugRoll: Move<MachikoroG> = (G, ctx, roll: number) => {
  * @param G
  * @param ctx
  */
-const keepRoll: Move<MachikoroG> = (G, ctx) => {
+const keepRoll: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canCommitRoll(G)) return INVALID_MOVE;
   G.log_buffer = [];
 
-  commitRoll(G, ctx);
+  commitRoll(G, ctx, random);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -255,15 +257,15 @@ const keepRoll: Move<MachikoroG> = (G, ctx) => {
  * @param G
  * @param ctx
  */
-const addTwo: Move<MachikoroG> = (G, ctx) => {
+const addTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canAddTwo(G, ctx)) return INVALID_MOVE;
   G.log_buffer = [];
 
   G.roll += 2;
   G.log_buffer.push(Log.addTwo(G.roll));
-  commitRoll(G, ctx);
+  commitRoll(G, ctx, random);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -273,7 +275,7 @@ const addTwo: Move<MachikoroG> = (G, ctx) => {
  * @param ctx
  * @param est Establishment to buy.
  */
-const buyEst: Move<MachikoroG> = (G, ctx, est: Establishment) => {
+const buyEst: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
   if (!canBuyEst(G, ctx, est)) return INVALID_MOVE;
   G.log_buffer = [];
 
@@ -284,7 +286,7 @@ const buyEst: Move<MachikoroG> = (G, ctx, est: Establishment) => {
   G.justBoughtEst = est;
   G.log_buffer.push(Log.buy(est.name));
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -294,7 +296,7 @@ const buyEst: Move<MachikoroG> = (G, ctx, est: Establishment) => {
  * @param ctx
  * @param land Landmark to buy.
  */
-const buyLand: Move<MachikoroG> = (G, ctx, land: Landmark) => {
+const buyLand: Move<MachikoroG> = ({ G, ctx, events, log }, land: Landmark) => {
   if (!canBuyLand(G, ctx, land)) return INVALID_MOVE;
   G.log_buffer = [];
 
@@ -303,9 +305,9 @@ const buyLand: Move<MachikoroG> = (G, ctx, land: Landmark) => {
   G.money[player] -= land.cost;
   G.state = State.End;
   G.log_buffer.push(Log.buy(land.name));
-  if (canEndGame(G, ctx)) endGame(G, ctx, player);
+  if (canEndGame(G, ctx)) endGame(G, events, player);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -315,7 +317,7 @@ const buyLand: Move<MachikoroG> = (G, ctx, land: Landmark) => {
  * @param ctx
  * @param opponent Player to take money from.
  */
-const doTV: Move<MachikoroG> = (G, ctx, opponent: number) => {
+const doTV: Move<MachikoroG> = ({ G, ctx, log }, opponent: number) => {
   if (!canDoTV(G, ctx, opponent)) return INVALID_MOVE;
   G.log_buffer = [];
 
@@ -324,7 +326,7 @@ const doTV: Move<MachikoroG> = (G, ctx, opponent: number) => {
   G.doTV = false;
   switchState(G, ctx);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -335,14 +337,14 @@ const doTV: Move<MachikoroG> = (G, ctx, opponent: number) => {
  * @param ctx
  * @param est Establishment you own to give up.
  */
-const doOfficePhase1: Move<MachikoroG> = (G, ctx, est: Establishment) => {
+const doOfficePhase1: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
   if (!canDoOfficePhase1(G, ctx, est)) return INVALID_MOVE;
   G.log_buffer = [];
 
   G.officeEst = est;
   G.state = State.OfficePhase2;
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -354,7 +356,7 @@ const doOfficePhase1: Move<MachikoroG> = (G, ctx, est: Establishment) => {
  * @param opponent Player to take an establishment from.
  * @param est Establishment to take.
  */
-const doOfficePhase2: Move<MachikoroG> = (G, ctx, opponent: number, est: Establishment) => {
+const doOfficePhase2: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est: Establishment) => {
   if (!canDoOfficePhase2(G, ctx, opponent, est)) return INVALID_MOVE;
   G.log_buffer = [];
 
@@ -369,7 +371,7 @@ const doOfficePhase2: Move<MachikoroG> = (G, ctx, opponent: number, est: Establi
   }
   switchState(G, ctx);
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log.setMetadata(G.log_buffer);
   return;
 };
 
@@ -378,17 +380,17 @@ const doOfficePhase2: Move<MachikoroG> = (G, ctx, opponent: number, est: Establi
  * @param G
  * @param ctx
  */
-const endTurn: Move<MachikoroG> = (G, ctx) => {
+const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
   if (!canEndTurn(G)) return INVALID_MOVE;
   G.log_buffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   if (G.state === State.Buy && Land.isOwned(G.land_data, player, Land.Airport))
     earn(G, { to: player, amount: 10 }, Land.Airport.name);
-  if (G.secondTurn) ctx.events!.endTurn({ next: player.toString() });
-  else ctx.events!.endTurn();
+  if (G.secondTurn) events.endTurn({ next: player.toString() });
+  else events.endTurn();
 
-  ctx.log?.setMetadata(G.log_buffer);
+  log?.setMetadata(G.log_buffer);
   return;
 };
 
@@ -399,7 +401,7 @@ const endTurn: Move<MachikoroG> = (G, ctx) => {
  * @param G
  * @param ctx
  */
-const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
+const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
   const currentPlayer = parseInt(ctx.currentPlayer);
 
   // Do Red establishments.
@@ -436,7 +438,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
       if (count === 0) continue;
 
       let base = est.base;
-      if (Est.isEqual(est, Est.TunaBoat)) base = getTunaRoll(G, ctx);
+      if (Est.isEqual(est, Est.TunaBoat)) base = getTunaRoll(G, random);
 
       earn(G, { to: player, amount: base * count }, est.name);
     }
@@ -577,9 +579,9 @@ const take = (G: MachikoroG, obj: { from: number; to: number; amount: number }, 
  * @param ctx
  * @returns Dice roll.
  */
-const getTunaRoll = (G: MachikoroG, ctx: Ctx): number => {
+const getTunaRoll = (G: MachikoroG, random: RandomAPI): number => {
   if (!G.tunaRoll) {
-    const dice = ctx.random!.Die(6, 2);
+    const dice = random.Die(6, 2);
     G.tunaRoll = dice[0] + dice[1];
     G.log_buffer.push(Log.tunaRoll(G.tunaRoll));
   }
@@ -611,9 +613,9 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
  * @param ctx
  * @param winner ID of the winning player.
  */
-const endGame = (G: MachikoroG, ctx: Ctx, winner: number): void => {
+const endGame = (G: MachikoroG, events: EventsAPI, winner: number): void => {
   G.log_buffer.push(Log.endGame(winner));
-  ctx.events!.endGame();
+  events.endGame();
 };
 
 // --- Game -------------------------------------------------------------------
@@ -643,7 +645,7 @@ export const Machikoro: Game<MachikoroG> = {
   name: GAME_NAME,
 
   // `setupData` is set in src/lobby/Lobby.js
-  setup: (ctx, setupData?) => {
+  setup: ({ ctx, random }, setupData) => {
     if (!setupData) setupData = debugSetupData;
     const { expansion, supplyVariant, startCoins, randomizeTurnOrder } = setupData;
     const { numPlayers } = ctx;
@@ -654,9 +656,9 @@ export const Machikoro: Game<MachikoroG> = {
     const money = Array(numPlayers).fill(startCoins);
 
     // shuffle deck and play order
-    for (let i = 0; i < decks.length; i++) decks[i] = ctx.random!.Shuffle(decks[i]);
+    for (let i = 0; i < decks.length; i++) decks[i] = random.Shuffle(decks[i]);
     let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
-    if (randomizeTurnOrder) _playOrder = ctx.random!.Shuffle(_playOrder);
+    if (randomizeTurnOrder) _playOrder = random.Shuffle(_playOrder);
 
     const G: MachikoroG = {
       ...newTurnG,
@@ -685,7 +687,7 @@ export const Machikoro: Game<MachikoroG> = {
   },
 
   turn: {
-    onBegin: (G) => {
+    onBegin: ({ G }) => {
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
     },
@@ -721,5 +723,5 @@ export const Machikoro: Game<MachikoroG> = {
     endTurn: endTurn,
   },
 
-  playerView: PlayerView.STRIP_SECRETS,
+  playerView: PlayerView.STRIP_SECRETS!,
 };
