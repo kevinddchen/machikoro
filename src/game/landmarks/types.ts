@@ -21,7 +21,7 @@ export type Landmark = {
 /**
  * JSON-serializable object keeping track of landmark-related data during a
  * game. Should only be accessed within this module.
- * @prop _in_use - Array tracking which landmarks are in use. Indexed by
+ * @prop _inUse - Array tracking which landmarks are in use. Indexed by
  * landmark ID.
  * @prop _owned - Array tracking which landmarks are owned by each player.
  * Indexed by landmark ID then by player number.

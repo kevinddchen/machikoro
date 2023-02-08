@@ -3,13 +3,12 @@
 //
 
 import * as Metadata from './metadata';
+import * as Types from './types';
 import { Expansion } from '../types';
 
-import type * as Types from './types';
 import type { MachikoroG } from '../types';
 
-export { Metadata };
-export type { Types };
+export { Metadata, Types };
 
 type Landmark = Types.Landmark;
 type _LandmarkData = Types._LandmarkData;
@@ -47,13 +46,7 @@ export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => 
  * @returns List of all landmarks that are in use for this game.
  */
 export const getAllInUse = (G: MachikoroG): Landmark[] => {
-  const lands: Landmark[] = [];
-  for (const land of Metadata.LANDMARKS) {
-    if (isInUse(G, land)) {
-      lands.push(land);
-    }
-  }
-  return lands;
+  return Metadata.LANDMARKS.filter((land) => isInUse(G, land));
 };
 
 /**
@@ -62,13 +55,7 @@ export const getAllInUse = (G: MachikoroG): Landmark[] => {
  * @returns List of all landmarks owned by the player.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
-  const lands: Landmark[] = [];
-  for (const land of Metadata.LANDMARKS) {
-    if (owns(G, player, land)) {
-      lands.push(land);
-    }
-  }
-  return lands;
+  return Metadata.LANDMARKS.filter((land) => owns(G, player, land));
 };
 
 /**
@@ -84,11 +71,11 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
 /**
  * Initialize the landmark data for a game by modifying `G`.
  * @param G
- * @param expansion
- * @param numPlayers
  */
-export const initialize = (G: MachikoroG, expansion: Expansion, numPlayers: number): void => {
+export const initialize = (G: MachikoroG): void => {
+  const { expansion, numPlayers } = G;
   const numLands = Metadata.LANDMARKS.length;
+
   const data: _LandmarkData = {
     _inUse: Array(numLands).fill(false),
     _owned: Array(numLands).fill(Array(numPlayers).fill(false)),
@@ -98,11 +85,11 @@ export const initialize = (G: MachikoroG, expansion: Expansion, numPlayers: numb
   let ids: number[];
   switch (expansion) {
     case Expansion.Base: {
-      ids = Metadata.BASE_LANDMARK_IDS;
+      ids = Metadata._BASE_LANDMARK_IDS;
       break;
     }
     case Expansion.Harbor: {
-      ids = Metadata.HARBOR_LANDMARK_IDS;
+      ids = Metadata._HARBOR_LANDMARK_IDS;
       break;
     }
     default:

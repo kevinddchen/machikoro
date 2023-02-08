@@ -1,5 +1,5 @@
 //
-// Metadata for landmarks.
+// Game metadata for landmarks.
 //
 
 import type { Landmark } from './types';
@@ -57,12 +57,17 @@ export const Airport: Landmark = {
  */
 export const LANDMARKS: Landmark[] = [Harbor, TrainStation, ShoppingMall, AmusementPark, RadioTower, Airport];
 
-/*
+/**
+ * List of all landmarks, sorted by ID.
+ */
+export const _LANDMARKS_BY_ID: Landmark[] = [...LANDMARKS].sort((a, b) => a._id - b._id);
+
+/**
  * Landmarks used in the Base expansion.
  */
-export const BASE_LANDMARK_IDS: number[] = [0, 1, 2, 3];
+export const _BASE_LANDMARK_IDS: number[] = [0, 1, 2, 3];
 
-/*
+/**
  * Landmarks used in the Harbor expansion.
  */
-export const HARBOR_LANDMARK_IDS: number[] = [0, 1, 2, 3, 4, 5];
+export const _HARBOR_LANDMARK_IDS: number[] = [0, 1, 2, 3, 4, 5];
