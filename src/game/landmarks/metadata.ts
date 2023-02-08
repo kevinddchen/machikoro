@@ -1,11 +1,15 @@
-import type { Landmark } from '../types';
+//
+// Metadata for landmarks.
+//
+
+import type { Landmark } from './types';
 
 export const TrainStation: Landmark = {
   _id: 0,
   name: 'Train Station',
   description: '',
   cost: 4,
-  image_filename: 'land0.gif',
+  imageFilename: 'land0.gif',
 };
 
 export const ShoppingMall: Landmark = {
@@ -13,7 +17,7 @@ export const ShoppingMall: Landmark = {
   name: 'Shopping Mall',
   description: '',
   cost: 10,
-  image_filename: 'land1.gif',
+  imageFilename: 'land1.gif',
 };
 
 export const AmusementPark: Landmark = {
@@ -21,7 +25,7 @@ export const AmusementPark: Landmark = {
   name: 'Amusement Park',
   description: '',
   cost: 16,
-  image_filename: 'land2.gif',
+  imageFilename: 'land2.gif',
 };
 
 export const RadioTower: Landmark = {
@@ -29,7 +33,7 @@ export const RadioTower: Landmark = {
   name: 'Radio Tower',
   description: '',
   cost: 22,
-  image_filename: 'land3.gif',
+  imageFilename: 'land3.gif',
 };
 
 export const Harbor: Landmark = {
@@ -37,7 +41,7 @@ export const Harbor: Landmark = {
   name: 'Harbor',
   description: '',
   cost: 2,
-  image_filename: 'land5.png',
+  imageFilename: 'land5.png',
 };
 
 export const Airport: Landmark = {
@@ -45,14 +49,20 @@ export const Airport: Landmark = {
   name: 'Airport',
   description: '',
   cost: 30,
-  image_filename: 'land6.png',
+  imageFilename: 'land6.png',
 };
 
-// this array also sets the order landmarks are displayed
-export const all_landmarks: Landmark[] = [Harbor, TrainStation, ShoppingMall, AmusementPark, RadioTower, Airport];
+/**
+ * List of all landmarks, and order they should be displayed.
+ */
+export const LANDMARKS: Landmark[] = [Harbor, TrainStation, ShoppingMall, AmusementPark, RadioTower, Airport];
 
-// ids of landmarks used in base game
-export const base_landmark_ids: number[] = [0, 1, 2, 3];
+/*
+ * Landmarks used in the Base expansion.
+ */
+export const BASE_LANDMARK_IDS: number[] = [0, 1, 2, 3];
 
-// ids of landmarks used in harbor expansion
-export const harbor_landmark_ids: number[] = [0, 1, 2, 3, 4, 5];
+/*
+ * Landmarks used in the Harbor expansion.
+ */
+export const HARBOR_LANDMARK_IDS: number[] = [0, 1, 2, 3, 4, 5];
