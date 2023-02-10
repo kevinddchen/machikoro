@@ -1,67 +1,74 @@
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { EventsAPI } from 'boardgame.io/dist/types/src/plugins/plugin-events';
-import { RandomAPI } from 'boardgame.io/dist/types/src/plugins/random/random';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
-import { CardType, Color, Expansion, State, SupplyVariant } from './enums';
-import type { Establishment, Landmark, MachikoroG } from './types';
+import { Expansion, SupplyVariant, TurnState } from './types';
+import { EstColor, EstType } from './establishments/types';
 
-/**
- * === Machikoro core game logic ===
- *
- * We use the `boardgame.io` framework: https://boardgame.io/. It handles all
- * interactions between the client and the server. All what we have to do is
- * define the `Machikoro` object at the bottom on this file.
- *
- * `G` is an object that represents the game state.
- * `ctx` is a read-only object that contains some useful metadata.
- *
- * Functions that have the name `can___Q` are queries whether a move is legal or
- * not, and return boolean values. These used internally and are also passed to
- * the client to render things correctly.
- *
- * === Internal ===
- *
- * `G.state` tracks the player's internal state. The possible values are
- *    roll: rolling dice
- *    tv: doing tv action
- *    office1: doing office action, picking own establishment
- *    office2: doing office action, picking opponent establishment
- *    buy: buy an establishment
- *    end: player is done everything, but can undo if they wish
- */
+import type { Landmark } from './landmarks/types';
+import type { Establishment } from './establishments/types';
+import type { MachikoroG } from './types';
+
+//
+// === Machikoro ===
+//
+// We use the `boardgame.io` framework: https://boardgame.io/. It handles all
+// interactions between the client and the server. We just have to define the
+// `Machikoro` Game object at the bottom on this file.
+//
+// `G` is an object that represents the game state. Its contents are defined by
+// the `MachikoroG` type. The object itself can only be modified by Move
+// functions. This is a feature of the `boardgame.io` framework.
+//
+// `ctx` is a read-only object that contains some useful metadata. There are
+// some other important plugins, such as `random` and `events`.
+//
 
 export const GAME_NAME = 'machikoro';
 
-// --- Queries ----------------------------------------------------------------
-// These functions are used to internally to check whether a move is legal or
-// not, and externally for the client to render things correctly.
+//
+// === Queries ===
+//
+// These functions do not modify `G` and are exported for use in the client.
+//
+
+/**
+ * @param G
+ * @param player
+ * @returns The number of coins owned by the player.
+ */
+export const getCoins = (G: MachikoroG, player: number): number => {
+  return G._money[player];
+};
 
 /**
  * @param G
  * @param ctx
- * @param n Number of dice to roll.
+ * @param n - Number of dice to roll.
  * @returns True if the current player can roll `n` number of dice.
  */
 export const canRoll = (G: MachikoroG, ctx: Ctx, n: number): boolean => {
   const player = parseInt(ctx.currentPlayer);
   return (
-    G.state === State.Roll &&
-    (n === 1 || (n === 2 && Land.isOwned(G.land_data, player, Land.TrainStation))) &&
-    (G.numRolls === 0 || (G.numRolls === 1 && Land.isOwned(G.land_data, player, Land.RadioTower)))
+    G.turnState === TurnState.Roll &&
+    // can always roll 1 die, can roll 2 if you own train station
+    (n === 1 || (n === 2 && Land.owns(G, player, Land.Meta.TrainStation))) &&
+    // can reroll if you own radio tower
+    (G.numRolls === 0 || (G.numRolls === 1 && Land.owns(G, player, Land.Meta.RadioTower)))
   );
 };
 
 /**
  * @param G
  * @returns True if the current player has rolled the dice and can proceed
- *  to evaluate its outcome.
+ * to evaluate its outcome.
  */
 export const canCommitRoll = (G: MachikoroG): boolean => {
-  return G.state === State.Roll && G.numRolls > 0;
+  // need to have rolled the dice
+  return G.turnState === TurnState.Roll && G.numRolls > 0;
 };
 
 /**
@@ -71,90 +78,107 @@ export const canCommitRoll = (G: MachikoroG): boolean => {
  */
 export const canAddTwo = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  return canCommitRoll(G) && Land.isOwned(G.land_data, player, Land.Harbor) && G.roll >= 10;
+  // need to own harbor and roll a 10 or higher
+  return canCommitRoll(G) && Land.owns(G, player, Land.Meta.Harbor) && G.roll! >= 10; // G.roll not null via canCommitRoll() check
 };
 
 /**
  * @param G
  * @param ctx
- * @returns True if the current player cannot roll the dice or activate Harbor.
+ * @returns True if the current player cannot modify the dice roll any further.
  */
-export const canSkipConfirmation = (G: MachikoroG, ctx: Ctx): boolean => {
+export const noFurtherRollActions = (G: MachikoroG, ctx: Ctx): boolean => {
   return !(canAddTwo(G, ctx) || canRoll(G, ctx, 1) || canRoll(G, ctx, 2));
 };
 
 /**
  * @param G
  * @param ctx
- * @param est Establishment to buy.
- * @returns True if the current player can buy the establishment `est`.
+ * @param est
+ * @returns True if the current player can buy the establishment.
  */
 export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
   return (
-    G.state === State.Buy &&
-    Est.isInUse(G.est_data, est) &&
-    Est.countAvailable(G.est_data, est) > 0 &&
-    G.money[player] >= est.cost &&
-    (est.color === Color.Purple ? Est.countOwned(G.est_data, player, est) === 0 : true) // only own unique purples
+    G.turnState === TurnState.Buy &&
+    // establishment is available for purchase
+    Est.countAvailable(G, est) > 0 &&
+    // player has enough coins
+    getCoins(G, player) >= est.cost &&
+    // if establishment is purple, player does not already own it
+    (est.color === EstColor.Purple ? Est.countOwned(G, player, est) === 0 : true)
   );
 };
 
 /**
  * @param G
  * @param ctx
- * @param land Landmark to buy.
- * @returns True if the current player can buy the landmark `land`.
+ * @param land
+ * @returns True if the current player can buy the landmark.
  */
 export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => {
   const player = parseInt(ctx.currentPlayer);
   return (
-    G.state === State.Buy &&
-    Land.isInUse(G.land_data, land) &&
-    !Land.isOwned(G.land_data, player, land) &&
-    G.money[player] >= land.cost
+    G.turnState === TurnState.Buy &&
+    // landmark is in use
+    Land.isInUse(G, land) &&
+    // player does not currently own the landmark
+    !Land.owns(G, player, land) &&
+    // player has enough coins
+    getCoins(G, player) >= land.cost
   );
 };
 
 /**
  * @param G
  * @param ctx
- * @param opponent Player to take money from.
- * @returns True if the current player can take money from the player, as a TV
- *  action.
+ * @param opponent
+ * @returns True if the current player can take coins from the opponent as a TV
+ * action.
  */
 export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  return G.state === State.TV && opponent !== player;
+  // cannot take from self
+  return G.turnState === TurnState.TV && opponent !== player;
 };
 
 /**
  * @param G
  * @param ctx
- * @param est Establishment the current player owns to give up.
- * @returns True if the current player can pick `est` as the establishment to
- *  give up, as the first phase of the office action.
+ * @param est
+ * @returns True if the current player can pick the establishment to give up,
+ * as part of the office action.
  */
-export const canDoOfficePhase1 = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
+export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  return G.state === State.OfficePhase1 && Est.countOwned(G.est_data, player, est) > 0 && est.color !== Color.Purple;
+  // must pick own establishment that is not purple
+  return (
+    G.turnState === TurnState.OfficeGive &&
+    // must own the establishment
+    Est.countOwned(G, player, est) > 0 &&
+    // cannot give purple
+    est.color !== EstColor.Purple
+  );
 };
 
 /**
  * @param G
  * @param ctx
- * @param opponent Player to take an establishment from.
- * @param est Establishment to take.
- * @returns True if the current player can take a player's establishment, as
- *  the second phase of the office action.
+ * @param opponent
+ * @param est
+ * @returns True if the current player can take the opponent's establishment,
+ * as the second phase of the office action.
  */
-export const canDoOfficePhase2 = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
+export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
   return (
-    G.state === State.OfficePhase2 &&
+    G.turnState === TurnState.OfficeTake &&
+    // cannot be take from self
     opponent !== player &&
-    Est.countOwned(G.est_data, opponent, est) > 0 &&
-    est.color !== Color.Purple
+    // opponent must own the establishment
+    Est.countOwned(G, opponent, est) > 0 &&
+    // cannot take purple
+    est.color !== EstColor.Purple
   );
 };
 
@@ -163,7 +187,7 @@ export const canDoOfficePhase2 = (G: MachikoroG, ctx: Ctx, opponent: number, est
  * @returns True if the current player can end their turn.
  */
 export const canEndTurn = (G: MachikoroG): boolean => {
-  return G.state === State.Buy || G.state === State.End;
+  return G.turnState === TurnState.Buy || G.turnState === TurnState.End;
 };
 
 /**
@@ -173,12 +197,20 @@ export const canEndTurn = (G: MachikoroG): boolean => {
  */
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  for (const land of Land.getAllInUse(G.land_data)) if (!Land.isOwned(G.land_data, player, land)) return false;
+  // a player has won if they own all landmarks in use
+  for (const land of Land.getAllInUse(G)) {
+    if (!Land.owns(G, player, land)) {
+      return false;
+    }
+  }
   return true;
 };
 
-// --- Moves ------------------------------------------------------------------
-// These are moves the player can make, and are called in the `Game` object.
+//
+// === Moves ===
+//
+// These functions are Moves.
+//
 
 /**
  * Roll one die.
@@ -186,15 +218,23 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
  * @param ctx
  */
 const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
-  if (!canRoll(G, ctx, 1)) return INVALID_MOVE;
-  G.log_buffer = [];
+  if (!canRoll(G, ctx, 1)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
   G.roll = random.Die(6);
-  G.numRolls++;
-  G.log_buffer.push(Log.rollOne(G.roll));
-  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx, random);
+  G.numRolls += 1;
+  G._logBuffer.push(Log.rollOne(G.roll));
 
-  log.setMetadata(G.log_buffer);
+  // save a tuna roll, in case it's needed later
+  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+
+  if (noFurtherRollActions(G, ctx)) {
+    commitRoll(G, ctx);
+  }
+
+  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -204,36 +244,58 @@ const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
  * @param ctx
  */
 const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
-  if (!canRoll(G, ctx, 2)) return INVALID_MOVE;
-  G.log_buffer = [];
+  if (!canRoll(G, ctx, 2)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   const dice = random.Die(6, 2);
-  if (Land.isOwned(G.land_data, player, Land.AmusementPark)) G.secondTurn = dice[0] === dice[1];
-  G.roll = dice[0] + dice[1];
-  G.numRolls++;
-  G.log_buffer.push(Log.rollTwo(dice));
-  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx, random);
 
-  log.setMetadata(G.log_buffer);
+  // if player owns an amusement park, they get a second turn
+  if (Land.owns(G, player, Land.Meta.AmusementPark)) {
+    G.secondTurn = dice[0] === dice[1];
+  }
+
+  G.roll = dice[0] + dice[1];
+  G.numRolls += 1;
+  G._logBuffer.push(Log.rollTwo(dice));
+
+  // save a tuna roll, in case it's needed later
+  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+
+  if (noFurtherRollActions(G, ctx)) {
+    commitRoll(G, ctx);
+  }
+
+  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
- * Force roll outcome; this move is removed in production.
+ * Force the outcome of the dice roll. This move is removed in production.
  * @param G
  * @param ctx
- * @param roll Forced outcome of the dice.
+ * @param roll - Desired dice total.
  */
 const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
-  G.log_buffer = [];
+  if (!canRoll(G, ctx, 1)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
   G.roll = roll;
-  G.numRolls++;
-  G.log_buffer.push(Log.rollOne(roll));
-  if (canSkipConfirmation(G, ctx)) commitRoll(G, ctx, random);
+  G.numRolls += 1;
+  G._logBuffer.push(Log.rollOne(roll));
 
-  log.setMetadata(G.log_buffer);
+  // save a tuna roll, in case it's needed later
+  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+
+  if (noFurtherRollActions(G, ctx)) {
+    commitRoll(G, ctx);
+  }
+
+  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -242,13 +304,15 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
  * @param G
  * @param ctx
  */
-const keepRoll: Move<MachikoroG> = ({ G, ctx, random, log }) => {
-  if (!canCommitRoll(G)) return INVALID_MOVE;
-  G.log_buffer = [];
+const keepRoll: Move<MachikoroG> = ({ G, ctx, log }) => {
+  if (!canCommitRoll(G)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
-  commitRoll(G, ctx, random);
+  commitRoll(G, ctx);
 
-  log.setMetadata(G.log_buffer);
+  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -257,15 +321,17 @@ const keepRoll: Move<MachikoroG> = ({ G, ctx, random, log }) => {
  * @param G
  * @param ctx
  */
-const addTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
-  if (!canAddTwo(G, ctx)) return INVALID_MOVE;
-  G.log_buffer = [];
+const addTwo: Move<MachikoroG> = ({ G, ctx, log }) => {
+  if (!canAddTwo(G, ctx)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
-  G.roll += 2;
-  G.log_buffer.push(Log.addTwo(G.roll));
-  commitRoll(G, ctx, random);
+  G.roll! += 2; // G.roll not null via canAddTwo() check
+  G._logBuffer.push(Log.addTwo(G.roll!));
+  commitRoll(G, ctx);
 
-  log.setMetadata(G.log_buffer);
+  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -273,20 +339,23 @@ const addTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
  * Buy an establishment.
  * @param G
  * @param ctx
- * @param est Establishment to buy.
+ * @param est
  */
 const buyEst: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
-  if (!canBuyEst(G, ctx, est)) return INVALID_MOVE;
-  G.log_buffer = [];
+  if (!canBuyEst(G, ctx, est)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
-  Est.buy(G.est_data, player, est);
-  G.money[player] -= est.cost;
-  G.state = State.End;
+  Est.buy(G, player, est);
+  setCoins(G, player, -est.cost);
   G.justBoughtEst = est;
-  G.log_buffer.push(Log.buy(est.name));
+  G._logBuffer.push(Log.buy(est.name));
 
-  log.setMetadata(G.log_buffer);
+  G.turnState = TurnState.End;
+
+  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -294,84 +363,92 @@ const buyEst: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
  * Buy a landmark.
  * @param G
  * @param ctx
- * @param land Landmark to buy.
+ * @param land
  */
 const buyLand: Move<MachikoroG> = ({ G, ctx, events, log }, land: Landmark) => {
-  if (!canBuyLand(G, ctx, land)) return INVALID_MOVE;
-  G.log_buffer = [];
+  if (!canBuyLand(G, ctx, land)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
-  Land.buy(G.land_data, player, land);
-  G.money[player] -= land.cost;
-  G.state = State.End;
-  G.log_buffer.push(Log.buy(land.name));
-  if (canEndGame(G, ctx)) endGame(G, events, player);
+  Land.buy(G, player, land);
+  setCoins(G, player, -land.cost);
+  G._logBuffer.push(Log.buy(land.name));
 
-  log.setMetadata(G.log_buffer);
+  G.turnState = TurnState.End;
+  if (canEndGame(G, ctx)) {
+    endGame(G, events, player);
+  }
+
+  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
- * Activate the TV establishment.
+ * Activate the TV establishment by picking an opponent to take 5 coins from.
  * @param G
  * @param ctx
- * @param opponent Player to take money from.
+ * @param opponent
  */
 const doTV: Move<MachikoroG> = ({ G, ctx, log }, opponent: number) => {
-  if (!canDoTV(G, ctx, opponent)) return INVALID_MOVE;
-  G.log_buffer = [];
-
-  const player = parseInt(ctx.currentPlayer);
-  take(G, { from: opponent, to: player, amount: 5 }, Est.TVStation.name);
-  G.doTV = false;
-  switchState(G, ctx);
-
-  log.setMetadata(G.log_buffer);
-  return;
-};
-
-/**
- * Activate the office establishment. For the first phase, pick an
- * establishment you own to give up.
- * @param G
- * @param ctx
- * @param est Establishment you own to give up.
- */
-const doOfficePhase1: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
-  if (!canDoOfficePhase1(G, ctx, est)) return INVALID_MOVE;
-  G.log_buffer = [];
-
-  G.officeEst = est;
-  G.state = State.OfficePhase2;
-
-  log.setMetadata(G.log_buffer);
-  return;
-};
-
-/**
- * Activate the office establishment. For the second phase, pick an
- * establishment an opponent owns to take.
- * @param G
- * @param ctx
- * @param opponent Player to take an establishment from.
- * @param est Establishment to take.
- */
-const doOfficePhase2: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est: Establishment) => {
-  if (!canDoOfficePhase2(G, ctx, opponent, est)) return INVALID_MOVE;
-  G.log_buffer = [];
-
-  const player = parseInt(ctx.currentPlayer);
-  if (G.officeEst) {
-    Est.transfer(G.est_data, { from: player, to: opponent, est: G.officeEst });
-    Est.transfer(G.est_data, { from: opponent, to: player, est: est });
-    G.doOffice = false;
-    G.log_buffer.push(Log.office({ player_est_name: G.officeEst.name, opponent_est_name: est.name }, opponent));
-  } else {
-    throw Error('Unexpected error: `G.officeEst` is not set.');
+  if (!canDoTV(G, ctx, opponent)) {
+    return INVALID_MOVE;
   }
+  G._logBuffer = [];
+
+  const player = parseInt(ctx.currentPlayer);
+  take(G, { from: opponent, to: player }, Est.Meta.TVStation.earnings, Est.Meta.TVStation.name);
+
   switchState(G, ctx);
 
-  log.setMetadata(G.log_buffer);
+  log.setMetadata(G._logBuffer);
+  return;
+};
+
+/**
+ * Activate the office establishment by picking an establishment you own to
+ * give up.
+ * @param G
+ * @param ctx
+ * @param est
+ */
+const doOfficeGive: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
+  if (!canDoOfficeGive(G, ctx, est)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
+
+  G.officeGiveEst = est;
+  G.turnState = TurnState.OfficeTake;
+
+  log.setMetadata(G._logBuffer);
+  return;
+};
+
+/**
+ * Activate the office establishment by picking an establishment an opponent
+ * owns to take.
+ * @param G
+ * @param ctx
+ * @param opponent
+ * @param est
+ */
+const doOfficeTake: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est: Establishment) => {
+  if (!canDoOfficeTake(G, ctx, opponent, est)) return INVALID_MOVE;
+  G._logBuffer = [];
+
+  const player = parseInt(ctx.currentPlayer);
+  if (!G.officeGiveEst) {
+    throw Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
+  }
+  Est.transfer(G, { from: player, to: opponent, est: G.officeGiveEst });
+  Est.transfer(G, { from: opponent, to: player, est });
+  G._logBuffer.push(Log.office({ player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent));
+
+  switchState(G, ctx);
+
+  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -381,142 +458,177 @@ const doOfficePhase2: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est
  * @param ctx
  */
 const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
-  if (!canEndTurn(G)) return INVALID_MOVE;
-  G.log_buffer = [];
+  if (!canEndTurn(G)) {
+    return INVALID_MOVE;
+  }
+  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
-  if (G.state === State.Buy && Land.isOwned(G.land_data, player, Land.Airport))
-    earn(G, { to: player, amount: 10 }, Land.Airport.name);
-  if (G.secondTurn) events.endTurn({ next: player.toString() });
-  else events.endTurn();
+  // a player earns coins via the airport if they did not buy anything
+  if (G.turnState === TurnState.Buy && Land.owns(G, player, Land.Meta.Airport)) {
+    earn(G, player, Land.Meta.AIRPORT_EARNINGS, Land.Meta.Airport.name);
+  }
 
-  log?.setMetadata(G.log_buffer);
+  // check second turn
+  if (G.secondTurn) {
+    events.endTurn({ next: player.toString() });
+  } else {
+    events.endTurn();
+  }
+
+  log.setMetadata(G._logBuffer);
   return;
 };
 
-// --- Helpers ----------------------------------------------------------------
+//
+// === Move Helpers ===
+//
+// These functions are used by Moves, and may modify `G`.
+//
+
+/**
+ * Modify a player's coins by the given amount.
+ * @param G
+ * @param player
+ * @param amount - Number of coins to give to the player. Can be negative.
+ */
+const setCoins = (G: MachikoroG, player: number, amount: number): void => {
+  G._money[player] += amount;
+};
 
 /**
  * Evaluate the outcome of the roll by performing establishment actions.
  * @param G
  * @param ctx
  */
-const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
+const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
   const currentPlayer = parseInt(ctx.currentPlayer);
+  const roll = G.roll!;
 
   // Do Red establishments.
-  let ests = Est.getAllInUse(G.est_data).filter((est) => est.color === Color.Red && est.activation.includes(G.roll));
+  const all_ests = Est.getAllInUse(G);
+  const red_ests = all_ests.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
-    for (const est of ests) {
-      // normal: Cafe, Restaurant, PizzaJoint, HamburgerStand
-      // special: SushiBar
-      if (Est.isEqual(est, Est.SushiBar) && !Land.isOwned(G.land_data, opponent, Land.Harbor)) continue;
+    for (const est of red_ests) {
+      // sushi bar requires Harbor
+      if (Est.isEqual(est, Est.Meta.SushiBar) && !Land.owns(G, opponent, Land.Meta.Harbor)) {
+        continue;
+      }
 
-      const count = Est.countOwned(G.est_data, opponent, est);
-      if (count === 0) continue;
+      const count = Est.countOwned(G, opponent, est);
 
-      let base = est.base;
-      if (est.type === CardType.Cup && Land.isOwned(G.land_data, opponent, Land.ShoppingMall)) base += 1;
+      // all red establishments take `est.earnings` coins from the player
+      let earnings = est.earnings;
+      // +1 coin if opponent owns Shopping Mall
+      if (est.type === EstType.Cup && Land.owns(G, opponent, Land.Meta.ShoppingMall)) {
+        earnings += 1;
+      }
 
-      take(G, { from: currentPlayer, to: opponent, amount: base * count }, est.name);
+      const amount = earnings * count;
+      take(G, { from: currentPlayer, to: opponent }, amount, est.name);
     }
   }
 
   // Do Blue establishments.
-  ests = Est.getAllInUse(G.est_data).filter((est) => est.color === Color.Blue && est.activation.includes(G.roll));
+  const blue_ests = all_ests.filter((est) => est.color === EstColor.Blue && est.rolls.includes(roll));
   for (const player of getNextPlayers(ctx)) {
-    for (const est of ests) {
-      // normal: WheatField, LivestockFarm, Forest, Mine, AppleOrchard, FlowerOrchard,
-      // special: MackerelBoat, TunaBoat
+    for (const est of blue_ests) {
+      // mackerel boat and tuna boat require Harbor
       if (
-        (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) &&
-        !Land.isOwned(G.land_data, player, Land.Harbor)
-      )
+        (Est.isEqual(est, Est.Meta.MackerelBoat) || Est.isEqual(est, Est.Meta.TunaBoat)) &&
+        !Land.owns(G, player, Land.Meta.Harbor)
+      ) {
         continue;
+      }
 
-      const count = Est.countOwned(G.est_data, player, est);
-      if (count === 0) continue;
+      const count = Est.countOwned(G, player, est);
 
-      let base = est.base;
-      if (Est.isEqual(est, Est.TunaBoat)) base = getTunaRoll(G, random);
+      // tuna boat earnings are based off the tuna roll
+      // all other blue establishments take `est.earnings` coins from the player
+      let earnings;
+      if (Est.isEqual(est, Est.Meta.TunaBoat)) {
+        earnings = getTunaRoll(G);
+      } else {
+        earnings = est.earnings;
+      }
 
-      earn(G, { to: player, amount: base * count }, est.name);
+      const amount = earnings * count;
+      earn(G, player, amount, est.name);
     }
   }
 
   // Do Green establishments.
-  ests = Est.getAllInUse(G.est_data).filter((est) => est.color === Color.Green && est.activation.includes(G.roll));
-  for (const est of ests) {
-    // normal: Bakery, ConvenienceStore
-    // special: CheeseFactory, FurnitureFactory, ProduceMarket, FlowerShop, FoodWarehouse
-    const count = Est.countOwned(G.est_data, currentPlayer, est);
-    if (count === 0) continue;
+  const green_ests = all_ests.filter((est) => est.color === EstColor.Green && est.rolls.includes(roll));
+  for (const est of green_ests) {
+    const count = Est.countOwned(G, currentPlayer, est);
 
-    let base = est.base;
-    if (est.type === CardType.Shop && Land.isOwned(G.land_data, currentPlayer, Land.ShoppingMall)) base += 1;
+    let earnings = est.earnings;
+    // +1 coin to shops if player owns Shopping Mall
+    if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.Meta.ShoppingMall)) {
+      earnings += 1;
+    }
 
+    // by default a green establishment earns `multiplier * earnings = 1 * earnings`
+    // but there are many special cases where `multiplier` is not 1.
     let multiplier = 1;
-    if (Est.isEqual(est, Est.CheeseFactory))
-      multiplier = Est.countTypeOwned(G.est_data, currentPlayer, CardType.Animal);
-    else if (Est.isEqual(est, Est.FurnitureFactory))
-      multiplier = Est.countTypeOwned(G.est_data, currentPlayer, CardType.Gear);
-    else if (Est.isEqual(est, Est.ProduceMarket))
-      multiplier = Est.countTypeOwned(G.est_data, currentPlayer, CardType.Wheat);
-    else if (Est.isEqual(est, Est.FlowerShop))
-      multiplier = Est.countOwned(G.est_data, currentPlayer, Est.FlowerOrchard);
-    else if (Est.isEqual(est, Est.FoodWarehouse))
-      multiplier = Est.countTypeOwned(G.est_data, currentPlayer, CardType.Cup);
+    if (Est.isEqual(est, Est.Meta.CheeseFactory)) {
+      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
+    } else if (Est.isEqual(est, Est.Meta.FurnitureFactory)) {
+      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
+    } else if (Est.isEqual(est, Est.Meta.ProduceMarket)) {
+      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
+    } else if (Est.isEqual(est, Est.Meta.FlowerShop)) {
+      multiplier = Est.countOwned(G, currentPlayer, Est.Meta.FlowerOrchard);
+    } else if (Est.isEqual(est, Est.Meta.FoodWarehouse)) {
+      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
+    }
 
-    earn(G, { to: currentPlayer, amount: base * multiplier * count }, est.name);
+    const amount = earnings * multiplier * count;
+    earn(G, currentPlayer, amount, est.name);
   }
 
   // Do Purple establishments.
-  ests = Est.getAllInUse(G.est_data).filter((est) => est.color === Color.Purple && est.activation.includes(G.roll));
-  for (const est of ests) {
-    // normal: -
-    // special: Stadium, TVStation, Office, Publisher, TaxOffice
-    if (Est.countOwned(G.est_data, currentPlayer, est) === 0) continue;
+  const purple_ests = all_ests.filter((est) => est.color === EstColor.Purple && est.rolls.includes(roll));
+  for (const est of purple_ests) {
+    if (Est.countOwned(G, currentPlayer, est) === 0) {
+      continue;
+    }
 
-    if (Est.isEqual(est, Est.Stadium))
-      for (const opponent of getPreviousPlayers(ctx))
-        take(G, { from: opponent, to: currentPlayer, amount: est.base }, est.name);
-    else if (Est.isEqual(est, Est.TVStation)) G.doTV = true;
-    else if (Est.isEqual(est, Est.Office)) G.doOffice = true;
-    else if (Est.isEqual(est, Est.Publisher))
+    // each purple establishment has its own effect
+    if (Est.isEqual(est, Est.Meta.Stadium)) {
       for (const opponent of getPreviousPlayers(ctx)) {
-        const count =
-          Est.countTypeOwned(G.est_data, opponent, CardType.Cup) +
-          Est.countTypeOwned(G.est_data, opponent, CardType.Shop);
-        take(
-          G,
-          {
-            from: opponent,
-            to: currentPlayer,
-            amount: est.base * count,
-          },
-          est.name
-        );
+        take(G, { from: opponent, to: currentPlayer, }, est.earnings, est.name);
       }
-    else if (Est.isEqual(est, Est.TaxOffice))
-      for (const opponent of getPreviousPlayers(ctx))
-        if (G.money[opponent] >= Est.TAX_OFFICE_THRESHOLD)
-          take(
-            G,
-            {
-              from: opponent,
-              to: currentPlayer,
-              amount: Math.floor(G.money[opponent] / 2),
-            },
-            est.name
-          );
+    } else if (Est.isEqual(est, Est.Meta.TVStation)) {
+      G.doTV = true;
+    } else if (Est.isEqual(est, Est.Meta.Office)) {
+      G.doOffice = true;
+    } else if (Est.isEqual(est, Est.Meta.Publisher)) {
+      for (const opponent of getPreviousPlayers(ctx)) {
+        const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
+        const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
+        const amount = (n_cups + n_shops) * est.earnings;
+        take(G, { from: opponent, to: currentPlayer}, amount, est.name);
+      }
+    } else if (Est.isEqual(est, Est.Meta.TaxOffice)) {
+      for (const opponent of getPreviousPlayers(ctx)) {
+        const opp_coins = getCoins(G, opponent);
+        if (opp_coins < Est.Meta.TAX_OFFICE_THRESHOLD) {
+          continue;
+        }
+        const amount = Math.floor(opp_coins / 2);
+        take(G, { from: opponent, to: currentPlayer}, amount, est.name);
+      }
+    }
   }
 
+  // always switch state after committing role
   switchState(G, ctx);
 };
 
 /**
  * Return the next players (including self) in the order that the Blue
- * establishments are evaluated.
+ * establishments are evaluated. I.e. i, i+1, i+2, ..., 0, 1, 2, ..., i-1.
  * @param ctx
  * @returns Array of player IDs.
  */
@@ -533,7 +645,7 @@ const getNextPlayers = (ctx: Ctx): number[] => {
 
 /**
  * Return the previous players (excluding self) in the order that the Red
- * establishments are evaluated.
+ * establishments are evaluated. I.e. i-1, i-2, ..., 2, 1, 0, ..., i+2, i+1.
  * @param ctx
  * @returns Array of player IDs.
  */
@@ -549,61 +661,73 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
 };
 
 /**
+ * Player earns coins from the bank, and the event is logged.
  * @param G
- * @param obj `to` receives `amount` coins from the bank.
- * @param name Name of establishment or landmark activated.
+ * @param player
+ * @param amount - Number of coins. If zero, no log is created.
+ * @param name - Name of establishment or landmark activated.
  */
-const earn = (G: MachikoroG, obj: { to: number; amount: number }, name: string): void => {
-  const { to, amount } = obj;
-  G.money[to] += amount;
-  if (amount > 0) G.log_buffer.push(Log.earn(obj, name));
+const earn = (G: MachikoroG, player: number, amount: number, name: string): void => {
+  setCoins(G, player, amount);
+  if (amount > 0) {
+    G._logBuffer.push(Log.earn(player, amount, name));
+  }
 };
 
 /**
+ * Player takes coins from another player, and the event is logged.
  * @param G
- * @param obj `from` gives `amount` coins to `to`, or as much as possible.
- * @param name Name of establishment or landmark activated.
+ * @param args.from - Coins are taken from this player
+ * @param args.to - Coins are given to this player
+ * @param amount - Number of coins. If zero, no log is created. Actual money
+ * taken will never exceed the amount `args.from` has.
+ * @param name - Name of establishment or landmark activated.
  */
-const take = (G: MachikoroG, obj: { from: number; to: number; amount: number }, name: string): void => {
-  const { from, to, amount } = obj;
-  const min = Math.min(amount, G.money[from]);
-  G.money[from] -= min;
-  G.money[to] += min;
-  obj.amount = min; // so that log shows correct amount exchanged
-  if (min > 0) G.log_buffer.push(Log.take(obj, name));
+const take = (G: MachikoroG, args: { from: number; to: number}, amount: number, name: string): void => {
+  const { from, to } = args;
+  const actual_amount = Math.min(amount, getCoins(G, from));
+  setCoins(G, from, -actual_amount);
+  setCoins(G, to, actual_amount);
+  if (actual_amount > 0) {
+    G._logBuffer.push(Log.take(args, actual_amount, name));
+  }
 };
 
 /**
- * Make a roll for the tuna boat, if not done yet for this turn.
+ * Get the roll for the tuna boat, logging if not done yet for this turn.
  * @param G
- * @param ctx
  * @returns Dice roll.
  */
-const getTunaRoll = (G: MachikoroG, random: RandomAPI): number => {
-  if (!G.tunaRoll) {
-    const dice = random.Die(6, 2);
-    G.tunaRoll = dice[0] + dice[1];
-    G.log_buffer.push(Log.tunaRoll(G.tunaRoll));
+const getTunaRoll = (G: MachikoroG): number => {
+  if (!G.tunaHasRolled) {
+    G.tunaHasRolled = true;
+    G._logBuffer.push(Log.tunaRoll(G.tunaRoll!));
   }
-  return G.tunaRoll;
+  return G.tunaRoll!;
 };
 
 /**
- * To be run after the roll is commited. Checks if any Purple establishment
- * needs to be performed, and changes the game state accordingly.
+ * To be run after the roll is commited and after doing TV or Office. Checks if
+ * TV or Office needs to be performed, and changes the game state accordingly.
  * @param G
  * @param ctx
  */
 const switchState = (G: MachikoroG, ctx: Ctx): void => {
   const player = parseInt(ctx.currentPlayer);
-  if (G.doTV) G.state = State.TV;
-  else if (G.doOffice) G.state = State.OfficePhase1;
-  else {
-    if (G.money[player] === 0) {
-      G.money[player]++;
-      G.log_buffer.push(Log.earn({ to: player, amount: 1 }, 'City Hall'));
+  if (G.doTV) {
+    G.doTV = false;
+    G.turnState = TurnState.TV;
+  }
+  else if (G.doOffice) {
+    G.doOffice = false;
+    G.turnState = TurnState.OfficeGive;
+  } else {
+    // city hall before buying
+    if (getCoins(G, player) === 0) {
+      setCoins(G, player, Land.Meta.CITY_HALL_EARNINGS)
+      G._logBuffer.push(Log.earn(player, Land.Meta.CITY_HALL_EARNINGS, 'City Hall'));
     }
-    G.state = State.Buy;
+    G.turnState = TurnState.Buy;
   }
 };
 
@@ -611,16 +735,22 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
  * End the game.
  * @param G
  * @param ctx
- * @param winner ID of the winning player.
+ * @param winner - ID of the winning player.
  */
 const endGame = (G: MachikoroG, events: EventsAPI, winner: number): void => {
-  G.log_buffer.push(Log.endGame(winner));
+  G._logBuffer.push(Log.endGame(winner));
   events.endGame();
 };
 
-// --- Game -------------------------------------------------------------------
+//
+// === Game ===
+//
+// Declaring the game object.
+//
 
-// set-up to use in debug mode
+/**
+ * Set-up data for debug mode.
+ */
 const debugSetupData = {
   expansion: Expansion.Harbor,
   supplyVariant: SupplyVariant.Total,
@@ -628,48 +758,63 @@ const debugSetupData = {
   randomizeTurnOrder: false,
 };
 
-// properties of G for a new turn
+/**
+ * Properties of `G` to overwrite on a new turn.
+ */
 const newTurnG = {
-  state: State.Roll,
-  roll: 0,
+  turnState: TurnState.Roll,
+  roll: null,
   numRolls: 0,
   secondTurn: false,
   doTV: false,
   doOffice: false,
-  officeEst: null,
-  tunaRoll: null,
+  officeGiveEst: null,
   justBoughtEst: null,
+  tunaRoll: null,
+  tunaHasRolled: false,
 };
 
 export const Machikoro: Game<MachikoroG> = {
   name: GAME_NAME,
 
-  // `setupData` is set in src/lobby/Lobby.js
   setup: ({ ctx, random }, setupData) => {
-    if (!setupData) setupData = debugSetupData;
+    // `setupData` is set in `src/lobby/Lobby.js`
+    if (!setupData) {
+      setupData = debugSetupData;
+    }
     const { expansion, supplyVariant, startCoins, randomizeTurnOrder } = setupData;
     const { numPlayers } = ctx;
-    const { data: est_data, decks } = Est.initialize(expansion, supplyVariant, numPlayers);
-    const land_data = Land.initialize(expansion, numPlayers);
 
-    // initial coins
+    // initialize coins
     const money = Array(numPlayers).fill(startCoins);
 
-    // shuffle deck and play order
-    for (let i = 0; i < decks.length; i++) decks[i] = random.Shuffle(decks[i]);
     let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
-    if (randomizeTurnOrder) _playOrder = random.Shuffle(_playOrder);
+    if (randomizeTurnOrder) {
+      _playOrder = random.Shuffle(_playOrder);
+    }
 
     const G: MachikoroG = {
-      ...newTurnG,
-      money,
-      est_data,
-      land_data,
+      expansion,
       supplyVariant,
       _playOrder,
-      secret: { decks },
-      log_buffer: [],
+      ...newTurnG,
+      secret: { _decks: null },
+      _money: money,
+      _estData: null,
+      _landData: null,
+      _logBuffer: [],
     };
+
+    // initialize data
+    Land.initialize(G, numPlayers);
+    Est.initialize(G, numPlayers);
+
+    // shuffle deck and play order
+    const decks = G.secret._decks!;
+    for (let i = 0; i < decks.length; i++) {
+      decks[i] = random.Shuffle(decks[i]);
+    }
+
     Est.replenishSupply(G);
     return G;
   },
@@ -677,12 +822,19 @@ export const Machikoro: Game<MachikoroG> = {
   validateSetupData: (setupData, numPlayers) => {
     if (setupData) {
       const { expansion, supplyVariant, startCoins } = setupData;
-      if (!Object.values(Expansion).includes(expansion)) return `Unknown expansion: ${expansion}`;
-      if (!Object.values(SupplyVariant).includes(supplyVariant)) return `Unknown supply variant: ${supplyVariant}`;
-      if (!Number.isInteger(startCoins)) return `Number of starting coins, ${startCoins}, must be an integer`;
+      if (!Object.values(Expansion).includes(expansion)) {
+        return `Unknown expansion: ${expansion}`;
+      }
+      if (!Object.values(SupplyVariant).includes(supplyVariant)) {
+        return `Unknown supply variant: ${supplyVariant}`;
+      }
+      if (!Number.isInteger(startCoins)) {
+        return `Number of starting coins, ${startCoins}, must be an integer`;
+      }
     }
-    if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5))
+    if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5)) {
       return `Number of players, ${numPlayers}, must be an integer between 2 to 5.`;
+    }
     return;
   },
 
@@ -718,8 +870,8 @@ export const Machikoro: Game<MachikoroG> = {
     buyEst: buyEst,
     buyLand: buyLand,
     doTV: doTV,
-    doOfficePhase1: doOfficePhase1,
-    doOfficePhase2: doOfficePhase2,
+    doOfficePhase1: doOfficeGive,
+    doOfficePhase2: doOfficeTake,
     endTurn: endTurn,
   },
 

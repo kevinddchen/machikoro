@@ -1,5 +1,12 @@
-import { LogEvent } from '../enums';
-import { LogLine } from '../types';
+//
+// Utility functions for the log.
+//
+
+import { LogEvent } from './types';
+
+import type { LogLine } from './types';
+
+export * as Types from './types';
 
 export const rollOne = (roll: number): LogLine => {
   return {
@@ -22,18 +29,20 @@ export const addTwo = (roll: number): LogLine => {
   };
 };
 
-export const earn = (obj: { to: number; amount: number }, name: string): LogLine => {
+export const earn = (player: number, amount: number, name: string): LogLine => {
   return {
     event: LogEvent.Earn,
-    ...obj,
+    player,
+    amount,
     name,
   };
 };
 
-export const take = (obj: { from: number; to: number; amount: number }, name: string): LogLine => {
+export const take = (args: { from: number; to: number }, amount: number, name: string): LogLine => {
   return {
     event: LogEvent.Take,
-    ...obj,
+    ...args,
+    amount,
     name,
   };
 };

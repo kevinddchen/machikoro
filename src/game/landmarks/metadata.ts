@@ -53,6 +53,16 @@ export const Airport: Landmark = {
 };
 
 /**
+ * Coins earned for City Hall's effect.
+ */
+export const CITY_HALL_EARNINGS = 1;
+
+/**
+ * Coins earned for Airport's effect.
+ */
+export const AIRPORT_EARNINGS = 10;
+
+/**
  * List of all landmarks, and order they should be displayed.
  */
 export const LANDMARKS: Landmark[] = [Harbor, TrainStation, ShoppingMall, AmusementPark, RadioTower, Airport];

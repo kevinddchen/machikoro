@@ -305,9 +305,6 @@ export const TaxOffice: Establishment = {
   type: null,
 };
 
-// number of coins tax office triggers on
-export const TAX_OFFICE_THRESHOLD = 10;
-
 export const TunaBoat: Establishment = {
   _id: 23,
   name: 'Tuna Boat',
@@ -364,6 +361,11 @@ export const ESTABLISHMENTS: Establishment[] = [
   Publisher,
   TaxOffice,
 ];
+
+/**
+ * Number of coins the tax office triggers on
+ */
+export const TAX_OFFICE_THRESHOLD = 10;
 
 /**
  * Maximum number of unique establishments in the supply for Variable Supply.

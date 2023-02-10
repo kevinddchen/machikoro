@@ -2,17 +2,15 @@
 // Utility functions for establishments.
 //
 
-import * as Metadata from './metadata';
-import * as Types from './types';
+import * as Meta from './metadata';
 import { EstColor, EstType } from './types';
 import { Expansion, SupplyVariant } from '../types';
 
+import type { Establishment, _EstablishmentData } from './types';
 import type { MachikoroG } from '../types';
 
-export { Metadata, Types };
-
-type Establishment = Types.Establishment;
-type _EstablishmentData = Types._EstablishmentData;
+export * as Types from './types';
+export { Meta };
 
 /**
  * @param a
@@ -68,7 +66,7 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
  * @returns List of all unique establishments that are in use for this game.
  */
 export const getAllInUse = (G: MachikoroG): Establishment[] => {
-  return Metadata.ESTABLISHMENTS.filter((est) => isInUse(G, est));
+  return Meta.ESTABLISHMENTS.filter((est) => isInUse(G, est));
 };
 
 /**
@@ -77,7 +75,7 @@ export const getAllInUse = (G: MachikoroG): Establishment[] => {
  * @returns List of all unique establishments owned by the player.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
-  return Metadata.ESTABLISHMENTS.filter((est) => countOwned(G, player, est) > 0);
+  return Meta.ESTABLISHMENTS.filter((est) => countOwned(G, player, est) > 0);
 };
 
 /**
@@ -89,7 +87,7 @@ export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
  */
 export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): number => {
   // prettier-ignore
-  return Metadata.ESTABLISHMENTS
+  return Meta.ESTABLISHMENTS
     .filter((est) => est.type === type)
     .reduce((acc, est) => acc + countOwned(G, player, est), 0);
 };
@@ -124,7 +122,7 @@ export const transfer = (G: MachikoroG, args: { from: number; to: number; est: E
  */
 export const replenishSupply = (G: MachikoroG): void => {
   const { supplyVariant } = G;
-  const { _decks: decks } = G.secret;
+  const decks = G.secret._decks!;
 
   switch (supplyVariant) {
     case SupplyVariant.Total: {
@@ -137,7 +135,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     }
     case SupplyVariant.Variable: {
       // put establishments into the supply until there are 10 unique establishments
-      while (decks[0].length > 0 && countUniqueAvailable(G) < Metadata.VARIABLE_SUPPLY_LIMIT) {
+      while (decks[0].length > 0 && countUniqueAvailable(G) < Meta.VARIABLE_SUPPLY_LIMIT) {
         const est = decks[0].pop()!;
         G._estData!._availableCount[est._id] += 1;
       }
@@ -147,11 +145,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       // put establishments into the supply until there are five unique
       // establishments with activation <= 6, five establishments with activation
       // > 7, and two purple establishments (this requires three decks).
-      const limits = [
-        Metadata.HYBRID_SUPPY_LIMIT_LOWER,
-        Metadata.HYBRID_SUPPY_LIMIT_UPPER,
-        Metadata.HYBRID_SUPPY_LIMIT_PURPLE,
-      ];
+      const limits = [Meta.HYBRID_SUPPY_LIMIT_LOWER, Meta.HYBRID_SUPPY_LIMIT_UPPER, Meta.HYBRID_SUPPY_LIMIT_PURPLE];
       const funcs = [countUniqueAvailableLower, countUniqueAvailableUpper, countUniqueAvailablePurple];
       for (let i = 0; i < 3; i++)
         while (decks[i].length > 0 && funcs[i](G) < limits[i]) {
@@ -169,9 +163,9 @@ export const replenishSupply = (G: MachikoroG): void => {
  * Initialize the landmark data for a game by modifying `G`.
  * @param G
  */
-export const initialize = (G: MachikoroG): void => {
-  const { expansion, supplyVariant, numPlayers } = G;
-  const numEsts = Metadata.ESTABLISHMENTS.length;
+export const initialize = (G: MachikoroG, numPlayers: number): void => {
+  const { expansion, supplyVariant } = G;
+  const numEsts = Meta.ESTABLISHMENTS.length;
 
   const data: _EstablishmentData = {
     _inUse: Array(numEsts).fill(false),
@@ -184,11 +178,11 @@ export const initialize = (G: MachikoroG): void => {
   let ids: number[];
   switch (expansion) {
     case Expansion.Base: {
-      ids = Metadata._BASE_ESTABLISHMENT_IDS;
+      ids = Meta._BASE_ESTABLISHMENT_IDS;
       break;
     }
     case Expansion.Harbor: {
-      ids = Metadata._HARBOR_ESTABLISHMENT_IDS;
+      ids = Meta._HARBOR_ESTABLISHMENT_IDS;
       break;
     }
     default:
@@ -196,7 +190,7 @@ export const initialize = (G: MachikoroG): void => {
   }
 
   for (const id of ids) {
-    const est = Metadata._ESTABLISHMENTS_BY_ID[id];
+    const est = Meta._ESTABLISHMENTS_BY_ID[id];
     data._inUse[id] = true;
     // all establishments have 6 copies except for purple establishments,
     // which have the same number of copies as the number of players.
@@ -204,7 +198,7 @@ export const initialize = (G: MachikoroG): void => {
   }
 
   // give each player their starting establishments
-  for (const id of Metadata._STARTING_ESTABLISHMENT_IDS) {
+  for (const id of Meta._STARTING_ESTABLISHMENT_IDS) {
     for (const player of Array(numPlayers).keys()) {
       data._ownedCount[id][player] += 1;
     }
@@ -218,7 +212,7 @@ export const initialize = (G: MachikoroG): void => {
       // put all cards into one deck
       decks = [[]];
       for (const id of ids) {
-        const est = Metadata._ESTABLISHMENTS_BY_ID[id];
+        const est = Meta._ESTABLISHMENTS_BY_ID[id];
         decks[0].push(...Array<Establishment>(data._remainingCount[id]).fill(est));
       }
       break;
@@ -227,7 +221,7 @@ export const initialize = (G: MachikoroG): void => {
       // put all cards into three decks: lower, upper, and purple
       decks = [[], [], []];
       for (const id of ids) {
-        const est = Metadata._ESTABLISHMENTS_BY_ID[id];
+        const est = Meta._ESTABLISHMENTS_BY_ID[id];
         if (isLower(est)) {
           decks[0].push(...Array<Establishment>(data._remainingCount[id]).fill(est));
         } else if (isUpper(est)) {
@@ -271,7 +265,7 @@ export const isUpper = (est: Establishment): boolean => {
  * from the supply.
  */
 export const countUniqueAvailable = (G: MachikoroG): number => {
-  return Metadata.ESTABLISHMENTS.filter((est) => countAvailable(G, est) > 0).length;
+  return Meta.ESTABLISHMENTS.filter((est) => countAvailable(G, est) > 0).length;
 };
 
 /**
@@ -281,7 +275,7 @@ export const countUniqueAvailable = (G: MachikoroG): number => {
  */
 export const countUniqueAvailableLower = (G: MachikoroG): number => {
   // prettier-ignore
-  return Metadata.ESTABLISHMENTS
+  return Meta.ESTABLISHMENTS
     .filter((est) => isLower(est) && countAvailable(G, est) > 0)
     .length;
 };
@@ -293,7 +287,7 @@ export const countUniqueAvailableLower = (G: MachikoroG): number => {
  */
 export const countUniqueAvailableUpper = (G: MachikoroG): number => {
   // prettier-ignore
-  return Metadata.ESTABLISHMENTS
+  return Meta.ESTABLISHMENTS
     .filter((est) => isUpper(est) && countAvailable(G, est) > 0)
     .length;
 };
@@ -305,7 +299,7 @@ export const countUniqueAvailableUpper = (G: MachikoroG): number => {
  */
 export const countUniqueAvailablePurple = (G: MachikoroG): number => {
   // prettier-ignore
-  return Metadata.ESTABLISHMENTS
+  return Meta.ESTABLISHMENTS
     .filter((est) => (est.color === EstColor.Purple) && countAvailable(G, est) > 0)
     .length;
 };

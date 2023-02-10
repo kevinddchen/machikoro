@@ -2,16 +2,14 @@
 // Utility functions for landmarks.
 //
 
-import * as Metadata from './metadata';
-import * as Types from './types';
+import * as Meta from './metadata';
 import { Expansion } from '../types';
 
+import type { Landmark, _LandmarkData } from './types';
 import type { MachikoroG } from '../types';
 
-export { Metadata, Types };
-
-type Landmark = Types.Landmark;
-type _LandmarkData = Types._LandmarkData;
+export * as Types from './types';
+export { Meta };
 
 /**
  * @param a
@@ -46,7 +44,7 @@ export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => 
  * @returns List of all landmarks that are in use for this game.
  */
 export const getAllInUse = (G: MachikoroG): Landmark[] => {
-  return Metadata.LANDMARKS.filter((land) => isInUse(G, land));
+  return Meta.LANDMARKS.filter((land) => isInUse(G, land));
 };
 
 /**
@@ -55,7 +53,7 @@ export const getAllInUse = (G: MachikoroG): Landmark[] => {
  * @returns List of all landmarks owned by the player.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
-  return Metadata.LANDMARKS.filter((land) => owns(G, player, land));
+  return Meta.LANDMARKS.filter((land) => owns(G, player, land));
 };
 
 /**
@@ -72,9 +70,9 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
  * Initialize the landmark data for a game by modifying `G`.
  * @param G
  */
-export const initialize = (G: MachikoroG): void => {
-  const { expansion, numPlayers } = G;
-  const numLands = Metadata.LANDMARKS.length;
+export const initialize = (G: MachikoroG, numPlayers: number): void => {
+  const { expansion } = G;
+  const numLands = Meta.LANDMARKS.length;
 
   const data: _LandmarkData = {
     _inUse: Array(numLands).fill(false),
@@ -85,11 +83,11 @@ export const initialize = (G: MachikoroG): void => {
   let ids: number[];
   switch (expansion) {
     case Expansion.Base: {
-      ids = Metadata._BASE_LANDMARK_IDS;
+      ids = Meta._BASE_LANDMARK_IDS;
       break;
     }
     case Expansion.Harbor: {
-      ids = Metadata._HARBOR_LANDMARK_IDS;
+      ids = Meta._HARBOR_LANDMARK_IDS;
       break;
     }
     default:
