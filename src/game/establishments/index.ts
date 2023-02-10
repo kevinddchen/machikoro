@@ -54,7 +54,7 @@ export const countAvailable = (G: MachikoroG, est: Establishment): number => {
  * player.
  */
 export const countOwned = (G: MachikoroG, player: number, est: Establishment): number => {
-  return G._estData!._ownedCount[player][est._id];
+  return G._estData!._ownedCount[est._id][player];
 };
 
 /**
@@ -167,7 +167,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     _inUse: Array(numEsts).fill(false),
     _remainingCount: Array(numEsts).fill(0),
     _availableCount: Array(numEsts).fill(0),
-    _ownedCount: Array(numEsts).fill(Array(numPlayers).fill(0)),
+    _ownedCount: Array(numEsts).fill(null).map(() => Array(numPlayers).fill(0)),
   };
 
   // initialize establishments in use

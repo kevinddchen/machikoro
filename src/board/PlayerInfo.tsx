@@ -80,10 +80,10 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
       let _doOffice: (est: Est.Establishment) => void;
       if (player === currentPlayer) {
         _canDoOffice = isActive && canDoOfficeGive(G, ctx, est);
-        _doOffice = (est) => moves.doOfficePhase1(est);
+        _doOffice = (est) => moves.doOfficeGive(est);
       } else {
         _canDoOffice = isActive && canDoOfficeTake(G, ctx, player, est);
-        _doOffice = (est) => moves.doOfficePhase2(player, est);
+        _doOffice = (est) => moves.doOfficeTake(player, est);
       }
 
       for (let j = 0; j < count; j++) {
