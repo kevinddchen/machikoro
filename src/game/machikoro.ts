@@ -6,10 +6,10 @@ import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
 import { Expansion, SupplyVariant, TurnState } from './types';
-import { EstColor, EstType } from './establishments/types';
+import { EstColor, EstType } from './establishments';
 
-import type { Landmark } from './landmarks/types';
-import type { Establishment } from './establishments/types';
+import type { Landmark } from './landmarks';
+import type { Establishment } from './establishments';
 import type { MachikoroG } from './types';
 
 //
@@ -55,9 +55,9 @@ export const canRoll = (G: MachikoroG, ctx: Ctx, n: number): boolean => {
   return (
     G.turnState === TurnState.Roll &&
     // can always roll 1 die, can roll 2 if you own train station
-    (n === 1 || (n === 2 && Land.owns(G, player, Land.Meta.TrainStation))) &&
+    (n === 1 || (n === 2 && Land.owns(G, player, Land.TrainStation))) &&
     // can reroll if you own radio tower
-    (G.numRolls === 0 || (G.numRolls === 1 && Land.owns(G, player, Land.Meta.RadioTower)))
+    (G.numRolls === 0 || (G.numRolls === 1 && Land.owns(G, player, Land.RadioTower)))
   );
 };
 
@@ -79,7 +79,7 @@ export const canCommitRoll = (G: MachikoroG): boolean => {
 export const canAddTwo = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
   // need to own harbor and roll a 10 or higher
-  return canCommitRoll(G) && Land.owns(G, player, Land.Meta.Harbor) && G.roll! >= 10; // G.roll not null via canCommitRoll() check
+  return canCommitRoll(G) && Land.owns(G, player, Land.Harbor) && G.roll! >= 10; // G.roll not null via canCommitRoll() check
 };
 
 /**
@@ -253,7 +253,7 @@ const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   const dice = random.Die(6, 2);
 
   // if player owns an amusement park, they get a second turn
-  if (Land.owns(G, player, Land.Meta.AmusementPark)) {
+  if (Land.owns(G, player, Land.AmusementPark)) {
     G.secondTurn = dice[0] === dice[1];
   }
 
@@ -398,7 +398,7 @@ const doTV: Move<MachikoroG> = ({ G, ctx, log }, opponent: number) => {
   G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
-  take(G, { from: opponent, to: player }, Est.Meta.TVStation.earnings, Est.Meta.TVStation.name);
+  take(G, { from: opponent, to: player }, Est.TVStation.earnings, Est.TVStation.name);
 
   switchState(G, ctx);
 
@@ -465,8 +465,8 @@ const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
 
   const player = parseInt(ctx.currentPlayer);
   // a player earns coins via the airport if they did not buy anything
-  if (G.turnState === TurnState.Buy && Land.owns(G, player, Land.Meta.Airport)) {
-    earn(G, player, Land.Meta.AIRPORT_EARNINGS, Land.Meta.Airport.name);
+  if (G.turnState === TurnState.Buy && Land.owns(G, player, Land.Airport)) {
+    earn(G, player, Land.AIRPORT_EARNINGS, Land.Airport.name);
   }
 
   // check second turn
@@ -511,7 +511,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of red_ests) {
       // sushi bar requires Harbor
-      if (Est.isEqual(est, Est.Meta.SushiBar) && !Land.owns(G, opponent, Land.Meta.Harbor)) {
+      if (Est.isEqual(est, Est.SushiBar) && !Land.owns(G, opponent, Land.Harbor)) {
         continue;
       }
 
@@ -520,7 +520,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
       // all red establishments take `est.earnings` coins from the player
       let earnings = est.earnings;
       // +1 coin if opponent owns Shopping Mall
-      if (est.type === EstType.Cup && Land.owns(G, opponent, Land.Meta.ShoppingMall)) {
+      if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
         earnings += 1;
       }
 
@@ -535,8 +535,8 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
     for (const est of blue_ests) {
       // mackerel boat and tuna boat require Harbor
       if (
-        (Est.isEqual(est, Est.Meta.MackerelBoat) || Est.isEqual(est, Est.Meta.TunaBoat)) &&
-        !Land.owns(G, player, Land.Meta.Harbor)
+        (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) &&
+        !Land.owns(G, player, Land.Harbor)
       ) {
         continue;
       }
@@ -546,7 +546,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
       // tuna boat earnings are based off the tuna roll
       // all other blue establishments take `est.earnings` coins from the player
       let earnings;
-      if (Est.isEqual(est, Est.Meta.TunaBoat)) {
+      if (Est.isEqual(est, Est.TunaBoat)) {
         earnings = getTunaRoll(G);
       } else {
         earnings = est.earnings;
@@ -564,22 +564,22 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
 
     let earnings = est.earnings;
     // +1 coin to shops if player owns Shopping Mall
-    if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.Meta.ShoppingMall)) {
+    if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
       earnings += 1;
     }
 
     // by default a green establishment earns `multiplier * earnings = 1 * earnings`
     // but there are many special cases where `multiplier` is not 1.
     let multiplier = 1;
-    if (Est.isEqual(est, Est.Meta.CheeseFactory)) {
+    if (Est.isEqual(est, Est.CheeseFactory)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
-    } else if (Est.isEqual(est, Est.Meta.FurnitureFactory)) {
+    } else if (Est.isEqual(est, Est.FurnitureFactory)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
-    } else if (Est.isEqual(est, Est.Meta.ProduceMarket)) {
+    } else if (Est.isEqual(est, Est.ProduceMarket)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
-    } else if (Est.isEqual(est, Est.Meta.FlowerShop)) {
-      multiplier = Est.countOwned(G, currentPlayer, Est.Meta.FlowerOrchard);
-    } else if (Est.isEqual(est, Est.Meta.FoodWarehouse)) {
+    } else if (Est.isEqual(est, Est.FlowerShop)) {
+      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerOrchard);
+    } else if (Est.isEqual(est, Est.FoodWarehouse)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
     }
 
@@ -595,25 +595,25 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
     }
 
     // each purple establishment has its own effect
-    if (Est.isEqual(est, Est.Meta.Stadium)) {
+    if (Est.isEqual(est, Est.Stadium)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         take(G, { from: opponent, to: currentPlayer, }, est.earnings, est.name);
       }
-    } else if (Est.isEqual(est, Est.Meta.TVStation)) {
+    } else if (Est.isEqual(est, Est.TVStation)) {
       G.doTV = true;
-    } else if (Est.isEqual(est, Est.Meta.Office)) {
+    } else if (Est.isEqual(est, Est.Office)) {
       G.doOffice = true;
-    } else if (Est.isEqual(est, Est.Meta.Publisher)) {
+    } else if (Est.isEqual(est, Est.Publisher)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
         const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
         const amount = (n_cups + n_shops) * est.earnings;
         take(G, { from: opponent, to: currentPlayer}, amount, est.name);
       }
-    } else if (Est.isEqual(est, Est.Meta.TaxOffice)) {
+    } else if (Est.isEqual(est, Est.TaxOffice)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         const opp_coins = getCoins(G, opponent);
-        if (opp_coins < Est.Meta.TAX_OFFICE_THRESHOLD) {
+        if (opp_coins < Est.TAX_OFFICE_THRESHOLD) {
           continue;
         }
         const amount = Math.floor(opp_coins / 2);
@@ -724,8 +724,8 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
   } else {
     // city hall before buying
     if (getCoins(G, player) === 0) {
-      setCoins(G, player, Land.Meta.CITY_HALL_EARNINGS)
-      G._logBuffer.push(Log.earn(player, Land.Meta.CITY_HALL_EARNINGS, 'City Hall'));
+      setCoins(G, player, Land.CITY_HALL_EARNINGS)
+      G._logBuffer.push(Log.earn(player, Land.CITY_HALL_EARNINGS, 'City Hall'));
     }
     G.turnState = TurnState.Buy;
   }

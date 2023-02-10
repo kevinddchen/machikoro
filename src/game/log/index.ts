@@ -6,7 +6,7 @@ import { LogEvent } from './types';
 
 import type { LogLine } from './types';
 
-export * as Types from './types';
+export * from './types';
 
 export const rollOne = (roll: number): LogLine => {
   return {

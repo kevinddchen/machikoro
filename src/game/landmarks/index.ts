@@ -8,8 +8,8 @@ import { Expansion } from '../types';
 import type { Landmark, _LandmarkData } from './types';
 import type { MachikoroG } from '../types';
 
-export * as Types from './types';
-export { Meta };
+export * from './metadata';
+export * from './types';
 
 /**
  * @param a
