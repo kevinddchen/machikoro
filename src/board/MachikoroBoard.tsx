@@ -1,7 +1,7 @@
 import { BoardProps } from 'boardgame.io/react';
 import React from 'react';
 
-import * as game from 'game';
+import { MachikoroG } from 'game';
 import Buttons from './Buttons';
 import Logger from './Logger';
 import PlayerInfo from './PlayerInfo';
@@ -11,7 +11,7 @@ import Supply from './Supply';
 /**
  * Handles all game components
  */
-export default class MachikoroBoard extends React.Component<BoardProps<game.MachikoroG>, object> {
+export default class MachikoroBoard extends React.Component<BoardProps<MachikoroG>, object> {
   private names: string[];
 
   constructor(props: BoardProps) {

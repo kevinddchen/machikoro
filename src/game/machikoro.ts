@@ -5,12 +5,9 @@ import { EventsAPI } from 'boardgame.io/dist/types/src/plugins/plugin-events';
 import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
-import { Expansion, SupplyVariant, TurnState } from './types';
-import { EstColor, EstType } from './establishments';
-
-import type { Landmark } from './landmarks';
-import type { Establishment } from './establishments';
-import type { MachikoroG } from './types';
+import { Expansion, SupplyVariant, TurnState, MachikoroG } from './types';
+import { EstColor, EstType, Establishment } from './establishments';
+import { Landmark } from './landmarks';
 
 //
 // === Machikoro ===
@@ -597,7 +594,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
     // each purple establishment has its own effect
     if (Est.isEqual(est, Est.Stadium)) {
       for (const opponent of getPreviousPlayers(ctx)) {
-        take(G, { from: opponent, to: currentPlayer, }, est.earnings, est.name);
+        take(G, { from: opponent, to: currentPlayer }, est.earnings, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
       G.doTV = true;
@@ -608,7 +605,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
         const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
         const amount = (n_cups + n_shops) * est.earnings;
-        take(G, { from: opponent, to: currentPlayer}, amount, est.name);
+        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TaxOffice)) {
       for (const opponent of getPreviousPlayers(ctx)) {
@@ -617,7 +614,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
           continue;
         }
         const amount = Math.floor(opp_coins / 2);
-        take(G, { from: opponent, to: currentPlayer}, amount, est.name);
+        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     }
   }
@@ -683,7 +680,7 @@ const earn = (G: MachikoroG, player: number, amount: number, name: string): void
  * taken will never exceed the amount `args.from` has.
  * @param name - Name of establishment or landmark activated.
  */
-const take = (G: MachikoroG, args: { from: number; to: number}, amount: number, name: string): void => {
+const take = (G: MachikoroG, args: { from: number; to: number }, amount: number, name: string): void => {
   const { from, to } = args;
   const actual_amount = Math.min(amount, getCoins(G, from));
   setCoins(G, from, -actual_amount);
@@ -717,14 +714,13 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
   if (G.doTV) {
     G.doTV = false;
     G.turnState = TurnState.TV;
-  }
-  else if (G.doOffice) {
+  } else if (G.doOffice) {
     G.doOffice = false;
     G.turnState = TurnState.OfficeGive;
   } else {
     // city hall before buying
     if (getCoins(G, player) === 0) {
-      setCoins(G, player, Land.CITY_HALL_EARNINGS)
+      setCoins(G, player, Land.CITY_HALL_EARNINGS);
       G._logBuffer.push(Log.earn(player, Land.CITY_HALL_EARNINGS, 'City Hall'));
     }
     G.turnState = TurnState.Buy;

@@ -1,9 +1,12 @@
 import 'styles/main.css';
 
+import { Ctx } from 'boardgame.io';
 import React from 'react';
 import classNames from 'classnames';
 
-import { Ctx, MachikoroG, State } from 'game';
+import { MachikoroG, TurnState } from 'game';
+
+
 
 /**
  * @param G
@@ -25,14 +28,14 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
   render() {
     const { G, ctx, isActive } = this.props;
     const { currentPlayer, gameover } = ctx;
-    const { state } = G;
+    const { turnState: state } = G;
     const currentPlayerName = this.props.names[parseInt(currentPlayer)];
 
     let msg = '';
 
     /* Check `game/machikoro.ts` for various possible states */
     switch (state) {
-      case State.Roll: {
+      case TurnState.Roll: {
         if (isActive) {
           msg = 'It is your turn. Select a roll option from above.';
         } else {
@@ -40,7 +43,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case State.Buy: {
+      case TurnState.Buy: {
         if (isActive) {
           /* to do: write function to check if landmarks can be built? */
           msg = 'Purchase an establishment, build a landmark or end your turn.';
@@ -49,7 +52,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case State.TV: {
+      case TurnState.TV: {
         if (isActive) {
           msg = 'TV station: Choose a player who has to give you 5 coins.';
         } else {
@@ -57,10 +60,10 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case State.OfficePhase1:
-      case State.OfficePhase2: {
+      case TurnState.OfficeGive:
+      case TurnState.OfficeTake: {
         if (isActive) {
-          if (state === State.OfficePhase1) {
+          if (state === TurnState.OfficeGive) {
             msg = 'Office: Select an establishment to exchange with another player.';
           } else {
             msg = 'Office: Select an opposing establishment to exchange.';
@@ -70,7 +73,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case State.End: {
+      case TurnState.End: {
         if (isActive) {
           msg = 'No actions left. End turn?';
         } else {

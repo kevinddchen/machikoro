@@ -1,6 +1,6 @@
-import type { _LandmarkData } from './landmarks/types';
-import type { Establishment, _EstablishmentData } from './establishments/types';
-import type { LogLine } from './log/types';
+import { _LandmarkData } from './landmarks/types';
+import { Establishment, _EstablishmentData } from './establishments/types';
+import { LogLine } from './log/types';
 
 /**
  * The `G` object containing all game state variables.
@@ -58,3 +58,5 @@ export const SupplyVariant = {
 } as const;
 
 export type SupplyVariant = (typeof SupplyVariant)[keyof typeof SupplyVariant];
+
+export type Moves = Record<string, (...args: any[]) => void>;

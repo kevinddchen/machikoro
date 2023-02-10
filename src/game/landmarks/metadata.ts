@@ -2,7 +2,7 @@
 // Game metadata for landmarks.
 //
 
-import type { Landmark } from './types';
+import { Landmark } from './types';
 
 export const TrainStation: Landmark = {
   _id: 0,

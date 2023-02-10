@@ -2,9 +2,7 @@
 // Utility functions for the log.
 //
 
-import { LogEvent } from './types';
-
-import type { LogLine } from './types';
+import { LogEvent, LogLine } from './types';
 
 export * from './types';
 

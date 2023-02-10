@@ -2,11 +2,8 @@
 // Utility functions for establishments.
 //
 import * as Meta from './metadata';
-import { EstColor, EstType } from './types';
-import { Expansion, SupplyVariant } from '../types';
-
-import type { Establishment, _EstablishmentData } from './types';
-import type { MachikoroG } from '../types';
+import { EstColor, EstType, Establishment, _EstablishmentData } from './types';
+import { Expansion, SupplyVariant, MachikoroG } from '../types';
 
 export * from './metadata';
 export * from './types';
