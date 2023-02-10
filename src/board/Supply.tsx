@@ -5,7 +5,8 @@ import React from 'react';
 import classNames from 'classnames';
 
 import * as Est from 'game/establishments';
-import { MachikoroG, Moves, SupplyVariant, canBuyEst } from 'game';
+import { MachikoroG, SupplyVariant, canBuyEst } from 'game';
+import { Moves } from './types';
 import StackTable from './StackTable';
 
 /**

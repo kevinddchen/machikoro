@@ -1,4 +1,5 @@
 export * from './machikoro';
 export * from './types';
-
-// export type Moves = { [move: string]: (...args: any[]) => void };
+export * as Est from './establishments';
+export * as Land from './landmarks';
+export * as Log from './log';

@@ -6,7 +6,8 @@ import classNames from 'classnames';
 
 import * as Est from 'game/establishments';
 import * as Land from 'game/landmarks';
-import { MachikoroG, Moves, canBuyLand, canDoOfficeGive, canDoOfficeTake, canDoTV, getCoins } from 'game';
+import { MachikoroG, canBuyLand, canDoOfficeGive, canDoOfficeTake, canDoTV, getCoins } from 'game';
+import { Moves } from './types';
 import StackTable from './StackTable';
 
 /**

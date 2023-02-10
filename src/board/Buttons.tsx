@@ -4,7 +4,8 @@ import { Ctx } from 'boardgame.io';
 import React from 'react';
 import classNames from 'classnames';
 
-import { MachikoroG, Moves, canAddTwo, canCommitRoll, canEndTurn, canRoll } from 'game';
+import { MachikoroG, canAddTwo, canCommitRoll, canEndTurn, canRoll } from 'game';
+import { Moves } from './types';
 
 /**
  * @param G

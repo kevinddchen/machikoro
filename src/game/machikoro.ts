@@ -38,7 +38,7 @@ export const GAME_NAME = 'machikoro';
  * @returns The number of coins owned by the player.
  */
 export const getCoins = (G: MachikoroG, player: number): number => {
-  return G._money[player];
+  return G._coins[player];
 };
 
 /**
@@ -490,7 +490,7 @@ const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
  * @param amount - Number of coins to give to the player. Can be negative.
  */
 const setCoins = (G: MachikoroG, player: number, amount: number): void => {
-  G._money[player] += amount;
+  G._coins[player] += amount;
 };
 
 /**
@@ -782,7 +782,7 @@ export const Machikoro: Game<MachikoroG> = {
     const { numPlayers } = ctx;
 
     // initialize coins
-    const money = Array(numPlayers).fill(startCoins);
+    const coins = Array(numPlayers).fill(startCoins);
 
     let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
     if (randomizeTurnOrder) {
@@ -795,7 +795,7 @@ export const Machikoro: Game<MachikoroG> = {
       _playOrder,
       ...newTurnG,
       secret: { _decks: null },
-      _money: money,
+      _coins: coins,
       _estData: null,
       _landData: null,
       _logBuffer: [],
