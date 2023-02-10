@@ -3,7 +3,7 @@
 //
 import * as Meta from './metadata';
 import { EstColor, EstType, Establishment, _EstablishmentData } from './types';
-import { Expansion, SupplyVariant, MachikoroG } from '../types';
+import { Expansion, MachikoroG, SupplyVariant } from '../types';
 
 export * from './metadata';
 export * from './types';

@@ -3,8 +3,8 @@
 //
 
 import * as Meta from './metadata';
-import { Landmark, _LandmarkData } from './types';
 import { Expansion, MachikoroG } from '../types';
+import { Landmark, _LandmarkData } from './types';
 
 export * from './metadata';
 export * from './types';

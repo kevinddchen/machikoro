@@ -1,9 +1,9 @@
 import { BoardProps } from 'boardgame.io/react';
 import React from 'react';
 
-import { MachikoroG } from 'game';
 import Buttons from './Buttons';
 import Logger from './Logger';
+import { MachikoroG } from 'game';
 import PlayerInfo from './PlayerInfo';
 import StatusBar from './StatusBar';
 import Supply from './Supply';

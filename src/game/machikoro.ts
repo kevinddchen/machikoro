@@ -5,8 +5,8 @@ import { EventsAPI } from 'boardgame.io/dist/types/src/plugins/plugin-events';
 import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
-import { Expansion, SupplyVariant, TurnState, MachikoroG } from './types';
 import { EstColor, EstType, Establishment } from './establishments';
+import { Expansion, MachikoroG, SupplyVariant, TurnState } from './types';
 import { Landmark } from './landmarks';
 
 //

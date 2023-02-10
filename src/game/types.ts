@@ -1,6 +1,6 @@
-import { _LandmarkData } from './landmarks/types';
 import { Establishment, _EstablishmentData } from './establishments/types';
 import { LogLine } from './log/types';
+import { _LandmarkData } from './landmarks/types';
 
 /**
  * The `G` object containing all game state variables.

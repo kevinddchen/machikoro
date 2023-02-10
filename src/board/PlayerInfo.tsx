@@ -70,8 +70,7 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
     const minis = [];
 
     const ownedEstablishments: Est.Establishment[] = [];
-    for (const est of this.establishments)
-      if (Est.countOwned(G, player, est) > 0) ownedEstablishments.push(est);
+    for (const est of this.establishments) if (Est.countOwned(G, player, est) > 0) ownedEstablishments.push(est);
 
     for (let i = 0; i < ownedEstablishments.length; i++) {
       const est = ownedEstablishments[i];

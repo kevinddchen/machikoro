@@ -2,7 +2,7 @@
 // Game metadata for establishments.
 //
 
-import { Establishment, EstColor, EstType } from './types';
+import { EstColor, EstType, Establishment } from './types';
 
 export const WheatField: Establishment = {
   _id: 0,

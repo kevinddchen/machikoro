@@ -1,6 +1,6 @@
 import 'styles/main.css';
 
-import { LogEntry, Ctx } from 'boardgame.io';
+import { Ctx, LogEntry } from 'boardgame.io';
 import React from 'react';
 
 import { LogEvent, LogLine } from 'game/log';

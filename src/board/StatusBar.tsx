@@ -6,8 +6,6 @@ import classNames from 'classnames';
 
 import { MachikoroG, TurnState } from 'game';
 
-
-
 /**
  * @param G
  * @param ctx
