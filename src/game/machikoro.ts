@@ -225,10 +225,8 @@ const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollOne(G.roll));
 
-  makeTunaRoll(G, random);
-
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx);
+    commitRoll(G, ctx, random);
   }
 
   log.setMetadata(G._logBuffer);
@@ -258,10 +256,8 @@ const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollTwo(dice));
 
-  makeTunaRoll(G, random);
-
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx);
+    commitRoll(G, ctx, random);
   }
 
   log.setMetadata(G._logBuffer);
@@ -284,10 +280,8 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollOne(roll));
 
-  makeTunaRoll(G, random);
-
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx);
+    commitRoll(G, ctx, random);
   }
 
   log.setMetadata(G._logBuffer);
@@ -299,13 +293,13 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
  * @param G
  * @param ctx
  */
-const keepRoll: Move<MachikoroG> = ({ G, ctx, log }) => {
+const keepRoll: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canCommitRoll(G)) {
     return INVALID_MOVE;
   }
   G._logBuffer = [];
 
-  commitRoll(G, ctx);
+  commitRoll(G, ctx, random);
 
   log.setMetadata(G._logBuffer);
   return;
@@ -316,7 +310,7 @@ const keepRoll: Move<MachikoroG> = ({ G, ctx, log }) => {
  * @param G
  * @param ctx
  */
-const addTwo: Move<MachikoroG> = ({ G, ctx, log }) => {
+const addTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canAddTwo(G, ctx)) {
     return INVALID_MOVE;
   }
@@ -324,7 +318,7 @@ const addTwo: Move<MachikoroG> = ({ G, ctx, log }) => {
 
   G.roll! += 2; // G.roll not null via canAddTwo() check
   G._logBuffer.push(Log.addTwo(G.roll!));
-  commitRoll(G, ctx);
+  commitRoll(G, ctx, random);
 
   log.setMetadata(G._logBuffer);
   return;
@@ -495,8 +489,9 @@ const setCoins = (G: MachikoroG, player: number, amount: number): void => {
  * Evaluate the outcome of the roll by performing establishment actions.
  * @param G
  * @param ctx
+ * @param random
  */
-const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
+const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
   const currentPlayer = parseInt(ctx.currentPlayer);
   const roll = G.roll!;
 
@@ -542,7 +537,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
       // all other blue establishments take `est.earnings` coins from the player
       let earnings;
       if (Est.isEqual(est, Est.TunaBoat)) {
-        earnings = getTunaRoll(G);
+        earnings = getTunaRoll(G, random);
       } else {
         earnings = est.earnings;
       }
@@ -689,26 +684,17 @@ const take = (G: MachikoroG, args: { from: number; to: number }, amount: number,
 };
 
 /**
- * Roll dice for the tuna boat roll. This is done every turn, even if it is not
- * needed.
- * @param G
- * @param random
- */
-const makeTunaRoll = (G: MachikoroG, random: RandomAPI): void => {
-  G.secret.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
-};
-
-/**
  * Get the roll for the tuna boat, logging if not done yet for this turn.
  * @param G
+ * @param random
  * @returns Dice roll.
  */
-const getTunaRoll = (G: MachikoroG): number => {
-  if (!G.tunaHasRolled) {
-    G.tunaHasRolled = true;
-    G._logBuffer.push(Log.tunaRoll(G.secret.tunaRoll!));
+const getTunaRoll = (G: MachikoroG, random: RandomAPI): number => {
+  if (G.tunaRoll === null) {
+    G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+    G._logBuffer.push(Log.tunaRoll(G.tunaRoll));
   }
-  return G.secret.tunaRoll!;
+  return G.tunaRoll;
 };
 
 /**
@@ -775,7 +761,6 @@ const newTurnG = {
   officeGiveEst: null,
   justBoughtEst: null,
   tunaRoll: null,
-  tunaHasRolled: false,
 };
 
 export const Machikoro: Game<MachikoroG> = {
@@ -802,7 +787,7 @@ export const Machikoro: Game<MachikoroG> = {
       supplyVariant,
       _playOrder,
       ...newTurnG,
-      secret: { tunaRoll: null, _decks: null },
+      secret: { _decks: null },
       _coins: coins,
       _estData: null,
       _landData: null,
