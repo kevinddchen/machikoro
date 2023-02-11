@@ -1,21 +1,13 @@
 import 'styles/main.css';
 
+import { Ctx } from 'boardgame.io';
 import React from 'react';
 import classNames from 'classnames';
 
-import {
-  Ctx,
-  Est,
-  Establishment,
-  Land,
-  Landmark,
-  MachikoroG,
-  Moves,
-  canBuyLand,
-  canDoOfficePhase1,
-  canDoOfficePhase2,
-  canDoTV,
-} from 'game';
+import * as Est from 'game/establishments';
+import * as Land from 'game/landmarks';
+import { MachikoroG, canBuyLand, canDoOfficeGive, canDoOfficeTake, canDoTV, getCoins } from 'game';
+import { Moves } from './types';
 import StackTable from './StackTable';
 
 /**
@@ -42,20 +34,20 @@ interface PlayerInfoProps {
  * and establishments, etc.
  */
 class PlayerInfo extends React.Component<PlayerInfoProps, object> {
-  private landmarks: Landmark[];
-  private establishments: Establishment[];
+  private landmarks: Land.Landmark[];
+  private establishments: Est.Establishment[];
 
   constructor(props: PlayerInfoProps) {
     super(props);
     const { G } = this.props;
-    this.establishments = Est.getAllInUse(G.est_data);
-    this.landmarks = Land.getAllInUse(G.land_data);
+    this.establishments = Est.getAllInUse(G);
+    this.landmarks = Land.getAllInUse(G);
   }
 
   render() {
     const { G, ctx, moves, isActive, isSelf, player, name } = this.props;
     const currentPlayer = parseInt(ctx.currentPlayer);
-    const money = G.money[player];
+    const money = getCoins(G, player);
     const _canDoTV = isActive && canDoTV(G, ctx, player);
 
     const land_img = 'land_img' + (isSelf ? '_self' : '');
@@ -66,11 +58,11 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
     for (let i = 0; i < this.landmarks.length; i++) {
       const land = this.landmarks[i];
       const _canBuyLand = isActive && player === currentPlayer && canBuyLand(G, ctx, land);
-      const _owned = Land.isOwned(G.land_data, player, land);
+      const _owned = Land.owns(G, player, land);
 
       Table.push(
         <td key={i} className={classNames('land_td', { active: _canBuyLand })} onClick={() => moves.buyLand(land)}>
-          <img className={classNames(land_img, { inactive: !_owned })} src={`./assets/${land.image_filename}`} alt='' />
+          <img className={classNames(land_img, { inactive: !_owned })} src={`./assets/${land.imageFilename}`} alt='' />
         </td>
       );
     }
@@ -78,27 +70,26 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
     // establishment miniatures
     const minis = [];
 
-    const ownedEstablishments: Establishment[] = [];
-    for (const est of this.establishments)
-      if (Est.countOwned(G.est_data, player, est) > 0) ownedEstablishments.push(est);
+    const ownedEstablishments: Est.Establishment[] = [];
+    for (const est of this.establishments) if (Est.countOwned(G, player, est) > 0) ownedEstablishments.push(est);
 
     for (let i = 0; i < ownedEstablishments.length; i++) {
       const est = ownedEstablishments[i];
-      const count = Est.countOwned(G.est_data, player, est);
+      const count = Est.countOwned(G, player, est);
 
       let _canDoOffice: boolean;
-      let _doOffice: (est: Establishment) => void;
+      let _doOffice: (est: Est.Establishment) => void;
       if (player === currentPlayer) {
-        _canDoOffice = isActive && canDoOfficePhase1(G, ctx, est);
-        _doOffice = (est) => moves.doOfficePhase1(est);
+        _canDoOffice = isActive && canDoOfficeGive(G, ctx, est);
+        _doOffice = (est) => moves.doOfficeGive(est);
       } else {
-        _canDoOffice = isActive && canDoOfficePhase2(G, ctx, player, est);
-        _doOffice = (est) => moves.doOfficePhase2(player, est);
+        _canDoOffice = isActive && canDoOfficeTake(G, ctx, player, est);
+        _doOffice = (est) => moves.doOfficeTake(player, est);
       }
 
       for (let j = 0; j < count; j++) {
         const which_path =
-          i === ownedEstablishments.length - 1 && j === count - 1 ? est.image_filename : est.mini_filename;
+          i === ownedEstablishments.length - 1 && j === count - 1 ? est.imageFilename : est.miniFilename;
 
         minis.push(
           <div

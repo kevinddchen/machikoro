@@ -1,72 +1,88 @@
-import { CardType, Color, LogEvent, State, SupplyVariant } from './enums';
+import { Establishment, _EstablishmentData } from './establishments/types';
+import { LogLine } from './log/types';
+import { _LandmarkData } from './landmarks/types';
 
+/**
+ * The `G` object containing all game state variables.
+ * @param expansion - the expansion of the game.
+ * @param supplyVariant - the supply variant of the game.
+ * @param _playOrder - the order of players in the game. (Private, do not access)
+ * @param turnState - the current player's turn state.
+ * @param roll - the current player's dice roll total.
+ * @param numRolls - the number of dice rolls made by the current player.
+ * @param secondTurn - true if the current player can make another turn.
+ * @param doTV - true if the current player will activate the TV station.
+ * @param doOffice - true if the current player will activate the office.
+ * @param officeGiveEst - the establishment picked for the office to give.
+ * @param justBoughtEst - the establishment just bought (for prettier rendering).
+ * @param tunaRoll - the roll made for the tuna boat.
+ * @param tunaHasRolled - true if the tuna boat has rolled.
+ * @param secret - game state that is not passed to clients.
+ * @param _coins - coins for each player. (Private, do not access)
+ * @param _estData - establishment data. (Private, do not access)
+ * @param _landData - landmark data. (Private, do not access)
+ * @param _logBuffer - buffer of log lines. (Private, do not access)
+ */
 export type MachikoroG = {
-  state: State; // tracks game state
-  roll: number; // player roll
-  numRolls: number; // number of rolls made
-  money: number[]; // money for each player
-  est_data: EstablishmentData;
-  land_data: LandmarkData;
+  readonly expansion: Expansion;
   readonly supplyVariant: SupplyVariant;
-  readonly _playOrder: string[];
-  secret: Secrets; // game state that is not passed to clients (e.g. establishment deck)
-  log_buffer: LogLine[]; // temporarily stores `LogLine` objects for each move
-  secondTurn: boolean; // true if player can make another turn
-  doTV: boolean; // true if player will activate TV
-  doOffice: boolean; // true if player will activate office
-  officeEst: Establishment | null; // establishment picked for office
-  tunaRoll: number | null; // roll made for tuna boat
-  justBoughtEst: Establishment | null; // establishment just bought (for prettier rendering)
-};
-
-export type Secrets = {
-  decks: Establishment[][];
-};
-
-export type Establishment = {
-  readonly _id: number; // unique internal id used to enumerate establishments
-  readonly name: string; // display name
-  readonly description: string; // tooltip text
-  readonly image_filename: string; // filename of full-sized image
-  readonly mini_filename: string; // filename of miniature image
-  readonly cost: number;
-  readonly base: number; // the earnings per activation (for simple effects)
-  readonly activation: number[]; // which rolls the establishment activates
-  readonly color: Color;
-  readonly type: CardType | null;
-};
-
-export type EstablishmentData = {
-  _in_use: boolean[];
-  _remaining_count: number[]; // remaining in supply and deck
-  _available_count: number[]; // available to buy from supply
-  _owned_count: number[][];
-};
-
-export type Landmark = {
-  readonly _id: number; // internal id used to enumerate landmarks
-  readonly name: string;
-  readonly description: string;
-  readonly image_filename: string;
-  readonly cost: number;
-};
-
-export type LandmarkData = {
-  _in_use: boolean[];
-  _owned: boolean[][];
+  readonly _playOrder: string[]; // TODO: do not use a property of `G` for this
+  turnState: TurnState;
+  roll: number | null;
+  numRolls: number;
+  secondTurn: boolean;
+  doTV: boolean;
+  doOffice: boolean;
+  officeGiveEst: Establishment | null;
+  justBoughtEst: Establishment | null;
+  tunaRoll: number | null; // TODO: make secret
+  tunaHasRolled: boolean;
+  secret: Secrets;
+  _coins: number[];
+  _estData: _EstablishmentData | null;
+  _landData: _LandmarkData | null;
+  _logBuffer: LogLine[];
 };
 
 /**
- * A `LogLine` is an object that is created during a move that stores a
- * `LogEvent` describing the type of event that needs to be logged and any
- * relevant metadata, such as the dice roll or money earned. Over the course of
- * a move, these `LogLine` objects are gathered in an array. At the end of the
- * move, the array of `LogLine` objects is passed to `ctx.log.setMetadata`.
- *
- * On the client, these `LogLine` objects are retrieved from `ctx.log` where it
- * is parsed by the `Logger` component.
+ * Game state that is not passed to the clients
+ * @param _decks - the establishment draw decks. (Private, do not access)
  */
-export interface LogLine {
-  readonly event: LogEvent;
-  [key: string]: any;
-}
+export type Secrets = {
+  _decks: Establishment[][] | null;
+};
+
+/**
+ * Turn state enum.
+ */
+export const TurnState = {
+  Roll: 'Roll',
+  TV: 'TV',
+  OfficeGive: 'OfficeGive',
+  OfficeTake: 'OfficeTake',
+  Buy: 'Buy',
+  End: 'End',
+} as const;
+
+export type TurnState = (typeof TurnState)[keyof typeof TurnState];
+
+/**
+ * Expansion enum.
+ */
+export const Expansion = {
+  Base: 'Base',
+  Harbor: 'Harbor',
+} as const;
+
+export type Expansion = (typeof Expansion)[keyof typeof Expansion];
+
+/**
+ * Supply variant enum.
+ */
+export const SupplyVariant = {
+  Total: 'Total',
+  Variable: 'Variable',
+  Hybrid: 'Hybrid',
+} as const;
+
+export type SupplyVariant = (typeof SupplyVariant)[keyof typeof SupplyVariant];

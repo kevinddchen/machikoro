@@ -1,9 +1,12 @@
 import 'styles/main.css';
 
+import { Ctx } from 'boardgame.io';
 import React from 'react';
 import classNames from 'classnames';
 
-import { Ctx, Est, Establishment, MachikoroG, Moves, SupplyVariant, canBuyEst } from 'game';
+import * as Est from 'game/establishments';
+import { MachikoroG, SupplyVariant, canBuyEst } from 'game';
+import { Moves } from './types';
 import StackTable from './StackTable';
 
 /**
@@ -23,12 +26,12 @@ interface SupplyProps {
  * Supply area, where players see and buy establishments
  */
 export default class Supply extends React.Component<SupplyProps, object> {
-  private establishments: Establishment[];
+  private establishments: Est.Establishment[];
 
   constructor(props: SupplyProps) {
     super(props);
     const { G } = this.props;
-    this.establishments = Est.getAllInUse(G.est_data);
+    this.establishments = Est.getAllInUse(G);
   }
 
   render() {
@@ -39,8 +42,8 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const est = this.establishments[i];
 
       const _canBuyEst = isActive && canBuyEst(G, ctx, est);
-      const available = Est.countAvailable(G.est_data, est);
-      const remaining = Est.countRemaining(G.est_data, est);
+      const available = Est.countAvailable(G, est);
+      const remaining = Est.countRemaining(G, est);
 
       // display the establishment on the board if
       // (i) it is available, or
@@ -55,7 +58,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
           <td key={i} className={classNames('est_td', { active: _canBuyEst })} onClick={() => moves.buyEst(est)}>
             <img
               className={classNames('est_img', { inactive: available === 0 })}
-              src={`./assets/${est.image_filename}`}
+              src={`./assets/${est.imageFilename}`}
               alt=''
             />
             <div className='est_num'>

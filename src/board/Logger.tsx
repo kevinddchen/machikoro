@@ -1,9 +1,9 @@
 import 'styles/main.css';
 
-import { LogEntry } from 'boardgame.io';
+import { Ctx, LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { Ctx, LogEvent, LogLine } from 'game';
+import { LogEvent, LogLine } from 'game/log';
 
 const COIN = '\uD83D\uDFE4';
 

@@ -78,11 +78,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   };
 
   setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    this.setState({ expansion: parseInt(e.target.value) });
+    this.setState({ expansion: e.target.value as Expansion });
   };
 
   setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    this.setState({ supplyVariant: parseInt(e.target.value) });
+    this.setState({ supplyVariant: e.target.value as SupplyVariant });
   };
 
   // --- Fetch matches --------------------------------------------------------

@@ -11,10 +11,12 @@ App is online at <a href="http://playmachikoro.herokuapp.com/">playmachikoro.her
 
 ## Local Install
 
+First, install [Node.js](https://nodejs.org/en/).
+
 ```bash
 git clone git@github.com:kevinddchen/machikoro.git
 cd machikoro
-npm install .
+npm install
 npm run build
 npm run serve
 ```

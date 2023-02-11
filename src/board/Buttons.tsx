@@ -1,9 +1,11 @@
 import 'styles/main.css';
 
+import { Ctx } from 'boardgame.io';
 import React from 'react';
 import classNames from 'classnames';
 
-import { Ctx, MachikoroG, Moves, canAddTwo, canCommitRoll, canEndTurn, canRoll } from 'game';
+import { MachikoroG, canAddTwo, canCommitRoll, canEndTurn, canRoll } from 'game';
+import { Moves } from './types';
 
 /**
  * @param G
@@ -55,7 +57,7 @@ export default class Buttons extends React.Component<ButtonsProps, object> {
             className={classNames('button', { button_active: _canAddTwo }, { button_hide: !_canAddTwo })}
             onClick={() => moves.addTwo()}
           >
-            Keep ({G.roll + 2})
+            Keep ({G.roll! + 2})
           </button>
         </div>
         <div className='div-column-right'>
