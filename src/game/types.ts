@@ -16,7 +16,6 @@ import { _LandmarkData } from './landmarks/types';
  * @param officeGiveEst - the establishment picked for the office to give.
  * @param justBoughtEst - the establishment just bought (for prettier rendering).
  * @param tunaRoll - the roll made for the tuna boat.
- * @param tunaHasRolled - true if the tuna boat has rolled.
  * @param secret - game state that is not passed to clients.
  * @param _coins - coins for each player. (Private, do not access)
  * @param _estData - establishment data. (Private, do not access)
@@ -35,8 +34,7 @@ export type MachikoroG = {
   doOffice: boolean;
   officeGiveEst: Establishment | null;
   justBoughtEst: Establishment | null;
-  tunaRoll: number | null; // TODO: make secret
-  tunaHasRolled: boolean;
+  tunaRoll: number | null;
   secret: Secrets;
   _coins: number[];
   _estData: _EstablishmentData | null;

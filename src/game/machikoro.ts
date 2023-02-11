@@ -1,6 +1,7 @@
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { EventsAPI } from 'boardgame.io/dist/types/src/plugins/plugin-events';
+import { RandomAPI } from 'boardgame.io/dist/types/src/plugins/random/random';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
@@ -164,7 +165,7 @@ export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): bo
  * @param opponent
  * @param est
  * @returns True if the current player can take the opponent's establishment,
- * as the second phase of the office action.
+ * as a part of the office action.
  */
 export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
@@ -224,11 +225,8 @@ const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollOne(G.roll));
 
-  // save a tuna roll, in case it's needed later
-  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
-
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx);
+    commitRoll(G, ctx, random);
   }
 
   log.setMetadata(G._logBuffer);
@@ -258,11 +256,8 @@ const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollTwo(dice));
 
-  // save a tuna roll, in case it's needed later
-  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
-
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx);
+    commitRoll(G, ctx, random);
   }
 
   log.setMetadata(G._logBuffer);
@@ -285,11 +280,8 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollOne(roll));
 
-  // save a tuna roll, in case it's needed later
-  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
-
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx);
+    commitRoll(G, ctx, random);
   }
 
   log.setMetadata(G._logBuffer);
@@ -301,13 +293,13 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
  * @param G
  * @param ctx
  */
-const keepRoll: Move<MachikoroG> = ({ G, ctx, log }) => {
+const keepRoll: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canCommitRoll(G)) {
     return INVALID_MOVE;
   }
   G._logBuffer = [];
 
-  commitRoll(G, ctx);
+  commitRoll(G, ctx, random);
 
   log.setMetadata(G._logBuffer);
   return;
@@ -318,7 +310,7 @@ const keepRoll: Move<MachikoroG> = ({ G, ctx, log }) => {
  * @param G
  * @param ctx
  */
-const addTwo: Move<MachikoroG> = ({ G, ctx, log }) => {
+const addTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   if (!canAddTwo(G, ctx)) {
     return INVALID_MOVE;
   }
@@ -326,7 +318,7 @@ const addTwo: Move<MachikoroG> = ({ G, ctx, log }) => {
 
   G.roll! += 2; // G.roll not null via canAddTwo() check
   G._logBuffer.push(Log.addTwo(G.roll!));
-  commitRoll(G, ctx);
+  commitRoll(G, ctx, random);
 
   log.setMetadata(G._logBuffer);
   return;
@@ -497,8 +489,9 @@ const setCoins = (G: MachikoroG, player: number, amount: number): void => {
  * Evaluate the outcome of the roll by performing establishment actions.
  * @param G
  * @param ctx
+ * @param random
  */
-const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
+const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
   const currentPlayer = parseInt(ctx.currentPlayer);
   const roll = G.roll!;
 
@@ -544,7 +537,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx): void => {
       // all other blue establishments take `est.earnings` coins from the player
       let earnings;
       if (Est.isEqual(est, Est.TunaBoat)) {
-        earnings = getTunaRoll(G);
+        earnings = getTunaRoll(G, random);
       } else {
         earnings = est.earnings;
       }
@@ -693,14 +686,15 @@ const take = (G: MachikoroG, args: { from: number; to: number }, amount: number,
 /**
  * Get the roll for the tuna boat, logging if not done yet for this turn.
  * @param G
+ * @param random
  * @returns Dice roll.
  */
-const getTunaRoll = (G: MachikoroG): number => {
-  if (!G.tunaHasRolled) {
-    G.tunaHasRolled = true;
-    G._logBuffer.push(Log.tunaRoll(G.tunaRoll!));
+const getTunaRoll = (G: MachikoroG, random: RandomAPI): number => {
+  if (G.tunaRoll === null) {
+    G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+    G._logBuffer.push(Log.tunaRoll(G.tunaRoll));
   }
-  return G.tunaRoll!;
+  return G.tunaRoll;
 };
 
 /**
@@ -767,7 +761,6 @@ const newTurnG = {
   officeGiveEst: null,
   justBoughtEst: null,
   tunaRoll: null,
-  tunaHasRolled: false,
 };
 
 export const Machikoro: Game<MachikoroG> = {
@@ -866,8 +859,8 @@ export const Machikoro: Game<MachikoroG> = {
     buyEst: buyEst,
     buyLand: buyLand,
     doTV: doTV,
-    doOfficePhase1: doOfficeGive,
-    doOfficePhase2: doOfficeTake,
+    doOfficeGive: doOfficeGive,
+    doOfficeTake: doOfficeTake,
     endTurn: endTurn,
   },
 
