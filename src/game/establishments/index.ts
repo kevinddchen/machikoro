@@ -3,7 +3,7 @@
 //
 
 import * as Meta from './metadata';
-import { EstColor, EstType, Establishment, _EstablishmentData } from './types';
+import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant } from '../types';
 
 export * from './metadata';
@@ -119,7 +119,7 @@ export const transfer = (G: MachikoroG, args: { from: number; to: number; est: E
  */
 export const replenishSupply = (G: MachikoroG): void => {
   const { supplyVariant } = G;
-  const decks = G.secret._decks!;
+  const decks = G.secret._decks;
 
   switch (supplyVariant) {
     case SupplyVariant.Total: {
@@ -164,7 +164,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion, supplyVariant } = G;
   const numEsts = Meta.ESTABLISHMENTS.length;
 
-  const data: _EstablishmentData = {
+  const data: EstablishmentData = {
     _inUse: Array(numEsts).fill(false),
     _remainingCount: Array(numEsts).fill(0),
     _availableCount: Array(numEsts).fill(0),

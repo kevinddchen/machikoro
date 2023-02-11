@@ -733,7 +733,7 @@ export const Machikoro: Game<MachikoroG> = {
     const { numPlayers } = ctx;
 
     // initialize coins
-    const coins = Array(numPlayers).fill(startCoins);
+    const _coins = Array(numPlayers).fill(startCoins);
 
     let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
     if (randomizeTurnOrder) {
@@ -745,8 +745,8 @@ export const Machikoro: Game<MachikoroG> = {
       supplyVariant,
       _playOrder,
       ...newTurnG,
-      secret: { _decks: null },
-      _coins: coins,
+      secret: { _decks: [] },
+      _coins,
       _estData: null,
       _landData: null,
       _logBuffer: [],
