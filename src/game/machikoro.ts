@@ -1,6 +1,7 @@
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { EventsAPI } from 'boardgame.io/dist/types/src/plugins/plugin-events';
+import { RandomAPI } from 'boardgame.io/dist/types/src/plugins/random/random';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
@@ -224,8 +225,7 @@ const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollOne(G.roll));
 
-  // save a tuna roll, in case it's needed later
-  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+  makeTunaRoll(G, random);
 
   if (noFurtherRollActions(G, ctx)) {
     commitRoll(G, ctx);
@@ -258,8 +258,7 @@ const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollTwo(dice));
 
-  // save a tuna roll, in case it's needed later
-  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+  makeTunaRoll(G, random);
 
   if (noFurtherRollActions(G, ctx)) {
     commitRoll(G, ctx);
@@ -285,8 +284,7 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
   G.numRolls += 1;
   G._logBuffer.push(Log.rollOne(roll));
 
-  // save a tuna roll, in case it's needed later
-  G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+  makeTunaRoll(G, random);
 
   if (noFurtherRollActions(G, ctx)) {
     commitRoll(G, ctx);
@@ -691,6 +689,16 @@ const take = (G: MachikoroG, args: { from: number; to: number }, amount: number,
 };
 
 /**
+ * Roll dice for the tuna boat roll. This is done every turn, even if it is not
+ * needed.
+ * @param G
+ * @param random
+ */
+const makeTunaRoll = (G: MachikoroG, random: RandomAPI): void => {
+  G.secret.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
+};
+
+/**
  * Get the roll for the tuna boat, logging if not done yet for this turn.
  * @param G
  * @returns Dice roll.
@@ -698,9 +706,9 @@ const take = (G: MachikoroG, args: { from: number; to: number }, amount: number,
 const getTunaRoll = (G: MachikoroG): number => {
   if (!G.tunaHasRolled) {
     G.tunaHasRolled = true;
-    G._logBuffer.push(Log.tunaRoll(G.tunaRoll!));
+    G._logBuffer.push(Log.tunaRoll(G.secret.tunaRoll!));
   }
-  return G.tunaRoll!;
+  return G.secret.tunaRoll!;
 };
 
 /**
@@ -794,7 +802,7 @@ export const Machikoro: Game<MachikoroG> = {
       supplyVariant,
       _playOrder,
       ...newTurnG,
-      secret: { _decks: null },
+      secret: { tunaRoll: null, _decks: null },
       _coins: coins,
       _estData: null,
       _landData: null,
@@ -866,8 +874,8 @@ export const Machikoro: Game<MachikoroG> = {
     buyEst: buyEst,
     buyLand: buyLand,
     doTV: doTV,
-    doOfficePhase1: doOfficeGive,
-    doOfficePhase2: doOfficeTake,
+    doOfficeGive: doOfficeGive,
+    doOfficeTake: doOfficeTake,
     endTurn: endTurn,
   },
 

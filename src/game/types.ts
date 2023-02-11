@@ -35,7 +35,6 @@ export type MachikoroG = {
   doOffice: boolean;
   officeGiveEst: Establishment | null;
   justBoughtEst: Establishment | null;
-  tunaRoll: number | null; // TODO: make secret
   tunaHasRolled: boolean;
   secret: Secrets;
   _coins: number[];
@@ -46,9 +45,11 @@ export type MachikoroG = {
 
 /**
  * Game state that is not passed to the clients
+ * @param tunaRoll - the roll made for the tuna boat.
  * @param _decks - the establishment draw decks. (Private, do not access)
  */
 export type Secrets = {
+  tunaRoll: number | null;
   _decks: Establishment[][] | null;
 };
 
