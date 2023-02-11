@@ -79,8 +79,8 @@ export default class Logger extends React.Component<LogProps, object> {
         return `\tchanged roll to ${logLine.roll}`;
       }
       case LogEvent.Earn: {
-        const { to, amount, name } = logLine;
-        return `\t${names[to]} earned ${amount} ${COIN}  (${name})`;
+        const { player, amount, name } = logLine;
+        return `\t${names[player]} earned ${amount} ${COIN}  (${name})`;
       }
       case LogEvent.Take: {
         const { from, to, amount, name } = logLine;
