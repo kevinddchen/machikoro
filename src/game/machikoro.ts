@@ -220,7 +220,7 @@ const rollOne: Move<MachikoroG> = ({ G, ctx, random }) => {
 
   G.roll = random.Die(6);
   G.numRolls += 1;
-  G._logBuffer.push(Log.rollOne(G.roll));
+  Log.logRollOne(G, G.roll);
 
   if (noFurtherRollActions(G, ctx)) {
     commitRoll(G, ctx, random);
@@ -247,7 +247,7 @@ const rollTwo: Move<MachikoroG> = ({ G, ctx, random }) => {
 
   G.roll = dice[0] + dice[1];
   G.numRolls += 1;
-  G._logBuffer.push(Log.rollTwo(dice));
+  Log.logRollTwo(G, dice);
 
   if (noFurtherRollActions(G, ctx)) {
     commitRoll(G, ctx, random);
@@ -267,7 +267,7 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random }, roll: number) => {
 
   G.roll = roll;
   G.numRolls += 1;
-  G._logBuffer.push(Log.rollOne(roll));
+  Log.logRollOne(G, roll);
 
   if (noFurtherRollActions(G, ctx)) {
     commitRoll(G, ctx, random);
@@ -297,8 +297,9 @@ const addTwo: Move<MachikoroG> = ({ G, ctx, random }) => {
     return INVALID_MOVE;
   }
 
-  G.roll! += 2; // G.roll not null via canAddTwo() check
-  G._logBuffer.push(Log.addTwo(G.roll!));
+  G.roll! += 2; // G.roll is not null via canAddTwo() check
+  Log.logAddTwo(G, G.roll!);
+
   commitRoll(G, ctx, random);
 
   return;
@@ -317,7 +318,7 @@ const buyEst: Move<MachikoroG> = ({ G, ctx }, est: Establishment) => {
   Est.buy(G, player, est);
   setCoins(G, player, -est.cost);
   G.justBoughtEst = est;
-  G._logBuffer.push(Log.buy(est.name));
+  Log.logBuy(G, est.name);
 
   G.turnState = TurnState.End;
 
@@ -336,7 +337,7 @@ const buyLand: Move<MachikoroG> = ({ G, ctx, events }, land: Landmark) => {
   const player = parseInt(ctx.currentPlayer);
   Land.buy(G, player, land);
   setCoins(G, player, -land.cost);
-  G._logBuffer.push(Log.buy(land.name));
+  Log.logBuy(G, land.name);
 
   G.turnState = TurnState.End;
   if (canEndGame(G, ctx)) {
@@ -396,7 +397,7 @@ const doOfficeTake: Move<MachikoroG> = ({ G, ctx }, opponent: number, est: Estab
   }
   Est.transfer(G, { from: player, to: opponent, est: G.officeGiveEst });
   Est.transfer(G, { from: opponent, to: player, est });
-  G._logBuffer.push(Log.office({ player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent));
+  Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
   switchState(G, ctx);
 
@@ -618,7 +619,7 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
 const earn = (G: MachikoroG, player: number, amount: number, name: string): void => {
   setCoins(G, player, amount);
   if (amount > 0) {
-    G._logBuffer.push(Log.earn(player, amount, name));
+    Log.logEarn(G, player, amount, name);
   }
 };
 
@@ -637,7 +638,7 @@ const take = (G: MachikoroG, args: { from: number; to: number }, amount: number,
   setCoins(G, from, -actual_amount);
   setCoins(G, to, actual_amount);
   if (actual_amount > 0) {
-    G._logBuffer.push(Log.take(args, actual_amount, name));
+    Log.logTake(G, args, actual_amount, name);
   }
 };
 
@@ -650,7 +651,7 @@ const take = (G: MachikoroG, args: { from: number; to: number }, amount: number,
 const getTunaRoll = (G: MachikoroG, random: RandomAPI): number => {
   if (G.tunaRoll === null) {
     G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
-    G._logBuffer.push(Log.tunaRoll(G.tunaRoll));
+    Log.logTunaRoll(G, G.tunaRoll);
   }
   return G.tunaRoll;
 };
@@ -673,7 +674,7 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
     // city hall before buying
     if (getCoins(G, player) === 0) {
       setCoins(G, player, Land.CITY_HALL_EARNINGS);
-      G._logBuffer.push(Log.earn(player, Land.CITY_HALL_EARNINGS, 'City Hall'));
+      Log.logEarn(G, player, Land.CITY_HALL_EARNINGS, 'City Hall');
     }
     G.turnState = TurnState.Buy;
   }
@@ -686,7 +687,7 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
  * @param winner - ID of the winning player.
  */
 const endGame = (G: MachikoroG, events: EventsAPI, winner: number): void => {
-  G._logBuffer.push(Log.endGame(winner));
+  Log.logEndGame(G, winner);
   events.endGame();
 };
 
@@ -745,11 +746,11 @@ export const Machikoro: Game<MachikoroG> = {
       supplyVariant,
       _playOrder,
       ...newTurnG,
-      secret: { _decks: [] },
+      secret: { _decks: null },
       _coins,
       _estData: null,
       _landData: null,
-      _logBuffer: [],
+      _logBuffer: null,
     };
 
     // initialize data

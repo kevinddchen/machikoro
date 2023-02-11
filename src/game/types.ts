@@ -39,7 +39,7 @@ export type MachikoroG = {
   _coins: number[];
   _estData: EstablishmentData | null;
   _landData: LandmarkData | null;
-  _logBuffer: LogLine[];
+  _logBuffer: LogLine[] | null;
 };
 
 /**
@@ -47,7 +47,7 @@ export type MachikoroG = {
  * @param _decks - the establishment draw decks. (Private, do not access directly)
  */
 export type Secrets = {
-  _decks: Establishment[][];
+  _decks: Establishment[][] | null;
 };
 
 /**

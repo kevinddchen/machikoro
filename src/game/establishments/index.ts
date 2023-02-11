@@ -119,7 +119,7 @@ export const transfer = (G: MachikoroG, args: { from: number; to: number; est: E
  */
 export const replenishSupply = (G: MachikoroG): void => {
   const { supplyVariant } = G;
-  const decks = G.secret._decks;
+  const decks = G.secret._decks!;
 
   switch (supplyVariant) {
     case SupplyVariant.Total: {
