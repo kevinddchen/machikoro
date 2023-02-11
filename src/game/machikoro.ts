@@ -165,7 +165,7 @@ export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): bo
  * @param opponent
  * @param est
  * @returns True if the current player can take the opponent's establishment,
- * as the second phase of the office action.
+ * as a part of the office action.
  */
 export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
