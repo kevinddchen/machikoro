@@ -2,9 +2,28 @@
 // Utility functions for the log.
 //
 
+import { GameMethod } from 'boardgame.io/core';
+import { Plugin } from 'boardgame.io';
+
 import { LogEvent, LogLine } from './types';
+import { MachikoroG } from '../types';
 
 export * from './types';
+
+export const LogPlugin: Plugin<any, any, MachikoroG> = {
+  name: 'log',
+
+  fnWrap: (fn, fnType) =>
+    fnType === GameMethod.MOVE
+      ? ({ G, log, ...rest }, ...args) => {
+          // initialize empty log buffer
+          G = { ...G, _logBuffer: [] };
+          G = fn({ G, log, ...rest }, ...args);
+          log.setMetadata(G._logBuffer);
+          return G;
+        }
+      : fn,
+};
 
 export const rollOne = (roll: number): LogLine => {
   return {

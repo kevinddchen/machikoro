@@ -212,14 +212,11 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
 
 /**
  * Roll one die.
- * @param G
- * @param ctx
  */
-const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const rollOne: Move<MachikoroG> = ({ G, ctx, random }) => {
   if (!canRoll(G, ctx, 1)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   G.roll = random.Die(6);
   G.numRolls += 1;
@@ -229,20 +226,16 @@ const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
     commitRoll(G, ctx, random);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Roll two dice.
- * @param G
- * @param ctx
  */
-const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const rollTwo: Move<MachikoroG> = ({ G, ctx, random }) => {
   if (!canRoll(G, ctx, 2)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   const dice = random.Die(6, 2);
@@ -260,21 +253,17 @@ const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
     commitRoll(G, ctx, random);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Force the outcome of the dice roll. This move is removed in production.
- * @param G
- * @param ctx
  * @param roll - Desired dice total.
  */
-const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
+const debugRoll: Move<MachikoroG> = ({ G, ctx, random }, roll: number) => {
   if (!canRoll(G, ctx, 1)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   G.roll = roll;
   G.numRolls += 1;
@@ -284,57 +273,45 @@ const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
     commitRoll(G, ctx, random);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Do not activate Harbor and keep the current roll.
- * @param G
- * @param ctx
  */
-const keepRoll: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const keepRoll: Move<MachikoroG> = ({ G, ctx, random }) => {
   if (!canCommitRoll(G)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   commitRoll(G, ctx, random);
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate Harbor and add 2 to the current roll.
- * @param G
- * @param ctx
  */
-const addTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const addTwo: Move<MachikoroG> = ({ G, ctx, random }) => {
   if (!canAddTwo(G, ctx)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   G.roll! += 2; // G.roll not null via canAddTwo() check
   G._logBuffer.push(Log.addTwo(G.roll!));
   commitRoll(G, ctx, random);
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Buy an establishment.
- * @param G
- * @param ctx
  * @param est
  */
-const buyEst: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
+const buyEst: Move<MachikoroG> = ({ G, ctx }, est: Establishment) => {
   if (!canBuyEst(G, ctx, est)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   Est.buy(G, player, est);
@@ -344,21 +321,17 @@ const buyEst: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
 
   G.turnState = TurnState.End;
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Buy a landmark.
- * @param G
- * @param ctx
  * @param land
  */
-const buyLand: Move<MachikoroG> = ({ G, ctx, events, log }, land: Landmark) => {
+const buyLand: Move<MachikoroG> = ({ G, ctx, events }, land: Landmark) => {
   if (!canBuyLand(G, ctx, land)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   Land.buy(G, player, land);
@@ -370,62 +343,52 @@ const buyLand: Move<MachikoroG> = ({ G, ctx, events, log }, land: Landmark) => {
     endGame(G, events, player);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate the TV establishment by picking an opponent to take 5 coins from.
- * @param G
- * @param ctx
  * @param opponent
  */
-const doTV: Move<MachikoroG> = ({ G, ctx, log }, opponent: number) => {
+const doTV: Move<MachikoroG> = ({ G, ctx }, opponent: number) => {
   if (!canDoTV(G, ctx, opponent)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   take(G, { from: opponent, to: player }, Est.TVStation.earnings, Est.TVStation.name);
 
   switchState(G, ctx);
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate the office establishment by picking an establishment you own to
  * give up.
- * @param G
- * @param ctx
  * @param est
  */
-const doOfficeGive: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
+const doOfficeGive: Move<MachikoroG> = ({ G, ctx }, est: Establishment) => {
   if (!canDoOfficeGive(G, ctx, est)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   G.officeGiveEst = est;
   G.turnState = TurnState.OfficeTake;
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate the office establishment by picking an establishment an opponent
  * owns to take.
- * @param G
- * @param ctx
  * @param opponent
  * @param est
  */
-const doOfficeTake: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est: Establishment) => {
-  if (!canDoOfficeTake(G, ctx, opponent, est)) return INVALID_MOVE;
-  G._logBuffer = [];
+const doOfficeTake: Move<MachikoroG> = ({ G, ctx }, opponent: number, est: Establishment) => {
+  if (!canDoOfficeTake(G, ctx, opponent, est)) {
+    return INVALID_MOVE;
+  }
 
   const player = parseInt(ctx.currentPlayer);
   if (!G.officeGiveEst) {
@@ -437,20 +400,16 @@ const doOfficeTake: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est: 
 
   switchState(G, ctx);
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * End the turn.
- * @param G
- * @param ctx
  */
-const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
+const endTurn: Move<MachikoroG> = ({ G, ctx, events }) => {
   if (!canEndTurn(G)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   // a player earns coins via the airport if they did not buy anything
@@ -465,7 +424,6 @@ const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
     events.endTurn();
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -863,6 +821,8 @@ export const Machikoro: Game<MachikoroG> = {
     doOfficeTake: doOfficeTake,
     endTurn: endTurn,
   },
+
+  plugins: [Log.LogPlugin],
 
   playerView: PlayerView.STRIP_SECRETS!,
 };
