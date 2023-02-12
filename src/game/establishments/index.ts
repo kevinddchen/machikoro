@@ -3,7 +3,7 @@
 //
 
 import * as Meta from './metadata';
-import { EstColor, EstType, Establishment, EstablishmentData } from './types';
+import { EstColor, EstType, Establishment, _EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant } from '../types';
 
 export * from './metadata';
@@ -164,7 +164,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion, supplyVariant } = G;
   const numEsts = Meta.ESTABLISHMENTS.length;
 
-  const data: EstablishmentData = {
+  const data: _EstablishmentData = {
     _inUse: Array(numEsts).fill(false),
     _remainingCount: Array(numEsts).fill(0),
     _availableCount: Array(numEsts).fill(0),

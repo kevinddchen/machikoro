@@ -26,7 +26,7 @@ export type Landmark = {
  * @prop _owned - Array tracking which landmarks are owned by each player.
  * Indexed by landmark ID then by player number.
  */
-export type LandmarkData = {
+export type _LandmarkData = {
   _inUse: boolean[];
   _owned: boolean[][];
 };

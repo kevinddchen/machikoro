@@ -40,7 +40,7 @@ export type Establishment = {
  * @prop _ownedCount - Array tracking how many of each establishment are owned
  * by each player. Indexed by establishment ID then by player number.
  */
-export type EstablishmentData = {
+export type _EstablishmentData = {
   _inUse: boolean[];
   _remainingCount: number[];
   _availableCount: number[];

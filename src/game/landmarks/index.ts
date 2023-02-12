@@ -4,7 +4,7 @@
 
 import * as Meta from './metadata';
 import { Expansion, MachikoroG } from '../types';
-import { Landmark, LandmarkData } from './types';
+import { Landmark, _LandmarkData } from './types';
 
 export * from './metadata';
 export * from './types';
@@ -72,7 +72,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion } = G;
   const numLands = Meta.LANDMARKS.length;
 
-  const data: LandmarkData = {
+  const data: _LandmarkData = {
     _inUse: Array(numLands).fill(false),
     _owned: Array(numLands).fill(null).map(() => Array(numPlayers).fill(false)),
   };
