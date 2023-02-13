@@ -13,8 +13,7 @@
  * @prop rolls - Which rolls activate the establishment.
  * @prop color - The color of the establishment.
  * @prop type - The type of the establishment (for combos, e.g. 'Animal').
- * @prop _id - Unique id used to enumerate establishments. (Private, do not
- * access directly)
+ * @prop _id - Unique id used to enumerate establishments. (Private, do not access directly)
  */
 export type Establishment = {
   readonly name: string;

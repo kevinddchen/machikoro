@@ -8,8 +8,7 @@
  * @prop description - Tooltip text.
  * @prop imageFilename - Filename of full-sized image.
  * @prop cost - Cost to buy.
- * @prop _id - Unique id used to enumerate landmarks. (Private, do not access
- * directly)
+ * @prop _id - Unique id used to enumerate landmarks. (Private, do not access directly)
  */
 export type Landmark = {
   readonly name: string;

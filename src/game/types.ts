@@ -10,7 +10,7 @@ import { LandmarkData } from './landmarks/types';
  * The `G` object containing all game state variables.
  * @param expansion - the expansion of the game.
  * @param supplyVariant - the supply variant of the game.
- * @param _playOrder - the order of players in the game. (Private, do not access directly)
+ * @param _turnOrder - the order of players in the game. (Private, do not access directly)
  * @param turnState - the current player's turn state.
  * @param roll - the current player's dice roll total.
  * @param numRolls - the number of dice rolls made by the current player.
@@ -29,7 +29,7 @@ import { LandmarkData } from './landmarks/types';
 export type MachikoroG = {
   readonly expansion: Expansion;
   readonly supplyVariant: SupplyVariant;
-  readonly _playOrder: string[]; // TODO: do not use a property of `G` for this
+  readonly _turnOrder: string[];
   turnState: TurnState;
   roll: number | null;
   numRolls: number;
@@ -48,8 +48,7 @@ export type MachikoroG = {
 
 /**
  * Game state that is not passed to the clients
- * @param _decks - the establishment draw decks. (Private, do not access
- * directly)
+ * @param _decks - the establishment draw decks. (Private, do not access directly)
  */
 export type Secrets = {
   _decks: Establishment[][] | null;

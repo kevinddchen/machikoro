@@ -753,17 +753,17 @@ export const Machikoro: Game<MachikoroG> = {
     // initialize coins
     const _coins = Array(numPlayers).fill(startCoins);
 
-    // initialize play order
-    let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
+    // initialize turn order
+    let _turnOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
     if (randomizeTurnOrder) {
-      _playOrder = random.Shuffle(_playOrder);
+      _turnOrder = random.Shuffle(_turnOrder);
     }
 
     // initialize `G` object
     const G: MachikoroG = {
       expansion,
       supplyVariant,
-      _playOrder,
+      _turnOrder,
       ...newTurnG,
       secret: { _decks: null },
       _coins,
@@ -809,7 +809,7 @@ export const Machikoro: Game<MachikoroG> = {
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
     },
-    order: TurnOrder.CUSTOM_FROM('_playOrder'),
+    order: TurnOrder.CUSTOM_FROM('_turnOrder'),
   },
 
   moves: {
