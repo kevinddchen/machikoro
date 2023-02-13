@@ -1,3 +1,7 @@
+//
+// Types for Machikoro game.
+//
+
 import { Establishment, EstablishmentData } from './establishments/types';
 import { LogEvent } from './log/types';
 import { LandmarkData } from './landmarks/types';
