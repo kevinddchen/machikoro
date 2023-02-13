@@ -434,8 +434,8 @@ const endTurn: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  const player = parseInt(ctx.currentPlayer);
   // a player earns coins via the airport if they did not buy anything
+  const player = parseInt(ctx.currentPlayer);
   if (G.turnState === TurnState.Buy && Land.owns(G, player, Land.Airport)) {
     earn(G, player, Land.AIRPORT_EARNINGS, Land.Airport.name);
   }
@@ -512,6 +512,9 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       }
 
       const count = Est.countOwned(G, player, est);
+      if (count === 0) {
+        continue; // avoids logging tuna boat roll when player has no tuna boats
+      }
 
       // tuna boat earnings are based off the tuna roll
       // all other blue establishments take `est.earnings` coins from the player
@@ -531,6 +534,9 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   const green_ests = all_ests.filter((est) => est.color === EstColor.Green && est.rolls.includes(roll));
   for (const est of green_ests) {
     const count = Est.countOwned(G, currentPlayer, est);
+    if (count === 0) {
+      continue;
+    }
 
     let earnings = est.earnings;
     // +1 coin to shops if player owns Shopping Mall

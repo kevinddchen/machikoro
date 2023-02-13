@@ -3,7 +3,7 @@ import 'styles/main.css';
 import { Ctx, LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { LogEvent, LogLine } from 'game/log';
+import { LogEventType, LogEvent } from 'game/logx';
 
 const COIN = '\uD83D\uDFE4';
 
@@ -38,7 +38,7 @@ export default class Logger extends React.Component<LogProps, object> {
   };
 
   /**
-   * Take a `LogEntry` and parse its array of `LogLines` into strings.
+   * Take a `LogEntry` and parse its array of `LogEvent` into strings.
    * @param entry
    * @param lines List of strings to append to.
    * @returns
@@ -47,8 +47,8 @@ export default class Logger extends React.Component<LogProps, object> {
     const { metadata } = entry;
     if (metadata) {
       try {
-        for (const logLine of metadata as LogLine[]) {
-          const line = this.parseLogLine(logLine);
+        for (const event of metadata as LogEvent[]) {
+          const line = this.parseLogEvent(event);
           if (line) lines.push(line);
         }
       } catch (e) {
@@ -58,46 +58,46 @@ export default class Logger extends React.Component<LogProps, object> {
   };
 
   /**
-   * Parse a single `LogLine` to its string.
-   * @param logLine
+   * Parse a single `LogEvent` to its string.
+   * @param event
    * @returns
    */
-  parseLogLine = (logLine: LogLine): string | null => {
+  parseLogEvent = (event: LogEvent): string | null => {
     const { names } = this.props;
-    const { event } = logLine;
+    const { eventType } = event;
 
-    switch (event) {
-      case LogEvent.RollOne: {
-        return `\trolled ${logLine.roll}`;
+    switch (eventType) {
+      case LogEventType.RollOne: {
+        return `\trolled ${event.roll}`;
       }
-      case LogEvent.RollTwo: {
-        const { dice } = logLine;
+      case LogEventType.RollTwo: {
+        const { dice } = event;
         const roll = dice[0] + dice[1];
         return `\trolled ${roll} (${dice})`;
       }
-      case LogEvent.AddTwo: {
-        return `\tchanged roll to ${logLine.roll}`;
+      case LogEventType.AddTwo: {
+        return `\tchanged roll to ${event.roll}`;
       }
-      case LogEvent.Earn: {
-        const { player, amount, name } = logLine;
+      case LogEventType.Earn: {
+        const { player, amount, name } = event;
         return `\t${names[player]} earned ${amount} ${COIN}  (${name})`;
       }
-      case LogEvent.Take: {
-        const { from, to, amount, name } = logLine;
+      case LogEventType.Take: {
+        const { from, to, amount, name } = event;
         return `\t${names[from]} paid ${names[to]} ${amount} ${COIN}  (${name})`;
       }
-      case LogEvent.Buy: {
-        return `\tbought ${logLine.name}`;
+      case LogEventType.Buy: {
+        return `\tbought ${event.name}`;
       }
-      case LogEvent.Office: {
-        const { player_est_name, opponent_est_name, opponent } = logLine;
+      case LogEventType.Office: {
+        const { player_est_name, opponent_est_name, opponent } = event;
         return `\ttraded ${player_est_name} for ${opponent_est_name} with ${names[opponent]}`;
       }
-      case LogEvent.TunaRoll: {
-        return `\t(Tuna boat roll: ${logLine.roll})`;
+      case LogEventType.TunaRoll: {
+        return `\t(Tuna boat roll: ${event.roll})`;
       }
-      case LogEvent.EndGame: {
-        return `Game over! Winner: ${names[logLine.winner]}`;
+      case LogEventType.EndGame: {
+        return `Game over! Winner: ${names[event.winner]}`;
       }
       default:
         return null;
