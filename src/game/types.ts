@@ -3,8 +3,8 @@
 //
 
 import { Establishment, EstablishmentData } from './establishments/types';
-import { LogEvent } from './log/types';
 import { LandmarkData } from './landmarks/types';
+import { LogEvent } from './log/types';
 
 /**
  * The `G` object containing all game state variables.
