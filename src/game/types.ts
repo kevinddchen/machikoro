@@ -1,6 +1,6 @@
-import { Establishment, EstablishmentData } from './establishments/types';
-import { LogLine } from './log/types';
-import { LandmarkData } from './landmarks/types';
+import { Establishment, _EstablishmentData } from './establishments/types';
+import { LogEvent } from './logx/types';
+import { _LandmarkData } from './landmarks/types';
 
 /**
  * The `G` object containing all game state variables.
@@ -37,9 +37,9 @@ export type MachikoroG = {
   tunaRoll: number | null;
   secret: Secrets;
   _coins: number[];
-  _estData: EstablishmentData | null;
-  _landData: LandmarkData | null;
-  _logBuffer: LogLine[] | null;
+  _estData: _EstablishmentData | null;
+  _landData: _LandmarkData | null;
+  _logBuffer: LogEvent[] | null;
 };
 
 /**
