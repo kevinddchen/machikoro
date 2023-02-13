@@ -1,3 +1,7 @@
+//
+// Implementation of Machikoro board game.
+//
+
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
@@ -8,22 +12,6 @@ import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, MachikoroG, SupplyVariant, TurnState } from './types';
 import { Landmark } from './landmarks';
-
-//
-// === Machikoro ===
-//
-// We use the `boardgame.io` framework: https://boardgame.io/. It handles all
-// interactions between the client and the server. We just have to define the
-// `Machikoro` Game object at the bottom on this file.
-//
-// `G` is an object that represents the game state. Its contents are defined by
-// the `MachikoroG` type. The object itself can only be modified by Move
-// functions. This is a feature of the `boardgame.io` framework.
-//
-// `ctx` is a read-only object that contains some useful metadata. There are
-// some other important plugins, such as `logx` which is a custom plugin that
-// keeps track of logging.
-//
 
 export const GAME_NAME = 'machikoro';
 
@@ -467,7 +455,8 @@ const setCoins = (G: MachikoroG, player: number, amount: number): void => {
 };
 
 /**
- * Evaluate the outcome of the roll by performing establishment actions.
+ * Evaluate the outcome of the roll by performing establishment actions. This
+ * function controls the execution of the establishments.
  * @param context
  */
 const commitRoll = (context: FnContext<MachikoroG>): void => {
@@ -604,7 +593,7 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
 
 /**
  * Return the next players (including self) in the order that the Blue
- * establishments are evaluated. I.e. i, i+1, i+2, ..., 0, 1, 2, ..., i-1.
+ * establishments are evaluated, i.e. i, i+1, i+2, ..., 0, 1, 2, ..., i-1.
  * @param ctx
  * @returns Array of player IDs.
  */
@@ -621,7 +610,7 @@ const getNextPlayers = (ctx: Ctx): number[] => {
 
 /**
  * Return the previous players (excluding self) in the order that the Red
- * establishments are evaluated. I.e. i-1, i-2, ..., 2, 1, 0, ..., i+2, i+1.
+ * establishments are evaluated, i.e. i-1, i-2, ..., 2, 1, 0, ..., i+2, i+1.
  * @param ctx
  * @returns Array of player IDs.
  */
@@ -699,7 +688,8 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     G.turnState = TurnState.OfficeGive;
   } else {
     // city hall before buying
-    if (getCoins(G, player) === 0) {
+    // HACK: city hall is currently not treated like a regular landmark
+    if (getCoins(G, player) === 0 && G.expansion === Expansion.Harbor) {
       setCoins(G, player, Land.CITY_HALL_EARNINGS);
       Log.logEarn(G, player, Land.CITY_HALL_EARNINGS, 'City Hall');
     }
@@ -763,15 +753,17 @@ export const Machikoro: Game<MachikoroG> = {
     // initialize coins
     const _coins = Array(numPlayers).fill(startCoins);
 
-    let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
+    // initialize turn order
+    let _turnOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
     if (randomizeTurnOrder) {
-      _playOrder = random.Shuffle(_playOrder);
+      _turnOrder = random.Shuffle(_turnOrder);
     }
 
+    // initialize `G` object
     const G: MachikoroG = {
       expansion,
       supplyVariant,
-      _playOrder,
+      _turnOrder,
       ...newTurnG,
       secret: { _decks: null },
       _coins,
@@ -780,17 +772,16 @@ export const Machikoro: Game<MachikoroG> = {
       _logBuffer: null,
     };
 
-    // initialize data
+    // initialize landmark and establishment data
     Land.initialize(G, numPlayers);
     Est.initialize(G, numPlayers);
 
-    // shuffle deck and play order
+    // shuffle decks
     const decks = G.secret._decks!;
     for (let i = 0; i < decks.length; i++) {
       decks[i] = random.Shuffle(decks[i]);
     }
 
-    Est.replenishSupply(G);
     return G;
   },
 
@@ -818,7 +809,7 @@ export const Machikoro: Game<MachikoroG> = {
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
     },
-    order: TurnOrder.CUSTOM_FROM('_playOrder'),
+    order: TurnOrder.CUSTOM_FROM('_turnOrder'),
   },
 
   moves: {

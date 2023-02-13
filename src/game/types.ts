@@ -1,12 +1,16 @@
-import { Establishment, _EstablishmentData } from './establishments/types';
+//
+// Types for Machikoro game.
+//
+
+import { Establishment, EstablishmentData } from './establishments/types';
+import { LandmarkData } from './landmarks/types';
 import { LogEvent } from './log/types';
-import { _LandmarkData } from './landmarks/types';
 
 /**
  * The `G` object containing all game state variables.
  * @param expansion - the expansion of the game.
  * @param supplyVariant - the supply variant of the game.
- * @param _playOrder - the order of players in the game. (Private, do not access directly)
+ * @param _turnOrder - the order of players in the game. (Private, do not access directly)
  * @param turnState - the current player's turn state.
  * @param roll - the current player's dice roll total.
  * @param numRolls - the number of dice rolls made by the current player.
@@ -25,7 +29,7 @@ import { _LandmarkData } from './landmarks/types';
 export type MachikoroG = {
   readonly expansion: Expansion;
   readonly supplyVariant: SupplyVariant;
-  readonly _playOrder: string[]; // TODO: do not use a property of `G` for this
+  readonly _turnOrder: string[];
   turnState: TurnState;
   roll: number | null;
   numRolls: number;
@@ -37,8 +41,8 @@ export type MachikoroG = {
   tunaRoll: number | null;
   secret: Secrets;
   _coins: number[];
-  _estData: _EstablishmentData | null;
-  _landData: _LandmarkData | null;
+  _estData: EstablishmentData | null;
+  _landData: LandmarkData | null;
   _logBuffer: LogEvent[] | null;
 };
 
