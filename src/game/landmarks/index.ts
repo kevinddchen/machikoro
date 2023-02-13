@@ -4,7 +4,7 @@
 
 import * as Meta from './metadata';
 import { Expansion, MachikoroG } from '../types';
-import { Landmark, _LandmarkData } from './types';
+import { Landmark, LandmarkData } from './types';
 
 export * from './metadata';
 export * from './types';
@@ -24,7 +24,7 @@ export const isEqual = (a: Landmark, b: Landmark): boolean => {
  * @returns True if the landmark is in use for this game.
  */
 export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
-  return G._landData!._inUse[land._id];
+  return G._landData!.inUse[land._id];
 };
 
 /**
@@ -34,7 +34,7 @@ export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
  * @returns True if the player owns the landmark.
  */
 export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => {
-  return G._landData!._owned[land._id][player];
+  return G._landData!.owned[land._id][player];
 };
 
 /**
@@ -61,7 +61,7 @@ export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
  * @param land
  */
 export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
-  G._landData!._owned[land._id][player] = true;
+  G._landData!.owned[land._id][player] = true;
 };
 
 /**
@@ -72,9 +72,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion } = G;
   const numLands = Meta.LANDMARKS.length;
 
-  const data: _LandmarkData = {
-    _inUse: Array(numLands).fill(false),
-    _owned: Array(numLands)
+  const data: LandmarkData = {
+    inUse: Array(numLands).fill(false),
+    owned: Array(numLands)
       .fill(null)
       .map(() => Array(numPlayers).fill(false)),
   };
@@ -95,7 +95,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   }
 
   for (const id of ids) {
-    data._inUse[id] = true;
+    data.inUse[id] = true;
   }
 
   // update G

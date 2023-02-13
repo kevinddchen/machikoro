@@ -13,7 +13,8 @@
  * @prop rolls - Which rolls activate the establishment.
  * @prop color - The color of the establishment.
  * @prop type - The type of the establishment (for combos, e.g. 'Animal').
- * @prop _id - Unique id used to enumerate establishments.
+ * @prop _id - Unique id used to enumerate establishments. (Private, do not
+ * access directly)
  */
 export type Establishment = {
   readonly name: string;
@@ -31,20 +32,20 @@ export type Establishment = {
 /**
  * JSON-serializable object keeping track of establishment-related data during
  * a game. Should only be accessed within this module.
- * @prop _inUse - Array tracking which establishments are in use. Indexed by
+ * @prop inUse - Array tracking which establishments are in use. Indexed by
  * establishment ID.
- * @prop _remainingCount - Array tracking how many of each establishment are
+ * @prop remainingCount - Array tracking how many of each establishment are
  * remaining in the supply and deck. Indexed by establishment ID.
- * @prop _availableCount - Array tracking how many of each establishment are
+ * @prop availableCount - Array tracking how many of each establishment are
  * available to buy from the supply. Indexed by establishment ID.
- * @prop _ownedCount - Array tracking how many of each establishment are owned
+ * @prop ownedCount - Array tracking how many of each establishment are owned
  * by each player. Indexed by establishment ID then by player number.
  */
-export type _EstablishmentData = {
-  _inUse: boolean[];
-  _remainingCount: number[];
-  _availableCount: number[];
-  _ownedCount: number[][];
+export type EstablishmentData = {
+  inUse: boolean[];
+  remainingCount: number[];
+  availableCount: number[];
+  ownedCount: number[][];
 };
 
 /**

@@ -763,11 +763,13 @@ export const Machikoro: Game<MachikoroG> = {
     // initialize coins
     const _coins = Array(numPlayers).fill(startCoins);
 
+    // initialize play order
     let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
     if (randomizeTurnOrder) {
       _playOrder = random.Shuffle(_playOrder);
     }
 
+    // initialize `G` object
     const G: MachikoroG = {
       expansion,
       supplyVariant,
@@ -780,17 +782,16 @@ export const Machikoro: Game<MachikoroG> = {
       _logBuffer: null,
     };
 
-    // initialize data
+    // initialize landmark and establishment data
     Land.initialize(G, numPlayers);
     Est.initialize(G, numPlayers);
 
-    // shuffle deck and play order
+    // shuffle decks
     const decks = G.secret._decks!;
     for (let i = 0; i < decks.length; i++) {
       decks[i] = random.Shuffle(decks[i]);
     }
 
-    Est.replenishSupply(G);
     return G;
   },
 

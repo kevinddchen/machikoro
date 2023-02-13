@@ -3,7 +3,7 @@
 //
 
 import * as Meta from './metadata';
-import { EstColor, EstType, Establishment, _EstablishmentData } from './types';
+import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant } from '../types';
 
 export * from './metadata';
@@ -24,7 +24,7 @@ export const isEqual = (a: Establishment, b: Establishment): boolean => {
  * @returns True if the establishment is in use for this game.
  */
 export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
-  return G._estData!._inUse[est._id];
+  return G._estData!.inUse[est._id];
 };
 
 /**
@@ -34,7 +34,7 @@ export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
  * in the supply and deck.
  */
 export const countRemaining = (G: MachikoroG, est: Establishment): number => {
-  return G._estData!._remainingCount[est._id];
+  return G._estData!.remainingCount[est._id];
 };
 
 /**
@@ -44,7 +44,7 @@ export const countRemaining = (G: MachikoroG, est: Establishment): number => {
  * purchase from the supply.
  */
 export const countAvailable = (G: MachikoroG, est: Establishment): number => {
-  return G._estData!._availableCount[est._id];
+  return G._estData!.availableCount[est._id];
 };
 
 /**
@@ -55,7 +55,7 @@ export const countAvailable = (G: MachikoroG, est: Establishment): number => {
  * player.
  */
 export const countOwned = (G: MachikoroG, player: number, est: Establishment): number => {
-  return G._estData!._ownedCount[est._id][player];
+  return G._estData!.ownedCount[est._id][player];
 };
 
 /**
@@ -96,9 +96,9 @@ export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): nu
  * @param est
  */
 export const buy = (G: MachikoroG, player: number, est: Establishment): void => {
-  G._estData!._remainingCount[est._id] -= 1;
-  G._estData!._availableCount[est._id] -= 1;
-  G._estData!._ownedCount[est._id][player] += 1;
+  G._estData!.remainingCount[est._id] -= 1;
+  G._estData!.availableCount[est._id] -= 1;
+  G._estData!.ownedCount[est._id][player] += 1;
 };
 
 /**
@@ -109,8 +109,8 @@ export const buy = (G: MachikoroG, player: number, est: Establishment): void => 
  * @param args.est - Establishment in question.
  */
 export const transfer = (G: MachikoroG, args: { from: number; to: number; est: Establishment }): void => {
-  G._estData!._ownedCount[args.est._id][args.from] -= 1;
-  G._estData!._ownedCount[args.est._id][args.to] += 1;
+  G._estData!.ownedCount[args.est._id][args.from] -= 1;
+  G._estData!.ownedCount[args.est._id][args.to] += 1;
 };
 
 /**
@@ -126,7 +126,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       // put all establishments into the supply
       while (decks[0].length > 0) {
         const est = decks[0].pop()!;
-        G._estData!._availableCount[est._id] += 1;
+        G._estData!.availableCount[est._id] += 1;
       }
       break;
     }
@@ -134,7 +134,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       // put establishments into the supply until there are 10 unique establishments
       while (decks[0].length > 0 && countUniqueAvailable(G) < Meta.VARIABLE_SUPPLY_LIMIT) {
         const est = decks[0].pop()!;
-        G._estData!._availableCount[est._id] += 1;
+        G._estData!.availableCount[est._id] += 1;
       }
       break;
     }
@@ -147,7 +147,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       for (let i = 0; i < 3; i++)
         while (decks[i].length > 0 && funcs[i](G) < limits[i]) {
           const est = decks[i].pop()!;
-          G._estData!._availableCount[est._id] += 1;
+          G._estData!.availableCount[est._id] += 1;
         }
       break;
     }
@@ -164,11 +164,11 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion, supplyVariant } = G;
   const numEsts = Meta.ESTABLISHMENTS.length;
 
-  const data: _EstablishmentData = {
-    _inUse: Array(numEsts).fill(false),
-    _remainingCount: Array(numEsts).fill(0),
-    _availableCount: Array(numEsts).fill(0),
-    _ownedCount: Array(numEsts)
+  const data: EstablishmentData = {
+    inUse: Array(numEsts).fill(false),
+    remainingCount: Array(numEsts).fill(0),
+    availableCount: Array(numEsts).fill(0),
+    ownedCount: Array(numEsts)
       .fill(null)
       .map(() => Array(numPlayers).fill(0)),
   };
@@ -190,16 +190,16 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   for (const id of ids) {
     const est = Meta._ESTABLISHMENTS_BY_ID[id];
-    data._inUse[id] = true;
+    data.inUse[id] = true;
     // all establishments have 6 copies except for purple establishments,
     // which have the same number of copies as the number of players.
-    data._remainingCount[id] = est.color === EstColor.Purple ? numPlayers : 6;
+    data.remainingCount[id] = est.color === EstColor.Purple ? numPlayers : 6;
   }
 
   // give each player their starting establishments
   for (const id of Meta._STARTING_ESTABLISHMENT_IDS) {
     for (const player of Array(numPlayers).keys()) {
-      data._ownedCount[id][player] += 1;
+      data.ownedCount[id][player] += 1;
     }
   }
 
@@ -212,7 +212,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       decks = [[]];
       for (const id of ids) {
         const est = Meta._ESTABLISHMENTS_BY_ID[id];
-        decks[0].push(...Array<Establishment>(data._remainingCount[id]).fill(est));
+        decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
       }
       break;
     }
@@ -222,11 +222,11 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       for (const id of ids) {
         const est = Meta._ESTABLISHMENTS_BY_ID[id];
         if (isLower(est)) {
-          decks[0].push(...Array<Establishment>(data._remainingCount[id]).fill(est));
+          decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
         } else if (isUpper(est)) {
-          decks[1].push(...Array<Establishment>(data._remainingCount[id]).fill(est));
+          decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
         } else {
-          decks[2].push(...Array<Establishment>(data._remainingCount[id]).fill(est));
+          decks[2].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
         }
       }
       break;
