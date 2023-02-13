@@ -3,7 +3,7 @@ import 'styles/main.css';
 import { Ctx, LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { LogEventType, LogEvent } from 'game/logx';
+import { LogEvent, LogEventType } from 'game/log';
 
 const COIN = '\uD83D\uDFE4';
 

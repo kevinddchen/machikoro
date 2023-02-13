@@ -1,5 +1,5 @@
 import { Establishment, _EstablishmentData } from './establishments/types';
-import { LogEvent } from './logx/types';
+import { LogEvent } from './log/types';
 import { _LandmarkData } from './landmarks/types';
 
 /**

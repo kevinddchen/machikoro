@@ -74,7 +74,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   const data: _LandmarkData = {
     _inUse: Array(numLands).fill(false),
-    _owned: Array(numLands).fill(null).map(() => Array(numPlayers).fill(false)),
+    _owned: Array(numLands)
+      .fill(null)
+      .map(() => Array(numPlayers).fill(false)),
   };
 
   // initialize landmarks in use

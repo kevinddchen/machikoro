@@ -27,4 +27,3 @@ export interface LogEvent {
   readonly eventType: LogEventType;
   [key: string]: any;
 }
-

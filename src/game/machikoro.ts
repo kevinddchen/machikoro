@@ -4,7 +4,7 @@ import { FnContext } from 'boardgame.io/dist/types/src/types';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
-import * as Log from './logx';
+import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, MachikoroG, SupplyVariant, TurnState } from './types';
 import { Landmark } from './landmarks';

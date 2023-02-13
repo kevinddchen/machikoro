@@ -2,8 +2,8 @@
 // Custom plugin to handle logging.
 //
 
-import { Plugin } from 'boardgame.io';
 import { GameMethod } from 'boardgame.io/core';
+import { Plugin } from 'boardgame.io';
 
 import { LogEventType } from './types';
 import { MachikoroG } from '../types';
