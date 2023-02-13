@@ -1,12 +1,12 @@
 import { Establishment, _EstablishmentData } from './establishments/types';
-import { LogLine } from './log/types';
+import { LogEvent } from './log/types';
 import { _LandmarkData } from './landmarks/types';
 
 /**
  * The `G` object containing all game state variables.
  * @param expansion - the expansion of the game.
  * @param supplyVariant - the supply variant of the game.
- * @param _playOrder - the order of players in the game. (Private, do not access)
+ * @param _playOrder - the order of players in the game. (Private, do not access directly)
  * @param turnState - the current player's turn state.
  * @param roll - the current player's dice roll total.
  * @param numRolls - the number of dice rolls made by the current player.
@@ -17,10 +17,10 @@ import { _LandmarkData } from './landmarks/types';
  * @param justBoughtEst - the establishment just bought (for prettier rendering).
  * @param tunaRoll - the roll made for the tuna boat.
  * @param secret - game state that is not passed to clients.
- * @param _coins - coins for each player. (Private, do not access)
- * @param _estData - establishment data. (Private, do not access)
- * @param _landData - landmark data. (Private, do not access)
- * @param _logBuffer - buffer of log lines. (Private, do not access)
+ * @param _coins - coins for each player. (Private, do not access directly)
+ * @param _estData - establishment data. (Private, do not access directly)
+ * @param _landData - landmark data. (Private, do not access directly)
+ * @param _logBuffer - buffer of log lines. (Private, do not access directly)
  */
 export type MachikoroG = {
   readonly expansion: Expansion;
@@ -39,12 +39,12 @@ export type MachikoroG = {
   _coins: number[];
   _estData: _EstablishmentData | null;
   _landData: _LandmarkData | null;
-  _logBuffer: LogLine[];
+  _logBuffer: LogEvent[] | null;
 };
 
 /**
  * Game state that is not passed to the clients
- * @param _decks - the establishment draw decks. (Private, do not access)
+ * @param _decks - the establishment draw decks. (Private, do not access directly)
  */
 export type Secrets = {
   _decks: Establishment[][] | null;

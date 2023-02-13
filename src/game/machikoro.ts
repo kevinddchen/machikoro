@@ -1,7 +1,6 @@
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
-import { EventsAPI } from 'boardgame.io/dist/types/src/plugins/plugin-events';
-import { RandomAPI } from 'boardgame.io/dist/types/src/plugins/random/random';
+import { FnContext } from 'boardgame.io/dist/types/src/types';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
@@ -22,7 +21,8 @@ import { Landmark } from './landmarks';
 // functions. This is a feature of the `boardgame.io` framework.
 //
 // `ctx` is a read-only object that contains some useful metadata. There are
-// some other important plugins, such as `random` and `events`.
+// some other important plugins, such as `logx` which is a custom plugin that
+// keeps track of logging.
 //
 
 export const GAME_NAME = 'machikoro';
@@ -212,220 +212,204 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
 
 /**
  * Roll one die.
- * @param G
- * @param ctx
+ * @param context
  */
-const rollOne: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const rollOne: Move<MachikoroG> = (context) => {
+  const { G, ctx, random } = context;
   if (!canRoll(G, ctx, 1)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   G.roll = random.Die(6);
   G.numRolls += 1;
-  G._logBuffer.push(Log.rollOne(G.roll));
+  Log.logRollOne(G, G.roll);
 
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx, random);
+    commitRoll(context);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Roll two dice.
- * @param G
- * @param ctx
+ * @param context
  */
-const rollTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const rollTwo: Move<MachikoroG> = (context) => {
+  const { G, ctx, random } = context;
   if (!canRoll(G, ctx, 2)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
-  const player = parseInt(ctx.currentPlayer);
   const dice = random.Die(6, 2);
 
   // if player owns an amusement park, they get a second turn
+  const player = parseInt(ctx.currentPlayer);
   if (Land.owns(G, player, Land.AmusementPark)) {
     G.secondTurn = dice[0] === dice[1];
   }
 
   G.roll = dice[0] + dice[1];
   G.numRolls += 1;
-  G._logBuffer.push(Log.rollTwo(dice));
+  Log.logRollTwo(G, dice);
 
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx, random);
+    commitRoll(context);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Force the outcome of the dice roll. This move is removed in production.
- * @param G
- * @param ctx
+ * @param context
  * @param roll - Desired dice total.
  */
-const debugRoll: Move<MachikoroG> = ({ G, ctx, random, log }, roll: number) => {
+const debugRoll: Move<MachikoroG> = (context, roll: number) => {
+  const { G, ctx } = context;
   if (!canRoll(G, ctx, 1)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   G.roll = roll;
   G.numRolls += 1;
-  G._logBuffer.push(Log.rollOne(roll));
+  Log.logRollOne(G, roll);
 
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(G, ctx, random);
+    commitRoll(context);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Do not activate Harbor and keep the current roll.
- * @param G
- * @param ctx
+ * @param context
  */
-const keepRoll: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const keepRoll: Move<MachikoroG> = (context) => {
+  const { G } = context;
   if (!canCommitRoll(G)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
-  commitRoll(G, ctx, random);
+  commitRoll(context);
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate Harbor and add 2 to the current roll.
- * @param G
- * @param ctx
+ * @param context
  */
-const addTwo: Move<MachikoroG> = ({ G, ctx, random, log }) => {
+const addTwo: Move<MachikoroG> = (context) => {
+  const { G, ctx } = context;
   if (!canAddTwo(G, ctx)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
-  G.roll! += 2; // G.roll not null via canAddTwo() check
-  G._logBuffer.push(Log.addTwo(G.roll!));
-  commitRoll(G, ctx, random);
+  G.roll! += 2; // G.roll is not null via canAddTwo() check
+  Log.logAddTwo(G, G.roll!);
 
-  log.setMetadata(G._logBuffer);
+  commitRoll(context);
+
   return;
 };
 
 /**
  * Buy an establishment.
- * @param G
- * @param ctx
+ * @param context
  * @param est
  */
-const buyEst: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
+const buyEst: Move<MachikoroG> = (context, est: Establishment) => {
+  const { G, ctx } = context;
   if (!canBuyEst(G, ctx, est)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   Est.buy(G, player, est);
   setCoins(G, player, -est.cost);
   G.justBoughtEst = est;
-  G._logBuffer.push(Log.buy(est.name));
+  Log.logBuy(G, est.name);
 
   G.turnState = TurnState.End;
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Buy a landmark.
- * @param G
- * @param ctx
+ * @param context
  * @param land
  */
-const buyLand: Move<MachikoroG> = ({ G, ctx, events, log }, land: Landmark) => {
+const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
+  const { G, ctx } = context;
   if (!canBuyLand(G, ctx, land)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   Land.buy(G, player, land);
   setCoins(G, player, -land.cost);
-  G._logBuffer.push(Log.buy(land.name));
+  Log.logBuy(G, land.name);
 
   G.turnState = TurnState.End;
   if (canEndGame(G, ctx)) {
-    endGame(G, events, player);
+    endGame(context, player);
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate the TV establishment by picking an opponent to take 5 coins from.
- * @param G
- * @param ctx
+ * @param context
  * @param opponent
  */
-const doTV: Move<MachikoroG> = ({ G, ctx, log }, opponent: number) => {
+const doTV: Move<MachikoroG> = (context, opponent: number) => {
+  const { G, ctx } = context;
   if (!canDoTV(G, ctx, opponent)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   const player = parseInt(ctx.currentPlayer);
   take(G, { from: opponent, to: player }, Est.TVStation.earnings, Est.TVStation.name);
 
-  switchState(G, ctx);
+  switchState(context);
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate the office establishment by picking an establishment you own to
  * give up.
- * @param G
- * @param ctx
+ * @param context
  * @param est
  */
-const doOfficeGive: Move<MachikoroG> = ({ G, ctx, log }, est: Establishment) => {
+const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
+  const { G, ctx } = context;
   if (!canDoOfficeGive(G, ctx, est)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
   G.officeGiveEst = est;
   G.turnState = TurnState.OfficeTake;
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * Activate the office establishment by picking an establishment an opponent
  * owns to take.
- * @param G
- * @param ctx
+ * @param context
  * @param opponent
  * @param est
  */
-const doOfficeTake: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est: Establishment) => {
-  if (!canDoOfficeTake(G, ctx, opponent, est)) return INVALID_MOVE;
-  G._logBuffer = [];
+const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establishment) => {
+  const { G, ctx } = context;
+  if (!canDoOfficeTake(G, ctx, opponent, est)) {
+    return INVALID_MOVE;
+  }
 
   const player = parseInt(ctx.currentPlayer);
   if (!G.officeGiveEst) {
@@ -433,27 +417,25 @@ const doOfficeTake: Move<MachikoroG> = ({ G, ctx, log }, opponent: number, est: 
   }
   Est.transfer(G, { from: player, to: opponent, est: G.officeGiveEst });
   Est.transfer(G, { from: opponent, to: player, est });
-  G._logBuffer.push(Log.office({ player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent));
+  Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
-  switchState(G, ctx);
+  switchState(context);
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
 /**
  * End the turn.
- * @param G
- * @param ctx
+ * @param context
  */
-const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
+const endTurn: Move<MachikoroG> = (context) => {
+  const { G, ctx, events } = context;
   if (!canEndTurn(G)) {
     return INVALID_MOVE;
   }
-  G._logBuffer = [];
 
-  const player = parseInt(ctx.currentPlayer);
   // a player earns coins via the airport if they did not buy anything
+  const player = parseInt(ctx.currentPlayer);
   if (G.turnState === TurnState.Buy && Land.owns(G, player, Land.Airport)) {
     earn(G, player, Land.AIRPORT_EARNINGS, Land.Airport.name);
   }
@@ -465,7 +447,6 @@ const endTurn: Move<MachikoroG> = ({ G, ctx, events, log }) => {
     events.endTurn();
   }
 
-  log.setMetadata(G._logBuffer);
   return;
 };
 
@@ -487,11 +468,10 @@ const setCoins = (G: MachikoroG, player: number, amount: number): void => {
 
 /**
  * Evaluate the outcome of the roll by performing establishment actions.
- * @param G
- * @param ctx
- * @param random
+ * @param context
  */
-const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
+const commitRoll = (context: FnContext<MachikoroG>): void => {
+  const { G, ctx } = context;
   const currentPlayer = parseInt(ctx.currentPlayer);
   const roll = G.roll!;
 
@@ -532,12 +512,15 @@ const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
       }
 
       const count = Est.countOwned(G, player, est);
+      if (count === 0) {
+        continue; // avoids logging tuna boat roll when player has no tuna boats
+      }
 
       // tuna boat earnings are based off the tuna roll
       // all other blue establishments take `est.earnings` coins from the player
       let earnings;
       if (Est.isEqual(est, Est.TunaBoat)) {
-        earnings = getTunaRoll(G, random);
+        earnings = getTunaRoll(context);
       } else {
         earnings = est.earnings;
       }
@@ -551,6 +534,9 @@ const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
   const green_ests = all_ests.filter((est) => est.color === EstColor.Green && est.rolls.includes(roll));
   for (const est of green_ests) {
     const count = Est.countOwned(G, currentPlayer, est);
+    if (count === 0) {
+      continue;
+    }
 
     let earnings = est.earnings;
     // +1 coin to shops if player owns Shopping Mall
@@ -613,7 +599,7 @@ const commitRoll = (G: MachikoroG, ctx: Ctx, random: RandomAPI): void => {
   }
 
   // always switch state after committing role
-  switchState(G, ctx);
+  switchState(context);
 };
 
 /**
@@ -660,7 +646,7 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
 const earn = (G: MachikoroG, player: number, amount: number, name: string): void => {
   setCoins(G, player, amount);
   if (amount > 0) {
-    G._logBuffer.push(Log.earn(player, amount, name));
+    Log.logEarn(G, player, amount, name);
   }
 };
 
@@ -679,20 +665,20 @@ const take = (G: MachikoroG, args: { from: number; to: number }, amount: number,
   setCoins(G, from, -actual_amount);
   setCoins(G, to, actual_amount);
   if (actual_amount > 0) {
-    G._logBuffer.push(Log.take(args, actual_amount, name));
+    Log.logTake(G, args, actual_amount, name);
   }
 };
 
 /**
  * Get the roll for the tuna boat, logging if not done yet for this turn.
  * @param G
- * @param random
  * @returns Dice roll.
  */
-const getTunaRoll = (G: MachikoroG, random: RandomAPI): number => {
+const getTunaRoll = (context: FnContext<MachikoroG>): number => {
+  const { G, random } = context;
   if (G.tunaRoll === null) {
     G.tunaRoll = random.Die(6, 2).reduce((a, b) => a + b, 0);
-    G._logBuffer.push(Log.tunaRoll(G.tunaRoll));
+    Log.logTunaRoll(G, G.tunaRoll);
   }
   return G.tunaRoll;
 };
@@ -700,10 +686,10 @@ const getTunaRoll = (G: MachikoroG, random: RandomAPI): number => {
 /**
  * To be run after the roll is commited and after doing TV or Office. Checks if
  * TV or Office needs to be performed, and changes the game state accordingly.
- * @param G
- * @param ctx
+ * @param context
  */
-const switchState = (G: MachikoroG, ctx: Ctx): void => {
+const switchState = (context: FnContext<MachikoroG>): void => {
+  const { G, ctx } = context;
   const player = parseInt(ctx.currentPlayer);
   if (G.doTV) {
     G.doTV = false;
@@ -715,7 +701,7 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
     // city hall before buying
     if (getCoins(G, player) === 0) {
       setCoins(G, player, Land.CITY_HALL_EARNINGS);
-      G._logBuffer.push(Log.earn(player, Land.CITY_HALL_EARNINGS, 'City Hall'));
+      Log.logEarn(G, player, Land.CITY_HALL_EARNINGS, 'City Hall');
     }
     G.turnState = TurnState.Buy;
   }
@@ -723,12 +709,12 @@ const switchState = (G: MachikoroG, ctx: Ctx): void => {
 
 /**
  * End the game.
- * @param G
- * @param ctx
+ * @param context
  * @param winner - ID of the winning player.
  */
-const endGame = (G: MachikoroG, events: EventsAPI, winner: number): void => {
-  G._logBuffer.push(Log.endGame(winner));
+const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
+  const { G, events } = context;
+  Log.logEndGame(G, winner);
   events.endGame();
 };
 
@@ -775,7 +761,7 @@ export const Machikoro: Game<MachikoroG> = {
     const { numPlayers } = ctx;
 
     // initialize coins
-    const coins = Array(numPlayers).fill(startCoins);
+    const _coins = Array(numPlayers).fill(startCoins);
 
     let _playOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
     if (randomizeTurnOrder) {
@@ -788,10 +774,10 @@ export const Machikoro: Game<MachikoroG> = {
       _playOrder,
       ...newTurnG,
       secret: { _decks: null },
-      _coins: coins,
+      _coins,
       _estData: null,
       _landData: null,
-      _logBuffer: [],
+      _logBuffer: null,
     };
 
     // initialize data
@@ -863,6 +849,8 @@ export const Machikoro: Game<MachikoroG> = {
     doOfficeTake: doOfficeTake,
     endTurn: endTurn,
   },
+
+  plugins: [Log.LogxPlugin],
 
   playerView: PlayerView.STRIP_SECRETS!,
 };

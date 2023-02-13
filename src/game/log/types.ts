@@ -3,21 +3,9 @@
 //
 
 /**
- * A `LogLine` is an object that is created during a move that stores a
- * `LogEvent` describing the type of event that needs to be logged and any
- * relevant metadata, such as the dice roll or money earned. Over the course of
- * a move, these `LogLine` objects are gathered in an array. At the end of the
- * move, the array of `LogLine` objects is passed to `ctx.log.setMetadata`.
- *
- * On the client, these `LogLine` objects are retrieved from `ctx.log` where it
- * is parsed by the `Logger` component.
+ * Enumerates the types of events that we log.
  */
-export interface LogLine {
-  readonly event: LogEvent;
-  [key: string]: any;
-}
-
-export const LogEvent = {
+export const LogEventType = {
   RollOne: 'RollOne',
   RollTwo: 'RollTwo',
   AddTwo: 'AddTwo',
@@ -29,4 +17,13 @@ export const LogEvent = {
   EndGame: 'EndGame',
 } as const;
 
-export type LogEvent = (typeof LogEvent)[keyof typeof LogEvent];
+export type LogEventType = (typeof LogEventType)[keyof typeof LogEventType];
+
+/**
+ * A `LogEvent` is an object that that stores a `LogEventType` together with
+ * any metadata that is needed to be logged.
+ */
+export interface LogEvent {
+  readonly eventType: LogEventType;
+  [key: string]: any;
+}

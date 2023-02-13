@@ -168,7 +168,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     _inUse: Array(numEsts).fill(false),
     _remainingCount: Array(numEsts).fill(0),
     _availableCount: Array(numEsts).fill(0),
-    _ownedCount: Array(numEsts).fill(null).map(() => Array(numPlayers).fill(0)),
+    _ownedCount: Array(numEsts)
+      .fill(null)
+      .map(() => Array(numPlayers).fill(0)),
   };
 
   // initialize establishments in use

@@ -1,75 +1,136 @@
 //
-// Utility functions for the log.
+// Custom plugin to handle logging.
 //
 
-import { LogEvent, LogLine } from './types';
+import { GameMethod } from 'boardgame.io/core';
+import { Plugin } from 'boardgame.io';
+
+import { LogEventType } from './types';
+import { MachikoroG } from '../types';
 
 export * from './types';
 
-export const rollOne = (roll: number): LogLine => {
-  return {
-    event: LogEvent.RollOne,
-    roll,
-  };
+/**
+ * 'logx' stands for 'log-extension', where we add additional functionality to
+ * the built-in 'log' plugin.
+ *
+ * Over the course of a move, we accumulate `LogEvent` objects which each
+ * represent an event that should be logged. These are gathered in a buffer
+ * array stored in `G._logBuffer`. At the end of the move, the array of
+ * `LogEvent` objects is flushed to the `log.setMetadata` method, which stores
+ * these log events as metadata for the move.
+ *
+ * On the client, this array of `LogEvent` objects are retrieved from where it
+ * can be parsed.
+ */
+export const LogxPlugin: Plugin<any, any, MachikoroG> = {
+  name: 'logx',
+
+  fnWrap: (fn, fnType) => {
+    if (fnType === GameMethod.MOVE) {
+      return ({ G, log, ...rest }, ...args) => {
+        // initialize empty log buffer
+        G = { ...G, _logBuffer: [] };
+        G = fn({ G, log, ...rest }, ...args);
+        log.setMetadata(G._logBuffer);
+        // clear log buffer
+        G = { ...G, _logBuffer: null };
+        return G;
+      };
+    } else {
+      return fn;
+    }
+  },
 };
 
-export const rollTwo = (dice: number[]): LogLine => {
-  return {
-    event: LogEvent.RollTwo,
-    dice,
-  };
+/**
+ * Log the outcome of rolling one die.
+ * @param G
+ * @param roll - The value of the die.
+ */
+export const logRollOne = (G: MachikoroG, roll: number): void => {
+  G._logBuffer!.push({ eventType: LogEventType.RollOne, roll });
 };
 
-export const addTwo = (roll: number): LogLine => {
-  return {
-    event: LogEvent.AddTwo,
-    roll,
-  };
+/**
+ * Log the outcome of rolling two dice
+ * @param G
+ * @param dice - The values of each die.
+ */
+export const logRollTwo = (G: MachikoroG, dice: number[]): void => {
+  G._logBuffer!.push({ eventType: LogEventType.RollTwo, dice });
 };
 
-export const earn = (player: number, amount: number, name: string): LogLine => {
-  return {
-    event: LogEvent.Earn,
-    player,
-    amount,
-    name,
-  };
+/**
+ * Log the use of Harbor to add two to the roll.
+ * @param G
+ * @param roll - The new value of the roll.
+ */
+export const logAddTwo = (G: MachikoroG, roll: number): void => {
+  G._logBuffer!.push({ eventType: LogEventType.AddTwo, roll });
 };
 
-export const take = (args: { from: number; to: number }, amount: number, name: string): LogLine => {
-  return {
-    event: LogEvent.Take,
-    ...args,
-    amount,
-    name,
-  };
+/**
+ * Log a player earning coins from the bank.
+ * @param G
+ * @param player
+ * @param amount
+ * @param name - Name of establishment or landmark activated.
+ */
+export const logEarn = (G: MachikoroG, player: number, amount: number, name: string): void => {
+  G._logBuffer!.push({ eventType: LogEventType.Earn, player, amount, name });
 };
 
-export const buy = (name: string): LogLine => {
-  return {
-    event: LogEvent.Buy,
-    name,
-  };
+/**
+ * Log a player taking coins from an opponent.
+ * @param G
+ * @param args.from - Coins are taken from this player
+ * @param args.to - Coins are given to this player
+ * @param amount
+ * @param name - Name of establishment or landmark activated.
+ */
+export const logTake = (G: MachikoroG, args: { from: number; to: number }, amount: number, name: string): void => {
+  G._logBuffer!.push({ eventType: LogEventType.Take, ...args, amount, name });
 };
 
-export const office = (obj: { player_est_name: string; opponent_est_name: string }, opponent: number): LogLine => {
-  return {
-    event: LogEvent.Office,
-    ...obj,
-    opponent,
-  };
+/**
+ * Log a player purchasing an establishment or landmark.
+ * @param G
+ * @param name - Name of establishment or landmark activated.
+ */
+export const logBuy = (G: MachikoroG, name: string): void => {
+  G._logBuffer!.push({ eventType: LogEventType.Buy, name });
 };
 
-export const tunaRoll = (roll: number): LogLine => {
-  return {
-    event: LogEvent.TunaRoll,
-    roll,
-  };
+/**
+ * Log the effect of the Office establishment.
+ * @param G
+ * @param args.player_est_name - Name of the player's establishment.
+ * @param args.opponent_est_name - Name of the opponent's establishment.
+ * @param opponent
+ */
+export const logOffice = (
+  G: MachikoroG,
+  args: { player_est_name: string; opponent_est_name: string },
+  opponent: number
+): void => {
+  G._logBuffer!.push({ eventType: LogEventType.Office, ...args, opponent });
 };
 
-export const endGame = (winner: number): LogLine => {
-  return {
-    event: LogEvent.EndGame,
-    winner,
-  };
+/**
+ * Log the tuna roll for the turn.
+ * @param G
+ * @param roll - The sum value of the two dice.
+ */
+export const logTunaRoll = (G: MachikoroG, roll: number): void => {
+  G._logBuffer!.push({ eventType: LogEventType.TunaRoll, roll });
+};
+
+/**
+ * Log the winner of the game.
+ * @param G
+ * @param winner - ID of the winning player.
+ */
+export const logEndGame = (G: MachikoroG, winner: number): void => {
+  G._logBuffer!.push({ eventType: LogEventType.EndGame, winner });
 };
