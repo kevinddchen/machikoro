@@ -1,51 +1,92 @@
+import { MatchInfo } from './types';
+
 /**
- * Handles match credentials storage and retrieval on client browser.
+ * Internal version number for the authentication system. Bump this number to
+ * clear all previously stored credentials from the client browser.
+ */
+const AUTH_VERSION = 1;
+
+/**
+ * Key where the authentication version is stored in local storage.
+ */
+const AUTH_VERSION_KEY = "auth_version";
+
+/**
+ * Handles match info storage and retrieval on client browser.
  */
 export default class Authenticator {
-  /**
-   * Save credentials for a match to local storage.
-   * @param matchID Must be unique.
-   * @param playerID Must be a single character.
-   * @param credentials
-   */
-  saveCredentials(matchID: string, playerID: string, credentials: string): void {
-    const storageString = playerID + credentials;
-    localStorage.setItem(matchID, storageString);
-  }
 
-  /**
-   * Check if local storage contains credentials for a match.
-   * @param matchID
-   * @returns True if credentials are stored.
-   */
-  hasCredentials(matchID: string): boolean {
-    return localStorage.getItem(matchID) ? true : false;
-  }
-
-  /**
-   * Retrieve credentials for a match from local storage, if any.
-   * @param matchID
-   * @returns
-   */
-  fetchCredentials(matchID: string): {
-    playerID?: string;
-    credentials?: string;
-  } {
-    const storageString = localStorage.getItem(matchID);
-    if (!storageString) {
-      return {};
-    } else {
-      const playerID = storageString.slice(0, 1);
-      const credentials = storageString.slice(1);
-      return { playerID, credentials };
+  constructor() {
+    // if the client is using an older version of the authentication system,
+    // clear all stored credentials and update the version number
+    const client_version = this.fetchAuthVersion();
+    const this_version = AUTH_VERSION;
+    if (client_version < this_version) {
+      this.clearAllMatchInfo();
+      this.setAuthVersion();
     }
   }
 
   /**
-   * Delete credentials for a match from local storage.
+   * @returns Client's version of the authentication system.
+   */
+  fetchAuthVersion(): number {
+    const version = localStorage.getItem(AUTH_VERSION_KEY);
+    return version ? parseInt(version) : 0;
+  }
+
+  /**
+   * Update client's version of the authentication system.
+   */
+  setAuthVersion(): void {
+    localStorage.setItem(AUTH_VERSION_KEY, AUTH_VERSION.toString());
+  }
+
+  /**
+   * Save info for a match.
+   * @param matchInfo
+   */
+  saveMatchInfo(matchInfo: MatchInfo): void {
+    const { matchID, playerID, credentials } = matchInfo;
+    const storageString = playerID + "_" + credentials;
+    localStorage.setItem(matchID, storageString);
+  }
+
+  /**
+   * @param matchID
+   * @returns True if client has saved info for the match.
+   */
+  hasMatchInfo(matchID: string): boolean {
+    return localStorage.getItem(matchID) !== null;
+  }
+
+  /**
+   * @param matchID
+   * @returns Client's saved info for a match, if it exists.
+   */
+  fetchMatchInfo(matchID: string): MatchInfo | null {
+    const storageString = localStorage.getItem(matchID);
+    if (storageString === null) {
+      return null;
+    }
+    const split = storageString.split("_");
+    const playerID = split[0];
+    const credentials = split[1];
+    return { matchID, playerID, credentials };
+  }
+
+  /**
+   * Delete info for a match.
    * @param matchID
    */
-  deleteCredentials(matchID: string): void {
+  deleteMatchInfo(matchID: string): void {
     localStorage.removeItem(matchID);
+  }
+
+  /**
+   * Delete all saved match info.
+   */
+  clearAllMatchInfo(): void {
+    localStorage.clear();
   }
 }

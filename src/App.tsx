@@ -4,61 +4,67 @@ import { Client } from 'boardgame.io/react';
 import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 
-import { ClientInfo, Matchmaker } from 'lobby';
+import { MatchInfo, debugMatchInfo, Matchmaker } from 'lobby';
 import { IN_PROD, PORT } from './config';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';
 
-const defaultClientInfo: ClientInfo = {
-  matchID: '',
-  playerID: '',
-  credentials: '',
-};
-
 /**
- * @extends ClientInfo
- * @param play If true, start the game.
+ * @prop {matchInfo|null} matchInfo - Information a client needs to connect to a match.
+ * @prop {boolean} play - Boolean switch between rendering the game client and the matchmaking lobby.
  */
-interface AppState extends ClientInfo {
+interface AppState {
+  matchInfo: MatchInfo | null;
   play: boolean;
 }
 
 /**
- * Create Machi Koro application.
+ * Machi Koro application.
+ * @prop {string} serverOrigin - URL of the server.
  */
 export default class App extends React.Component<object, AppState> {
-  private serverOrigin: string; // URL and port of the server.
+  private serverOrigin: string;
 
   constructor(props: object) {
     super(props);
-    this.state = {
-      ...defaultClientInfo,
-      play: false,
-    };
+    this.state = { matchInfo: null, play: false };
     this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
   }
 
-  setClientInfo = (clientInfo: ClientInfo): void => {
-    this.setState(clientInfo);
+  setMatchInfo = (matchInfo: MatchInfo): void => {
+    this.setState({ matchInfo });
   };
 
-  clearClientInfo = (): void => {
-    this.setState(defaultClientInfo);
+  clearMatchInfo = (): void => {
+    this.setState({ matchInfo: null });
   };
 
-  startMatch = (): void => this.setState({ play: true });
+  startMatch = (): void => {
+    this.setState({ play: true });
+  };
 
   startDebug = (): void => {
-    this.clearClientInfo();
+    this.setMatchInfo(debugMatchInfo);
     this.startMatch();
   };
 
   // --- Render ---------------------------------------------------------------
 
-  render() {
-    const { matchID, playerID, credentials, play } = this.state;
+  debugButton = (): JSX.Element => {
+    // only render in development mode!
+    return (
+      <div className='padded_div'>
+        <button onClick={this.startDebug}>DEBUG</button>
+      </div>
+    );
+  };
 
-    if (play) {
+  render() {
+    const { matchInfo, play } = this.state;
+
+    if (matchInfo && play) {
+      // Render the game client
+      const { matchID, playerID, credentials } = matchInfo;
       const MachikoroClient = Client({
         game: Machikoro,
         board: MachikoroBoard,
@@ -67,21 +73,16 @@ export default class App extends React.Component<object, AppState> {
 
       return <MachikoroClient matchID={matchID} playerID={playerID} credentials={credentials} />;
     } else {
+      // Render the matchmaking lobby
       return (
         <div>
-          {!IN_PROD ? ( // only show debug button in development
-            <div className='padded_div'>
-              <button onClick={this.startDebug}>DEBUG</button>
-            </div>
-          ) : null}
+          {IN_PROD ? null : this.debugButton()}
           <div className='title'>MACHI KORO</div>
           <Matchmaker
-            matchID={matchID}
-            playerID={playerID}
-            credentials={credentials}
+            matchInfo={matchInfo}
             serverOrigin={this.serverOrigin}
-            setClientInfo={this.setClientInfo}
-            clearClientInfo={this.clearClientInfo}
+            setMatchInfo={this.setMatchInfo}
+            clearMatchInfo={this.clearMatchInfo}
             startMatch={this.startMatch}
           />
           <footer className='footer'>

@@ -1,11 +1,17 @@
 /**
- * Information needed by the client to authenticate API calls with server.
- * @param matchID Random string that identifies the match the client is in.
- * @param playerID Player number of the client in the match. Takes values '0', '1', '2', ...
- * @param credentials Random string that authenticates client interactions with the server.
+ * Information a client needs to connect to a match.
+ * @prop {string} matchID - Identifies the match.
+ * @prop {string} playerID - Player number in the match, e.g. '0', '1', '2', ...
+ * @prop {string} credentials - Token to authenticate interactions with server.
  */
-export type ClientInfo = {
+export interface MatchInfo {
   matchID: string;
   playerID: string;
   credentials: string;
+}
+
+export const debugMatchInfo: MatchInfo = {
+  matchID: '',
+  playerID: '',
+  credentials: '',
 };
