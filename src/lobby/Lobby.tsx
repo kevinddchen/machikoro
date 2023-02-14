@@ -66,6 +66,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   constructor(props: LobbyProps) {
     super(props);
     this.state = {
+      // default values
       numPlayers: 4,
       expansion: Expansion.Harbor,
       supplyVariant: SupplyVariant.Hybrid,

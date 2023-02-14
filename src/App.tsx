@@ -4,13 +4,13 @@ import { Client } from 'boardgame.io/react';
 import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 
-import { MatchInfo, debugMatchInfo, Matchmaker } from 'lobby';
 import { IN_PROD, PORT } from './config';
+import { MatchInfo, Matchmaker, debugMatchInfo } from 'lobby';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';
 
 /**
- * @prop {matchInfo|null} matchInfo - Information a client needs to connect to a match.
+ * @prop {MatchInfo|null} matchInfo - Information a client needs to connect to a match.
  * @prop {boolean} play - Boolean switch between rendering the game client and the matchmaking lobby.
  */
 interface AppState {

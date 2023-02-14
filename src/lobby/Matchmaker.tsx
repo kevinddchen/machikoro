@@ -3,8 +3,8 @@ import 'styles/main.css';
 import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 
-import { MatchInfo } from './types';
 import Lobby from './Lobby';
+import { MatchInfo } from './types';
 import Room from './Room';
 
 /**

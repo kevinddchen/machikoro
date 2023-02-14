@@ -9,13 +9,12 @@ const AUTH_VERSION = 1;
 /**
  * Key where the authentication version is stored in local storage.
  */
-const AUTH_VERSION_KEY = "auth_version";
+const AUTH_VERSION_KEY = 'auth_version';
 
 /**
  * Handles match info storage and retrieval on client browser.
  */
 export default class Authenticator {
-
   constructor() {
     // if the client is using an older version of the authentication system,
     // clear all stored credentials and update the version number
@@ -48,7 +47,7 @@ export default class Authenticator {
    */
   saveMatchInfo(matchInfo: MatchInfo): void {
     const { matchID, playerID, credentials } = matchInfo;
-    const storageString = playerID + "_" + credentials;
+    const storageString = playerID + '_' + credentials;
     localStorage.setItem(matchID, storageString);
   }
 
@@ -69,7 +68,7 @@ export default class Authenticator {
     if (storageString === null) {
       return null;
     }
-    const split = storageString.split("_");
+    const split = storageString.split('_');
     const playerID = split[0];
     const credentials = split[1];
     return { matchID, playerID, credentials };

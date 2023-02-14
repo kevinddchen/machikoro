@@ -37,8 +37,8 @@ interface RoomProps {
 
 /**
  * @param playerList - List of metadata for players in the room.
- * @param expansion - Expansion to play.
- * @param supplyVariant - Supply variant to use.
+ * @param expansion - Expansion to play. This is initially not set, but is fetched.
+ * @param supplyVariant - Supply variant to use. This is initially not set, but is fetched.
  */
 interface RoomState {
   playerList: Server.PlayerMetadata[];
@@ -91,8 +91,10 @@ export default class Room extends React.Component<RoomProps, RoomState> {
    * Leave the match and delete credentials.
    */
   leaveMatch = async (): Promise<void> => {
-    const { matchInfo, lobbyClient } = this.props;
-    const { matchID, playerID, credentials } = matchInfo;
+    const {
+      matchInfo: { matchID, playerID, credentials },
+      lobbyClient,
+    } = this.props;
 
     try {
       await lobbyClient.leaveMatch(GAME_NAME, matchID, {
@@ -112,8 +114,9 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const { matchInfo } = this.props;
-    const { matchID } = matchInfo;
+    const {
+      matchInfo: { matchID },
+    } = this.props;
 
     console.log(`Joined room for match '${matchID}'.`);
     this.props.clearErrorMessage();
@@ -130,8 +133,9 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   // --- Render ----------------------------------------------------------------
 
   renderPlayerList(): JSX.Element[] {
-    const { matchInfo } = this.props;
-    const { playerID } = matchInfo;
+    const {
+      matchInfo: { playerID },
+    } = this.props;
     const { playerList } = this.state;
 
     const tbody: JSX.Element[] = [];
@@ -159,8 +163,9 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   }
 
   render() {
-    const { matchInfo } = this.props;
-    const { matchID } = matchInfo;
+    const {
+      matchInfo: { matchID },
+    } = this.props;
     const { expansion, supplyVariant } = this.state;
 
     return (
