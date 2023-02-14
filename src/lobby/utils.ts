@@ -6,7 +6,7 @@ import { Expansion, SupplyVariant } from 'game';
  * Currently, the most reliable way to check if a seat is occupied is to check
  * if the `PlayerMetadata` object contains the field 'name'. If yes, then it is
  * occupied.
- * @param player `PlayerMetadata` object to check.
+ * @param player - `PlayerMetadata` object to check.
  * @returns True if the seat is occupied.
  */
 export function seatIsOccupied(player: Server.PlayerMetadata): boolean {
@@ -15,15 +15,17 @@ export function seatIsOccupied(player: Server.PlayerMetadata): boolean {
 
 /**
  * Count the number of occupied seats.
- * @param players List of `PlayerMetadata` objects.
+ * @param players - List of `PlayerMetadata` objects.
  * @returns Number of occupied seats.
  */
 export function countPlayers(players: Server.PlayerMetadata[]): number {
   return players.filter(seatIsOccupied).length;
 }
 
-/* Name generating fuctions */
-
+/**
+ * @param expansion 
+ * @returns Display name for expansion.
+ */
 export function expansionName(expansion?: Expansion): string {
   switch (expansion) {
     case Expansion.Base:
@@ -35,6 +37,10 @@ export function expansionName(expansion?: Expansion): string {
   }
 }
 
+/**
+ * @param supplyVariant 
+ * @returns Display name for supply variant.
+ */
 export function supplyVariantName(supplyVariant?: SupplyVariant): string {
   switch (supplyVariant) {
     case SupplyVariant.Hybrid:
