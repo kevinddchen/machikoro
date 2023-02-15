@@ -23,7 +23,7 @@ export function countPlayers(players: Server.PlayerMetadata[]): number {
 }
 
 /**
- * @param expansion 
+ * @param expansion
  * @returns Display name for expansion.
  */
 export function expansionName(expansion: Expansion | null): string {
@@ -38,7 +38,7 @@ export function expansionName(expansion: Expansion | null): string {
 }
 
 /**
- * @param supplyVariant 
+ * @param supplyVariant
  * @returns Display name for supply variant.
  */
 export function supplyVariantName(supplyVariant: SupplyVariant | null): string {
