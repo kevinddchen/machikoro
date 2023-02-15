@@ -1,5 +1,6 @@
 import 'styles/main.css';
 
+import { LobbyAPI } from 'boardgame.io';
 import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 import { Server } from 'boardgame.io';
@@ -11,14 +12,10 @@ import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
 /**
- * Match fetch request timer, in milliseconds.
- */
-const UPDATE_INTERVAL_MS = 1000;
-
-/**
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
  * with server match management API.
+ * @prop {number} updateIntervalMs - Match fetch request timer, in milliseconds.
  * @prop {MatchInfo} matchInfo - Information a client needs to connect to a match.
  * @func clearMatchInfo - Callback to clear match info.
  * @func startMatch - Callback to start match.
@@ -28,6 +25,7 @@ const UPDATE_INTERVAL_MS = 1000;
 interface RoomProps {
   name: string;
   lobbyClient: LobbyClient;
+  updateIntervalMs: number;
   matchInfo: MatchInfo;
   clearMatchInfo: () => void;
   startMatch: () => void;
@@ -36,14 +34,16 @@ interface RoomProps {
 }
 
 /**
- * @param playerList - List of metadata for players in the room.
- * @param expansion - Expansion to play. This is initially not set, but is fetched.
- * @param supplyVariant - Supply variant to use. This is initially not set, but is fetched.
+ * @prop {string} name - Name of the player.
+ * @prop {PlayerMetadata[]} players - List of metadata for players in the room.
+ * @prop {Expansion|null} expansion - Expansion to play. This is initially null, but is fetched.
+ * @prop {SupplyVariant|null} supplyVariant - Supply variant to use. This is initially null, but is fetched.
  */
 interface RoomState {
-  playerList: Server.PlayerMetadata[];
-  expansion?: Expansion;
-  supplyVariant?: SupplyVariant;
+  connected: boolean;
+  players: Server.PlayerMetadata[];
+  expansion: Expansion | null;
+  supplyVariant: SupplyVariant | null;
 }
 
 /**
@@ -52,12 +52,19 @@ interface RoomState {
  */
 export default class Room extends React.Component<RoomProps, RoomState> {
   private fetchInterval?: NodeJS.Timeout;
-  private authenticator: Authenticator; // manages local credential storage and retrieval
+  private authenticator: Authenticator;
+
+  static defaultProps = {
+    updateIntervalMs: 1000,
+  };
 
   constructor(props: RoomProps) {
     super(props);
     this.state = {
-      playerList: [],
+      connected: false,
+      players: [],
+      expansion: null,
+      supplyVariant: null,
     };
     this.authenticator = new Authenticator();
   }
@@ -66,49 +73,67 @@ export default class Room extends React.Component<RoomProps, RoomState> {
    * Fetches list of players from the server. Also automatically starts the
    * game when there are enough people.
    */
-  fetchMatch = async (): Promise<void> => {
+  private fetchMatch = async (): Promise<void> => {
     const { matchInfo, lobbyClient } = this.props;
     const { matchID } = matchInfo;
-    const { playerList } = this.state;
+    const { connected, players } = this.state;
 
+    let match: LobbyAPI.Match;
     try {
-      const match = await lobbyClient.getMatch(GAME_NAME, matchID);
-      if (!_.isEqual(match.players, playerList)) {
-        const { expansion, supplyVariant } = match.setupData;
-        this.setState({ playerList: match.players, expansion, supplyVariant });
-        // if seats are all full, start match now
-        if (countPlayers(match.players) === match.players.length) {
-          this.props.startMatch();
-        }
-      }
+      match = await lobbyClient.getMatch(GAME_NAME, matchID);
     } catch (e) {
-      // TODO: do we need to display "Cannot fetch Matches" like in the Lobby?
+      this.props.setErrorMessage('Connecting to server...');
+      this.setState({ connected: false });
       console.error('(fetchMatch)', e);
+      return;
+    }
+
+    // if we were not connected before, clear the error message
+    if (!connected) {
+      this.props.clearErrorMessage();
+      this.setState({ connected: true });
+    }
+    // if player list has changed, update state
+    if (!_.isEqual(match.players, players)) {
+      const { expansion, supplyVariant } = match.setupData;
+      this.setState({ players: match.players, expansion, supplyVariant });
+      // if seats are all full, start match now
+      if (countPlayers(match.players) === match.players.length) {
+        this.props.startMatch();
+      }
     }
   };
 
   /**
    * Leave the match and delete credentials.
    */
-  leaveMatch = async (): Promise<void> => {
+  private leaveMatch = async (): Promise<void> => {
     const {
       matchInfo: { matchID, playerID, credentials },
       lobbyClient,
     } = this.props;
+    const { connected } = this.state;
+
+    if (!connected) {
+      return;
+    }
 
     try {
       await lobbyClient.leaveMatch(GAME_NAME, matchID, {
         playerID,
         credentials,
       });
-      this.authenticator.deleteMatchInfo(matchID);
-      console.log(`Deleted credentials for match '${matchID}', seat ${playerID}.`);
-      this.props.clearMatchInfo();
-      // this will trigger `Matchmaker` to switch to the lobby
     } catch (e) {
       this.props.setErrorMessage('Error when leaving match. Try again.');
       console.error('(leaveMatch)', e);
+      return;
     }
+
+    this.authenticator.deleteMatchInfo(matchID);
+    console.log(`Deleted credentials for match '${matchID}', seat ${playerID}.`);
+
+    // this will trigger `Matchmaker` to switch to the lobby
+    this.props.clearMatchInfo();
   };
 
   // --- React -----------------------------------------------------------------
@@ -116,31 +141,34 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   componentDidMount() {
     const {
       matchInfo: { matchID },
+      updateIntervalMs,
     } = this.props;
 
     console.log(`Joined room for match '${matchID}'.`);
     this.props.clearErrorMessage();
 
     this.fetchMatch();
-    this.fetchInterval = setInterval(this.fetchMatch, UPDATE_INTERVAL_MS);
+    this.fetchInterval = setInterval(this.fetchMatch, updateIntervalMs);
   }
 
   componentWillUnmount() {
     console.log('Leaving room...');
-    if (this.fetchInterval) clearInterval(this.fetchInterval);
+    if (this.fetchInterval) {
+      clearInterval(this.fetchInterval);
+    }
   }
 
   // --- Render ----------------------------------------------------------------
 
-  renderPlayerList(): JSX.Element[] {
+  private renderPlayers(): JSX.Element[] {
     const {
       matchInfo: { playerID },
     } = this.props;
-    const { playerList } = this.state;
+    const { players } = this.state;
 
     const tbody: JSX.Element[] = [];
-    for (let seat = 0; seat < playerList.length; seat++) {
-      const { id, name } = playerList[seat];
+    for (let seat = 0; seat < players.length; seat++) {
+      const { id, name } = players[seat];
       let indicator = 'mm-td';
       let button: JSX.Element | null;
       if (id.toString() === playerID) {
@@ -190,7 +218,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
               <br />
               <table className='mm-table'>
                 <tbody>
-                  <tr>{this.renderPlayerList()}</tr>
+                  <tr>{this.renderPlayers()}</tr>
                 </tbody>
               </table>
             </div>

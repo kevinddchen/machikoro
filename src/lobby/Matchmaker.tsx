@@ -51,11 +51,11 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
     this.lobbyClient = new LobbyClient({ server: props.serverOrigin });
   }
 
-  setName = (name: string): void => {
+  private setName = (name: string): void => {
     this.setState({ name });
   };
 
-  setErrorMessage = (errorMessage: string): void => {
+  private setErrorMessage = (errorMessage: string): void => {
     this.setState({ errorMessage });
   };
 
@@ -63,7 +63,7 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
    * Clear the error message. The render will only be updated if the error
    * message was not empty.
    */
-  clearErrorMessage = (): void => {
+  private clearErrorMessage = (): void => {
     const { errorMessage } = this.state;
     if (errorMessage) {
       this.setState({ errorMessage: '' });
