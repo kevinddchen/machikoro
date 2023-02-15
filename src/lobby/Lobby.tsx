@@ -11,13 +11,9 @@ import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
 /**
- * Match fetch request timer, in milliseconds.
- */
-const UPDATE_INTERVAL_MS = 1000;
-
-/**
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
+ * @prop {number} updateIntervalMs - Match fetch request timer, in milliseconds.
  * with server match management API.
  * @func setMatchInfo - Callback to set match info.
  * @func setName - Callback to set name.
@@ -27,6 +23,7 @@ const UPDATE_INTERVAL_MS = 1000;
 interface LobbyProps {
   name: string;
   lobbyClient: LobbyClient;
+  updateIntervalMs: number;
   setMatchInfo: (matchInfo: MatchInfo) => void;
   setName: (name: string) => void;
   setErrorMessage: (errorMessage: string) => void;
@@ -65,6 +62,10 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   private expansionRef: React.RefObject<HTMLSelectElement>;
   private supplyVariantRef: React.RefObject<HTMLSelectElement>;
 
+  static defaultProps = {
+    updateIntervalMs: 1000,
+  };
+
   constructor(props: LobbyProps) {
     super(props);
     this.state = {
@@ -82,19 +83,19 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     this.supplyVariantRef = React.createRef();
   }
 
-  setName = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  private setName = (e: React.ChangeEvent<HTMLInputElement>): void => {
     this.props.setName(e.target.value);
   };
 
-  setNumPlayers = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+  private setNumPlayers = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     this.setState({ numPlayers: parseInt(e.target.value) });
   };
 
-  setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+  private setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     this.setState({ expansion: e.target.value as Expansion });
   };
 
-  setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+  private setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     this.setState({ supplyVariant: e.target.value as SupplyVariant });
   };
 
@@ -104,7 +105,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * Fetch available matches from the server. Updates render if the fetched
    * list differs from the list currently displayed.
    */
-  fetchMatches = async (): Promise<void> => {
+  private fetchMatches = async (): Promise<void> => {
     const { lobbyClient } = this.props;
     const { connected, matches } = this.state;
 
@@ -141,7 +142,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * Create a match based on the selected options.
    */
-  createMatch = async (): Promise<void> => {
+  private createMatch = async (): Promise<void> => {
     const { lobbyClient } = this.props;
     const { connected, numPlayers, expansion, supplyVariant } = this.state;
 
@@ -176,7 +177,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * Join the match corresponding to `matchID`.
    * @param matchID
    */
-  joinMatch = async (matchID: string): Promise<void> => {
+  private joinMatch = async (matchID: string): Promise<void> => {
     const { connected } = this.state;
 
     if (!connected) {
@@ -201,7 +202,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @param matchID
    * @returns True on success, false on failure.
    */
-  joinMatchNoCredentials = async (matchID: string): Promise<boolean> => {
+  private joinMatchNoCredentials = async (matchID: string): Promise<boolean> => {
     const { name, lobbyClient } = this.props;
     const { connected } = this.state;
 
@@ -259,7 +260,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * Check if entered name is valid. Sets error message if not.
    * @returns True if `this.props.name` is OK.
    */
-  validateName = (): boolean => {
+  private validateName = (): boolean => {
     const { name } = this.props;
     if (name.length === 0) {
       this.props.setErrorMessage('Please enter a name.');
@@ -275,7 +276,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   // --- React ----------------------------------------------------------------
 
   componentDidMount() {
-    const { name } = this.props;
+    const { name, updateIntervalMs } = this.props;
     const { numPlayers, expansion, supplyVariant } = this.state;
 
     console.log('Joined lobby.');
@@ -296,7 +297,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     }
 
     this.fetchMatches();
-    this.fetchInterval = setInterval(this.fetchMatches, UPDATE_INTERVAL_MS);
+    this.fetchInterval = setInterval(this.fetchMatches, updateIntervalMs);
   }
 
   componentWillUnmount() {
@@ -308,7 +309,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   // --- Render ---------------------------------------------------------------
 
-  renderMatches(): JSX.Element[] {
+  private renderMatches(): JSX.Element[] {
     const { matches } = this.state;
 
     const tbody: JSX.Element[] = [];

@@ -11,14 +11,10 @@ import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
 /**
- * Match fetch request timer, in milliseconds.
- */
-const UPDATE_INTERVAL_MS = 1000;
-
-/**
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
  * with server match management API.
+ * @prop {number} updateIntervalMs - Match fetch request timer, in milliseconds.
  * @prop {MatchInfo} matchInfo - Information a client needs to connect to a match.
  * @func clearMatchInfo - Callback to clear match info.
  * @func startMatch - Callback to start match.
@@ -28,6 +24,7 @@ const UPDATE_INTERVAL_MS = 1000;
 interface RoomProps {
   name: string;
   lobbyClient: LobbyClient;
+  updateIntervalMs: number;
   matchInfo: MatchInfo;
   clearMatchInfo: () => void;
   startMatch: () => void;
@@ -52,7 +49,11 @@ interface RoomState {
  */
 export default class Room extends React.Component<RoomProps, RoomState> {
   private fetchInterval?: NodeJS.Timeout;
-  private authenticator: Authenticator; // manages local credential storage and retrieval
+  private authenticator: Authenticator;
+
+  static defaultProps = {
+    updateIntervalMs: 1000,
+  };
 
   constructor(props: RoomProps) {
     super(props);
@@ -66,7 +67,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
    * Fetches list of players from the server. Also automatically starts the
    * game when there are enough people.
    */
-  fetchMatch = async (): Promise<void> => {
+  private fetchMatch = async (): Promise<void> => {
     const { matchInfo, lobbyClient } = this.props;
     const { matchID } = matchInfo;
     const { playerList } = this.state;
@@ -90,7 +91,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   /**
    * Leave the match and delete credentials.
    */
-  leaveMatch = async (): Promise<void> => {
+  private leaveMatch = async (): Promise<void> => {
     const {
       matchInfo: { matchID, playerID, credentials },
       lobbyClient,
@@ -114,15 +115,13 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const {
-      matchInfo: { matchID },
-    } = this.props;
+    const { matchInfo: { matchID }, updateIntervalMs } = this.props;
 
     console.log(`Joined room for match '${matchID}'.`);
     this.props.clearErrorMessage();
 
     this.fetchMatch();
-    this.fetchInterval = setInterval(this.fetchMatch, UPDATE_INTERVAL_MS);
+    this.fetchInterval = setInterval(this.fetchMatch, updateIntervalMs);
   }
 
   componentWillUnmount() {
@@ -132,7 +131,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
   // --- Render ----------------------------------------------------------------
 
-  renderPlayerList(): JSX.Element[] {
+  private renderPlayerList(): JSX.Element[] {
     const {
       matchInfo: { playerID },
     } = this.props;

@@ -31,26 +31,26 @@ export default class App extends React.Component<object, AppState> {
     this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
   }
 
-  setMatchInfo = (matchInfo: MatchInfo): void => {
+  private setMatchInfo = (matchInfo: MatchInfo): void => {
     this.setState({ matchInfo });
   };
 
-  clearMatchInfo = (): void => {
+  private clearMatchInfo = (): void => {
     this.setState({ matchInfo: null });
   };
 
-  startMatch = (): void => {
+  private startMatch = (): void => {
     this.setState({ play: true });
   };
 
-  startDebug = (): void => {
+  private startDebug = (): void => {
     this.setMatchInfo(debugMatchInfo);
     this.startMatch();
   };
 
   // --- Render ---------------------------------------------------------------
 
-  debugButton = (): JSX.Element => {
+  private debugButton = (): JSX.Element => {
     // only render in development mode!
     return (
       <div className='padded_div'>
