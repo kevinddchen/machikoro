@@ -57,10 +57,10 @@ export interface Secret {
 
 /**
  * Data needed to setup a game.
- * @prop {Expansion} expansion - the expansion of the game.
- * @prop {SupplyVariant} supplyVariant - the supply variant of the game.
- * @prop {number} startCoins - the number of coins each player starts with.
- * @prop {boolean} randomizeTurnOrder - true if the turn order should be randomized.
+ * @prop {Expansion} expansion - Expansion of the game.
+ * @prop {SupplyVariant} supplyVariant - Supply variant of the game.
+ * @prop {number} startCoins - Number of coins each player starts with.
+ * @prop {boolean} randomizeTurnOrder - True if the turn order should be randomized.
  */
 export interface SetupData {
   expansion: Expansion;
