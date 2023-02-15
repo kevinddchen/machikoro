@@ -13,8 +13,8 @@ import { MatchInfo } from './types';
 /**
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
- * @prop {number} updateIntervalMs - Match fetch request timer, in milliseconds.
  * with server match management API.
+ * @prop {number} updateIntervalMs - Match fetch request timer, in milliseconds.
  * @func setMatchInfo - Callback to set match info.
  * @func setName - Callback to set name.
  * @func setErrorMessage - Callback to set error message.
@@ -122,7 +122,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         this.props.setErrorMessage('Connecting to server...');
       }
       this.setState({ connected: false, matches: null });
-      console.error('(fetchMatch)', e);
+      console.error('(fetchMatches)', e);
       return;
     }
 
@@ -254,7 +254,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     return true;
   };
 
-  // --- Helper ---------------------------------------------------------------
+  // --- Helpers --------------------------------------------------------------
 
   /**
    * Check if entered name is valid. Sets error message if not.
