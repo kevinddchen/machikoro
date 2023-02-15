@@ -5,7 +5,7 @@ import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 import _ from 'lodash';
 
-import { Expansion, GAME_NAME, SupplyVariant } from 'game';
+import { Expansion, GAME_NAME, SetupData, SupplyVariant } from 'game';
 import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
@@ -134,15 +134,13 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     try {
       // create match
-      const { matchID } = await lobbyClient.createMatch(GAME_NAME, {
-        numPlayers,
-        setupData: {
-          expansion,
-          supplyVariant,
-          startCoins: 3,
-          randomizeTurnOrder: true,
-        },
-      });
+      const setupData: SetupData = {
+        expansion,
+        supplyVariant,
+        startCoins: 3,
+        randomizeTurnOrder: true,
+      };
+      const { matchID } = await lobbyClient.createMatch(GAME_NAME, { numPlayers, setupData });
       console.log(`Created match '${matchID}'.`);
       // after creating the match, try to join
       await this.joinMatch(matchID);
@@ -283,7 +281,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         const numPlayers = players.length;
         let button: JSX.Element | null;
         if (this.authenticator.hasMatchInfo(matchID)) {
-          /// Able to automatically join the room (e.g. joined before, but closed browser)
+          // Able to automatically join the room (e.g. joined before, but closed browser)
           button = (
             <button className='button' onClick={() => this.joinMatch(matchID)}>
               Rejoin

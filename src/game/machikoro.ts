@@ -10,7 +10,7 @@ import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
-import { Expansion, MachikoroG, SupplyVariant, TurnState } from './types';
+import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState } from './types';
 import { Landmark } from './landmarks';
 
 export const GAME_NAME = 'machikoro';
@@ -739,11 +739,10 @@ const newTurnG = {
   tunaRoll: null,
 };
 
-export const Machikoro: Game<MachikoroG> = {
+export const Machikoro: Game<MachikoroG, any, SetupData> = {
   name: GAME_NAME,
 
   setup: ({ ctx, random }, setupData) => {
-    // `setupData` is set in `src/lobby/Lobby.js`
     if (!setupData) {
       setupData = debugSetupData;
     }
@@ -794,8 +793,8 @@ export const Machikoro: Game<MachikoroG> = {
       if (!Object.values(SupplyVariant).includes(supplyVariant)) {
         return `Unknown supply variant: ${supplyVariant}`;
       }
-      if (!Number.isInteger(startCoins)) {
-        return `Number of starting coins, ${startCoins}, must be an integer`;
+      if (!Number.isInteger(startCoins) || startCoins < 0) {
+        return `Number of starting coins, ${startCoins}, must be a non-negative integer`;
       }
     }
     if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5)) {
