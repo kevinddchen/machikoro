@@ -308,17 +308,17 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   // --- Render ---------------------------------------------------------------
 
-  renderMatchList(): JSX.Element[] {
-    const { matches: matchList } = this.state;
+  renderMatches(): JSX.Element[] {
+    const { matches } = this.state;
 
     const tbody: JSX.Element[] = [];
-    if (!matchList) {
+    if (!matches) {
       tbody.push(<div key={0}>Fetching matches...</div>);
-    } else if (matchList.length === 0) {
+    } else if (matches.length === 0) {
       tbody.push(<div key={0}>No open matches.</div>);
     } else {
-      for (let i = 0; i < matchList.length; i++) {
-        const { matchID, players, setupData } = matchList[i];
+      for (let i = 0; i < matches.length; i++) {
+        const { matchID, players, setupData } = matches[i];
         const numActivePlayers = countPlayers(players);
         const numPlayers = players.length;
         let button: JSX.Element | null;
@@ -407,7 +407,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         </div>
         <div className='padded_div'>
           <span className='subtitle'>Lobby</span>
-          <div>{this.renderMatchList()}</div>
+          <div>{this.renderMatches()}</div>
         </div>
       </div>
     );
