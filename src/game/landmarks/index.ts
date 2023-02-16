@@ -39,7 +39,8 @@ export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => 
 
 /**
  * @param G
- * @returns List of all landmarks that are in use for this game.
+ * @returns List of all landmarks that are in use for this game. The landmarks
+ * are returned in the intended display order.
  */
 export const getAllInUse = (G: MachikoroG): Landmark[] => {
   return Meta.LANDMARKS.filter((land) => isInUse(G, land));
@@ -48,7 +49,8 @@ export const getAllInUse = (G: MachikoroG): Landmark[] => {
 /**
  * @param data
  * @param player
- * @returns List of all landmarks owned by the player.
+ * @returns List of all landmarks owned by the player. The landmarks are
+ * returned in the intended display order.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
   return Meta.LANDMARKS.filter((land) => owns(G, player, land));

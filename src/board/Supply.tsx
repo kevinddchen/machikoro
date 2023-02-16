@@ -1,34 +1,21 @@
 import 'styles/main.css';
 
-import { Ctx } from 'boardgame.io';
+import { BoardProps } from 'boardgame.io/react';
 import React from 'react';
 import classNames from 'classnames';
 
-import * as Est from 'game/establishments';
-import { MachikoroG, SupplyVariant, canBuyEst } from 'game';
-import { Moves } from './types';
+import * as Game from 'game';
+import { Est, MachikoroG } from 'game';
 import StackTable from './StackTable';
 
 /**
- * @param G
- * @param ctx
- * @param moves List of moves.
- * @param isActive True if it is the client's turn.
- */
-interface SupplyProps {
-  G: MachikoroG;
-  ctx: Ctx;
-  moves: Moves;
-  isActive: boolean;
-}
-
-/**
  * Supply area, where players see and buy establishments
+ * @prop {Establishment[]} establishments - List of establishments in use.
  */
-export default class Supply extends React.Component<SupplyProps, object> {
+export default class Supply extends React.Component<BoardProps<MachikoroG>, object> {
   private establishments: Est.Establishment[];
 
-  constructor(props: SupplyProps) {
+  constructor(props: BoardProps<MachikoroG>) {
     super(props);
     const { G } = this.props;
     this.establishments = Est.getAllInUse(G);
@@ -41,7 +28,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
     for (let i = 0; i < this.establishments.length; i++) {
       const est = this.establishments[i];
 
-      const _canBuyEst = isActive && canBuyEst(G, ctx, est);
+      const canBuyEst = isActive && Game.canBuyEst(G, ctx, est);
       const available = Est.countAvailable(G, est);
       const remaining = Est.countRemaining(G, est);
 
@@ -51,11 +38,11 @@ export default class Supply extends React.Component<SupplyProps, object> {
       // (iii) we are using total supply
       if (
         available > 0 ||
-        (!!G.justBoughtEst && Est.isEqual(est, G.justBoughtEst)) ||
-        G.supplyVariant === SupplyVariant.Total
+        (G.justBoughtEst !== null && Est.isEqual(est, G.justBoughtEst)) ||
+        G.supplyVariant === Game.SupplyVariant.Total
       ) {
         Table.push(
-          <td key={i} className={classNames('est_td', { active: _canBuyEst })} onClick={() => moves.buyEst(est)}>
+          <td key={i} className={classNames('est_td', { active: canBuyEst })} onClick={() => moves.buyEst(est)}>
             <img
               className={classNames('est_img', { inactive: available === 0 })}
               src={`./assets/${est.imageFilename}`}

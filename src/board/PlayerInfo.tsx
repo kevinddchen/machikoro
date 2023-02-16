@@ -1,39 +1,32 @@
 import 'styles/main.css';
 
-import { Ctx } from 'boardgame.io';
+import { BoardProps } from 'boardgame.io/react';
 import React from 'react';
 import classNames from 'classnames';
 
-import * as Est from 'game/establishments';
-import * as Land from 'game/landmarks';
-import { MachikoroG, canBuyLand, canDoOfficeGive, canDoOfficeTake, canDoTV, getCoins } from 'game';
-import { Moves } from './types';
+import * as Game from 'game';
+import { Est, Land, MachikoroG } from 'game';
 import StackTable from './StackTable';
 
 /**
- * @param G
- * @param ctx
- * @param moves List of moves.
- * @param isActive True if it is the client's turn.
- * @param isSelf True if `player` is the client's player number.
- * @param player Player number (not necessarily the client's player number).
- * @param name Player name (not necessarily the client's name).
+ * @extends BoardProps<MachikoroG>
+ * @prop {number} player - Player number corresponding to the component.
+ * @prop {string} name - Player name corresponding to the component.
+ * @prop {boolean} idClient - True if the client is player number `player`.
  */
-interface PlayerInfoProps {
-  G: MachikoroG;
-  ctx: Ctx;
-  moves: Moves;
-  isActive: boolean;
-  isSelf: boolean;
+interface PlayerInfoProps extends BoardProps<MachikoroG> {
   player: number;
   name: string;
+  isClient: boolean;
 }
 
 /**
  * Information panels for a player, displaying name, money, purchased landmarks
  * and establishments, etc.
+ * @prop {Landmark[]} landmarks - List of landmarks in use.
+ * @prop {Establishment[]} establishments - List of establishments in use.
  */
-class PlayerInfo extends React.Component<PlayerInfoProps, object> {
+export default class PlayerInfo extends React.Component<PlayerInfoProps, object> {
   private landmarks: Land.Landmark[];
   private establishments: Est.Establishment[];
 
@@ -45,24 +38,24 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
   }
 
   render() {
-    const { G, ctx, moves, isActive, isSelf, player, name } = this.props;
+    const { G, ctx, moves, isActive, isClient, player, name } = this.props;
     const currentPlayer = parseInt(ctx.currentPlayer);
-    const money = getCoins(G, player);
-    const _canDoTV = isActive && canDoTV(G, ctx, player);
+    const money = Game.getCoins(G, player);
+    const canDoTV = isActive && Game.canDoTV(G, ctx, player);
 
-    const land_img = 'land_img' + (isSelf ? '_self' : '');
-    const estmini_div = 'estmini_div' + (isSelf ? '_self' : '');
+    const land_img = 'land_img' + (isClient ? '_self' : '');
+    const estmini_div = 'estmini_div' + (isClient ? '_self' : '');
 
     // landmarks
     const Table = new StackTable(2);
     for (let i = 0; i < this.landmarks.length; i++) {
       const land = this.landmarks[i];
-      const _canBuyLand = isActive && player === currentPlayer && canBuyLand(G, ctx, land);
-      const _owned = Land.owns(G, player, land);
+      const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
+      const owned = Land.owns(G, player, land);
 
       Table.push(
-        <td key={i} className={classNames('land_td', { active: _canBuyLand })} onClick={() => moves.buyLand(land)}>
-          <img className={classNames(land_img, { inactive: !_owned })} src={`./assets/${land.imageFilename}`} alt='' />
+        <td key={i} className={classNames('land_td', { active: canBuyLand })} onClick={() => moves.buyLand(land)}>
+          <img className={classNames(land_img, { inactive: !owned })} src={`./assets/${land.imageFilename}`} alt='' />
         </td>
       );
     }
@@ -77,14 +70,14 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
       const est = ownedEstablishments[i];
       const count = Est.countOwned(G, player, est);
 
-      let _canDoOffice: boolean;
-      let _doOffice: (est: Est.Establishment) => void;
+      let canDoOffice: boolean;
+      let doOffice: (est: Est.Establishment) => void;
       if (player === currentPlayer) {
-        _canDoOffice = isActive && canDoOfficeGive(G, ctx, est);
-        _doOffice = (est) => moves.doOfficeGive(est);
+        canDoOffice = isActive && Game.canDoOfficeGive(G, ctx, est);
+        doOffice = (est) => moves.doOfficeGive(est);
       } else {
-        _canDoOffice = isActive && canDoOfficeTake(G, ctx, player, est);
-        _doOffice = (est) => moves.doOfficeTake(player, est);
+        canDoOffice = isActive && Game.canDoOfficeTake(G, ctx, player, est);
+        doOffice = (est) => moves.doOfficeTake(player, est);
       }
 
       for (let j = 0; j < count; j++) {
@@ -94,8 +87,8 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
         minis.push(
           <div
             key={`${i}_${j}`}
-            className={classNames(estmini_div, { active: _canDoOffice })}
-            onClick={() => _doOffice(est)}
+            className={classNames(estmini_div, { active: canDoOffice })}
+            onClick={() => doOffice(est)}
           >
             <img className='estmini_img' src={`./assets/${which_path}`} alt='' />
           </div>
@@ -109,7 +102,7 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
           <img className='coin_img' src='./assets/coin.png' alt='' />
           <div className='coin_num'>{money}</div>
         </div>
-        <div className={classNames('name_div', { active: _canDoTV })} onClick={() => moves.doTV(player)}>
+        <div className={classNames('name_div', { active: canDoTV })} onClick={() => moves.doTV(player)}>
           <div className='name_text'>{name}</div>
         </div>
         <div>{Table.render()}</div>
@@ -118,5 +111,3 @@ class PlayerInfo extends React.Component<PlayerInfoProps, object> {
     );
   }
 }
-
-export default PlayerInfo;
