@@ -36,6 +36,8 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
     this.names = initializeNames(matchData!);
   }
 
+  // --- Render ---------------------------------------------------------------
+
   /**
    * @returns Elements displaying player information (e.g. coins, landmarks, establishments)
    */

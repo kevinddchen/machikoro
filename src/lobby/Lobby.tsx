@@ -99,7 +99,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     this.setState({ supplyVariant: e.target.value as SupplyVariant });
   };
 
-  // --- Fetch matches --------------------------------------------------------
+  // --- Methods --------------------------------------------------------------
 
   /**
    * Fetch available matches from the server. Updates render if the fetched
@@ -136,8 +136,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       this.setState({ matches: newMatchList.matches });
     }
   };
-
-  // --- Match management -----------------------------------------------------
 
   /**
    * Create a match based on the selected options.
@@ -254,8 +252,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     return true;
   };
 
-  // --- Helpers --------------------------------------------------------------
-
   /**
    * Check if entered name is valid. Sets error message if not.
    * @returns True if `this.props.name` is OK.
@@ -312,7 +308,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * @returns Elements displaying available matches.
    */
-  private renderMatches(): JSX.Element[] {
+  private renderMatches = (): JSX.Element[] => {
     const { matches } = this.state;
 
     const tbody: JSX.Element[] = [];
@@ -379,7 +375,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       }
     }
     return tbody;
-  }
+  };
 
   render() {
     return (

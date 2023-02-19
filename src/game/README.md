@@ -1,4 +1,4 @@
-# Core game logic
+# Game
 
 This module defines the core game logic.
 We use the [boardgame.io](https://boardgame.io/) framework.

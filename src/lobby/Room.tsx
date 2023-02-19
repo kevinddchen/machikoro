@@ -69,6 +69,8 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     this.authenticator = new Authenticator();
   }
 
+  // --- Methods --------------------------------------------------------------
+
   /**
    * Fetches list of players from the server. Also automatically starts the
    * game when there are enough people.
@@ -157,7 +159,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   /**
    * @returns Elements displaying player names.
    */
-  private renderPlayers(): JSX.Element[] {
+  private renderPlayers = (): JSX.Element[] => {
     const { matchInfo } = this.props;
     const { players } = this.state;
 
@@ -185,7 +187,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
       );
     }
     return tbody;
-  }
+  };
 
   render() {
     const { matchInfo } = this.props;

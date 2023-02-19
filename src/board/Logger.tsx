@@ -18,6 +18,14 @@ interface LogProps extends BoardProps<MachikoroG> {
 
 /**
  * Player-viewable game log.
+ *
+ * The `log` plugin contains a list of `LogEntry` objects, one for each move.
+ * Each `LogEntry` contains an array of `LogEvent` objects. We create these
+ * `LogEvent` objects during the course of a move to log certain events, such
+ * as the dice roll, how many coins a player takes, etc. All of these
+ * `LogEvent` objects are parsed into strings and displayed in the log. See
+ * 'src/game/log/index.ts' for more details on how these `LogEvent` objects are
+ * created.
  * @prop {RefObject} textBoxRef - Reference to the log text box.
  */
 export default class Logger extends React.Component<LogProps, object> {
@@ -28,12 +36,15 @@ export default class Logger extends React.Component<LogProps, object> {
     this.textBoxRef = React.createRef();
   }
 
+  // --- Methods --------------------------------------------------------------
+
   /**
+   * Returns a string indicating the start of a turn for a given player.
    * @param turn - Turn number; starts at 0.
    * @param repeatedTurns - Total number of repeated turns so far.
-   * @returns A string indicating the start of a turn for a given player.
+   * @returns A string.
    */
-  logStartTurn = (turn: number, repeatedTurns: number): string => {
+  private logStartTurn = (turn: number, repeatedTurns: number): string => {
     const { ctx, names } = this.props;
     const player = ctx.playOrder[(turn - repeatedTurns) % names.length];
     const name = names[parseInt(player)];
@@ -41,33 +52,32 @@ export default class Logger extends React.Component<LogProps, object> {
   };
 
   /**
-   * Takes a `LogEntry` and parse its array of `LogEvent` into strings. These
-   * strings are appended to the `lines` array.
+   * Takes a `LogEntry` and parse its array of `LogEvent` objects into strings.
    * @param entry
-   * @param lines - List of strings to append to.
+   * @returns An array of strings.
    */
-  parseLogEntry = (entry: LogEntry, lines: string[]): void => {
+  private parseLogEntry = (entry: LogEntry): string[] => {
     const { metadata } = entry;
-    if (metadata) {
-      try {
-        for (const event of metadata as Log.LogEvent[]) {
-          const line = this.parseLogEvent(event);
-          if (line !== null) {
-            lines.push(line);
-          }
-        }
-      } catch (e) {
-        console.error(e);
+    if (!metadata) {
+      return [];
+    }
+
+    const lines: string[] = [];
+    for (const event of metadata as Log.LogEvent[]) {
+      const line = this.parseLogEvent(event);
+      if (line !== null) {
+        lines.push(line);
       }
     }
+    return lines;
   };
 
   /**
    * Parse a single `LogEvent` to its string.
    * @param event
-   * @returns String to display in the log.
+   * @returns A string.
    */
-  parseLogEvent = (event: Log.LogEvent): string | null => {
+  private parseLogEvent = (event: Log.LogEvent): string | null => {
     const { names } = this.props;
     const { eventType } = event;
 
@@ -105,40 +115,35 @@ export default class Logger extends React.Component<LogProps, object> {
         return `Game over! Winner: ${names[event.winner]}`;
       }
       default:
+        console.error(`Unknown log event type: ${eventType}`);
         return null;
     }
   };
 
-  componentDidUpdate() {
-    // scroll log box to bottom
-    if (this.textBoxRef.current) {
-      this.textBoxRef.current.scrollTop = this.textBoxRef.current.scrollHeight;
-    }
-  }
-
-  render() {
-    const { log } = this.props;
-
-    // parse log and remove undos
-    const cleanLog: LogEntry[] = [];
+  /**
+   * Parse an entire log into an array of strings.
+   * @param log
+   * @returns An array of strings.
+   */
+  private parseLog = (log: LogEntry[]): string[] => {
+    // remove undos
+    const entries: LogEntry[] = [];
     for (const entry of log) {
       if (entry.action.type === 'UNDO') {
-        cleanLog.pop();
+        entries.pop();
       } else {
-        cleanLog.push(entry);
+        entries.push(entry);
       }
     }
 
-    const logBody: JSX.Element[] = [];
+    let lines: string[] = [];
     // since there is no entry in the log for the first turn, we need to manually add it
-    logBody.push(<div key={-1}>{this.logStartTurn(0, 0)}</div>);
+    lines.push(this.logStartTurn(0, 0));
 
     let turn = 0;
     let repeated_turns = 0;
 
-    for (let i = 0; i < cleanLog.length; i++) {
-      const entry = cleanLog[i];
-      const lines: string[] = [];
+    for (const entry of entries) {
       // Special case for start of new turn
       if (entry.action.type === 'GAME_EVENT' && entry.action.payload.type === 'endTurn') {
         turn += 1;
@@ -150,22 +155,41 @@ export default class Logger extends React.Component<LogProps, object> {
 
         // Usual case is a move
       } else if (entry.action.type === 'MAKE_MOVE') {
-        this.parseLogEntry(entry, lines);
+        const add_lines = this.parseLogEntry(entry);
+        lines = lines.concat(add_lines);
       }
+    }
+    return lines;
+  };
 
-      for (let j = 0; j < lines.length; j++) {
-        const line = lines[j];
-        logBody.push(
-          <div key={`${i}_${j}`} className='log_div'>
-            {line}
-          </div>
-        );
-      }
+  // --- React ----------------------------------------------------------------
+
+  componentDidUpdate() {
+    // scroll log box to bottom
+    if (this.textBoxRef.current) {
+      this.textBoxRef.current.scrollTop = this.textBoxRef.current.scrollHeight;
+    }
+  }
+
+  // --- Render ---------------------------------------------------------------
+
+  render() {
+    const { log } = this.props;
+
+    const lines = this.parseLog(log);
+    const tbody: JSX.Element[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      tbody.push(
+        <div key={i} className='log_div'>
+          {lines[i]}
+        </div>
+      );
     }
 
     return (
       <div ref={this.textBoxRef} id='log' className='log_box'>
-        {logBody}
+        {tbody}
       </div>
     );
   }
