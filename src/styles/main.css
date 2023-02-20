@@ -325,6 +325,26 @@ select {
   to {background-color: var(--primary-dark);}
 }*/
 
+/* TOOLTIP */
+
+.tooltip {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 30%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
 /* ESTABLISHMENTS */
 
 .est_td {
@@ -344,6 +364,11 @@ select {
   left: 5px;
   position: absolute;
   top: 5px;
+}
+
+.est_td:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 /* LOGS */

@@ -51,6 +51,9 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
             <div className='est_num'>
               {available}/{remaining}
             </div>
+            <div className='tooltip'>
+              {est.description}
+            </div>
           </td>
         );
       }

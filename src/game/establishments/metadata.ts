@@ -7,7 +7,7 @@ import { EstColor, EstType, Establishment } from './types';
 export const WheatField: Establishment = {
   _id: 0,
   name: 'Wheat Field',
-  description: '',
+  description: 'Receive 1 coin from the bank.',
   imageFilename: 'est0.gif',
   miniFilename: 'est0_mini.png',
   cost: 1,
@@ -20,7 +20,7 @@ export const WheatField: Establishment = {
 export const LivestockFarm: Establishment = {
   _id: 1,
   name: 'Livestock Farm',
-  description: '',
+  description: 'Receive 1 coin from the bank.',
   imageFilename: 'est1.gif',
   miniFilename: 'est1_mini.png',
   cost: 1,
@@ -33,7 +33,7 @@ export const LivestockFarm: Establishment = {
 export const Bakery: Establishment = {
   _id: 2,
   name: 'Bakery',
-  description: '',
+  description: 'Receive 1 coin from the bank.',
   imageFilename: 'est2.gif',
   miniFilename: 'est2_mini.png',
   cost: 1,
@@ -46,7 +46,7 @@ export const Bakery: Establishment = {
 export const Cafe: Establishment = {
   _id: 3,
   name: 'Cafe',
-  description: '',
+  description: 'Receive 1 coin from the player who just rolled.',
   imageFilename: 'est3.gif',
   miniFilename: 'est3_mini.png',
   cost: 2,
@@ -59,7 +59,7 @@ export const Cafe: Establishment = {
 export const ConvenienceStore: Establishment = {
   _id: 4,
   name: 'Convenience Store',
-  description: '',
+  description: 'Receive 3 coins from the bank.',
   imageFilename: 'est4.gif',
   miniFilename: 'est4_mini.png',
   cost: 2,
@@ -72,7 +72,7 @@ export const ConvenienceStore: Establishment = {
 export const Forest: Establishment = {
   _id: 5,
   name: 'Forest',
-  description: '',
+  description: 'Receive 1 coin from the bank.',
   imageFilename: 'est5.gif',
   miniFilename: 'est5_mini.png',
   cost: 3,
@@ -85,7 +85,7 @@ export const Forest: Establishment = {
 export const Stadium: Establishment = {
   _id: 6,
   name: 'Stadium',
-  description: '',
+  description: 'Receive 2 coins from each player.',
   imageFilename: 'est6.gif',
   miniFilename: 'est6_mini.png',
   cost: 6,
@@ -98,7 +98,7 @@ export const Stadium: Establishment = {
 export const TVStation: Establishment = {
   _id: 7,
   name: 'TV Station',
-  description: '',
+  description: 'Receive 5 coins from one player of your choice.',
   imageFilename: 'est7.gif',
   miniFilename: 'est7_mini.png',
   cost: 7,
@@ -111,7 +111,7 @@ export const TVStation: Establishment = {
 export const Office: Establishment = {
   _id: 8,
   name: 'Office',
-  description: '',
+  description: 'Exchange a non-Purple establishment with another player.',
   imageFilename: 'est8.gif',
   miniFilename: 'est8_mini.png',
   cost: 8,
@@ -124,7 +124,7 @@ export const Office: Establishment = {
 export const CheeseFactory: Establishment = {
   _id: 9,
   name: 'Cheese Factory',
-  description: '',
+  description: 'Receive 3 coins from the bank for each \uD83D\uDC2E establishment you own.',
   imageFilename: 'est9.gif',
   miniFilename: 'est9_mini.png',
   cost: 5,
@@ -137,7 +137,7 @@ export const CheeseFactory: Establishment = {
 export const FurnitureFactory: Establishment = {
   _id: 10,
   name: 'Furniture Factory',
-  description: '',
+  description: 'Receive 3 coins from the bank for each \u2699\uFE0F establishment you own.',
   imageFilename: 'est10.gif',
   miniFilename: 'est10_mini.png',
   cost: 3,
@@ -150,7 +150,7 @@ export const FurnitureFactory: Establishment = {
 export const Mine: Establishment = {
   _id: 11,
   name: 'Mine',
-  description: '',
+  description: 'Receive 5 coins from the bank.',
   imageFilename: 'est11.gif',
   miniFilename: 'est11_mini.png',
   cost: 6,
@@ -163,7 +163,7 @@ export const Mine: Establishment = {
 export const Restaurant: Establishment = {
   _id: 12,
   name: 'Restaurant',
-  description: '',
+  description: 'Receive 2 coins from the player who just rolled.',
   imageFilename: 'est12.gif',
   miniFilename: 'est12_mini.png',
   cost: 3,
@@ -176,7 +176,7 @@ export const Restaurant: Establishment = {
 export const AppleOrchard: Establishment = {
   _id: 13,
   name: 'Apple Orchard',
-  description: '',
+  description: 'Receive 3 coins from the bank.',
   imageFilename: 'est13.gif',
   miniFilename: 'est13_mini.png',
   cost: 3,
@@ -189,7 +189,7 @@ export const AppleOrchard: Establishment = {
 export const ProduceMarket: Establishment = {
   _id: 14,
   name: 'Produce Market',
-  description: '',
+  description: 'Receive 2 coins from the bank for each \uD83C\uDF3E establishment you own.',
   imageFilename: 'est14.gif',
   miniFilename: 'est14_mini.png',
   cost: 2,
@@ -202,7 +202,7 @@ export const ProduceMarket: Establishment = {
 export const SushiBar: Establishment = {
   _id: 15,
   name: 'Sushi Bar',
-  description: '',
+  description: 'If you have a "Harbor", receive 3 coins from the player who just rolled.',
   imageFilename: 'est15.png',
   miniFilename: 'est15_mini.png',
   cost: 2,
@@ -215,7 +215,7 @@ export const SushiBar: Establishment = {
 export const FlowerOrchard: Establishment = {
   _id: 16,
   name: 'Flower Orchard',
-  description: '',
+  description: 'Receive 1 coin from the bank.',
   imageFilename: 'est16.png',
   miniFilename: 'est16_mini.png',
   cost: 2,
@@ -228,7 +228,7 @@ export const FlowerOrchard: Establishment = {
 export const FlowerShop: Establishment = {
   _id: 17,
   name: 'Flower Shop',
-  description: '',
+  description: 'Receive 1 coin from the bank for each "Flower Orchard" establishment you own.',
   imageFilename: 'est17.png',
   miniFilename: 'est17_mini.png',
   cost: 1,
@@ -241,7 +241,7 @@ export const FlowerShop: Establishment = {
 export const PizzaJoint: Establishment = {
   _id: 18,
   name: 'Pizza Joint',
-  description: '',
+  description: 'Receive 1 coin from the player who just rolled.',
   imageFilename: 'est18.png',
   miniFilename: 'est18_mini.png',
   cost: 1,
@@ -254,7 +254,7 @@ export const PizzaJoint: Establishment = {
 export const Publisher: Establishment = {
   _id: 19,
   name: 'Publisher',
-  description: '',
+  description: 'Receive 1 coin from each player for each \u2615 and \uD83C\uDFEA establishment they own.',
   imageFilename: 'est19.png',
   miniFilename: 'est19_mini.png',
   cost: 5,
@@ -267,7 +267,7 @@ export const Publisher: Establishment = {
 export const MackerelBoat: Establishment = {
   _id: 20,
   name: 'Mackerel Boat',
-  description: '',
+  description: 'If you have a "Harbor", receive 3 coins from the bank.',
   imageFilename: 'est20.png',
   miniFilename: 'est20_mini.png',
   cost: 2,
@@ -280,7 +280,7 @@ export const MackerelBoat: Establishment = {
 export const HamburgerStand: Establishment = {
   _id: 21,
   name: 'Hamburger Stand',
-  description: '',
+  description: 'Receive 1 coin from the player who just rolled.',
   imageFilename: 'est21.png',
   miniFilename: 'est21_mini.png',
   cost: 1,
@@ -293,7 +293,7 @@ export const HamburgerStand: Establishment = {
 export const TaxOffice: Establishment = {
   _id: 22,
   name: 'Tax Office',
-  description: '',
+  description: 'Receive half (rounded down) of the coins from all players with 10 or more coins.',
   imageFilename: 'est22.png',
   miniFilename: 'est22_mini.png',
   cost: 4,
@@ -306,7 +306,7 @@ export const TaxOffice: Establishment = {
 export const TunaBoat: Establishment = {
   _id: 23,
   name: 'Tuna Boat',
-  description: '',
+  description: 'Roll 2 dice. If you have a "Harbor", receive as many coins as the dice total from the bank.',
   imageFilename: 'est23.png',
   miniFilename: 'est23_mini.png',
   cost: 5,
@@ -319,7 +319,7 @@ export const TunaBoat: Establishment = {
 export const FoodWarehouse: Establishment = {
   _id: 24,
   name: 'Food Warehouse',
-  description: '',
+  description: 'Receive 2 coins from the bank for each \u2615 establishment you own.',
   imageFilename: 'est24.png',
   miniFilename: 'est24_mini.png',
   cost: 2,
