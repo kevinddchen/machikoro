@@ -3,6 +3,7 @@
 //
 
 import { GameMethod } from 'boardgame.io/core';
+import { INVALID_MOVE } from 'boardgame.io/core';
 import { Plugin } from 'boardgame.io';
 
 import { LogEventType } from './types';
@@ -31,10 +32,13 @@ export const LogxPlugin: Plugin<any, any, MachikoroG> = {
       return ({ G, log, ...rest }, ...args) => {
         // initialize empty log buffer
         G = { ...G, _logBuffer: [] };
-        G = fn({ G, log, ...rest }, ...args);
-        log.setMetadata(G._logBuffer);
+        const moveResult = fn({ G, log, ...rest }, ...args);
+        if (moveResult === INVALID_MOVE) {
+          return INVALID_MOVE;
+        }
+        log.setMetadata(moveResult._logBuffer);
         // clear log buffer
-        G = { ...G, _logBuffer: null };
+        G = { ...moveResult, _logBuffer: null };
         return G;
       };
     } else {
