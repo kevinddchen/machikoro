@@ -4,7 +4,7 @@ import { Client } from 'boardgame.io/react';
 import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 
-import { IN_PROD, PORT } from './config';
+import { IN_PROD, PORT } from 'config';
 import { MatchInfo, Matchmaker, debugMatchInfo } from 'lobby';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';

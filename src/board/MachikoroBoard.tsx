@@ -9,54 +9,69 @@ import StatusBar from './StatusBar';
 import Supply from './Supply';
 
 /**
+ * Initialize the names array given the match data.
+ * @param matchData
+ * @returns List of player names, in order of player ID.
+ */
+const initializeNames = (matchData: { id: number; name?: string }[]): string[] => {
+  const numPlayers = matchData.length;
+  const names: string[] = Array(numPlayers).fill('');
+  for (const { id, name } of matchData) {
+    const displayName = name ? name : `player_${id}`; // use a default name if none is provided
+    names[id] = displayName;
+  }
+  return names;
+};
+
+/**
  * Handles all game components
+ * @prop {string[]} names - List of player names.
  */
 export default class MachikoroBoard extends React.Component<BoardProps<MachikoroG>, object> {
   private names: string[];
 
-  constructor(props: BoardProps) {
+  constructor(props: BoardProps<MachikoroG>) {
     super(props);
     const { matchData } = props;
-    this.names = matchData!.map((x) => (x.name ? x.name : `player_${x.id}`));
+    this.names = initializeNames(matchData!);
   }
 
-  render() {
-    const { G, ctx, moves, log, isActive, playerID, undo } = this.props;
-    const playerInfoList: JSX.Element[] = [];
+  // --- Render ---------------------------------------------------------------
 
+  /**
+   * @returns Elements displaying player information (e.g. coins, landmarks, establishments)
+   */
+  private renderPlayerInfo = (): JSX.Element[] => {
+    const { ctx, playerID } = this.props;
+
+    const tbody: JSX.Element[] = [];
     for (let i = 0; i < this.names.length; i++) {
+      // Player ID in order of play
       const player = parseInt(ctx.playOrder[i]);
-      const isSelf = !!playerID && player === parseInt(playerID); // true if `player` is the client's player number
-      playerInfoList.push(
-        <PlayerInfo
-          key={i}
-          G={G}
-          ctx={ctx}
-          moves={moves}
-          isActive={isActive}
-          isSelf={isSelf}
-          player={player}
-          name={this.names[player]}
-        />
-      );
+      // True if the client is player number `player`
+      const isClient = playerID !== null && player === parseInt(playerID);
+      tbody.push(<PlayerInfo key={i} {...this.props} player={player} name={this.names[player]} isClient={isClient} />);
     }
+    return tbody;
+  };
 
+  render() {
     return (
       <div>
         <div className='div-column'>
           <div className='div-row'>
-            <Buttons G={G} ctx={ctx} moves={moves} isActive={isActive} undo={undo} />
+            <Buttons {...this.props} />
           </div>
           <div className='div-row'>
-            <StatusBar G={G} ctx={ctx} names={this.names} isActive={isActive} />
+            <StatusBar {...this.props} names={this.names} />
           </div>
           <div className='div-row'>
-            <Supply G={G} ctx={ctx} moves={moves} isActive={isActive} />
+            <Supply {...this.props} />
           </div>
         </div>
-        <div className='div-column'>{playerInfoList}</div>
+        <div className='div-column'>{this.renderPlayerInfo()}</div>
         <div className='div-column'>
-          <Logger ctx={ctx} log={log} names={this.names} />
+          <Logger {...this.props} names={this.names} />
         </div>
       </div>
     );

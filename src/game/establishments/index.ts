@@ -61,6 +61,7 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
 /**
  * @param G
  * @returns List of all unique establishments that are in use for this game.
+ * The establishments are returned in the intended display order.
  */
 export const getAllInUse = (G: MachikoroG): Establishment[] => {
   return Meta.ESTABLISHMENTS.filter((est) => isInUse(G, est));
@@ -69,7 +70,8 @@ export const getAllInUse = (G: MachikoroG): Establishment[] => {
 /**
  * @param G
  * @param player
- * @returns List of all unique establishments owned by the player.
+ * @returns List of all unique establishments owned by the player. The
+ * establishments are returned in the intended display order.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
   return Meta.ESTABLISHMENTS.filter((est) => countOwned(G, player, est) > 0);

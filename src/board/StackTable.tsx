@@ -1,6 +1,6 @@
 /**
  * Tables with a fixed number of columns but unfixed number of rows.
- * @param columns Number of columns
+ * @param columns - Number of columns
  */
 export default class StackTable {
   private numColumns: number;
@@ -15,16 +15,16 @@ export default class StackTable {
 
   /**
    * Push an element to the table. Automatically forms a new row if needed.
-   * @param td <td> element to insert into the table.
+   * @param td - <td> element to insert into the table.
    */
   push(td: JSX.Element): void {
     this.tr.push(td);
     if (this.tr.length === this.numColumns) {
-      this._pushRow();
+      this.pushRow();
     }
   }
 
-  _pushRow(): void {
+  private pushRow(): void {
     this.tbody.push(<tr key={this.tbody.length}>{this.tr}</tr>);
     this.tr = [];
   }
@@ -34,7 +34,7 @@ export default class StackTable {
    * @returns A JSX element.
    */
   render(): JSX.Element {
-    this._pushRow();
+    this.pushRow();
     return (
       <table>
         <tbody>{this.tbody}</tbody>

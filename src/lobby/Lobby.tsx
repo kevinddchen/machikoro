@@ -99,7 +99,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     this.setState({ supplyVariant: e.target.value as SupplyVariant });
   };
 
-  // --- Fetch matches --------------------------------------------------------
+  // --- Methods --------------------------------------------------------------
 
   /**
    * Fetch available matches from the server. Updates render if the fetched
@@ -136,8 +136,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       this.setState({ matches: newMatchList.matches });
     }
   };
-
-  // --- Match management -----------------------------------------------------
 
   /**
    * Create a match based on the selected options.
@@ -254,8 +252,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     return true;
   };
 
-  // --- Helpers --------------------------------------------------------------
-
   /**
    * Check if entered name is valid. Sets error message if not.
    * @returns True if `this.props.name` is OK.
@@ -309,37 +305,49 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   // --- Render ---------------------------------------------------------------
 
-  private renderMatches(): JSX.Element[] {
+  /**
+   * @returns Elements displaying available matches.
+   */
+  private renderMatches = (): JSX.Element[] => {
     const { matches } = this.state;
 
     const tbody: JSX.Element[] = [];
-    if (!matches) {
+
+    // Matches have not been fetched yet
+    if (matches === null) {
       tbody.push(<div key={0}>Fetching matches...</div>);
+
+      // No matches
     } else if (matches.length === 0) {
       tbody.push(<div key={0}>No open matches.</div>);
+
+      // There are some matches
     } else {
       for (let i = 0; i < matches.length; i++) {
         const { matchID, players, setupData } = matches[i];
         const numActivePlayers = countPlayers(players);
         const numPlayers = players.length;
-        let button: JSX.Element | null;
+
+        // Button to join the room
+        let button: JSX.Element | null = null;
+
+        // Able to rejoin the room (e.g. joined before, but closed browser)
         if (this.authenticator.hasMatchInfo(matchID)) {
-          // Able to automatically join the room (e.g. joined before, but closed browser)
           button = (
             <button className='button' onClick={() => this.joinMatch(matchID)}>
               Rejoin
             </button>
           );
-        } else if (numActivePlayers === numPlayers) {
-          // Room is full
-          button = null;
-        } else {
+
+          // Room is not full; able to join the room as new player
+        } else if (numActivePlayers !== numPlayers) {
           button = (
             <button className='button' onClick={() => this.joinMatch(matchID)}>
               Join
             </button>
           );
         }
+
         tbody.push(
           <div className='lobby-container' key={i}>
             <div className='lobby-div-col lobby-div-col-width'>
@@ -367,7 +375,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       }
     }
     return tbody;
-  }
+  };
 
   render() {
     return (

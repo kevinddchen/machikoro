@@ -1,22 +1,18 @@
 import 'styles/main.css';
 
-import { Ctx } from 'boardgame.io';
+import { BoardProps } from 'boardgame.io/react';
 import React from 'react';
 import classNames from 'classnames';
 
-import { MachikoroG, TurnState } from 'game';
+import * as Game from 'game';
+import { MachikoroG } from 'game';
 
 /**
- * @param G
- * @param ctx
- * @param names List of player names.
- * @param isActive True if it is the client's turn.
+ * @extends BoardProps<MachikoroG>
+ * @prop {string[]} names - List of player names.
  */
-interface StatusBarProps {
-  G: MachikoroG;
-  ctx: Ctx;
+interface StatusBarProps extends BoardProps<MachikoroG> {
   names: string[];
-  isActive: boolean;
 }
 
 /**
@@ -24,16 +20,15 @@ interface StatusBarProps {
  */
 export default class StatusBar extends React.Component<StatusBarProps, object> {
   render() {
-    const { G, ctx, isActive } = this.props;
+    const { G, ctx, isActive, names } = this.props;
     const { currentPlayer, gameover } = ctx;
-    const { turnState: state } = G;
-    const currentPlayerName = this.props.names[parseInt(currentPlayer)];
+    const currentPlayerName = names[parseInt(currentPlayer)];
 
     let msg = '';
 
     /* Check `game/machikoro.ts` for various possible states */
-    switch (state) {
-      case TurnState.Roll: {
+    switch (G.turnState) {
+      case Game.TurnState.Roll: {
         if (isActive) {
           msg = 'It is your turn. Select a roll option from above.';
         } else {
@@ -41,7 +36,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case TurnState.Buy: {
+      case Game.TurnState.Buy: {
         if (isActive) {
           /* to do: write function to check if landmarks can be built? */
           msg = 'Purchase an establishment, build a landmark or end your turn.';
@@ -50,7 +45,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case TurnState.TV: {
+      case Game.TurnState.TV: {
         if (isActive) {
           msg = 'TV station: Choose a player who has to give you 5 coins.';
         } else {
@@ -58,10 +53,10 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case TurnState.OfficeGive:
-      case TurnState.OfficeTake: {
+      case Game.TurnState.OfficeGive:
+      case Game.TurnState.OfficeTake: {
         if (isActive) {
-          if (state === TurnState.OfficeGive) {
+          if (G.turnState === Game.TurnState.OfficeGive) {
             msg = 'Office: Select an establishment to exchange with another player.';
           } else {
             msg = 'Office: Select an opposing establishment to exchange.';
@@ -71,7 +66,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      case TurnState.End: {
+      case Game.TurnState.End: {
         if (isActive) {
           msg = 'No actions left. End turn?';
         } else {
@@ -80,7 +75,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         break;
       }
       default:
-        msg = state + '...'; /* for debug */
+        msg = G.turnState + '...'; /* for debug */
     }
 
     if (gameover) {
