@@ -12,7 +12,7 @@ import StackTable from './StackTable';
  * @extends BoardProps<MachikoroG>
  * @prop {number} player - Player number corresponding to the component.
  * @prop {string} name - Player name corresponding to the component.
- * @prop {boolean} idClient - True if the client is player number `player`.
+ * @prop {boolean} isClient - True if the client is player number `player`.
  */
 interface PlayerInfoProps extends BoardProps<MachikoroG> {
   player: number;
