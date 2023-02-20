@@ -254,7 +254,7 @@ export const PizzaJoint: Establishment = {
 export const Publisher: Establishment = {
   _id: 19,
   name: 'Publisher',
-  description: 'Receive 1 coin from each player for each \u2615 and \uD83C\uDFEA establishment they own.',
+  description: 'Receive 1 coin from each player for each \u2615 and \uD83C\uDFE0 establishment they own.',
   imageFilename: 'est19.png',
   miniFilename: 'est19_mini.png',
   cost: 5,

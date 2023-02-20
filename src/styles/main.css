@@ -352,6 +352,11 @@ select {
   position: relative;
 }
 
+.est_td:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 .est_img {
   display: block;
   height: 200px;
@@ -364,11 +369,6 @@ select {
   left: 5px;
   position: absolute;
   top: 5px;
-}
-
-.est_td:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
 }
 
 /* LOGS */

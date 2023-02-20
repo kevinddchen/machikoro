@@ -56,6 +56,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       Table.push(
         <td key={i} className={classNames('land_td', { active: canBuyLand })} onClick={() => moves.buyLand(land)}>
           <img className={classNames(land_img, { inactive: !owned })} src={`./assets/${land.imageFilename}`} alt='' />
+          {isClient ? <div className='tooltip'>{land.description}</div> : null}
         </td>
       );
     }
