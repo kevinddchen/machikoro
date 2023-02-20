@@ -409,6 +409,12 @@ select {
 
 .land_td {
   padding: 3px;
+  position: relative;
+}
+
+.land_td:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 .name_div {
