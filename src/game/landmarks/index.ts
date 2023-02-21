@@ -92,8 +92,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       ids = Meta._HARBOR_LANDMARK_IDS;
       break;
     }
-    default:
+    default: {
       throw new Error(`Expansion '${expansion}' not implemented.`);
+    }
   }
 
   for (const id of ids) {

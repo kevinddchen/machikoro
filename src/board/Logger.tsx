@@ -114,9 +114,10 @@ export default class Logger extends React.Component<LogProps, object> {
       case Log.LogEventType.EndGame: {
         return `Game over! Winner: ${names[event.winner]}`;
       }
-      default:
+      default: {
         console.error(`Unknown log event type: ${eventType}`);
         return null;
+      }
     }
   };
 
