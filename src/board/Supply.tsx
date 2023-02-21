@@ -9,6 +9,26 @@ import { Est, MachikoroG } from 'game';
 import StackTable from './StackTable';
 
 /**
+ * Convert `Est.EstColor` to CSS class name
+ * @param color 
+ * @returns 
+ */
+const colorToClass = (color: Est.EstColor): string => {
+  switch (color) {
+    case Est.EstColor.Blue:
+      return 'est_img_pri';
+    case Est.EstColor.Green:
+      return 'est_img_sec';
+    case Est.EstColor.Red:
+      return 'est_img_res';
+    case Est.EstColor.Purple:
+      return 'est_img_maj';
+    default:
+      throw new Error(`Invalid establishment color: ${color}`);
+  }
+};
+
+/**
  * Supply area, where players see and buy establishments
  * @prop {Establishment[]} establishments - List of establishments in use.
  */
@@ -32,31 +52,36 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
       const available = Est.countAvailable(G, est);
       const remaining = Est.countRemaining(G, est);
 
-      // display the establishment on the board if
-      // (i) it is available, or
-      // (ii) it was just bought, or
-      // (iii) we are using total supply
+      // do not display the establishment on the board if
+      // (i) it is not available, and
+      // (ii) it was not just bought, and
+      // (iii) we are not using total supply
       if (
-        available > 0 ||
-        (G.justBoughtEst !== null && Est.isEqual(est, G.justBoughtEst)) ||
-        G.supplyVariant === Game.SupplyVariant.Total
+        available === 0 &&
+        (G.justBoughtEst === null || !Est.isEqual(est, G.justBoughtEst)) &&
+        G.supplyVariant !== Game.SupplyVariant.Total
       ) {
-        Table.push(
-          <td key={i} className={classNames('est_td', { active: canBuyEst })} onClick={() => moves.buyEst(est)}>
-            <img
-              className={classNames('est_img', { inactive: available === 0 })}
-              src={`./assets/${est.imageFilename}`}
-              alt=''
-            />
-            <div className='est_num'>
-              {available}/{remaining}
-            </div>
-            <div className='tooltip'>
-              {est.description}
-            </div>
-          </td>
-        );
+        continue;
       }
+
+      const estColor = colorToClass(est.color);
+      const rollString = est.rolls.map((roll) => roll.toString()).join('; ');
+
+      Table.push(
+        <td
+          key={i}
+          className={classNames('est_td', estColor, { active: canBuyEst })}
+          onClick={() => moves.buyEst(est)}
+        >
+          <div className='est_roll'>{rollString}</div>
+          <div className='est_type'></div>
+          <div className='est_name'>{est.name}</div>
+          <div className='est_num'>
+            {available}/{remaining}
+          </div>
+          <div className='tooltip'>{est.description}</div>
+        </td>
+      );
     }
 
     return <div>{Table.render()}</div>;

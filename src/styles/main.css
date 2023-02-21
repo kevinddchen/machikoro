@@ -10,12 +10,14 @@
   --primary: #00acde; /* Blue */
   --primary-dark: #0083b1; /* Dark Blue */
 
-  --est-pri: #3b73b9; /* Primary Industry (Base) */
-  --est-pri-light: #7ab8df; /* Primary Industry (Alt) */
-  --est-sec: #477f39; /* Secondary Industry (Base) */
-  --est-sec-light: #88b86e; /* Secondary Industry (Alt) */
-  --est-res: #9c213a; /* Restaurants (Base) */
-  --est-res-light: #be6c7c; /* Restaurants (Alt) */
+  --est-pri: #1168a3; /* Primary Industry (Base) */
+  --est-pri-light: #7aaed4; /* Primary Industry (Alt) */
+  --est-sec: #3d7d35; /* Secondary Industry (Base) */
+  --est-sec-light: #91b373; /* Secondary Industry (Alt) */
+  --est-res: #a11c30; /* Restaurants (Base) */
+  --est-res-light: #c57f7d; /* Restaurants (Alt) */
+  --est-maj: #782b82; /* Major Establishments (Base) */
+  --est-maj-light: #ab7fb0; /* Major Establishments (Alt) */
 }
 
 /* DIV FORMATTING */
@@ -338,7 +340,7 @@ select {
   padding: 5px 0;
   position: absolute;
   z-index: 1;
-  top: 30%;
+  top: 40%;
   left: 50%;
   margin-left: -60px;
   opacity: 0;
@@ -350,6 +352,8 @@ select {
 .est_td {
   padding: 3px;
   position: relative;
+  height: 200px;
+  width: 125px;
 }
 
 .est_td:hover .tooltip {
@@ -357,18 +361,59 @@ select {
   opacity: 1;
 }
 
-.est_img {
-  display: block;
-  height: 200px;
-  width: 125px;
+.est_img_pri {
+  background-color: var(--est-pri);
+}
+
+.est_img_sec {
+  background-color: var(--est-sec);
+}
+
+.est_img_res {
+  background-color: var(--est-res);
+}
+
+.est_img_maj {
+  background-color: var(--est-maj);
+}
+
+.est_roll {
+  color: white;
+  position: relative;
+  margin: 0 auto;
+  top: -43%;
+  width: fit-content;
+  padding-left: 3px;
+  padding-right: 3px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bolder;
+  border-style: solid;
+}
+
+.est_type {
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.est_name {
+  color: white;
+  font-size: 16px;
+  width: 95%;
+  text-align: center;
+  position: absolute;
+  top: 40px;
 }
 
 .est_num {
   color: white;
   font-size: 14px;
-  left: 5px;
+  right: 5px;
   position: absolute;
-  top: 5px;
+  bottom: 5px;
 }
 
 /* LOGS */
