@@ -329,6 +329,24 @@ select {
 
 /* TOOLTIP */
 
+.est_tooltip {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 60px;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
 .tooltip {
   visibility: hidden;
   width: 120px;
@@ -347,8 +365,9 @@ select {
   transition: opacity 0.3s;
 }
 
+/* Tooltip arrow */
 .tooltip::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -367,7 +386,7 @@ select {
   width: 125px;
 }
 
-.est_td:hover .tooltip {
+.est_td:hover .est_tooltip {
   visibility: visible;
   opacity: 1;
 }
@@ -408,7 +427,7 @@ select {
   color: white;
   position: relative;
   margin: 0 auto;
-  top: -43%;
+  top: -40%;
   width: fit-content;
   padding-left: 3px;
   padding-right: 3px;
@@ -432,7 +451,15 @@ select {
   width: 95%;
   text-align: center;
   position: absolute;
-  top: 50px;
+  top: 30px;
+}
+
+.est_cost {
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
 }
 
 .est_num {
@@ -462,21 +489,13 @@ select {
 
 /* PLAYER INFO */
 
-.coin_td {
-  position: relative;
-}
-
-.coin_img {
-  width: 25px;
-}
-
 .coin_num {
-  color: white;
-  font-size: 14px;
-  position: absolute;
-  text-align: center;
+  color: black;
+  font-size: 16px;
+  position: relative;
+  text-align: left;
+  left: 3px; /* to account for the padding */
   top: 5px;
-  width: 25px;
 }
 
 .land_td {
@@ -495,9 +514,9 @@ select {
 
 .name_text {
   background: white;
-  font-size: 12pt;
+  font-size: 16px;
   overflow: hidden;
-  width: 80px;
+  width: 84px;
 }
 
 .land_img_self {

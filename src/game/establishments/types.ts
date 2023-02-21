@@ -64,11 +64,11 @@ export type EstColor = (typeof EstColor)[keyof typeof EstColor];
  * Establishment type enum.
  */
 export const EstType = {
-  Animal: '\uD83D\uDC2E',
-  Cup: '\u2615',
-  Gear: '\u2699\uFE0F',
-  Shop: '\uD83C\uDFE0',
-  Wheat: '\uD83C\uDF3E',
+  Animal: '\u{1F42E}',
+  Cup: '\u{2615}',
+  Gear: '\u{2699}\u{FE0F}',
+  Shop: '\u{1F3E0}',
+  Wheat: '\u{1F33E}',
 } as const;
 
 export type EstType = (typeof EstType)[keyof typeof EstType];

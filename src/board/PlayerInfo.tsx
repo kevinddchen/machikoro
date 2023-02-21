@@ -99,10 +99,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
     return (
       <div className='div-column'>
-        <div className='coin_td'>
-          <img className='coin_img' src='./assets/coin.png' alt='' />
-          <div className='coin_num'>{money}</div>
-        </div>
+        <div className='coin_num'>${money}</div>
         <div className={classNames('name_div', { active: canDoTV })} onClick={() => moves.doTV(player)}>
           <div className='name_text'>{name}</div>
         </div>

@@ -73,10 +73,11 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
           <div className='est_roll'>{rollString}</div>
           <div className='est_type'>{est.type}</div>
           <div className='est_name'>{est.name}</div>
+          <div className='est_cost'>${est.cost}</div>
           <div className='est_num'>
             {available}/{remaining}
           </div>
-          <div className='tooltip'>{est.description}</div>
+          <div className='est_tooltip'>{est.description}</div>
         </td>
       );
     }
