@@ -11,18 +11,19 @@ import StackTable from './StackTable';
 /**
  * Convert `Est.EstColor` to CSS class name
  * @param color
+ * @param canBuyEst - Color is darker if it can be bought.
  * @returns
  */
-const colorToClass = (color: Est.EstColor): string => {
+const colorToClass = (color: Est.EstColor, canBuyEst: boolean): string => {
   switch (color) {
     case Est.EstColor.Blue:
-      return 'est_img_pri';
+      return canBuyEst ? 'est_img_pri' : 'est_img_pri_light';
     case Est.EstColor.Green:
-      return 'est_img_sec';
+      return canBuyEst ? 'est_img_sec' : 'est_img_sec_light';
     case Est.EstColor.Red:
-      return 'est_img_res';
+      return canBuyEst ? 'est_img_res' : 'est_img_res_light';
     case Est.EstColor.Purple:
-      return 'est_img_maj';
+      return canBuyEst ? 'est_img_maj' : 'est_img_maj_light';
     default:
       throw new Error(`Invalid establishment color: ${color}`);
   }
@@ -64,11 +65,11 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
         continue;
       }
 
-      const estColor = colorToClass(est.color);
+      const estColor = colorToClass(est.color, canBuyEst);
       const rollString = est.rolls.map((roll) => roll.toString()).join('; ');
 
       Table.push(
-        <td key={i} className={classNames('est_td', estColor, { active: canBuyEst })} onClick={() => moves.buyEst(est)}>
+        <td key={i} className={classNames('est_td', estColor)} onClick={() => moves.buyEst(est)}>
           <div className='est_roll'>{rollString}</div>
           <div className='est_type'>{est.type}</div>
           <div className='est_name'>{est.name}</div>

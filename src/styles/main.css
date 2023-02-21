@@ -318,7 +318,7 @@ select {
 }
 
 .status-bar-active {
-  background-color: var(--est-res-light);
+  background-color: red;
   /*animation: change-color 5s ease-in-out infinite alternate;*/
 }
 
@@ -340,11 +340,22 @@ select {
   padding: 5px 0;
   position: absolute;
   z-index: 1;
-  top: 40%;
+  top: 100%;
   left: 50%;
   margin-left: -60px;
   opacity: 0;
   transition: opacity 0.3s;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent transparent #555 transparent;
 }
 
 /* ESTABLISHMENTS */
@@ -352,7 +363,7 @@ select {
 .est_td {
   padding: 3px;
   position: relative;
-  height: 200px;
+  height: 125px;
   width: 125px;
 }
 
@@ -365,16 +376,32 @@ select {
   background-color: var(--est-pri);
 }
 
+.est_img_pri_light {
+  background-color: var(--est-pri-light);
+}
+
 .est_img_sec {
   background-color: var(--est-sec);
+}
+
+.est_img_sec_light {
+  background-color: var(--est-sec-light);
 }
 
 .est_img_res {
   background-color: var(--est-res);
 }
 
+.est_img_res_light {
+  background-color: var(--est-res-light);
+}
+
 .est_img_maj {
   background-color: var(--est-maj);
+}
+
+.est_img_maj_light {
+  background-color: var(--est-maj-light);
 }
 
 .est_roll {
@@ -393,10 +420,10 @@ select {
 
 .est_type {
   color: white;
-  font-size: 14px;
+  font-size: 16px;
   position: absolute;
-  top: 5px;
   right: 5px;
+  top: 5px;
 }
 
 .est_name {
@@ -405,14 +432,14 @@ select {
   width: 95%;
   text-align: center;
   position: absolute;
-  top: 40px;
+  top: 50px;
 }
 
 .est_num {
   color: white;
   font-size: 14px;
-  right: 5px;
   position: absolute;
+  right: 5px;
   bottom: 5px;
 }
 
