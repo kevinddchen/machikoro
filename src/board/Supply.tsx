@@ -10,8 +10,8 @@ import StackTable from './StackTable';
 
 /**
  * Convert `Est.EstColor` to CSS class name
- * @param color 
- * @returns 
+ * @param color
+ * @returns
  */
 const colorToClass = (color: Est.EstColor): string => {
   switch (color) {
@@ -68,13 +68,9 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
       const rollString = est.rolls.map((roll) => roll.toString()).join('; ');
 
       Table.push(
-        <td
-          key={i}
-          className={classNames('est_td', estColor, { active: canBuyEst })}
-          onClick={() => moves.buyEst(est)}
-        >
+        <td key={i} className={classNames('est_td', estColor, { active: canBuyEst })} onClick={() => moves.buyEst(est)}>
           <div className='est_roll'>{rollString}</div>
-          <div className='est_type'></div>
+          <div className='est_type'>{est.type}</div>
           <div className='est_name'>{est.name}</div>
           <div className='est_num'>
             {available}/{remaining}

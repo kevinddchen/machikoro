@@ -124,7 +124,7 @@ export const Office: Establishment = {
 export const CheeseFactory: Establishment = {
   _id: 9,
   name: 'Cheese Factory',
-  description: 'Receive 3 coins from the bank for each \uD83D\uDC2E establishment you own.',
+  description: 'Receive 3 coins from the bank for each ' + EstType.Animal + ' establishment you own.',
   imageFilename: 'est9.gif',
   miniFilename: 'est9_mini.png',
   cost: 5,
@@ -137,7 +137,7 @@ export const CheeseFactory: Establishment = {
 export const FurnitureFactory: Establishment = {
   _id: 10,
   name: 'Furniture Factory',
-  description: 'Receive 3 coins from the bank for each \u2699\uFE0F establishment you own.',
+  description: 'Receive 3 coins from the bank for each ' + EstType.Gear + ' establishment you own.',
   imageFilename: 'est10.gif',
   miniFilename: 'est10_mini.png',
   cost: 3,
@@ -189,7 +189,7 @@ export const AppleOrchard: Establishment = {
 export const ProduceMarket: Establishment = {
   _id: 14,
   name: 'Produce Market',
-  description: 'Receive 2 coins from the bank for each \uD83C\uDF3E establishment you own.',
+  description: 'Receive 2 coins from the bank for each ' + EstType.Wheat + ' establishment you own.',
   imageFilename: 'est14.gif',
   miniFilename: 'est14_mini.png',
   cost: 2,
@@ -254,7 +254,8 @@ export const PizzaJoint: Establishment = {
 export const Publisher: Establishment = {
   _id: 19,
   name: 'Publisher',
-  description: 'Receive 1 coin from each player for each \u2615 and \uD83C\uDFE0 establishment they own.',
+  description:
+    'Receive 1 coin from each player for each ' + EstType.Cup + ' and ' + EstType.Shop + ' establishment they own.',
   imageFilename: 'est19.png',
   miniFilename: 'est19_mini.png',
   cost: 5,

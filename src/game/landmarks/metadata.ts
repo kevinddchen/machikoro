@@ -2,6 +2,7 @@
 // Game metadata for landmarks.
 //
 
+import { EstType } from '../establishments/types';
 import { Landmark } from './types';
 
 export const TrainStation: Landmark = {
@@ -15,7 +16,7 @@ export const TrainStation: Landmark = {
 export const ShoppingMall: Landmark = {
   _id: 1,
   name: 'Shopping Mall',
-  description: 'Receive 1 more coin for each of your \u2615 and \uD83C\uDFE0 establishments.',
+  description: 'Receive 1 more coin for each of your ' + EstType.Cup + ' and ' + EstType.Shop + ' establishments.',
   cost: 10,
   imageFilename: 'land1.gif',
 };
