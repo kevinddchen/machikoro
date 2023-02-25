@@ -6,8 +6,6 @@
  * Interface for establishment metadata.
  * @prop {string} name - Display name.
  * @prop {string} description - Tooltip text.
- * @prop {string} imageFilename - Filename of full-sized image.
- * @prop {string} miniFilename - Filename of miniature image.
  * @prop {number} cost - Cost to buy.
  * @prop {number} earnings - The earnings per activation (for simple effects).
  * @prop {number[]} rolls - Which rolls activate the establishment.
@@ -18,8 +16,6 @@
 export interface Establishment {
   readonly name: string;
   readonly description: string;
-  readonly imageFilename: string;
-  readonly miniFilename: string;
   readonly cost: number;
   readonly earnings: number;
   readonly rolls: number[];

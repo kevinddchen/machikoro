@@ -6,14 +6,12 @@
  * Interface for landmark metadata.
  * @prop {string} name - Display name.
  * @prop {string} description - Tooltip text.
- * @prop {string} imageFilename - Filename of full-sized image.
  * @prop {number} cost - Cost to buy.
  * @prop {number} _id - Unique id used to enumerate landmarks. (Private, do not access directly)
  */
 export interface Landmark {
   readonly name: string;
   readonly description: string;
-  readonly imageFilename: string;
   readonly cost: number;
   readonly _id: number;
 }

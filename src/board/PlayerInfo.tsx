@@ -45,9 +45,6 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     // NOTE: `player` is the player that we are rendering info for, and
     // `currentPlayer` is the player whose turn it is in the game.
 
-    // if client, we add an extra black border around the panel
-    const border = isClient ? 'is_client' : '';
-
     // landmarks
     const lands = new StackTable(1);
     for (let i = 0; i < this.landmarks.length; i++) {
@@ -114,10 +111,13 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       </div>
     );
 
+    // if client, we add an extra black border around the panel
+    const border = isClient ? 'is_client' : null;
+
     return (
       <div className={classNames('div-column', border)}>
         <div className='coin_num'>${money}</div>
-        {nameDiv}
+        <div>{nameDiv}</div>
         <div>{lands.render()}</div>
         <div>{minis.render()}</div>
       </div>

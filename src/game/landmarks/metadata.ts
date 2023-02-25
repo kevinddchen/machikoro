@@ -10,7 +10,6 @@ export const TrainStation: Landmark = {
   name: 'Train Station',
   description: 'You may throw 2 dice.',
   cost: 4,
-  imageFilename: 'land0.gif',
 };
 
 export const ShoppingMall: Landmark = {
@@ -18,7 +17,6 @@ export const ShoppingMall: Landmark = {
   name: 'Shopping Mall',
   description: 'Receive 1 more coin for each of your ' + EstType.Cup + ' and ' + EstType.Shop + ' establishments.',
   cost: 10,
-  imageFilename: 'land1.gif',
 };
 
 export const AmusementPark: Landmark = {
@@ -26,7 +24,6 @@ export const AmusementPark: Landmark = {
   name: 'Amuse. Park',
   description: 'When you roll doubles, you gain an extra turn.',
   cost: 16,
-  imageFilename: 'land2.gif',
 };
 
 export const RadioTower: Landmark = {
@@ -34,7 +31,6 @@ export const RadioTower: Landmark = {
   name: 'Radio Tower',
   description: 'Once per turn, you may roll again.',
   cost: 22,
-  imageFilename: 'land3.gif',
 };
 
 export const Harbor: Landmark = {
@@ -42,7 +38,6 @@ export const Harbor: Landmark = {
   name: 'Harbor',
   description: 'If the dice total is 10 or more, you may add 2 to the total.',
   cost: 2,
-  imageFilename: 'land5.png',
 };
 
 export const Airport: Landmark = {
@@ -50,7 +45,6 @@ export const Airport: Landmark = {
   name: 'Airport',
   description: 'If you build nothing on your turn, receive 10 coins from the bank.',
   cost: 30,
-  imageFilename: 'land6.png',
 };
 
 /**
