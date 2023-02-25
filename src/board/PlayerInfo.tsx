@@ -64,7 +64,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           onClick={() => moves.buyLand(land)}
         >
           <div className='mini_name'>{land.name}</div>
-          <div className={classNames('tooltip', 'mini_tooltip')}>{land.description}</div>
+          <div className={classNames('tooltip', 'mini_tooltip')}>
+            {land.description + '\n\nCost: ' + land.cost.toString()}
+          </div>
         </td>
       );
     }
