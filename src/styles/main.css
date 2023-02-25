@@ -308,6 +308,7 @@ select {
 }
 
 /* STATUS BAR */
+
 .status-bar {
   background-color: var(--primary);
   color: white;
@@ -384,6 +385,7 @@ select {
   position: relative;
   height: 125px;
   width: 125px;
+  border-radius: 8px;
 }
 
 .est_td:hover .est_tooltip {
@@ -427,7 +429,7 @@ select {
   color: white;
   position: relative;
   margin: 0 auto;
-  top: -40%;
+  top: -50px;
   width: fit-content;
   padding-left: 3px;
   padding-right: 3px;
@@ -531,26 +533,36 @@ select {
   width: 35px;
 }
 
-.estmini_div_self {
-  margin: 0 auto;
-  padding-left: 5px;
-  padding-right: 5px;
-  width: 100px;
-}
-
-.estmini_div {
-  margin: 0 auto;
-  padding-left: 5px;
-  padding-right: 5px;
+.estmini_td {
+  padding: 3px;
+  position: relative;
   width: 80px;
+  height: 20px;
+  border-radius: 6px;
 }
 
-.estmini_img_self {
-  display: block;
-  width: 100%;
+.estmini_td:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
-.estmini_img {
-  display: block;
-  width: 100%;
+.estmini_roll {
+  color: white;
+  position: relative;
+  margin: 0 auto;
+  width: fit-content;
+  padding-left: 3px;
+  padding-right: 3px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bolder;
+  border-style: solid;
+}
+
+.estmini_type {
+  color: white;
+  position: absolute;
+  font-size: 12px;
+  right: 5px;
+  top: 5px;
 }

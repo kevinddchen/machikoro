@@ -25,7 +25,8 @@ export default class StackTable {
   }
 
   private pushRow(): void {
-    this.tbody.push(<tr key={this.tbody.length}>{this.tr}</tr>);
+    const length = this.tr.length;
+    this.tbody.push(<tr key={length}>{this.tr}</tr>);
     this.tr = [];
   }
 

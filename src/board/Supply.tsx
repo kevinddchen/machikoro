@@ -6,28 +6,8 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { Est, MachikoroG } from 'game';
+import { colorToClass, rollsToString } from './utils';
 import StackTable from './StackTable';
-
-/**
- * Convert `Est.EstColor` to CSS class name
- * @param color
- * @param canBuyEst - Color is darker if it can be bought.
- * @returns
- */
-const colorToClass = (color: Est.EstColor, canBuyEst: boolean): string => {
-  switch (color) {
-    case Est.EstColor.Blue:
-      return canBuyEst ? 'est_img_pri' : 'est_img_pri_light';
-    case Est.EstColor.Green:
-      return canBuyEst ? 'est_img_sec' : 'est_img_sec_light';
-    case Est.EstColor.Red:
-      return canBuyEst ? 'est_img_res' : 'est_img_res_light';
-    case Est.EstColor.Purple:
-      return canBuyEst ? 'est_img_maj' : 'est_img_maj_light';
-    default:
-      throw new Error(`Invalid establishment color: ${color}`);
-  }
-};
 
 /**
  * Supply area, where players see and buy establishments
@@ -66,7 +46,7 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
       }
 
       const estColor = colorToClass(est.color, canBuyEst);
-      const rollString = est.rolls.map((roll) => roll.toString()).join('; ');
+      const rollString = rollsToString(est);
 
       Table.push(
         <td key={i} className={classNames('est_td', estColor)} onClick={() => moves.buyEst(est)}>
