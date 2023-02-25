@@ -18,9 +18,9 @@
   --est-res-light: #c57f7d; /* Restaurants (Alt) */
   --est-maj: #782b82; /* Major Establishments (Base) */
   --est-maj-light: #ab7fb0; /* Major Establishments (Alt) */
-
-  --land-owned: #ae5421; /* Landmark, when owned */
-  --land-canbuy: #d9a16e; /* Landmark, when can buy */
+  
+  --land-owned: #d9a16e; /* Landmark, when owned */
+  --land-canbuy: #ae5421; /* Landmark, when can buy */
   /* --land-canbuy: #f5e387; */
   --land-unowned: #ababab; /* Landmark, when unowned */
 }
@@ -300,6 +300,10 @@ select {
   cursor: pointer;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .inactive {
   filter: grayscale(1);
 }
@@ -335,24 +339,6 @@ select {
 
 /* TOOLTIP */
 
-.est_tooltip {
-  visibility: hidden;
-  width: 120px;
-  background-color: #555;
-  color: #fff;
-  font-size: 12px;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
-  top: 60px;
-  left: 50%;
-  margin-left: -60px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
 .tooltip {
   visibility: hidden;
   width: 120px;
@@ -364,15 +350,22 @@ select {
   padding: 5px 0;
   position: absolute;
   z-index: 1;
-  top: 100%;
   left: 50%;
   margin-left: -60px;
   opacity: 0;
   transition: opacity 0.3s;
 }
 
+.est-tooltip {
+  top: 60px;
+}
+
+.mini-tooltip {
+  top: calc(100% + 7px);
+}
+
 /* Tooltip arrow */
-.tooltip::after {
+.mini-tooltip::after {
   content: '';
   position: absolute;
   bottom: 100%;
@@ -393,7 +386,7 @@ select {
   border-radius: 8px;
 }
 
-.est_td:hover .est_tooltip {
+.est_td:hover .tooltip {
   visibility: visible;
   opacity: 1;
 }

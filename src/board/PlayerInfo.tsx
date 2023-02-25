@@ -55,9 +55,13 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const landColor = landColorToClass(owned, canBuyLand);
 
       lands.push(
-        <td key={i} className={classNames('mini_td', landColor)} onClick={() => moves.buyLand(land)}>
+        <td
+          key={i}
+          className={classNames('mini_td', landColor, { clickable: canBuyLand })}
+          onClick={() => moves.buyLand(land)}
+        >
           <div className='mini_name'>{land.name}</div>
-          <div className='tooltip'>{land.description}</div>
+          <div className={classNames('tooltip', 'mini-tooltip')}>{land.description}</div>
         </td>
       );
     }
@@ -86,10 +90,14 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
         minis.push(
-          <td key={key} className={classNames('mini_td', estColor)} onClick={() => doOffice(est)}>
+          <td
+            key={key}
+            className={classNames('mini_td', estColor, { clickable: canDoOffice })}
+            onClick={() => doOffice(est)}
+          >
             <div className='mini_roll'>{rollString}</div>
             <div className='mini_type'>{est.type}</div>
-            <div className='tooltip'>{est.name}</div>
+            <div className={classNames('tooltip', 'mini-tooltip')}>{est.name}</div>
           </td>
         );
       }

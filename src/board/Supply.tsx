@@ -49,7 +49,11 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
       const rollString = rollsToString(est);
 
       table.push(
-        <td key={i} className={classNames('est_td', estColor)} onClick={() => moves.buyEst(est)}>
+        <td
+          key={i}
+          className={classNames('est_td', estColor, { inactive: available === 0 }, { clickable: canBuyEst })}
+          onClick={() => moves.buyEst(est)}
+        >
           <div className='est_roll'>{rollString}</div>
           <div className='est_type'>{est.type}</div>
           <div className='est_name'>{est.name}</div>
@@ -57,7 +61,7 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
           <div className='est_num'>
             {available}/{remaining}
           </div>
-          <div className='est_tooltip'>{est.description}</div>
+          <div className={classNames('tooltip', 'est-tooltip')}>{est.description}</div>
         </td>
       );
     }
