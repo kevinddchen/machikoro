@@ -72,7 +72,7 @@ From the project root directory, run `heroku git:remote -a playmachikoro` to add
 To deploy your local app, run
 
 ```bash
-git push heroku master
+git push heroku main
 ```
 
 This will only work if you are a collaborator.
