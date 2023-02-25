@@ -202,6 +202,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   // give each player their starting establishments
   for (const id of Meta._STARTING_ESTABLISHMENT_IDS) {
+    if (!data.inUse[id]) {
+      continue;
+    }
     for (const player of Array(numPlayers).keys()) {
       data.ownedCount[id][player] += 1;
     }

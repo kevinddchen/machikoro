@@ -101,6 +101,16 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     data.inUse[id] = true;
   }
 
+  // give each player their starting landmarks
+  for (const id of Meta._STARTING_LANDMARK_IDS) {
+    if (!data.inUse[id]) {
+      continue;
+    }
+    for (const player of Array(numPlayers).keys()) {
+      data.owned[id][player] = true;
+    }
+  }
+
   // update G
   G._landData = data;
 };

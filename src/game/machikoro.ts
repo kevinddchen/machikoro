@@ -688,10 +688,9 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     G.turnState = TurnState.OfficeGive;
   } else {
     // city hall before buying
-    // HACK: city hall is currently not treated like a regular landmark
-    if (getCoins(G, player) === 0 && G.expansion === Expansion.Harbor) {
+    if (getCoins(G, player) === 0 && Land.isInUse(G, Land.CityHall)) {
       setCoins(G, player, Land.CITY_HALL_EARNINGS);
-      Log.logEarn(G, player, Land.CITY_HALL_EARNINGS, 'City Hall');
+      Log.logEarn(G, player, Land.CITY_HALL_EARNINGS, Land.CityHall.name);
     }
     G.turnState = TurnState.Buy;
   }
