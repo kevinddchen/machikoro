@@ -6,13 +6,14 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
+import { estColorToClass, landColorToClass, rollsToString } from './utils';
 import StackTable from './StackTable';
 
 /**
  * @extends BoardProps<MachikoroG>
  * @prop {number} player - Player number corresponding to the component.
  * @prop {string} name - Player name corresponding to the component.
- * @prop {boolean} isClient - True if the client is player number `player`.
+ * @prop {boolean} isClient - True if we are rendering the client's own info.
  */
 interface PlayerInfoProps extends BoardProps<MachikoroG> {
   player: number;
@@ -28,12 +29,10 @@ interface PlayerInfoProps extends BoardProps<MachikoroG> {
  */
 export default class PlayerInfo extends React.Component<PlayerInfoProps, object> {
   private landmarks: Land.Landmark[];
-  private establishments: Est.Establishment[];
 
   constructor(props: PlayerInfoProps) {
     super(props);
     const { G } = this.props;
-    this.establishments = Est.getAllInUse(G);
     this.landmarks = Land.getAllInUse(G);
   }
 
@@ -43,31 +42,38 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
 
-    const land_img = 'land_img' + (isClient ? '_self' : '');
-    const estmini_div = 'estmini_div' + (isClient ? '_self' : '');
+    // NOTE: `player` is the player that we are rendering info for, and
+    // `currentPlayer` is the player whose turn it is in the game.
 
     // landmarks
-    const Table = new StackTable(2);
+    const lands = new StackTable(1);
     for (let i = 0; i < this.landmarks.length; i++) {
       const land = this.landmarks[i];
       const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
       const owned = Land.owns(G, player, land);
 
-      Table.push(
-        <td key={i} className={classNames('land_td', { active: canBuyLand })} onClick={() => moves.buyLand(land)}>
-          <img className={classNames(land_img, { inactive: !owned })} src={`./assets/${land.imageFilename}`} alt='' />
+      const landColor = landColorToClass(owned, canBuyLand);
+
+      lands.push(
+        <td
+          key={i}
+          className={classNames('mini_td', landColor, { clickable: canBuyLand })}
+          onClick={() => moves.buyLand(land)}
+        >
+          <div className='mini_name'>{land.name}</div>
+          <div className={classNames('tooltip', 'mini_tooltip')}>
+            {land.description + '\n\nCost: ' + land.cost.toString()}
+          </div>
         </td>
       );
     }
 
     // establishment miniatures
-    const minis = [];
+    const minis = new StackTable(1);
 
-    const ownedEstablishments: Est.Establishment[] = [];
-    for (const est of this.establishments) if (Est.countOwned(G, player, est) > 0) ownedEstablishments.push(est);
-
-    for (let i = 0; i < ownedEstablishments.length; i++) {
-      const est = ownedEstablishments[i];
+    const ownedEsts = Est.getAllOwned(G, player);
+    for (let i = 0; i < ownedEsts.length; i++) {
+      const est = ownedEsts[i];
       const count = Est.countOwned(G, player, est);
 
       let canDoOffice: boolean;
@@ -80,33 +86,40 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         doOffice = (est) => moves.doOfficeTake(player, est);
       }
 
-      for (let j = 0; j < count; j++) {
-        const which_path =
-          i === ownedEstablishments.length - 1 && j === count - 1 ? est.imageFilename : est.miniFilename;
+      const estColor = estColorToClass(est.color, canDoOffice);
+      const rollString = rollsToString(est);
 
+      for (let j = 0; j < count; j++) {
+        const key = `${i}_${j}`;
         minis.push(
-          <div
-            key={`${i}_${j}`}
-            className={classNames(estmini_div, { active: canDoOffice })}
+          <td
+            key={key}
+            className={classNames('mini_td', estColor, { clickable: canDoOffice })}
             onClick={() => doOffice(est)}
           >
-            <img className='estmini_img' src={`./assets/${which_path}`} alt='' />
-          </div>
+            <div className='mini_roll'>{rollString}</div>
+            <div className='mini_type'>{est.type}</div>
+            <div className={classNames('tooltip', 'mini_tooltip')}>{est.name}</div>
+          </td>
         );
       }
     }
 
+    const nameDiv = (
+      <div className={classNames('name_text', { name_do_tv: canDoTV })} onClick={() => moves.doTV(player)}>
+        {name}
+      </div>
+    );
+
+    // if client, we add an extra black border around the panel
+    const border = isClient ? 'is_client' : null;
+
     return (
-      <div className='div-column'>
-        <div className='coin_td'>
-          <img className='coin_img' src='./assets/coin.png' alt='' />
-          <div className='coin_num'>{money}</div>
-        </div>
-        <div className={classNames('name_div', { active: canDoTV })} onClick={() => moves.doTV(player)}>
-          <div className='name_text'>{name}</div>
-        </div>
-        <div>{Table.render()}</div>
-        <div>{minis}</div>
+      <div className={classNames('div-column', border)}>
+        <div className='coin_num'>${money}</div>
+        <div>{nameDiv}</div>
+        <div>{lands.render()}</div>
+        <div>{minis.render()}</div>
       </div>
     );
   }

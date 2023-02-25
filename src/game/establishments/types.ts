@@ -6,8 +6,6 @@
  * Interface for establishment metadata.
  * @prop {string} name - Display name.
  * @prop {string} description - Tooltip text.
- * @prop {string} imageFilename - Filename of full-sized image.
- * @prop {string} miniFilename - Filename of miniature image.
  * @prop {number} cost - Cost to buy.
  * @prop {number} earnings - The earnings per activation (for simple effects).
  * @prop {number[]} rolls - Which rolls activate the establishment.
@@ -18,8 +16,6 @@
 export interface Establishment {
   readonly name: string;
   readonly description: string;
-  readonly imageFilename: string;
-  readonly miniFilename: string;
   readonly cost: number;
   readonly earnings: number;
   readonly rolls: number[];
@@ -64,11 +60,11 @@ export type EstColor = (typeof EstColor)[keyof typeof EstColor];
  * Establishment type enum.
  */
 export const EstType = {
-  Animal: 'Animal',
-  Cup: 'Cup',
-  Gear: 'Gear',
-  Shop: 'Shop',
-  Wheat: 'Wheat',
+  Animal: '\u{1F42E}',
+  Cup: '\u{2615}',
+  Gear: '\u{2699}\u{FE0F}',
+  Shop: '\u{1F3E0}',
+  Wheat: '\u{1F33E}',
 } as const;
 
 export type EstType = (typeof EstType)[keyof typeof EstType];

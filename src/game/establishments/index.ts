@@ -153,8 +153,9 @@ export const replenishSupply = (G: MachikoroG): void => {
         }
       break;
     }
-    default:
+    default: {
       throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
+    }
   }
 };
 
@@ -186,8 +187,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       ids = Meta._HARBOR_ESTABLISHMENT_IDS;
       break;
     }
-    default:
+    default: {
       throw new Error(`Expansion '${expansion}' not implemented.`);
+    }
   }
 
   for (const id of ids) {
@@ -200,6 +202,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   // give each player their starting establishments
   for (const id of Meta._STARTING_ESTABLISHMENT_IDS) {
+    if (!data.inUse[id]) {
+      continue;
+    }
     for (const player of Array(numPlayers).keys()) {
       data.ownedCount[id][player] += 1;
     }
@@ -233,8 +238,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       }
       break;
     }
-    default:
+    default: {
       throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
+    }
   }
 
   // update G

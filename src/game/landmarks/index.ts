@@ -92,12 +92,23 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       ids = Meta._HARBOR_LANDMARK_IDS;
       break;
     }
-    default:
+    default: {
       throw new Error(`Expansion '${expansion}' not implemented.`);
+    }
   }
 
   for (const id of ids) {
     data.inUse[id] = true;
+  }
+
+  // give each player their starting landmarks
+  for (const id of Meta._STARTING_LANDMARK_IDS) {
+    if (!data.inUse[id]) {
+      continue;
+    }
+    for (const player of Array(numPlayers).keys()) {
+      data.owned[id][player] = true;
+    }
   }
 
   // update G

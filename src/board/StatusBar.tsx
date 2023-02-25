@@ -74,8 +74,9 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         }
         break;
       }
-      default:
+      default: {
         msg = G.turnState + '...'; /* for debug */
+      }
     }
 
     if (gameover) {

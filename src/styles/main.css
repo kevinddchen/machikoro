@@ -10,12 +10,19 @@
   --primary: #00acde; /* Blue */
   --primary-dark: #0083b1; /* Dark Blue */
 
-  --est-pri: #3b73b9; /* Primary Industry (Base) */
-  --est-pri-light: #7ab8df; /* Primary Industry (Alt) */
-  --est-sec: #477f39; /* Secondary Industry (Base) */
-  --est-sec-light: #88b86e; /* Secondary Industry (Alt) */
-  --est-res: #9c213a; /* Restaurants (Base) */
-  --est-res-light: #be6c7c; /* Restaurants (Alt) */
+  --est-pri: #1168a3; /* Primary Industry (Base) */
+  --est-pri-light: #7aaed4; /* Primary Industry (Alt) */
+  --est-sec: #3d7d35; /* Secondary Industry (Base) */
+  --est-sec-light: #91b373; /* Secondary Industry (Alt) */
+  --est-res: #a11c30; /* Restaurants (Base) */
+  --est-res-light: #c57f7d; /* Restaurants (Alt) */
+  --est-maj: #782b82; /* Major Establishments (Base) */
+  --est-maj-light: #ab7fb0; /* Major Establishments (Alt) */
+
+  --land-owned: #d9a16e; /* Landmark, when owned */
+  --land-canbuy: #ae5421; /* Landmark, when can buy */
+  /* --land-canbuy: #f5e387; */
+  --land-unowned: #ababab; /* Landmark, when unowned */
 }
 
 /* DIV FORMATTING */
@@ -288,8 +295,7 @@ select {
 
 /* ACTIONS & ITEM SELECTION */
 
-.active {
-  background-color: red;
+.clickable {
   cursor: pointer;
 }
 
@@ -306,6 +312,7 @@ select {
 }
 
 /* STATUS BAR */
+
 .status-bar {
   background-color: var(--primary);
   color: white;
@@ -316,7 +323,7 @@ select {
 }
 
 .status-bar-active {
-  background-color: var(--est-res-light);
+  background-color: red;
   /*animation: change-color 5s ease-in-out infinite alternate;*/
 }
 
@@ -325,25 +332,139 @@ select {
   to {background-color: var(--primary-dark);}
 }*/
 
+/* TOOLTIP */
+
+.tooltip {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: pre-line;
+}
+
+.est_tooltip {
+  top: 60px;
+}
+
+.mini_tooltip {
+  top: calc(100% + 7px);
+}
+
+/* Tooltip arrow */
+.mini_tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent transparent #555 transparent;
+}
+
 /* ESTABLISHMENTS */
 
 .est_td {
   padding: 3px;
   position: relative;
+  height: 125px;
+  width: 125px;
+  border-radius: 8px;
 }
 
-.est_img {
-  display: block;
-  height: 200px;
-  width: 125px;
+.est_td:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.est_img_pri {
+  background-color: var(--est-pri);
+}
+
+.est_img_pri_light {
+  background-color: var(--est-pri-light);
+}
+
+.est_img_sec {
+  background-color: var(--est-sec);
+}
+
+.est_img_sec_light {
+  background-color: var(--est-sec-light);
+}
+
+.est_img_res {
+  background-color: var(--est-res);
+}
+
+.est_img_res_light {
+  background-color: var(--est-res-light);
+}
+
+.est_img_maj {
+  background-color: var(--est-maj);
+}
+
+.est_img_maj_light {
+  background-color: var(--est-maj-light);
+}
+
+.est_roll {
+  color: white;
+  position: relative;
+  margin: 0 auto;
+  top: -50px;
+  width: fit-content;
+  padding-left: 3px;
+  padding-right: 3px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bolder;
+  border-style: solid;
+  border-radius: 4px;
+}
+
+.est_type {
+  color: white;
+  font-size: 16px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
+.est_name {
+  color: white;
+  font-size: 16px;
+  width: 95%;
+  text-align: center;
+  position: absolute;
+  top: 30px;
+}
+
+.est_cost {
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
 }
 
 .est_num {
   color: white;
   font-size: 14px;
-  left: 5px;
   position: absolute;
-  top: 5px;
+  right: 5px;
+  bottom: 5px;
 }
 
 /* LOGS */
@@ -365,70 +486,96 @@ select {
 
 /* PLAYER INFO */
 
-.coin_td {
-  position: relative;
-}
-
-.coin_img {
-  width: 25px;
+.is_client {
+  border: black solid;
+  border-radius: 8px;
 }
 
 .coin_num {
-  color: white;
-  font-size: 14px;
-  position: absolute;
-  text-align: center;
+  color: black;
+  font-size: 16px;
+  position: relative;
+  text-align: left;
+  left: 3px; /* to account for the padding */
   top: 5px;
-  width: 25px;
 }
 
 .land_td {
   padding: 3px;
+  position: relative;
 }
 
 .name_div {
-  padding: 3px;
-}
-
-.name_text {
   background: white;
-  font-size: 12pt;
+  font-size: 16px;
   overflow: hidden;
-  width: 80px;
-}
-
-.land_img_self {
-  display: block;
-  height: 112px;
-  width: 70px;
-}
-
-.land_img {
-  display: block;
-  height: 56px;
-  width: 35px;
-}
-
-.estmini_div_self {
-  margin: 0 auto;
-  padding-left: 5px;
-  padding-right: 5px;
-  width: 100px;
-}
-
-.estmini_div {
-  margin: 0 auto;
-  padding-left: 5px;
-  padding-right: 5px;
-  width: 80px;
-}
-
-.estmini_img_self {
-  display: block;
   width: 100%;
 }
 
-.estmini_img {
-  display: block;
-  width: 100%;
+.name_do_tv {
+  cursor: pointer;
+  border: red solid;
+  border-radius: 8px;
+  border-width: 3px;
+}
+
+.land_td:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.land_img_owned {
+  background-color: var(--land-owned);
+}
+
+.land_img_can_buy {
+  background-color: var(--land-canbuy);
+}
+
+.land_img_unowned {
+  background-color: var(--land-unowned);
+}
+
+.mini_td {
+  padding: 3px;
+  position: relative;
+  width: 80px;
+  height: 20px;
+  border-radius: 8px;
+}
+
+.mini_td:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.mini_roll {
+  color: white;
+  position: relative;
+  margin: 0 auto;
+  width: fit-content;
+  padding-left: 3px;
+  padding-right: 3px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bolder;
+  border-style: solid;
+  border-radius: 4px;
+}
+
+.mini_type {
+  color: white;
+  position: absolute;
+  font-size: 12px;
+  right: 5px;
+  top: 5px;
+}
+
+.mini_name {
+  color: white;
+  font-size: 12px;
+  width: 95%;
+  text-align: center;
+  position: absolute;
+  top: 5px;
 }

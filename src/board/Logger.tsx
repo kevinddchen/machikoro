@@ -6,8 +6,6 @@ import React from 'react';
 
 import { Log, MachikoroG } from 'game';
 
-const COIN = '\uD83D\uDFE4';
-
 /**
  * @extends BoardProps<MachikoroG>
  * @prop {string[]} names - List of player names.
@@ -95,11 +93,11 @@ export default class Logger extends React.Component<LogProps, object> {
       }
       case Log.LogEventType.Earn: {
         const { player, amount, name } = event;
-        return `\t${names[player]} earned ${amount} ${COIN}  (${name})`;
+        return `\t${names[player]} earned $${amount} (${name})`;
       }
       case Log.LogEventType.Take: {
         const { from, to, amount, name } = event;
-        return `\t${names[from]} paid ${names[to]} ${amount} ${COIN}  (${name})`;
+        return `\t${names[from]} paid ${names[to]} $${amount} (${name})`;
       }
       case Log.LogEventType.Buy: {
         return `\tbought ${event.name}`;
@@ -114,9 +112,10 @@ export default class Logger extends React.Component<LogProps, object> {
       case Log.LogEventType.EndGame: {
         return `Game over! Winner: ${names[event.winner]}`;
       }
-      default:
+      default: {
         console.error(`Unknown log event type: ${eventType}`);
         return null;
+      }
     }
   };
 
