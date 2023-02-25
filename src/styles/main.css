@@ -295,11 +295,6 @@ select {
 
 /* ACTIONS & ITEM SELECTION */
 
-.active {
-  background-color: red;
-  cursor: pointer;
-}
-
 .clickable {
   cursor: pointer;
 }
@@ -356,16 +351,16 @@ select {
   transition: opacity 0.3s;
 }
 
-.est-tooltip {
+.est_tooltip {
   top: 60px;
 }
 
-.mini-tooltip {
+.mini_tooltip {
   top: calc(100% + 7px);
 }
 
 /* Tooltip arrow */
-.mini-tooltip::after {
+.mini_tooltip::after {
   content: '';
   position: absolute;
   bottom: 100%;
@@ -490,6 +485,11 @@ select {
 
 /* PLAYER INFO */
 
+.is_client {
+  border: black solid;
+  border-radius: 8px;
+}
+
 .coin_num {
   color: black;
   font-size: 16px;
@@ -502,6 +502,20 @@ select {
 .land_td {
   padding: 3px;
   position: relative;
+}
+
+.name_div {
+  background: white;
+  font-size: 16px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.name_tv {
+  cursor: pointer;
+  border: red solid;
+  border-radius: 8px;
+  border-width: 3px;
 }
 
 .land_td:hover .tooltip {
@@ -519,17 +533,6 @@ select {
 
 .land_img_unowned {
   background-color: var(--land-unowned);
-}
-
-.name_div {
-  padding: 3px;
-}
-
-.name_text {
-  background: white;
-  font-size: 16px;
-  overflow: hidden;
-  width: 84px;
 }
 
 .mini_td {

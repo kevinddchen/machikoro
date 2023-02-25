@@ -13,12 +13,12 @@ import StackTable from './StackTable';
  * @extends BoardProps<MachikoroG>
  * @prop {number} player - Player number corresponding to the component.
  * @prop {string} name - Player name corresponding to the component.
- * @prop {boolean} isPlayer - True if the client is player number `player`.
+ * @prop {boolean} isClient - True if we are rendering the client's info.
  */
 interface PlayerInfoProps extends BoardProps<MachikoroG> {
   player: number;
   name: string;
-  isPlayer: boolean;
+  isClient: boolean;
 }
 
 /**
@@ -37,13 +37,16 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
   }
 
   render() {
-    const { G, ctx, moves, isActive, player, name } = this.props;
+    const { G, ctx, moves, isActive, isClient, player, name } = this.props;
     const currentPlayer = parseInt(ctx.currentPlayer);
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
 
     // NOTE: `player` is the player that we are rendering info for, and
     // `currentPlayer` is the player whose turn it is in the game.
+
+    // if client, we add an extra black border around the panel
+    const border = isClient ? 'is_client' : '';
 
     // landmarks
     const lands = new StackTable(1);
@@ -61,7 +64,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           onClick={() => moves.buyLand(land)}
         >
           <div className='mini_name'>{land.name}</div>
-          <div className={classNames('tooltip', 'mini-tooltip')}>{land.description}</div>
+          <div className={classNames('tooltip', 'mini_tooltip')}>{land.description}</div>
         </td>
       );
     }
@@ -97,18 +100,21 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           >
             <div className='mini_roll'>{rollString}</div>
             <div className='mini_type'>{est.type}</div>
-            <div className={classNames('tooltip', 'mini-tooltip')}>{est.name}</div>
+            <div className={classNames('tooltip', 'mini_tooltip')}>{est.name}</div>
           </td>
         );
       }
     }
 
+    const nameDiv = <div className={classNames('name_text', { name_tv: canDoTV })} onClick={() => moves.doTV(player)}>{name}</div>
+
     return (
-      <div className='div-column'>
+      <div className={classNames('div-column', border)}>
         <div className='coin_num'>${money}</div>
-        <div className={classNames('name_div', { active: canDoTV })} onClick={() => moves.doTV(player)}>
+        {/* <div className={classNames('name_div', { name_tv: canDoTV })} onClick={() => moves.doTV(player)}>
           <div className='name_text'>{name}</div>
-        </div>
+        </div> */}
+        {nameDiv}
         <div>{lands.render()}</div>
         <div>{minis.render()}</div>
       </div>
