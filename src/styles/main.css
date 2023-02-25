@@ -512,7 +512,7 @@ select {
   width: 100%;
 }
 
-.name_tv {
+.name_do_tv {
   cursor: pointer;
   border: red solid;
   border-radius: 8px;
@@ -528,7 +528,7 @@ select {
   background-color: var(--land-owned);
 }
 
-.land_img_canbuy {
+.land_img_can_buy {
   background-color: var(--land-canbuy);
 }
 

@@ -31,7 +31,7 @@ export const landColorToClass = (owned: boolean, canBuy: boolean): string => {
   if (owned) {
     return 'land_img_owned';
   } else if (canBuy) {
-    return 'land_img_canbuy';
+    return 'land_img_can_buy';
   } else {
     return 'land_img_unowned';
   }

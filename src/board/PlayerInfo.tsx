@@ -13,7 +13,7 @@ import StackTable from './StackTable';
  * @extends BoardProps<MachikoroG>
  * @prop {number} player - Player number corresponding to the component.
  * @prop {string} name - Player name corresponding to the component.
- * @prop {boolean} isClient - True if we are rendering the client's info.
+ * @prop {boolean} isClient - True if we are rendering the client's own info.
  */
 interface PlayerInfoProps extends BoardProps<MachikoroG> {
   player: number;
@@ -106,7 +106,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     }
 
     const nameDiv = (
-      <div className={classNames('name_text', { name_tv: canDoTV })} onClick={() => moves.doTV(player)}>
+      <div className={classNames('name_text', { name_do_tv: canDoTV })} onClick={() => moves.doTV(player)}>
         {name}
       </div>
     );
