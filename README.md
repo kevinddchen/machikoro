@@ -5,7 +5,6 @@ For the basic game rules, [click here](https://www.fgbradleys.com/rules/rules2/M
 This app was developed using the React framework and the <a href="https://boardgame.io/">boardgame.io</a> game engine.
 
 **Disclaimer**: We do not own a license to the game.
-Images were taken _without_ permission from <a href="https://www.yucata.de/en">yucata.de</a> and <a href="https://machi-koro.fandom.com/">machi-koro.fandom.com</a>.
 
 ## Play
 
