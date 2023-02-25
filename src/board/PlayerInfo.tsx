@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
-import { estColorToClass, rollsToString, landColorToClass } from './utils';
+import { estColorToClass, landColorToClass, rollsToString } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -106,14 +106,15 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
     }
 
-    const nameDiv = <div className={classNames('name_text', { name_tv: canDoTV })} onClick={() => moves.doTV(player)}>{name}</div>
+    const nameDiv = (
+      <div className={classNames('name_text', { name_tv: canDoTV })} onClick={() => moves.doTV(player)}>
+        {name}
+      </div>
+    );
 
     return (
       <div className={classNames('div-column', border)}>
         <div className='coin_num'>${money}</div>
-        {/* <div className={classNames('name_div', { name_tv: canDoTV })} onClick={() => moves.doTV(player)}>
-          <div className='name_text'>{name}</div>
-        </div> */}
         {nameDiv}
         <div>{lands.render()}</div>
         <div>{minis.render()}</div>
