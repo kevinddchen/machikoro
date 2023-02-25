@@ -18,6 +18,11 @@
   --est-res-light: #c57f7d; /* Restaurants (Alt) */
   --est-maj: #782b82; /* Major Establishments (Base) */
   --est-maj-light: #ab7fb0; /* Major Establishments (Alt) */
+
+  --land-owned: #ae5421; /* Landmark, when owned */
+  --land-canbuy: #d9a16e; /* Landmark, when can buy */
+  /* --land-canbuy: #f5e387; */
+  --land-unowned: #ababab; /* Landmark, when unowned */
 }
 
 /* DIV FORMATTING */
@@ -437,6 +442,7 @@ select {
   font-size: 14px;
   font-weight: bolder;
   border-style: solid;
+  border-radius: 4px;
 }
 
 .est_type {
@@ -510,6 +516,18 @@ select {
   opacity: 1;
 }
 
+.land_img_owned {
+  background-color: var(--land-owned);
+}
+
+.land_img_canbuy {
+  background-color: var(--land-canbuy);
+}
+
+.land_img_unowned {
+  background-color: var(--land-unowned);
+}
+
 .name_div {
   padding: 3px;
 }
@@ -521,32 +539,20 @@ select {
   width: 84px;
 }
 
-.land_img_self {
-  display: block;
-  height: 112px;
-  width: 70px;
-}
-
-.land_img {
-  display: block;
-  height: 56px;
-  width: 35px;
-}
-
-.estmini_td {
+.mini_td {
   padding: 3px;
   position: relative;
   width: 80px;
   height: 20px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
-.estmini_td:hover .tooltip {
+.mini_td:hover .tooltip {
   visibility: visible;
   opacity: 1;
 }
 
-.estmini_roll {
+.mini_roll {
   color: white;
   position: relative;
   margin: 0 auto;
@@ -557,12 +563,22 @@ select {
   font-size: 12px;
   font-weight: bolder;
   border-style: solid;
+  border-radius: 4px;
 }
 
-.estmini_type {
+.mini_type {
   color: white;
   position: absolute;
   font-size: 12px;
   right: 5px;
+  top: 5px;
+}
+
+.mini_name {
+  color: white;
+  font-size: 12px;
+  width: 95%;
+  text-align: center;
+  position: absolute;
   top: 5px;
 }

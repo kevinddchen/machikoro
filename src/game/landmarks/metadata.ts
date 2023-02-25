@@ -23,7 +23,7 @@ export const ShoppingMall: Landmark = {
 
 export const AmusementPark: Landmark = {
   _id: 2,
-  name: 'Amusement Park',
+  name: 'Amuse. Park',
   description: 'When you roll doubles, you gain an extra turn.',
   cost: 16,
   imageFilename: 'land2.gif',

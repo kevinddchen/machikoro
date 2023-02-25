@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { Est, MachikoroG } from 'game';
-import { colorToClass, rollsToString } from './utils';
+import { estColorToClass, rollsToString } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -24,7 +24,7 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
 
   render() {
     const { G, ctx, moves, isActive } = this.props;
-    const Table = new StackTable(5);
+    const table = new StackTable(5);
 
     for (let i = 0; i < this.establishments.length; i++) {
       const est = this.establishments[i];
@@ -45,10 +45,10 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
         continue;
       }
 
-      const estColor = colorToClass(est.color, canBuyEst);
+      const estColor = estColorToClass(est.color, canBuyEst);
       const rollString = rollsToString(est);
 
-      Table.push(
+      table.push(
         <td key={i} className={classNames('est_td', estColor)} onClick={() => moves.buyEst(est)}>
           <div className='est_roll'>{rollString}</div>
           <div className='est_type'>{est.type}</div>
@@ -62,6 +62,6 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
       );
     }
 
-    return <div>{Table.render()}</div>;
+    return <div>{table.render()}</div>;
   }
 }

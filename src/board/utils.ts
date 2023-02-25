@@ -6,7 +6,7 @@ import { Est } from 'game';
  * @param darker - If true, uses darker variant.
  * @returns
  */
-export const colorToClass = (color: Est.EstColor, darker: boolean): string => {
+export const estColorToClass = (color: Est.EstColor, darker: boolean): string => {
   switch (color) {
     case Est.EstColor.Blue:
       return darker ? 'est_img_pri' : 'est_img_pri_light';
@@ -18,6 +18,22 @@ export const colorToClass = (color: Est.EstColor, darker: boolean): string => {
       return darker ? 'est_img_maj' : 'est_img_maj_light';
     default:
       throw new Error(`Invalid establishment color: ${color}`);
+  }
+};
+
+/**
+ * Return CSS class name for displaying a landmark.
+ * @param owned
+ * @param canBuy
+ * @returns
+ */
+export const landColorToClass = (owned: boolean, canBuy: boolean): string => {
+  if (owned) {
+    return 'land_img_owned';
+  } else if (canBuy) {
+    return 'land_img_canbuy';
+  } else {
+    return 'land_img_unowned';
   }
 };
 

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
-import { colorToClass, rollsToString } from './utils';
+import { estColorToClass, rollsToString, landColorToClass } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -46,15 +46,17 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     // `currentPlayer` is the player whose turn it is in the game.
 
     // landmarks
-    const Table = new StackTable(2);
+    const lands = new StackTable(1);
     for (let i = 0; i < this.landmarks.length; i++) {
       const land = this.landmarks[i];
       const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
       const owned = Land.owns(G, player, land);
 
-      Table.push(
-        <td key={i} className={classNames('land_td', { active: canBuyLand })} onClick={() => moves.buyLand(land)}>
-          <img className={classNames('land_img', { inactive: !owned })} src={`./assets/${land.imageFilename}`} alt='' />
+      const landColor = landColorToClass(owned, canBuyLand);
+
+      lands.push(
+        <td key={i} className={classNames('mini_td', landColor)} onClick={() => moves.buyLand(land)}>
+          <div className='mini_name'>{land.name}</div>
           <div className='tooltip'>{land.description}</div>
         </td>
       );
@@ -78,15 +80,15 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         doOffice = (est) => moves.doOfficeTake(player, est);
       }
 
-      const estColor = colorToClass(est.color, canDoOffice);
+      const estColor = estColorToClass(est.color, canDoOffice);
       const rollString = rollsToString(est);
 
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
         minis.push(
-          <td key={key} className={classNames('estmini_td', estColor)} onClick={() => doOffice(est)}>
-            <div className='estmini_roll'>{rollString}</div>
-            <div className='estmini_type'>{est.type}</div>
+          <td key={key} className={classNames('mini_td', estColor)} onClick={() => doOffice(est)}>
+            <div className='mini_roll'>{rollString}</div>
+            <div className='mini_type'>{est.type}</div>
             <div className='tooltip'>{est.name}</div>
           </td>
         );
@@ -99,7 +101,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         <div className={classNames('name_div', { active: canDoTV })} onClick={() => moves.doTV(player)}>
           <div className='name_text'>{name}</div>
         </div>
-        <div>{Table.render()}</div>
+        <div>{lands.render()}</div>
         <div>{minis.render()}</div>
       </div>
     );
