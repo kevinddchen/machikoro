@@ -32,6 +32,8 @@ export function expansionName(expansion: Expansion | null): string {
       return 'Base Game';
     case Expansion.Harbor:
       return 'Harbor Expansion';
+    case Expansion.MK2:
+      return 'Machi Koro 2';
     default:
       return '??? Expansion';
   }
