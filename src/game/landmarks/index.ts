@@ -53,7 +53,7 @@ export const isOwned = (G: MachikoroG, land: Landmark): boolean => {
  * @param G
  * @returns
  */
-const allLands = (G: MachikoroG): Landmark[] => {
+const getAll = (G: MachikoroG): Landmark[] => {
   if (G.expansion === Expansion.Base || G.expansion === Expansion.Harbor) {
     return Meta._LANDMARKS;
   } else if (G.expansion === Expansion.MK2) {
@@ -69,7 +69,7 @@ const allLands = (G: MachikoroG): Landmark[] => {
  * are returned in the intended display order.
  */
 export const getAllInUse = (G: MachikoroG): Landmark[] => {
-  return allLands(G).filter((land) => isInUse(G, land));
+  return getAll(G).filter((land) => isInUse(G, land));
 };
 
 /**
@@ -79,7 +79,7 @@ export const getAllInUse = (G: MachikoroG): Landmark[] => {
  * returned in the intended display order.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
-  return allLands(G).filter((land) => owns(G, player, land));
+  return getAll(G).filter((land) => owns(G, player, land));
 };
 
 /**
@@ -103,7 +103,7 @@ export const cost = (G: MachikoroG, land: Landmark, player: number | null): numb
     return land.cost[0];
   } else if (expansion === Expansion.MK2) {
     const landsOwned = player === null ? 0 : countAllOwned(G, player) - 1; // -1 because city hall does not count
-    const costIdx = Math.min(landsOwned, land.cost.length - 1); // avoid array out of bounds
+    const costIdx = Math.min(Math.max(landsOwned, 0), land.cost.length - 1); // avoid array out of bounds
     return land.cost[costIdx];
   } else {
     throw new Error(`Expansion '${expansion}' not implemented.`);
@@ -126,7 +126,7 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
  */
 export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion } = G;
-  const lands = allLands(G);
+  const lands = getAll(G);
   const numLands = lands.length;
 
   // initialize data structure
