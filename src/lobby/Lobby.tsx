@@ -306,9 +306,59 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   // --- Render ---------------------------------------------------------------
 
   /**
+   * @returns Elements for player name entry.
+   */
+  private renderPlayerName = (): JSX.Element => {
+    return (
+      <div className='padded_div'>
+        <span>Enter Player Name: </span>
+        <input
+          className='input-box'
+          ref={this.nameRef}
+          type='text'
+          maxLength={16}
+          spellCheck='false'
+          autoComplete='off'
+          onChange={this.setName}
+        />
+      </div>
+    );
+  };
+
+  /**
+   * @returns Elements for creating a new match.
+   */
+  private renderCreateMatch = (): JSX.Element => {
+    return (
+      <div className='padded_div'>
+        <span className='subtitle'>Create Room</span>
+        <br />
+        <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
+          <option value='2'>2 Players</option>
+          <option value='3'>3 Players</option>
+          <option value='4'>4 Players</option>
+          <option value='5'>5 Players</option>
+        </select>
+        <select ref={this.expansionRef} onChange={this.setExpansion}>
+          <option value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>
+          <option value={Expansion.Base}>{expansionName(Expansion.Base)}</option>
+        </select>
+        <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
+          <option value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>
+          <option value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>
+          <option value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
+        </select>
+        <button className='button' onClick={this.createMatch}>
+          Create Room
+        </button>
+      </div>
+    );
+  };
+
+  /**
    * @returns Elements displaying available matches.
    */
-  private renderMatches = (): JSX.Element[] => {
+  private renderMatches = (): JSX.Element => {
     const { matches } = this.state;
 
     const tbody: JSX.Element[] = [];
@@ -374,50 +424,21 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         );
       }
     }
-    return tbody;
+
+    return (
+      <div className='padded_div'>
+        <span className='subtitle'>Lobby</span>
+        <div>{tbody}</div>
+      </div>
+    );
   };
 
   render() {
     return (
       <div>
-        <div className='padded_div'>
-          <span>Enter Player Name: </span>
-          <input
-            className='input-box'
-            ref={this.nameRef}
-            type='text'
-            maxLength={16}
-            spellCheck='false'
-            autoComplete='off'
-            onChange={this.setName}
-          />
-        </div>
-        <div className='padded_div'>
-          <span className='subtitle'>Create Room</span>
-          <br />
-          <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
-            <option value='2'>2 Players</option>
-            <option value='3'>3 Players</option>
-            <option value='4'>4 Players</option>
-            <option value='5'>5 Players</option>
-          </select>
-          <select ref={this.expansionRef} onChange={this.setExpansion}>
-            <option value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>
-            <option value={Expansion.Base}>{expansionName(Expansion.Base)}</option>
-          </select>
-          <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
-            <option value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>
-            <option value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>
-            <option value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
-          </select>
-          <button className='button' onClick={this.createMatch}>
-            Create Room
-          </button>
-        </div>
-        <div className='padded_div'>
-          <span className='subtitle'>Lobby</span>
-          <div>{this.renderMatches()}</div>
-        </div>
+        <div>{this.renderPlayerName()}</div>
+        <div>{this.renderCreateMatch()}</div>
+        <div>{this.renderMatches()}</div>
       </div>
     );
   }
