@@ -717,8 +717,8 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.Harbor,
-  supplyVariant: SupplyVariant.Total,
+  expansion: Expansion.MK2,
+  supplyVariant: SupplyVariant.Hybrid,
   startCoins: 99,
   randomizeTurnOrder: false,
 };
@@ -808,6 +808,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
 
   turn: {
     onBegin: ({ G }) => {
+      Land.replenishSupply(G);
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
     },
