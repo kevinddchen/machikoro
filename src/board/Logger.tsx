@@ -93,11 +93,11 @@ export default class Logger extends React.Component<LogProps, object> {
       }
       case Log.LogEventType.Earn: {
         const { player, amount, name } = event;
-        return `\t${names[player]} earned $${amount} (${name})`;
+        return `\t${names[player]} earned ${amount} coins (${name})`;
       }
       case Log.LogEventType.Take: {
         const { from, to, amount, name } = event;
-        return `\t${names[from]} paid ${names[to]} $${amount} (${name})`;
+        return `\t${names[from]} paid ${names[to]} ${amount} coins (${name})`;
       }
       case Log.LogEventType.Buy: {
         return `\tbought ${event.name}`;

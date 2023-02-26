@@ -45,10 +45,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
     const { ctx, playerID } = this.props;
 
     // Player ID of the client.
-    let clientPlayer: number | null = null;
-    if (playerID !== null) {
-      clientPlayer = parseInt(playerID);
-    }
+    const clientPlayer = playerID === null ? null : parseInt(playerID);
 
     const tbody: JSX.Element[] = [];
     for (let i = 0; i < this.names.length; i++) {

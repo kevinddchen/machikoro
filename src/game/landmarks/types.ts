@@ -6,7 +6,8 @@
  * Interface for landmark metadata.
  * @prop {string} name - Display name.
  * @prop {string} description - Tooltip text.
- * @prop {number[]} cost - Cost to buy.
+ * @prop {number[]} cost - Cost to buy. In Machi Koro 2, the cost depends on
+ * the number of landmarks already owned.
  * @prop {number|null} coins - Context depends on the landmark. May indicate
  * coins earned, bonus coins earned, etc.
  * @prop {number} _id - Unique id used to enumerate landmarks. (Private, do not

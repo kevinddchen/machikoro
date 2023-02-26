@@ -12,7 +12,8 @@ import StackTable from './StackTable';
 /**
  * @extends BoardProps<MachikoroG>
  * @prop {number} player - Player ID corresponding to the component.
- * @prop {number | null} - Player ID of the client, or null if the client is not a player.
+ * @prop {number | null} clientPlayer - Player ID of the client, or null if the
+ * client is not a player.
  * @prop {string} name - Player name corresponding to the component.
  */
 interface PlayerInfoProps extends BoardProps<MachikoroG> {
@@ -57,7 +58,8 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       let landDescription = land.description;
       // add cost to the description if the client does not own the landmark
       if (clientPlayer === null || !Land.owns(G, clientPlayer, land)) {
-        landDescription += '\n\nCost: ' + land.cost.toString();
+        // TODO: this is fucked in Machi Koro 2
+        landDescription += '\n\nCost: ' + land.cost[0].toString();
       }
 
       lands.push(
@@ -116,7 +118,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     );
 
     // if client, we add an extra black border around the panel
-    const border = clientPlayer !== null && clientPlayer === player ? 'is_client' : null;
+    const border = clientPlayer === player ? 'is_client' : null;
 
     return (
       <div className={classNames('div-column', border)}>

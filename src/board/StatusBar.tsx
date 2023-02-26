@@ -47,7 +47,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
       }
       case Game.TurnState.TV: {
         if (isActive) {
-          msg = 'TV station: Choose a player who has to give you 5 coins.';
+          msg = 'TV station: Choose an opponent who has to give you ' + Game.Est.TVStation.earn + ' coins.';
         } else {
           msg = currentPlayerName + ' is making a move: TV station';
         }
@@ -59,7 +59,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
           if (G.turnState === Game.TurnState.OfficeGive) {
             msg = 'Business center: Select one of your establishments to exchange.';
           } else {
-            msg = 'Business center: Select an opponent\'s establishment to exchange.';
+            msg = "Business center: Select an opponent's establishment to exchange.";
           }
         } else {
           msg = currentPlayerName + ' is making a move: Business center';
