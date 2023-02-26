@@ -111,8 +111,7 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     // player does not currently own the landmark
     !Land.owns(G, player, land) &&
     // player has enough coins
-    // TODO: this is fucked in Machi Koro 2
-    getCoins(G, player) >= land.cost[0]
+    getCoins(G, player) >= Land.cost(G, land, player)
   );
 };
 
@@ -339,8 +338,7 @@ const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
 
   const player = parseInt(ctx.currentPlayer);
   Land.buy(G, player, land);
-  // TODO: this is fucked in Machi Koro 2
-  setCoins(G, player, -land.cost[0]);
+  setCoins(G, player, -Land.cost(G, land, player));
   Log.logBuy(G, land.name);
 
   G.turnState = TurnState.End;
@@ -793,9 +791,6 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       }
       if (!Object.values(SupplyVariant).includes(supplyVariant)) {
         return `Unknown supply variant: ${supplyVariant}`;
-      }
-      if (expansion === Expansion.MK2 && supplyVariant !== SupplyVariant.Hybrid) {
-        return 'Machi Koro 2 only has hybrid supply variant';
       }
       if (!Number.isInteger(startCoins) || startCoins < 0) {
         return `Number of starting coins, ${startCoins}, must be a non-negative integer`;

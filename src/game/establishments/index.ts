@@ -202,7 +202,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     starting = Meta._STARTING_ESTABLISHMENTS;
   } else if (expansion === Expansion.MK2) {
     ids = Meta2._MK2_ESTABLISHMENTS;
-    starting = Meta2._STARTING_ESTABLISHMENTS2;
+    starting = Meta2._MK2_STARTING_ESTABLISHMENTS;
   } else {
     throw new Error(`Expansion '${expansion}' not implemented.`);
   }

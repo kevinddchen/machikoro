@@ -77,6 +77,11 @@ export const _BASE_LANDMARKS = [TrainStation._id, ShoppingMall._id, AmusementPar
 export const _HARBOR_LANDMARKS = _LANDMARKS.map((landmark) => landmark._id);
 
 /**
- * Landmarks a player starts with.
+ * Landmarks a player starts with in the Base expansion.
  */
-export const _STARTING_LANDMARKS = [CityHall._id];
+export const _BASE_STARTING_LANDMARKS: number[] = [];
+
+/**
+ * Landmarks a player starts with in the Base expansion.
+ */
+export const _HARBOR_STARTING_LANDMARKS = [CityHall._id];

@@ -258,4 +258,4 @@ export const _MK2_ESTABLISHMENTS = _ESTABLISHMENTS2.map((est) => est._id);
 /**
  * Establishments a player starts with in Machi Koro 2.
  */
-export const _STARTING_ESTABLISHMENTS2: number[] = [];
+export const _MK2_STARTING_ESTABLISHMENTS: number[] = [];
