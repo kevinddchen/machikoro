@@ -39,7 +39,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
       case Game.TurnState.Buy: {
         if (isActive) {
           /* to do: write function to check if landmarks can be built? */
-          msg = 'Purchase an establishment, build a landmark or end your turn.';
+          msg = 'Purchase an establishment, build a landmark, or end your turn.';
         } else {
           msg = currentPlayerName + ' is making a move...';
         }
@@ -57,12 +57,12 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
       case Game.TurnState.OfficeTake: {
         if (isActive) {
           if (G.turnState === Game.TurnState.OfficeGive) {
-            msg = 'Office: Select an establishment to exchange with another player.';
+            msg = 'Business center: Select one of your establishments to exchange.';
           } else {
-            msg = 'Office: Select an opposing establishment to exchange.';
+            msg = 'Business center: Select an opponent\'s establishment to exchange.';
           }
         } else {
-          msg = currentPlayerName + ' is making a move: Office';
+          msg = currentPlayerName + ' is making a move: Business center';
         }
         break;
       }

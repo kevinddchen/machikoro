@@ -104,7 +104,7 @@ export default class Logger extends React.Component<LogProps, object> {
       }
       case Log.LogEventType.Office: {
         const { player_est_name, opponent_est_name, opponent } = event;
-        return `\ttraded ${player_est_name} for ${opponent_est_name} with ${names[opponent]}`;
+        return `\texchanged ${player_est_name} for ${opponent_est_name} with ${names[opponent]}`;
       }
       case Log.LogEventType.TunaRoll: {
         return `\t(Tuna boat roll: ${event.roll})`;
