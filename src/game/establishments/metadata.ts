@@ -281,6 +281,11 @@ export const TaxOffice: Establishment = {
 };
 
 /**
+ * Number of coins the tax office triggers on
+ */
+export const TAX_OFFICE_THRESHOLD = 10;
+
+/**
  * List of all establishments, and order they should be displayed.
  */
 export const _ESTABLISHMENTS = [
@@ -312,9 +317,38 @@ export const _ESTABLISHMENTS = [
 ];
 
 /**
- * Number of coins the tax office triggers on
+ * Establishments used in the Base expansion.
  */
-export const TAX_OFFICE_THRESHOLD = 10;
+export const _BASE_ESTABLISHMENTS = [
+  WheatField._id,
+  Ranch._id,
+  Bakery._id,
+  Cafe._id,
+  ConvenienceStore._id,
+  Forest._id,
+  CheeseFactory._id,
+  FurnitureFactory._id,
+  Mine._id,
+  FamilyRestaurant._id,
+  AppleOrchard._id,
+  FarmersMarket._id,
+  Stadium._id,
+  TVStation._id,
+  Office._id,
+];
+
+/**
+ * Establishments used in the Harbor expansion.
+ */
+export const _HARBOR_ESTABLISHMENTS = _ESTABLISHMENTS.map((est) => est._id);
+
+/**
+ * Establishments a player starts with.
+ */
+export const _STARTING_ESTABLISHMENTS = [
+  WheatField._id,
+  Bakery._id,
+];
 
 /**
  * Maximum number of unique establishments in the supply for Variable Supply.
@@ -334,22 +368,7 @@ export const _HYBRID_SUPPY_LIMIT_LOWER = 5;
 export const _HYBRID_SUPPY_LIMIT_UPPER = 5;
 
 /**
- * Maximum number of unique major (purple) establishments in the supply for 
+ * Maximum number of unique major (purple) establishments in the supply for
  * Hybrid Supply.
  */
 export const _HYBRID_SUPPY_LIMIT_MAJOR = 2;
-
-/**
- * Establishments used in the Base expansion.
- */
-export const _BASE_ESTABLISHMENTS = [1, 2, 3, 4, 6, 7, 10, 13, 14, 15, 16, 17, 20, 21, 22];
-
-/**
- * Establishments used in the Harbor expansion.
- */
-export const _HARBOR_ESTABLISHMENTS = _ESTABLISHMENTS.map((est) => est._id);
-
-/**
- * Establishments a player starts with.
- */
-export const _STARTING_ESTABLISHMENTS = [1, 3];
