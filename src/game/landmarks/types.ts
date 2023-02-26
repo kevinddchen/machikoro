@@ -6,13 +6,17 @@
  * Interface for landmark metadata.
  * @prop {string} name - Display name.
  * @prop {string} description - Tooltip text.
- * @prop {number} cost - Cost to buy.
- * @prop {number} _id - Unique id used to enumerate landmarks. (Private, do not access directly)
+ * @prop {number[]} cost - Cost to buy.
+ * @prop {number|null} coins - Context depends on the landmark. May indicate
+ * coins earned, bonus coins earned, etc.
+ * @prop {number} _id - Unique id used to enumerate landmarks. (Private, do not
+ * access directly)
  */
 export interface Landmark {
   readonly name: string;
   readonly description: string;
-  readonly cost: number;
+  readonly cost: number[];
+  readonly coins: number | null;
   readonly _id: number;
 }
 
