@@ -93,13 +93,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   };
 
   private setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    const expansion = e.target.value as Expansion;
-    // Machi Koro 2 only has hybrid supply variant
-    if (expansion === Expansion.MK2) {
-      this.setState({ expansion, supplyVariant: SupplyVariant.Hybrid });
-    } else {
-      this.setState({ expansion });
-    }
+    this.setState({ expansion: e.target.value as Expansion });
   };
 
   private setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -336,7 +330,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @returns Elements for creating a new match.
    */
   private renderCreateMatch = (): JSX.Element => {
-    const { expansion } = this.state;
 
     // prettier-ignore
     const numPlayersOptions = [
@@ -362,15 +355,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     // prettier-ignore
     const supplyVariantOptions = [
       <option key='0' value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>,
+      <option key='1' value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>,
+      <option key='2' value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
     ];
-    // Machi Koro 2 only has hybrid supply variant
-    if (expansion !== Expansion.MK2) {
-      // prettier-ignore
-      supplyVariantOptions.push(
-        <option key='1' value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>,
-        <option key='2' value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
-      );
-    }
 
     return (
       <div className='padded_div'>

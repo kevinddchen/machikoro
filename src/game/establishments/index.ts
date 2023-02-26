@@ -64,7 +64,7 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
  * @param G
  * @returns
  */
-const allEsts = (G: MachikoroG): Establishment[] => {
+const getAll = (G: MachikoroG): Establishment[] => {
   if (G.expansion === Expansion.Base || G.expansion === Expansion.Harbor) {
     return Meta._ESTABLISHMENTS;
   } else if (G.expansion === Expansion.MK2) {
@@ -80,7 +80,7 @@ const allEsts = (G: MachikoroG): Establishment[] => {
  * The establishments are returned in the intended display order.
  */
 export const getAllInUse = (G: MachikoroG): Establishment[] => {
-  return allEsts(G).filter((est) => isInUse(G, est));
+  return getAll(G).filter((est) => isInUse(G, est));
 };
 
 /**
@@ -90,7 +90,7 @@ export const getAllInUse = (G: MachikoroG): Establishment[] => {
  * establishments are returned in the intended display order.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
-  return allEsts(G).filter((est) => countOwned(G, player, est) > 0);
+  return getAll(G).filter((est) => countOwned(G, player, est) > 0);
 };
 
 /**
@@ -102,7 +102,7 @@ export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
  */
 export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): number => {
   // prettier-ignore
-  return allEsts(G)
+  return getAll(G)
     .filter((est) => est.type === type)
     .reduce((acc, est) => acc + countOwned(G, player, est), 0);
 };
@@ -147,22 +147,40 @@ export const replenishSupply = (G: MachikoroG): void => {
     }
   } else if (supplyVariant === SupplyVariant.Variable) {
     // put establishments into the supply until there are ten unique establishments
-    while (decks[0].length > 0 && countUniqueAvailable(G) < Meta._VARIABLE_SUPPLY_LIMIT) {
+    while (decks[0].length > 0 && getAllAvailable(G).length < Meta._VARIABLE_SUPPLY_LIMIT) {
       const est = decks[0].pop()!;
       G._estData!.availableCount[est._id] += 1;
     }
   } else if (supplyVariant === SupplyVariant.Hybrid) {
-    // put establishments into the supply until there are five unique
-    // establishments with activation <= 6 and five establishments with activation
-    // > 6 (and for Machi Koro 1, two major establishments).
-    const limits = [Meta._HYBRID_SUPPY_LIMIT_LOWER, Meta._HYBRID_SUPPY_LIMIT_UPPER];
-    const funcs = [countUniqueAvailableLower, countUniqueAvailableUpper];
-    if (G.expansion !== Expansion.MK2) {
-      limits.push(Meta._HYBRID_SUPPY_LIMIT_MAJOR);
-      funcs.push(countUniqueAvailableMajor);
+    // put establishments into the supply until there are 5 unique
+    // establishments with activation <= 6 and 5 establishments with activation
+    // > 6 (and for Machi Koro 1, 2 major establishments).
+
+    // prettier-ignore
+    const limits = [
+      Meta._HYBRID_SUPPY_LIMIT_LOWER,
+      Meta._HYBRID_SUPPY_LIMIT_UPPER,
+      Meta._HYBRID_SUPPY_LIMIT_MAJOR,
+    ];
+
+    let funcs: ((est: Establishment) => boolean)[];
+    if (G.expansion === Expansion.MK2) {
+      // prettier-ignore
+      funcs = [
+        isLower,
+        isUpper,
+      ]
+    } else {
+      // prettier-ignore
+      funcs = [
+        (est) => isLower(est) && !isMajor(est),
+        (est) => isUpper(est) && !isMajor(est),
+        isMajor,
+      ]
     }
+
     for (let i = 0; i < decks.length; i++) {
-      while (decks[i].length > 0 && funcs[i](G) < limits[i]) {
+      while (decks[i].length > 0 && getAllAvailable(G).filter(funcs[i]).length < limits[i]) {
         const est = decks[i].pop()!;
         G._estData!.availableCount[est._id] += 1;
       }
@@ -178,7 +196,7 @@ export const replenishSupply = (G: MachikoroG): void => {
  */
 export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion, supplyVariant } = G;
-  const ests = allEsts(G);
+  const ests = getAll(G);
   const numEsts = ests.length;
 
   // initialize data structure
@@ -202,7 +220,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     starting = Meta._STARTING_ESTABLISHMENTS;
   } else if (expansion === Expansion.MK2) {
     ids = Meta2._MK2_ESTABLISHMENTS;
-    starting = Meta2._STARTING_ESTABLISHMENTS2;
+    starting = Meta2._MK2_STARTING_ESTABLISHMENTS;
   } else {
     throw new Error(`Expansion '${expansion}' not implemented.`);
   }
@@ -211,9 +229,8 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   for (const id of ids) {
     const est = ests[id];
     data.inUse[id] = true;
-    // all establishments have 6 copies except for purple establishments,
-    // which have the same number of copies as the number of players.
-    data.remainingCount[id] = est.color === EstColor.Purple ? numPlayers : 6;
+    // if `est._initial` is null, use the number of players
+    data.remainingCount[id] = est._initial ?? numPlayers;
   }
 
   // give each player their starting establishments
@@ -293,36 +310,9 @@ const isMajor = (est: Establishment): boolean => {
 
 /**
  * @param G
- * @returns The number of unique establishments that are available for purchase
+ * @returns List of all unique establishments that are available for purchase
  * from the supply.
  */
-const countUniqueAvailable = (G: MachikoroG): number => {
-  return allEsts(G).filter((est) => countAvailable(G, est) > 0).length;
-};
-
-/**
- * @param G
- * @returns The number of unique establishments that are available for purchase
- * from the supply and are "Lower" for Hybrid Supply.
- */
-const countUniqueAvailableLower = (G: MachikoroG): number => {
-  return allEsts(G).filter((est) => isLower(est) && !isMajor(est) && countAvailable(G, est) > 0).length;
-};
-
-/**
- * @param G
- * @returns The number of unique establishments that are available for purchase
- * from the supply and are "Upper" for Hybrid Supply.
- */
-const countUniqueAvailableUpper = (G: MachikoroG): number => {
-  return allEsts(G).filter((est) => isUpper(est) && !isMajor(est) && countAvailable(G, est) > 0).length;
-};
-
-/**
- * @param data
- * @returns The number of unique establishments that are available for purchase
- * from the supply and are Major (purple).
- */
-const countUniqueAvailableMajor = (G: MachikoroG): number => {
-  return allEsts(G).filter((est) => isMajor(est) && countAvailable(G, est) > 0).length;
+const getAllAvailable = (G: MachikoroG): Establishment[] => {
+  return getAll(G).filter((est) => countAvailable(G, est) > 0);
 };

@@ -111,7 +111,7 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     // player does not currently own the landmark
     !Land.owns(G, player, land) &&
     // player has enough coins
-    getCoins(G, player) >= land.cost
+    getCoins(G, player) >= Land.cost(G, land, player)
   );
 };
 
@@ -338,7 +338,7 @@ const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
 
   const player = parseInt(ctx.currentPlayer);
   Land.buy(G, player, land);
-  setCoins(G, player, -land.cost);
+  setCoins(G, player, -Land.cost(G, land, player));
   Log.logBuy(G, land.name);
 
   G.turnState = TurnState.End;
@@ -361,7 +361,7 @@ const doTV: Move<MachikoroG> = (context, opponent: number) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  take(G, { from: opponent, to: player }, Est.TVStation.earnings, Est.TVStation.name);
+  take(G, { from: opponent, to: player }, Est.TVStation.earn, Est.TVStation.name);
 
   switchState(context);
 
@@ -425,7 +425,7 @@ const endTurn: Move<MachikoroG> = (context) => {
   // a player earns coins via the airport if they did not buy anything
   const player = parseInt(ctx.currentPlayer);
   if (G.turnState === TurnState.Buy && Land.owns(G, player, Land.Airport)) {
-    earn(G, player, Land.AIRPORT_EARNINGS, Land.Airport.name);
+    earn(G, player, Land.Airport.coins!, Land.Airport.name);
   }
 
   // check second turn
@@ -465,10 +465,10 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   const roll = G.roll!;
 
   // Do Red establishments.
-  const all_ests = Est.getAllInUse(G);
-  const red_ests = all_ests.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
+  const allEsts = Est.getAllInUse(G);
+  const redEsts = allEsts.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
-    for (const est of red_ests) {
+    for (const est of redEsts) {
       // sushi bar requires Harbor
       if (Est.isEqual(est, Est.SushiBar) && !Land.owns(G, opponent, Land.Harbor)) {
         continue;
@@ -476,11 +476,11 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
 
       const count = Est.countOwned(G, opponent, est);
 
-      // all red establishments take `est.earnings` coins from the player
-      let earnings = est.earnings;
+      // all red establishments take `est.earn` coins from the player
+      let earnings = est.earn;
       // +1 coin if opponent owns Shopping Mall
       if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
-        earnings += 1;
+        earnings += Land.ShoppingMall.coins!;
       }
 
       const amount = earnings * count;
@@ -489,9 +489,9 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   }
 
   // Do Blue establishments.
-  const blue_ests = all_ests.filter((est) => est.color === EstColor.Blue && est.rolls.includes(roll));
+  const blueEsts = allEsts.filter((est) => est.color === EstColor.Blue && est.rolls.includes(roll));
   for (const player of getNextPlayers(ctx)) {
-    for (const est of blue_ests) {
+    for (const est of blueEsts) {
       // mackerel boat and tuna boat require Harbor
       if (
         (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) &&
@@ -506,12 +506,12 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       }
 
       // tuna boat earnings are based off the tuna roll
-      // all other blue establishments take `est.earnings` coins from the player
+      // all other blue establishments receive `est.earn` coins from the bank
       let earnings;
       if (Est.isEqual(est, Est.TunaBoat)) {
         earnings = getTunaRoll(context);
       } else {
-        earnings = est.earnings;
+        earnings = est.earn;
       }
 
       const amount = earnings * count;
@@ -520,17 +520,17 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   }
 
   // Do Green establishments.
-  const green_ests = all_ests.filter((est) => est.color === EstColor.Green && est.rolls.includes(roll));
-  for (const est of green_ests) {
+  const greenEsts = allEsts.filter((est) => est.color === EstColor.Green && est.rolls.includes(roll));
+  for (const est of greenEsts) {
     const count = Est.countOwned(G, currentPlayer, est);
     if (count === 0) {
       continue;
     }
 
-    let earnings = est.earnings;
+    let earnings = est.earn;
     // +1 coin to shops if player owns Shopping Mall
     if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
-      earnings += 1;
+      earnings += Land.ShoppingMall.coins!;
     }
 
     // by default a green establishment earns `multiplier * earnings = 1 * earnings`
@@ -553,8 +553,8 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   }
 
   // Do Purple establishments.
-  const purple_ests = all_ests.filter((est) => est.color === EstColor.Purple && est.rolls.includes(roll));
-  for (const est of purple_ests) {
+  const purpleEsts = allEsts.filter((est) => est.color === EstColor.Purple && est.rolls.includes(roll));
+  for (const est of purpleEsts) {
     if (Est.countOwned(G, currentPlayer, est) === 0) {
       continue;
     }
@@ -562,7 +562,7 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     // each purple establishment has its own effect
     if (Est.isEqual(est, Est.Stadium)) {
       for (const opponent of getPreviousPlayers(ctx)) {
-        take(G, { from: opponent, to: currentPlayer }, est.earnings, est.name);
+        take(G, { from: opponent, to: currentPlayer }, est.earn, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
       G.doTV = true;
@@ -572,13 +572,13 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       for (const opponent of getPreviousPlayers(ctx)) {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
         const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
-        const amount = (n_cups + n_shops) * est.earnings;
+        const amount = (n_cups + n_shops) * est.earn;
         take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TaxOffice)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         const opp_coins = getCoins(G, opponent);
-        if (opp_coins < Est.TAX_OFFICE_THRESHOLD) {
+        if (opp_coins < Est.TaxOffice.earn) {
           continue;
         }
         const amount = Math.floor(opp_coins / 2);
@@ -689,8 +689,8 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   } else {
     // city hall before buying
     if (getCoins(G, player) === 0 && Land.isInUse(G, Land.CityHall)) {
-      setCoins(G, player, Land.CITY_HALL_EARNINGS);
-      Log.logEarn(G, player, Land.CITY_HALL_EARNINGS, Land.CityHall.name);
+      setCoins(G, player, Land.CityHall.coins!);
+      Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
     }
     G.turnState = TurnState.Buy;
   }
@@ -791,9 +791,6 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       }
       if (!Object.values(SupplyVariant).includes(supplyVariant)) {
         return `Unknown supply variant: ${supplyVariant}`;
-      }
-      if (expansion === Expansion.MK2 && supplyVariant !== SupplyVariant.Hybrid) {
-        return 'Machi Koro 2 only has hybrid supply variant';
       }
       if (!Number.isInteger(startCoins) || startCoins < 0) {
         return `Number of starting coins, ${startCoins}, must be a non-negative integer`;

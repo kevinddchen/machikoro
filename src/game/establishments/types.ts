@@ -7,21 +7,24 @@
  * @prop {string} name - Display name.
  * @prop {string} description - Tooltip text.
  * @prop {number} cost - Cost to buy.
- * @prop {number} earnings - The earnings per activation (for simple effects).
+ * @prop {number} earn - The earnings per activation (for simple effects).
  * @prop {number[]} rolls - Which rolls activate the establishment.
  * @prop {EstColor} color - The color of the establishment.
  * @prop {EstType|null} type - The type of the establishment (for combos, e.g. 'Animal').
- * @prop {number} _id - Unique id used to enumerate establishments. (Private, do not access directly)
+ * @prop {number} _id - Unique id used to enumerate establishments.
+ * @prop {number|null} _initial - The number of copies in the initial supply.
+ * If null, then is equal to the number of players.
  */
 export interface Establishment {
   readonly name: string;
   readonly description: string;
   readonly cost: number;
-  readonly earnings: number;
+  readonly earn: number;
   readonly rolls: number[];
   readonly color: EstColor;
   readonly type: EstType | null;
   readonly _id: number;
+  readonly _initial: number | null;
 }
 
 /**

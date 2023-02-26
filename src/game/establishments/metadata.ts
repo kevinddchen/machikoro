@@ -7,12 +7,13 @@ import { EstColor, EstType, Establishment } from './types';
 export const SushiBar: Establishment = {
   _id: 0,
   name: 'Sushi Bar',
-  description: 'If you have a "Harbor", receive 3 coins from the player who just rolled.',
+  description: 'If you have a "Harbor", take 3 coins from the player who just rolled.',
   cost: 2,
-  earnings: 3, // only if player has Harbor
+  earn: 3, // only if player has Harbor
   rolls: [1],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const WheatField: Establishment = {
@@ -20,10 +21,11 @@ export const WheatField: Establishment = {
   name: 'Wheat Field',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
-  earnings: 1,
+  earn: 1,
   rolls: [1],
   color: EstColor.Blue,
   type: EstType.Wheat,
+  _initial: 6,
 };
 
 export const Ranch: Establishment = {
@@ -31,10 +33,11 @@ export const Ranch: Establishment = {
   name: 'Ranch',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
-  earnings: 1,
+  earn: 1,
   rolls: [2],
   color: EstColor.Blue,
   type: EstType.Animal,
+  _initial: 6,
 };
 
 export const Bakery: Establishment = {
@@ -42,21 +45,23 @@ export const Bakery: Establishment = {
   name: 'Bakery',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
-  earnings: 1,
+  earn: 1,
   rolls: [2, 3],
   color: EstColor.Green,
   type: EstType.Shop,
+  _initial: 6,
 };
 
 export const Cafe: Establishment = {
   _id: 4,
   name: 'Cafe',
-  description: 'Receive 1 coin from the player who just rolled.',
+  description: 'Take 1 coin from the player who just rolled.',
   cost: 2,
-  earnings: 1,
+  earn: 1,
   rolls: [3],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const FlowerGarden: Establishment = {
@@ -64,10 +69,11 @@ export const FlowerGarden: Establishment = {
   name: 'Flower Garden',
   description: 'Receive 1 coin from the bank.',
   cost: 2,
-  earnings: 1,
+  earn: 1,
   rolls: [4],
   color: EstColor.Blue,
   type: EstType.Wheat,
+  _initial: 6,
 };
 
 export const ConvenienceStore: Establishment = {
@@ -75,10 +81,11 @@ export const ConvenienceStore: Establishment = {
   name: 'Convenience Store',
   description: 'Receive 3 coins from the bank.',
   cost: 2,
-  earnings: 3,
+  earn: 3,
   rolls: [4],
   color: EstColor.Green,
   type: EstType.Shop,
+  _initial: 6,
 };
 
 export const Forest: Establishment = {
@@ -86,32 +93,35 @@ export const Forest: Establishment = {
   name: 'Forest',
   description: 'Receive 1 coin from the bank.',
   cost: 3,
-  earnings: 1,
+  earn: 1,
   rolls: [5],
   color: EstColor.Blue,
   type: EstType.Gear,
+  _initial: 6,
 };
 
 export const FlowerShop: Establishment = {
   _id: 8,
   name: 'Flower Shop',
-  description: 'Receive 1 coin from the bank for each ' + FlowerGarden.name + ' establishment you own.',
+  description: 'Receive 1 coin from the bank for each "Flower Garden" establishment you own.',
   cost: 1,
-  earnings: 1, // coins earned per `FlowerGarden` establishment
+  earn: 1, // coins earned per `FlowerGarden` establishment
   rolls: [6],
   color: EstColor.Green,
   type: EstType.Shop,
+  _initial: 6,
 };
 
 export const PizzaJoint: Establishment = {
   _id: 9,
   name: 'Pizza Joint',
-  description: 'Receive 1 coin from the player who just rolled.',
+  description: 'Take 1 coin from the player who just rolled.',
   cost: 1,
-  earnings: 1,
+  earn: 1,
   rolls: [7],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const CheeseFactory: Establishment = {
@@ -119,21 +129,23 @@ export const CheeseFactory: Establishment = {
   name: 'Cheese Factory',
   description: 'Receive 3 coins from the bank for each ' + EstType.Animal + ' establishment you own.',
   cost: 5,
-  earnings: 3, // coins earned per Animal establishment
+  earn: 3, // coins earned per Animal establishment
   rolls: [7],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const HamburgerStand: Establishment = {
   _id: 11,
   name: 'Hamburger Stand',
-  description: 'Receive 1 coin from the player who just rolled.',
+  description: 'Take 1 coin from the player who just rolled.',
   cost: 1,
-  earnings: 1,
+  earn: 1,
   rolls: [8],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const MackerelBoat: Establishment = {
@@ -141,10 +153,11 @@ export const MackerelBoat: Establishment = {
   name: 'Mackerel Boat',
   description: 'If you have a "Harbor", receive 3 coins from the bank.',
   cost: 2,
-  earnings: 3, // only if player has Harbor
+  earn: 3, // only if player has Harbor
   rolls: [8],
   color: EstColor.Blue,
   type: null,
+  _initial: 6,
 };
 
 export const FurnitureFactory: Establishment = {
@@ -152,10 +165,11 @@ export const FurnitureFactory: Establishment = {
   name: 'Furniture Factory',
   description: 'Receive 3 coins from the bank for each ' + EstType.Gear + ' establishment you own.',
   cost: 3,
-  earnings: 3, // coins earned per Gear establishment
+  earn: 3, // coins earned per Gear establishment
   rolls: [8],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const Mine: Establishment = {
@@ -163,21 +177,23 @@ export const Mine: Establishment = {
   name: 'Mine',
   description: 'Receive 5 coins from the bank.',
   cost: 6,
-  earnings: 5,
+  earn: 5,
   rolls: [9],
   color: EstColor.Blue,
   type: EstType.Gear,
+  _initial: 6,
 };
 
 export const FamilyRestaurant: Establishment = {
   _id: 15,
   name: 'Family Restaurant',
-  description: 'Receive 2 coins from the player who just rolled.',
+  description: 'Take 2 coins from the player who just rolled.',
   cost: 3,
-  earnings: 2,
+  earn: 2,
   rolls: [9, 10],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const AppleOrchard: Establishment = {
@@ -185,10 +201,11 @@ export const AppleOrchard: Establishment = {
   name: 'Apple Orchard',
   description: 'Receive 3 coins from the bank.',
   cost: 3,
-  earnings: 3,
+  earn: 3,
   rolls: [10],
   color: EstColor.Blue,
   type: EstType.Wheat,
+  _initial: 6,
 };
 
 export const FarmersMarket: Establishment = {
@@ -196,10 +213,11 @@ export const FarmersMarket: Establishment = {
   name: 'Farmers Market',
   description: 'Receive 2 coins from the bank for each ' + EstType.Wheat + ' establishment you own.',
   cost: 2,
-  earnings: 2, // coins earned per Wheat establishment
+  earn: 2, // coins earned per Wheat establishment
   rolls: [11, 12],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const FoodWarehouse: Establishment = {
@@ -207,10 +225,11 @@ export const FoodWarehouse: Establishment = {
   name: 'Food Warehouse',
   description: 'Receive 2 coins from the bank for each ' + EstType.Cup + ' establishment you own.',
   cost: 2,
-  earnings: 2, // coins earned per Cup establishment
+  earn: 2, // coins earned per Cup establishment
   rolls: [12, 13],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const TunaBoat: Establishment = {
@@ -218,66 +237,72 @@ export const TunaBoat: Establishment = {
   name: 'Tuna Boat',
   description: 'Roll 2 dice. If you have a "Harbor", receive as many coins as the dice total from the bank.',
   cost: 5,
-  earnings: 0, // (special case)
+  earn: 0, // (special case; determined by tuna boat roll)
   rolls: [12, 13, 14],
   color: EstColor.Blue,
   type: null,
+  _initial: 6,
 };
 
 export const Stadium: Establishment = {
   _id: 20,
   name: 'Stadium',
-  description: 'Receive 2 coins from each player.',
+  description: 'Take 2 coins from each opponent.',
   cost: 6,
-  earnings: 2,
+  earn: 2,
   rolls: [6],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const TVStation: Establishment = {
   _id: 21,
   name: 'TV Station',
-  description: 'Receive 5 coins from one player of your choice.',
+  description: 'Take 5 coins from an opponent of your choice.',
   cost: 7,
-  earnings: 5,
+  earn: 5,
   rolls: [6],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const Office: Establishment = {
   _id: 22,
   name: 'Business Center',
-  description: 'Exchange a non-Purple establishment with another player.',
+  description: 'Exchange a non-Major establishment with an opponent.',
   cost: 8,
-  earnings: 0,
+  earn: 0,
   rolls: [6],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const Publisher: Establishment = {
   _id: 23,
   name: 'Publisher',
   description:
-    'Receive 1 coin from each player for each ' + EstType.Cup + ' and ' + EstType.Shop + ' establishment they own.',
+    'Take 1 coin from each opponent for each ' + EstType.Cup + ' and ' + EstType.Shop + ' establishment they own.',
   cost: 5,
-  earnings: 1, // coins earned per Cup and Shop establishment
+  earn: 1, // coins earned per Cup and Shop establishment
   rolls: [7],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const TaxOffice: Establishment = {
   _id: 24,
   name: 'Tax Office',
-  description: 'Receive half (rounded down) of the coins from all players with 10 or more coins.',
+  description: 'From each opponent who has more than 10 coins, take half, rounded down.',
   cost: 4,
-  earnings: 0, // (special case)
+  earn: 10, // This is not the coins taken, but the threshold for triggering the tax office
   rolls: [8, 9],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 /**
@@ -312,9 +337,35 @@ export const _ESTABLISHMENTS = [
 ];
 
 /**
- * Number of coins the tax office triggers on
+ * Establishments used in the Base expansion.
  */
-export const TAX_OFFICE_THRESHOLD = 10;
+export const _BASE_ESTABLISHMENTS = [
+  WheatField._id,
+  Ranch._id,
+  Bakery._id,
+  Cafe._id,
+  ConvenienceStore._id,
+  Forest._id,
+  CheeseFactory._id,
+  FurnitureFactory._id,
+  Mine._id,
+  FamilyRestaurant._id,
+  AppleOrchard._id,
+  FarmersMarket._id,
+  Stadium._id,
+  TVStation._id,
+  Office._id,
+];
+
+/**
+ * Establishments used in the Harbor expansion.
+ */
+export const _HARBOR_ESTABLISHMENTS = _ESTABLISHMENTS.map((est) => est._id);
+
+/**
+ * Establishments a player starts with.
+ */
+export const _STARTING_ESTABLISHMENTS = [WheatField._id, Bakery._id];
 
 /**
  * Maximum number of unique establishments in the supply for Variable Supply.
@@ -334,22 +385,7 @@ export const _HYBRID_SUPPY_LIMIT_LOWER = 5;
 export const _HYBRID_SUPPY_LIMIT_UPPER = 5;
 
 /**
- * Maximum number of unique major (purple) establishments in the supply for 
+ * Maximum number of unique major (purple) establishments in the supply for
  * Hybrid Supply.
  */
 export const _HYBRID_SUPPY_LIMIT_MAJOR = 2;
-
-/**
- * Establishments used in the Base expansion.
- */
-export const _BASE_ESTABLISHMENTS = [1, 2, 3, 4, 6, 7, 10, 13, 14, 15, 16, 17, 20, 21, 22];
-
-/**
- * Establishments used in the Harbor expansion.
- */
-export const _HARBOR_ESTABLISHMENTS = _ESTABLISHMENTS.map((est) => est._id);
-
-/**
- * Establishments a player starts with.
- */
-export const _STARTING_ESTABLISHMENTS = [1, 3];
