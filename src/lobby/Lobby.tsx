@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { Expansion, GAME_NAME, SetupData, SupplyVariant } from 'game';
 import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
+import { IN_PROD } from 'config';
 import { MatchInfo } from './types';
 
 /**
@@ -92,7 +93,13 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   };
 
   private setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    this.setState({ expansion: e.target.value as Expansion });
+    const expansion = e.target.value as Expansion;
+    // Machi Koro 2 only has one supply variant
+    if (expansion === Expansion.MK2) {
+      this.setState({ expansion, supplyVariant: SupplyVariant.Hybrid });
+    } else {
+      this.setState({ expansion });
+    }
   };
 
   private setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -329,24 +336,54 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @returns Elements for creating a new match.
    */
   private renderCreateMatch = (): JSX.Element => {
+    const { expansion } = this.state;
+
+    // prettier-ignore
+    const numPlayersOptions = [
+      <option key='0' value='2'>2 Players</option>,
+      <option key='1' value='3'>3 Players</option>,
+      <option key='2' value='4'>4 Players</option>,
+      <option key='3' value='5'>5 Players</option>,
+    ];
+
+    // prettier-ignore
+    const expansionOptions = [
+      <option key='0' value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>,
+      <option key='1' value={Expansion.Base}>{expansionName(Expansion.Base)}</option>,
+    ];
+    // TODO: enable Machi Koro 2 in production
+    if (!IN_PROD) {
+      // prettier-ignore
+      expansionOptions.push(
+        <option key='2' value={Expansion.MK2}>{expansionName(Expansion.MK2)}</option>
+      );
+    }
+
+    // prettier-ignore
+    const supplyVariantOptions = [
+      <option key='0' value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>,
+    ];
+    // Machi Koro 2 only has one supply variant.
+    if (expansion !== Expansion.MK2) {
+      // prettier-ignore
+      supplyVariantOptions.push(
+        <option key='1' value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>,
+        <option key='2' value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
+      );
+    }
+
     return (
       <div className='padded_div'>
         <span className='subtitle'>Create Room</span>
         <br />
         <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
-          <option value='2'>2 Players</option>
-          <option value='3'>3 Players</option>
-          <option value='4'>4 Players</option>
-          <option value='5'>5 Players</option>
+          {numPlayersOptions}
         </select>
         <select ref={this.expansionRef} onChange={this.setExpansion}>
-          <option value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>
-          <option value={Expansion.Base}>{expansionName(Expansion.Base)}</option>
+          {expansionOptions}
         </select>
         <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
-          <option value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>
-          <option value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>
-          <option value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
+          {supplyVariantOptions}
         </select>
         <button className='button' onClick={this.createMatch}>
           Create Room

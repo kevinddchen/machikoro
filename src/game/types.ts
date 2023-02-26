@@ -89,6 +89,7 @@ export type TurnState = (typeof TurnState)[keyof typeof TurnState];
 export const Expansion = {
   Base: 'Base',
   Harbor: 'Harbor',
+  MK2: 'MK2',
 } as const;
 
 export type Expansion = (typeof Expansion)[keyof typeof Expansion];
