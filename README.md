@@ -1,7 +1,11 @@
 # Machi Koro
 
 This is an implementation of the Machi Koro board game.
-For the basic game rules, [click here](https://www.fgbradleys.com/rules/rules2/MachiKoro-rules.pdf).
+For game rules:
+
+-   [Base game rules](https://www.fgbradleys.com/rules/rules2/MachiKoro-rules.pdf).
+-   [Harbor expansion rules](https://www.gokids.com.tw/tsaiss/gokids/rules/MK%20HABOR%20RULE%20EN.pdf)
+
 This app was developed using the React framework and the <a href="https://boardgame.io/">boardgame.io</a> game engine.
 
 **Disclaimer**: We do not own a license to the game.

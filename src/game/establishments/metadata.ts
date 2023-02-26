@@ -15,9 +15,9 @@ export const WheatField: Establishment = {
   type: EstType.Wheat,
 };
 
-export const LivestockFarm: Establishment = {
+export const Ranch: Establishment = {
   _id: 1,
-  name: 'Livestock Farm',
+  name: 'Ranch',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
   earnings: 1,
@@ -136,9 +136,9 @@ export const Mine: Establishment = {
   type: EstType.Gear,
 };
 
-export const Restaurant: Establishment = {
+export const FamilyRestaurant: Establishment = {
   _id: 12,
-  name: 'Restaurant',
+  name: 'Family Restaurant',
   description: 'Receive 2 coins from the player who just rolled.',
   cost: 3,
   earnings: 2,
@@ -158,9 +158,9 @@ export const AppleOrchard: Establishment = {
   type: EstType.Wheat,
 };
 
-export const ProduceMarket: Establishment = {
+export const FarmersMarket: Establishment = {
   _id: 14,
-  name: 'Produce Market',
+  name: 'Farmers Market',
   description: 'Receive 2 coins from the bank for each ' + EstType.Wheat + ' establishment you own.',
   cost: 2,
   earnings: 2, // coins earned per Wheat establishment
@@ -180,9 +180,9 @@ export const SushiBar: Establishment = {
   type: EstType.Cup,
 };
 
-export const FlowerOrchard: Establishment = {
+export const FlowerGarden: Establishment = {
   _id: 16,
-  name: 'Flower Orchard',
+  name: 'Flower Garden',
   description: 'Receive 1 coin from the bank.',
   cost: 2,
   earnings: 1,
@@ -194,7 +194,7 @@ export const FlowerOrchard: Establishment = {
 export const FlowerShop: Establishment = {
   _id: 17,
   name: 'Flower Shop',
-  description: 'Receive 1 coin from the bank for each "Flower Orchard" establishment you own.',
+  description: 'Receive 1 coin from the bank for each ' + FlowerGarden.name +' establishment you own.',
   cost: 1,
   earnings: 1, // coins earned per Flower Orchard establishment
   rolls: [6],
@@ -286,10 +286,10 @@ export const FoodWarehouse: Establishment = {
 export const ESTABLISHMENTS: Establishment[] = [
   SushiBar,
   WheatField,
-  LivestockFarm,
+  Ranch,
   Bakery,
   Cafe,
-  FlowerOrchard,
+  FlowerGarden,
   ConvenienceStore,
   Forest,
   FlowerShop,
@@ -299,9 +299,9 @@ export const ESTABLISHMENTS: Establishment[] = [
   MackerelBoat,
   FurnitureFactory,
   Mine,
-  Restaurant,
+  FamilyRestaurant,
   AppleOrchard,
-  ProduceMarket,
+  FarmersMarket,
   FoodWarehouse,
   TunaBoat,
   Stadium,
