@@ -540,10 +540,10 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
     } else if (Est.isEqual(est, Est.FurnitureFactory)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
-    } else if (Est.isEqual(est, Est.ProduceMarket)) {
+    } else if (Est.isEqual(est, Est.FarmersMarket)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
     } else if (Est.isEqual(est, Est.FlowerShop)) {
-      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerOrchard);
+      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden);
     } else if (Est.isEqual(est, Est.FoodWarehouse)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
     }
