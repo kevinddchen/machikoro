@@ -33,14 +33,14 @@ export const ShoppingMall: Landmark = {
   _id: 3,
   name: 'Shopping Mall',
   description: 'Your ' + EstType.Cup + ' and ' + EstType.Shop + ' establishments earn +1 coin when activated.',
-  coins: 1, // +1 coin for activation
+  coins: 1, // bonus coins on establishment activation
   cost: [10],
 };
 
 export const AmusementPark: Landmark = {
   _id: 4,
   name: 'Amuse. Park',
-  description: 'When you roll doubles, you gain an extra turn.',
+  description: 'If you roll doubles, take an extra turn.',
   coins: null,
   cost: [16],
 };
@@ -64,25 +64,17 @@ export const Airport: Landmark = {
 /**
  * List of all landmarks, and order they should be displayed.
  */
-export const _LANDMARKS: Landmark[] = [
-  CityHall,
-  Harbor,
-  TrainStation,
-  ShoppingMall,
-  AmusementPark,
-  RadioTower,
-  Airport,
-];
+export const _LANDMARKS = [CityHall, Harbor, TrainStation, ShoppingMall, AmusementPark, RadioTower, Airport];
 
 /**
  * Landmarks used in the Base expansion.
  */
-export const _BASE_LANDMARKS: number[] = [TrainStation._id, ShoppingMall._id, AmusementPark._id, RadioTower._id];
+export const _BASE_LANDMARKS = [TrainStation._id, ShoppingMall._id, AmusementPark._id, RadioTower._id];
 
 /**
  * Landmarks used in the Harbor expansion.
  */
-export const _HARBOR_LANDMARKS: number[] = _LANDMARKS.map((landmark) => landmark._id);
+export const _HARBOR_LANDMARKS = _LANDMARKS.map((landmark) => landmark._id);
 
 /**
  * Landmarks a player starts with.

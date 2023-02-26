@@ -7,7 +7,7 @@ import { EstColor, EstType, Establishment } from './types';
 export const SushiBar: Establishment = {
   _id: 0,
   name: 'Sushi Bar',
-  description: 'If you have a "Harbor", receive 3 coins from the player who just rolled.',
+  description: 'If you have a "Harbor", take 3 coins from the player who just rolled.',
   cost: 2,
   earn: 3, // only if player has Harbor
   rolls: [1],
@@ -51,7 +51,7 @@ export const Bakery: Establishment = {
 export const Cafe: Establishment = {
   _id: 4,
   name: 'Cafe',
-  description: 'Receive 1 coin from the player who just rolled.',
+  description: 'Take 1 coin from the player who just rolled.',
   cost: 2,
   earn: 1,
   rolls: [3],
@@ -106,7 +106,7 @@ export const FlowerShop: Establishment = {
 export const PizzaJoint: Establishment = {
   _id: 9,
   name: 'Pizza Joint',
-  description: 'Receive 1 coin from the player who just rolled.',
+  description: 'Take 1 coin from the player who just rolled.',
   cost: 1,
   earn: 1,
   rolls: [7],
@@ -128,7 +128,7 @@ export const CheeseFactory: Establishment = {
 export const HamburgerStand: Establishment = {
   _id: 11,
   name: 'Hamburger Stand',
-  description: 'Receive 1 coin from the player who just rolled.',
+  description: 'Take 1 coin from the player who just rolled.',
   cost: 1,
   earn: 1,
   rolls: [8],
@@ -172,7 +172,7 @@ export const Mine: Establishment = {
 export const FamilyRestaurant: Establishment = {
   _id: 15,
   name: 'Family Restaurant',
-  description: 'Receive 2 coins from the player who just rolled.',
+  description: 'Take 2 coins from the player who just rolled.',
   cost: 3,
   earn: 2,
   rolls: [9, 10],
@@ -218,7 +218,7 @@ export const TunaBoat: Establishment = {
   name: 'Tuna Boat',
   description: 'Roll 2 dice. If you have a "Harbor", receive as many coins as the dice total from the bank.',
   cost: 5,
-  earn: 0, // (special case)
+  earn: 0, // (special case; determined by tuna boat roll)
   rolls: [12, 13, 14],
   color: EstColor.Blue,
   type: null,
@@ -227,7 +227,7 @@ export const TunaBoat: Establishment = {
 export const Stadium: Establishment = {
   _id: 20,
   name: 'Stadium',
-  description: 'Receive 2 coins from each player.',
+  description: 'Take 2 coins from each opponent.',
   cost: 6,
   earn: 2,
   rolls: [6],
@@ -238,7 +238,7 @@ export const Stadium: Establishment = {
 export const TVStation: Establishment = {
   _id: 21,
   name: 'TV Station',
-  description: 'Receive 5 coins from one player of your choice.',
+  description: 'Take 5 coins from an opponent of your choice.',
   cost: 7,
   earn: 5,
   rolls: [6],
@@ -249,7 +249,7 @@ export const TVStation: Establishment = {
 export const Office: Establishment = {
   _id: 22,
   name: 'Business Center',
-  description: 'Exchange a non-Major establishment with another player.',
+  description: 'Exchange a non-Major establishment with an opponent.',
   cost: 8,
   earn: 0,
   rolls: [6],
@@ -261,7 +261,7 @@ export const Publisher: Establishment = {
   _id: 23,
   name: 'Publisher',
   description:
-    'Receive 1 coin from each player for each ' + EstType.Cup + ' and ' + EstType.Shop + ' establishment they own.',
+    'Take 1 coin from each opponent for each ' + EstType.Cup + ' and ' + EstType.Shop + ' establishment they own.',
   cost: 5,
   earn: 1, // coins earned per Cup and Shop establishment
   rolls: [7],
@@ -272,18 +272,13 @@ export const Publisher: Establishment = {
 export const TaxOffice: Establishment = {
   _id: 24,
   name: 'Tax Office',
-  description: 'Receive half (rounded down) of the coins from all players with 10 or more coins.',
+  description: 'From each opponent who has more than 10 coins, take half, rounded down.',
   cost: 4,
-  earn: 0, // (special case)
+  earn: 10, // This is not the coins taken, but the threshold for triggering the tax office
   rolls: [8, 9],
   color: EstColor.Purple,
   type: null,
 };
-
-/**
- * Number of coins the tax office triggers on
- */
-export const TAX_OFFICE_THRESHOLD = 10;
 
 /**
  * List of all establishments, and order they should be displayed.

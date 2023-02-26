@@ -7,7 +7,7 @@ import { EstColor, EstType, Establishment } from './types';
 export const SushiBar2: Establishment = {
   _id: 0,
   name: 'Sushi Bar',
-  description: 'Receive 3 coins from the player who just rolled.',
+  description: 'Take 3 coins from the player who just rolled.',
   cost: 2,
   earn: 3,
   rolls: [1],
@@ -51,7 +51,7 @@ export const Bakery2: Establishment = {
 export const Cafe2: Establishment = {
   _id: 4,
   name: 'Cafe',
-  description: 'Receive 2 coins from the player who just rolled.',
+  description: 'Take 2 coins from the player who just rolled.',
   cost: 1,
   earn: 2,
   rolls: [3],
@@ -106,7 +106,7 @@ export const FlowerShop2: Establishment = {
 export const Office2: Establishment = {
   _id: 9,
   name: 'Business Center',
-  description: 'You may exchange an establishment with another player.',
+  description: 'You may exchange an establishment with an opponent.',
   cost: 3,
   earn: 0,
   rolls: [6],
@@ -128,7 +128,7 @@ export const CornField2: Establishment = {
 export const Stadium2: Establishment = {
   _id: 11,
   name: 'Stadium',
-  description: 'Receive 3 coins from each player.',
+  description: 'Take 3 coins from each opponent.',
   cost: 3,
   earn: 3,
   rolls: [7],
@@ -139,7 +139,7 @@ export const Stadium2: Establishment = {
 export const HamburgerStand2: Establishment = {
   _id: 12,
   name: 'Hamburger Stand',
-  description: 'Receive 2 coin from the player who just rolled.',
+  description: 'Take 2 coins from the player who just rolled.',
   cost: 1,
   earn: 2,
   rolls: [8],
@@ -161,9 +161,9 @@ export const FurnitureFactory2: Establishment = {
 export const TaxOffice2: Establishment = {
   _id: 14,
   name: 'Shopping District',
-  description: 'Receive half (rounded down) of the coins from all players with 10 or more coins.',
+  description: 'From each opponent who has more than 10 coins, take half, rounded down.',
   cost: 3,
-  earn: 0, // (special case)
+  earn: 10, // This is not the coins taken, but the threshold for triggering the tax office
   rolls: [8, 9],
   color: EstColor.Purple,
   type: null,
@@ -172,7 +172,7 @@ export const TaxOffice2: Establishment = {
 export const FamilyRestaurant2: Establishment = {
   _id: 15,
   name: 'Family Restaurant',
-  description: 'Receive 2 coins from the player who just rolled.',
+  description: 'Take 2 coins from the player who just rolled.',
   cost: 2,
   earn: 2,
   rolls: [9, 10],
