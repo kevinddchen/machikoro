@@ -763,7 +763,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       supplyVariant,
       _turnOrder,
       ...newTurnG,
-      secret: { _decks: null },
+      secret: { _decks: null, _landDeck: null },
       _coins,
       _estData: null,
       _landData: null,
@@ -775,9 +775,13 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     Est.initialize(G, numPlayers);
 
     // shuffle decks
-    const decks = G.secret._decks!;
-    for (let i = 0; i < decks.length; i++) {
-      decks[i] = random.Shuffle(decks[i]);
+    if (G.secret._decks !== null) {
+      for (let i = 0; i < G.secret._decks.length; i++) {
+        G.secret._decks[i] = random.Shuffle(G.secret._decks[i]);
+      }
+    }
+    if (G.secret._landDeck !== null) {
+      G.secret._landDeck = random.Shuffle(G.secret._landDeck);
     }
 
     return G;

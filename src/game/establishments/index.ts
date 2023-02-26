@@ -85,6 +85,15 @@ export const getAllInUse = (G: MachikoroG): Establishment[] => {
 
 /**
  * @param G
+ * @returns List of all unique establishments that are available for purchase
+ * from the supply.
+ */
+export const getAllAvailable = (G: MachikoroG): Establishment[] => {
+  return getAll(G).filter((est) => countAvailable(G, est) > 0);
+};
+
+/**
+ * @param G
  * @param player
  * @returns List of all unique establishments owned by the player. The
  * establishments are returned in the intended display order.
@@ -306,13 +315,4 @@ const isUpper = (est: Establishment): boolean => {
  */
 const isMajor = (est: Establishment): boolean => {
   return est.color === EstColor.Purple;
-};
-
-/**
- * @param G
- * @returns List of all unique establishments that are available for purchase
- * from the supply.
- */
-const getAllAvailable = (G: MachikoroG): Establishment[] => {
-  return getAll(G).filter((est) => countAvailable(G, est) > 0);
 };

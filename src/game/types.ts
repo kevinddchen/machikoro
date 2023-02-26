@@ -3,7 +3,7 @@
 //
 
 import { Establishment, EstablishmentData } from './establishments/types';
-import { LandmarkData } from './landmarks/types';
+import { Landmark, LandmarkData } from './landmarks/types';
 import { LogEvent } from './log/types';
 
 /**
@@ -51,9 +51,11 @@ export interface MachikoroG {
 /**
  * Game state that is not passed to the clients
  * @prop {Establishment[][]|null} _decks - the establishment draw decks.
+ * @prop {Landmark[]|null} _landDeck - the landmark draw deck, for Machi Koro 2.
  */
 export interface Secret {
   _decks: Establishment[][] | null;
+  _landDeck: Landmark[] | null;
 }
 
 /**

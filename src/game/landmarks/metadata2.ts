@@ -214,3 +214,8 @@ export const _MK2_LANDMARKS: number[] = _LANDMARKS2.map((landmark) => landmark._
  * Landmarks a player starts with in Machi Koro 2.
  */
 export const _MK2_STARTING_LANDMARKS = [CityHall2._id];
+
+/**
+ * Maximum number of unique landmarks in the supply for Machi Koro 2.
+ */
+export const _SUPPY_LIMIT_LANDMARK = 2;
