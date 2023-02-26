@@ -94,7 +94,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   private setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const expansion = e.target.value as Expansion;
-    // Machi Koro 2 only has one supply variant
+    // Machi Koro 2 only has hybrid supply variant
     if (expansion === Expansion.MK2) {
       this.setState({ expansion, supplyVariant: SupplyVariant.Hybrid });
     } else {
@@ -363,7 +363,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     const supplyVariantOptions = [
       <option key='0' value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>,
     ];
-    // Machi Koro 2 only has one supply variant.
+    // Machi Koro 2 only has hybrid supply variant
     if (expansion !== Expansion.MK2) {
       // prettier-ignore
       supplyVariantOptions.push(

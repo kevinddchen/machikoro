@@ -792,7 +792,6 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       if (!Object.values(SupplyVariant).includes(supplyVariant)) {
         return `Unknown supply variant: ${supplyVariant}`;
       }
-      // Machi Koro 2 only has one supply variant
       if (expansion === Expansion.MK2 && supplyVariant !== SupplyVariant.Hybrid) {
         return 'Machi Koro 2 only has hybrid supply variant';
       }

@@ -227,7 +227,7 @@ export const Mine2: Establishment = {
 /**
  * List of all establishments in Machi Koro 2, and order they should be displayed.
  */
-export const _ESTABLISHMENTS2: Establishment[] = [
+export const _ESTABLISHMENTS2 = [
   SushiBar2,
   WheatField2,
   Vineyard2,
@@ -249,3 +249,13 @@ export const _ESTABLISHMENTS2: Establishment[] = [
   FoodWarehouse2,
   Mine2,
 ];
+
+/**
+ * Establishments used in Machi Koro 2.
+ */
+export const _MK2_ESTABLISHMENTS = _ESTABLISHMENTS2.map((est) => est._id);
+
+/**
+ * Establishments a player starts with in Machi Koro 2.
+ */
+export const _STARTING_ESTABLISHMENTS2: number[] = [];
