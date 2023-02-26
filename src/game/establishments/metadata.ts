@@ -94,7 +94,7 @@ export const TVStation: Establishment = {
 
 export const Office: Establishment = {
   _id: 8,
-  name: 'Office',
+  name: 'Business Center',
   description: 'Exchange a non-Purple establishment with another player.',
   cost: 8,
   earnings: 0,
