@@ -65,6 +65,7 @@ export const EstType = {
   Gear: '\u{2699}\u{FE0F}',
   Shop: '\u{1F3E0}',
   Wheat: '\u{1F33E}',
+  Fruit: '\u{1F348}',
 } as const;
 
 export type EstType = (typeof EstType)[keyof typeof EstType];

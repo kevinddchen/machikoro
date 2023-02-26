@@ -64,7 +64,7 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
  * The establishments are returned in the intended display order.
  */
 export const getAllInUse = (G: MachikoroG): Establishment[] => {
-  return Meta.ESTABLISHMENTS.filter((est) => isInUse(G, est));
+  return Meta._ESTABLISHMENTS.filter((est) => isInUse(G, est));
 };
 
 /**
@@ -74,7 +74,7 @@ export const getAllInUse = (G: MachikoroG): Establishment[] => {
  * establishments are returned in the intended display order.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
-  return Meta.ESTABLISHMENTS.filter((est) => countOwned(G, player, est) > 0);
+  return Meta._ESTABLISHMENTS.filter((est) => countOwned(G, player, est) > 0);
 };
 
 /**
@@ -86,7 +86,7 @@ export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
  */
 export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): number => {
   // prettier-ignore
-  return Meta.ESTABLISHMENTS
+  return Meta._ESTABLISHMENTS
     .filter((est) => est.type === type)
     .reduce((acc, est) => acc + countOwned(G, player, est), 0);
 };
@@ -134,7 +134,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     }
     case SupplyVariant.Variable: {
       // put establishments into the supply until there are 10 unique establishments
-      while (decks[0].length > 0 && countUniqueAvailable(G) < Meta.VARIABLE_SUPPLY_LIMIT) {
+      while (decks[0].length > 0 && countUniqueAvailable(G) < Meta._VARIABLE_SUPPLY_LIMIT) {
         const est = decks[0].pop()!;
         G._estData!.availableCount[est._id] += 1;
       }
@@ -144,7 +144,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       // put establishments into the supply until there are five unique
       // establishments with activation <= 6, five establishments with activation
       // > 7, and two purple establishments (this requires three decks).
-      const limits = [Meta.HYBRID_SUPPY_LIMIT_LOWER, Meta.HYBRID_SUPPY_LIMIT_UPPER, Meta.HYBRID_SUPPY_LIMIT_PURPLE];
+      const limits = [Meta._HYBRID_SUPPY_LIMIT_LOWER, Meta._HYBRID_SUPPY_LIMIT_UPPER, Meta._HYBRID_SUPPY_LIMIT_PURPLE];
       const funcs = [countUniqueAvailableLower, countUniqueAvailableUpper, countUniqueAvailablePurple];
       for (let i = 0; i < 3; i++)
         while (decks[i].length > 0 && funcs[i](G) < limits[i]) {
@@ -165,7 +165,7 @@ export const replenishSupply = (G: MachikoroG): void => {
  */
 export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion, supplyVariant } = G;
-  const numEsts = Meta.ESTABLISHMENTS.length;
+  const numEsts = Meta._ESTABLISHMENTS.length;
 
   const data: EstablishmentData = {
     inUse: Array(numEsts).fill(false),
@@ -272,7 +272,7 @@ export const isUpper = (est: Establishment): boolean => {
  * from the supply.
  */
 export const countUniqueAvailable = (G: MachikoroG): number => {
-  return Meta.ESTABLISHMENTS.filter((est) => countAvailable(G, est) > 0).length;
+  return Meta._ESTABLISHMENTS.filter((est) => countAvailable(G, est) > 0).length;
 };
 
 /**
@@ -282,7 +282,7 @@ export const countUniqueAvailable = (G: MachikoroG): number => {
  */
 export const countUniqueAvailableLower = (G: MachikoroG): number => {
   // prettier-ignore
-  return Meta.ESTABLISHMENTS
+  return Meta._ESTABLISHMENTS
     .filter((est) => isLower(est) && countAvailable(G, est) > 0)
     .length;
 };
@@ -294,7 +294,7 @@ export const countUniqueAvailableLower = (G: MachikoroG): number => {
  */
 export const countUniqueAvailableUpper = (G: MachikoroG): number => {
   // prettier-ignore
-  return Meta.ESTABLISHMENTS
+  return Meta._ESTABLISHMENTS
     .filter((est) => isUpper(est) && countAvailable(G, est) > 0)
     .length;
 };
@@ -306,7 +306,7 @@ export const countUniqueAvailableUpper = (G: MachikoroG): number => {
  */
 export const countUniqueAvailablePurple = (G: MachikoroG): number => {
   // prettier-ignore
-  return Meta.ESTABLISHMENTS
+  return Meta._ESTABLISHMENTS
     .filter((est) => (est.color === EstColor.Purple) && countAvailable(G, est) > 0)
     .length;
 };

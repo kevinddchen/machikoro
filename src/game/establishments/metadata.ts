@@ -194,9 +194,9 @@ export const FlowerGarden: Establishment = {
 export const FlowerShop: Establishment = {
   _id: 17,
   name: 'Flower Shop',
-  description: 'Receive 1 coin from the bank for each ' + FlowerGarden.name +' establishment you own.',
+  description: 'Receive 1 coin from the bank for each ' + FlowerGarden.name + ' establishment you own.',
   cost: 1,
-  earnings: 1, // coins earned per Flower Orchard establishment
+  earnings: 1, // coins earned per `FlowerGarden` establishment
   rolls: [6],
   color: EstColor.Green,
   type: EstType.Shop,
@@ -272,7 +272,7 @@ export const TunaBoat: Establishment = {
 export const FoodWarehouse: Establishment = {
   _id: 24,
   name: 'Food Warehouse',
-  description: 'Receive 2 coins from the bank for each \u2615 establishment you own.',
+  description: 'Receive 2 coins from the bank for each ' + EstType.Cup + ' establishment you own.',
   cost: 2,
   earnings: 2, // coins earned per Cup establishment
   rolls: [12, 13],
@@ -283,7 +283,7 @@ export const FoodWarehouse: Establishment = {
 /**
  * List of all establishments, and order they should be displayed.
  */
-export const ESTABLISHMENTS: Establishment[] = [
+export const _ESTABLISHMENTS: Establishment[] = [
   SushiBar,
   WheatField,
   Ranch,
@@ -319,30 +319,30 @@ export const TAX_OFFICE_THRESHOLD = 10;
 /**
  * Maximum number of unique establishments in the supply for Variable Supply.
  */
-export const VARIABLE_SUPPLY_LIMIT = 10;
+export const _VARIABLE_SUPPLY_LIMIT = 10;
 
 /**
  * Maximum number of unique establishments that activate with rolls <= 6 in the
  * supply for Hybrid Supply.
  */
-export const HYBRID_SUPPY_LIMIT_LOWER = 5;
+export const _HYBRID_SUPPY_LIMIT_LOWER = 5;
 
 /**
  * Maximum number of unique establishments that activate with rolls > 6 in the
  * supply for Hybrid Supply.
  */
-export const HYBRID_SUPPY_LIMIT_UPPER = 5;
+export const _HYBRID_SUPPY_LIMIT_UPPER = 5;
 
 /**
  * Maximum number of unique purple establishments in the supply for Hybrid
  * Supply.
  */
-export const HYBRID_SUPPY_LIMIT_PURPLE = 2;
+export const _HYBRID_SUPPY_LIMIT_PURPLE = 2;
 
 /**
  * List of all establishments, sorted by ID.
  */
-export const _ESTABLISHMENTS_BY_ID = [...ESTABLISHMENTS].sort((a, b) => a._id - b._id);
+export const _ESTABLISHMENTS_BY_ID = [..._ESTABLISHMENTS].sort((a, b) => a._id - b._id);
 
 /**
  * Establishments used in the Base expansion.
