@@ -44,13 +44,20 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
   private renderPlayerInfo = (): JSX.Element[] => {
     const { ctx, playerID } = this.props;
 
+    // Player ID of the client.
+    let clientPlayer: number | null = null;
+    if (playerID !== null) {
+      clientPlayer = parseInt(playerID);
+    }
+
     const tbody: JSX.Element[] = [];
     for (let i = 0; i < this.names.length; i++) {
-      // Player ID in order of play
+      // Player ID we are rendering info for.
       const player = parseInt(ctx.playOrder[i]);
-      // True if we are rendering the client's own info.
-      const isClient = playerID !== null && player === parseInt(playerID);
-      tbody.push(<PlayerInfo key={i} {...this.props} player={player} name={this.names[player]} isClient={isClient} />);
+
+      tbody.push(
+        <PlayerInfo key={i} {...this.props} player={player} clientPlayer={clientPlayer} name={this.names[player]} />
+      );
     }
     return tbody;
   };

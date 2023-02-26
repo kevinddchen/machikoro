@@ -11,14 +11,14 @@ import StackTable from './StackTable';
 
 /**
  * @extends BoardProps<MachikoroG>
- * @prop {number} player - Player number corresponding to the component.
+ * @prop {number} player - Player ID corresponding to the component.
+ * @prop {number | null} - Player ID of the client, or null if the client is not a player.
  * @prop {string} name - Player name corresponding to the component.
- * @prop {boolean} isClient - True if we are rendering the client's own info.
  */
 interface PlayerInfoProps extends BoardProps<MachikoroG> {
   player: number;
+  clientPlayer: number | null;
   name: string;
-  isClient: boolean;
 }
 
 /**
@@ -37,7 +37,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
   }
 
   render() {
-    const { G, ctx, moves, isActive, isClient, player, name } = this.props;
+    const { G, ctx, moves, isActive, player, clientPlayer, name } = this.props;
     const currentPlayer = parseInt(ctx.currentPlayer);
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
@@ -54,6 +54,12 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
       const landColor = landColorToClass(owned, canBuyLand);
 
+      let landDescription = land.description;
+      // add cost to the description if the client does not own the landmark
+      if (clientPlayer === null || !Land.owns(G, clientPlayer, land)) {
+        landDescription += '\n\nCost: ' + land.cost.toString();
+      }
+
       lands.push(
         <td
           key={i}
@@ -61,9 +67,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           onClick={() => moves.buyLand(land)}
         >
           <div className='mini_name'>{land.name}</div>
-          <div className={classNames('tooltip', 'mini_tooltip')}>
-            {land.description + '\n\nCost: ' + land.cost.toString()}
-          </div>
+          <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>
         </td>
       );
     }
@@ -112,7 +116,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     );
 
     // if client, we add an extra black border around the panel
-    const border = isClient ? 'is_client' : null;
+    const border = clientPlayer !== null && clientPlayer === player ? 'is_client' : null;
 
     return (
       <div className={classNames('div-column', border)}>
