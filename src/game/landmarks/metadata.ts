@@ -8,6 +8,7 @@ import { Landmark } from './types';
 export const CityHall: Landmark = {
   _id: 0,
   name: 'City Hall',
+  miniName: 'City Hall',
   description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
   coins: 1,
   _cost: [0],
@@ -16,6 +17,7 @@ export const CityHall: Landmark = {
 export const Harbor: Landmark = {
   _id: 1,
   name: 'Harbor',
+  miniName: 'Harbor',
   description: 'If the dice total is 10 or more, you may add 2 to the total.',
   coins: null,
   _cost: [2],
@@ -24,6 +26,7 @@ export const Harbor: Landmark = {
 export const TrainStation: Landmark = {
   _id: 2,
   name: 'Train Station',
+  miniName: 'Train Station',
   description: 'You may throw 2 dice.',
   coins: null,
   _cost: [4],
@@ -32,6 +35,7 @@ export const TrainStation: Landmark = {
 export const ShoppingMall: Landmark = {
   _id: 3,
   name: 'Shopping Mall',
+  miniName: 'Shopping Mall',
   description: 'Your ' + EstType.Cup + ' and ' + EstType.Shop + ' establishments earn +1 coin when activated.',
   coins: 1, // bonus coins on establishment activation
   _cost: [10],
@@ -39,7 +43,8 @@ export const ShoppingMall: Landmark = {
 
 export const AmusementPark: Landmark = {
   _id: 4,
-  name: 'Amuse. Park',
+  name: 'Amusement Park',
+  miniName: 'Amuse. Park',
   description: 'If you roll doubles, take an extra turn.',
   coins: null,
   _cost: [16],
@@ -48,6 +53,7 @@ export const AmusementPark: Landmark = {
 export const RadioTower: Landmark = {
   _id: 5,
   name: 'Radio Tower',
+  miniName: 'Radio Tower',
   description: 'Once per turn, you may roll again.',
   coins: null,
   _cost: [22],
@@ -56,6 +62,7 @@ export const RadioTower: Landmark = {
 export const Airport: Landmark = {
   _id: 6,
   name: 'Airport',
+  miniName: 'Airport',
   description: 'If you build nothing on your turn, receive 10 coins from the bank.',
   coins: 10,
   _cost: [30],

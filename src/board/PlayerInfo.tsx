@@ -67,7 +67,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           className={classNames('mini_td', landColor, { clickable: canBuyLand })}
           onClick={() => moves.buyLand(land)}
         >
-          <div className='mini_name'>{land.name}</div>
+          <div className='mini_name'>{land.miniName}</div>
           <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>
         </td>
       );
@@ -111,7 +111,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     }
 
     const nameDiv = (
-      <div className={classNames('name_text', { name_do_tv: canDoTV })} onClick={() => moves.doTV(player)}>
+      <div className={classNames('name_div', { name_do_tv: canDoTV })} onClick={() => moves.doTV(player)}>
         {name}
       </div>
     );

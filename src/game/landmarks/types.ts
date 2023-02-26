@@ -5,6 +5,7 @@
 /**
  * Interface for landmark metadata.
  * @prop {string} name - Display name.
+ * @prop {string} miniName - Display name in the player info.
  * @prop {string} description - Tooltip text.
  * @prop {number[]} _cost - Cost to buy. In Machi Koro 2, the cost depends on
  * the number of landmarks already owned. Do not use this property; use the
@@ -15,6 +16,7 @@
  */
 export interface Landmark {
   readonly name: string;
+  readonly miniName: string;
   readonly description: string;
   readonly _cost: number[];
   readonly coins: number | null;
