@@ -22,10 +22,11 @@ import { LogEvent } from './log/types';
  * @prop {Establishment|null} justBoughtEst - the establishment just bought (for prettier rendering).
  * @prop {number|null} tunaRoll - the roll made for the tuna boat.
  * @prop {Secret} secret - game state that is not passed to clients.
- * @prop {number[]} _coins - coins for each player. (Private, do not access directly)
- * @prop {EstablishmentData|null} _estData - establishment data. (Private, do not access directly)
- * @prop {LandmarkData|null} _landData - landmark data. (Private, do not access directly)
- * @prop {LogEvent[]|null} _logBuffer - buffer of log lines. (Private, do not access directly)
+ * @prop {number[]} _coins - coins for each player. Do not use this property;
+ * use `getCoins` and `setCoins` instead.
+ * @prop {EstablishmentData|null} _estData - establishment data.
+ * @prop {LandmarkData|null} _landData - landmark data.
+ * @prop {LogEvent[]|null} _logBuffer - buffer of log lines.
  */
 export interface MachikoroG {
   readonly expansion: Expansion;
@@ -49,7 +50,7 @@ export interface MachikoroG {
 
 /**
  * Game state that is not passed to the clients
- * @prop {Establishment[][]|null} _decks - the establishment draw decks. (Private, do not access directly)
+ * @prop {Establishment[][]|null} _decks - the establishment draw decks.
  */
 export interface Secret {
   _decks: Establishment[][] | null;

@@ -100,11 +100,13 @@ export const countAllOwned = (G: MachikoroG, player: number): number => {
 export const cost = (G: MachikoroG, land: Landmark, player: number | null): number => {
   const { expansion } = G;
   if (expansion === Expansion.Base || expansion === Expansion.Harbor) {
-    return land.cost[0];
+    // Machi Koro 1 only has one cost
+    return land._cost[0];
   } else if (expansion === Expansion.MK2) {
+    // Machi Koro 2 landmark costs change based on the number of landmarks owned
     const landsOwned = player === null ? 0 : countAllOwned(G, player) - 1; // -1 because city hall does not count
-    const costIdx = Math.min(Math.max(landsOwned, 0), land.cost.length - 1); // avoid array out of bounds
-    return land.cost[costIdx];
+    const costIdx = Math.min(Math.max(landsOwned, 0), land._cost.length - 1); // avoid array out of bounds
+    return land._cost[costIdx];
   } else {
     throw new Error(`Expansion '${expansion}' not implemented.`);
   }

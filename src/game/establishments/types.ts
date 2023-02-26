@@ -11,7 +11,9 @@
  * @prop {number[]} rolls - Which rolls activate the establishment.
  * @prop {EstColor} color - The color of the establishment.
  * @prop {EstType|null} type - The type of the establishment (for combos, e.g. 'Animal').
- * @prop {number} _id - Unique id used to enumerate establishments. (Private, do not access directly)
+ * @prop {number} _id - Unique id used to enumerate establishments.
+ * @prop {number|null} _initial - The number of copies in the initial supply.
+ * If null, then is equal to the number of players.
  */
 export interface Establishment {
   readonly name: string;
@@ -22,6 +24,7 @@ export interface Establishment {
   readonly color: EstColor;
   readonly type: EstType | null;
   readonly _id: number;
+  readonly _initial: number | null;
 }
 
 /**

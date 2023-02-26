@@ -229,9 +229,8 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   for (const id of ids) {
     const est = ests[id];
     data.inUse[id] = true;
-    // all establishments have 6 copies except for purple establishments,
-    // which have the same number of copies as the number of players.
-    data.remainingCount[id] = est.color === EstColor.Purple ? numPlayers : 6;
+    // if `est._initial` is null, use the number of players
+    data.remainingCount[id] = est._initial ?? numPlayers;
   }
 
   // give each player their starting establishments

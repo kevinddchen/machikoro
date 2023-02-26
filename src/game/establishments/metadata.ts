@@ -13,6 +13,7 @@ export const SushiBar: Establishment = {
   rolls: [1],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const WheatField: Establishment = {
@@ -24,6 +25,7 @@ export const WheatField: Establishment = {
   rolls: [1],
   color: EstColor.Blue,
   type: EstType.Wheat,
+  _initial: 6,
 };
 
 export const Ranch: Establishment = {
@@ -35,6 +37,7 @@ export const Ranch: Establishment = {
   rolls: [2],
   color: EstColor.Blue,
   type: EstType.Animal,
+  _initial: 6,
 };
 
 export const Bakery: Establishment = {
@@ -46,6 +49,7 @@ export const Bakery: Establishment = {
   rolls: [2, 3],
   color: EstColor.Green,
   type: EstType.Shop,
+  _initial: 6,
 };
 
 export const Cafe: Establishment = {
@@ -57,6 +61,7 @@ export const Cafe: Establishment = {
   rolls: [3],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const FlowerGarden: Establishment = {
@@ -68,6 +73,7 @@ export const FlowerGarden: Establishment = {
   rolls: [4],
   color: EstColor.Blue,
   type: EstType.Wheat,
+  _initial: 6,
 };
 
 export const ConvenienceStore: Establishment = {
@@ -79,6 +85,7 @@ export const ConvenienceStore: Establishment = {
   rolls: [4],
   color: EstColor.Green,
   type: EstType.Shop,
+  _initial: 6,
 };
 
 export const Forest: Establishment = {
@@ -90,6 +97,7 @@ export const Forest: Establishment = {
   rolls: [5],
   color: EstColor.Blue,
   type: EstType.Gear,
+  _initial: 6,
 };
 
 export const FlowerShop: Establishment = {
@@ -101,6 +109,7 @@ export const FlowerShop: Establishment = {
   rolls: [6],
   color: EstColor.Green,
   type: EstType.Shop,
+  _initial: 6,
 };
 
 export const PizzaJoint: Establishment = {
@@ -112,6 +121,7 @@ export const PizzaJoint: Establishment = {
   rolls: [7],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const CheeseFactory: Establishment = {
@@ -123,6 +133,7 @@ export const CheeseFactory: Establishment = {
   rolls: [7],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const HamburgerStand: Establishment = {
@@ -134,6 +145,7 @@ export const HamburgerStand: Establishment = {
   rolls: [8],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const MackerelBoat: Establishment = {
@@ -145,6 +157,7 @@ export const MackerelBoat: Establishment = {
   rolls: [8],
   color: EstColor.Blue,
   type: null,
+  _initial: 6,
 };
 
 export const FurnitureFactory: Establishment = {
@@ -156,6 +169,7 @@ export const FurnitureFactory: Establishment = {
   rolls: [8],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const Mine: Establishment = {
@@ -167,6 +181,7 @@ export const Mine: Establishment = {
   rolls: [9],
   color: EstColor.Blue,
   type: EstType.Gear,
+  _initial: 6,
 };
 
 export const FamilyRestaurant: Establishment = {
@@ -178,6 +193,7 @@ export const FamilyRestaurant: Establishment = {
   rolls: [9, 10],
   color: EstColor.Red,
   type: EstType.Cup,
+  _initial: 6,
 };
 
 export const AppleOrchard: Establishment = {
@@ -189,6 +205,7 @@ export const AppleOrchard: Establishment = {
   rolls: [10],
   color: EstColor.Blue,
   type: EstType.Wheat,
+  _initial: 6,
 };
 
 export const FarmersMarket: Establishment = {
@@ -200,6 +217,7 @@ export const FarmersMarket: Establishment = {
   rolls: [11, 12],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const FoodWarehouse: Establishment = {
@@ -211,6 +229,7 @@ export const FoodWarehouse: Establishment = {
   rolls: [12, 13],
   color: EstColor.Green,
   type: null,
+  _initial: 6,
 };
 
 export const TunaBoat: Establishment = {
@@ -222,6 +241,7 @@ export const TunaBoat: Establishment = {
   rolls: [12, 13, 14],
   color: EstColor.Blue,
   type: null,
+  _initial: 6,
 };
 
 export const Stadium: Establishment = {
@@ -233,6 +253,7 @@ export const Stadium: Establishment = {
   rolls: [6],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const TVStation: Establishment = {
@@ -244,6 +265,7 @@ export const TVStation: Establishment = {
   rolls: [6],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const Office: Establishment = {
@@ -255,6 +277,7 @@ export const Office: Establishment = {
   rolls: [6],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const Publisher: Establishment = {
@@ -267,6 +290,7 @@ export const Publisher: Establishment = {
   rolls: [7],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 export const TaxOffice: Establishment = {
@@ -278,6 +302,7 @@ export const TaxOffice: Establishment = {
   rolls: [8, 9],
   color: EstColor.Purple,
   type: null,
+  _initial: null,
 };
 
 /**
