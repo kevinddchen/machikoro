@@ -11,7 +11,7 @@ export const CityHall2: Landmark = {
   miniName: 'City Hall',
   description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
   coins: 1,
-  cost: [0, 0, 0],
+  cost: [0],
 };
 
 export const LoanOffice2: Landmark = {
@@ -22,7 +22,7 @@ export const LoanOffice2: Landmark = {
     'You can only build this landmark when you are the only player with no landmarks. ' +
     'Reduce the build cost of all landmarks by 2 coins (builder only).',
   coins: 2, // discount on landmarks
-  cost: [10, 10, 10],
+  cost: [10],
 };
 
 export const FarmersMarket2: Landmark = {

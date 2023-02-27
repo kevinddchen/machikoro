@@ -50,6 +50,8 @@ This will open the app in development mode at `localhost:3000` in your browser.
 There are some debugging tools which become unavailable in the production version of the app.
 Additionally, any changes made in the source code will be automatically updated in the browser, which is very convenient.
 
+To change the debug game settings, edit `debugSetupData` in [src/game/machikoro.ts](src/game/machikoro.ts).
+
 ### Run locally in production mode
 
 You must first build the app by running,
