@@ -19,6 +19,7 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
     const canCommitRoll = isActive && Game.canCommitRoll(G);
     const canAddTwo = isActive && Game.canAddTwo(G, ctx);
     const canEndTurn = isActive && Game.canEndTurn(G);
+    const canSkipOffice = isActive && Game.canSkipOffice(G);
 
     const tbody = (
       <div className='div-row'>
@@ -43,6 +44,13 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
             onClick={() => moves.addTwo()}
           >
             Keep ({G.roll! + 2})
+          </button>
+
+          <button
+            className={classNames('button', { button_active: canSkipOffice }, { button_hide: !canSkipOffice })}
+            onClick={() => moves.skipOffice()}
+          >
+            Skip
           </button>
         </div>
         <div className='div-column-right'>

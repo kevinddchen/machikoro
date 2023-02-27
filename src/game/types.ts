@@ -16,8 +16,8 @@ import { LogEvent } from './log/types';
  * @prop {number|null} roll - the current player's dice roll total.
  * @prop {number} numRolls - the number of dice rolls made by the current player.
  * @prop {boolean} secondTurn - true if the current player can make another turn.
- * @prop {boolean} doTV - true if the current player will activate the TV station.
- * @prop {boolean} doOffice - true if the current player will activate the office.
+ * @prop {number} doTV - number of times the current player will activate the TV station.
+ * @prop {number} doOffice - number of times the current player will activate the office.
  * @prop {Establishment|null} officeGiveEst - the establishment picked for the office to give.
  * @prop {Establishment|null} justBoughtEst - the establishment just bought (for prettier rendering).
  * @prop {Landmark|null} justBoughtLand - the landmark just bought (for prettier rendering in Machi Koro 2).
@@ -37,8 +37,8 @@ export interface MachikoroG {
   roll: number | null;
   numRolls: number;
   secondTurn: boolean;
-  doTV: boolean;
-  doOffice: boolean;
+  doTV: number;
+  doOffice: number;
   officeGiveEst: Establishment | null;
   justBoughtEst: Establishment | null;
   justBoughtLand: Landmark | null;

@@ -91,8 +91,8 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
     Est.countAvailable(G, est) > 0 &&
     // player has enough coins
     getCoins(G, player) >= est.cost &&
-    // if establishment is purple, player does not already own it
-    (est.color === EstColor.Purple ? Est.countOwned(G, player, est) === 0 : true)
+    // if playing Machi Koro 1 and establishment is major (purple), player does not already own it
+    (G.expansion === Expansion.MK2 || !Est.isMajor(est) || Est.countOwned(G, player, est) === 0)
   );
 };
 
@@ -139,13 +139,12 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
  */
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  // must pick own establishment that is not purple
   return (
     G.turnState === TurnState.OfficeGive &&
     // must own the establishment
     Est.countOwned(G, player, est) > 0 &&
-    // cannot give purple
-    est.color !== EstColor.Purple
+    // if playing Machi Koro 1, cannot give major (purple)
+    (G.expansion === Expansion.MK2 || !Est.isMajor(est))
   );
 };
 
@@ -165,8 +164,21 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
     opponent !== player &&
     // opponent must own the establishment
     Est.countOwned(G, opponent, est) > 0 &&
-    // cannot take purple
-    est.color !== EstColor.Purple
+    // if playing Machi Koro 1, cannot take major (purple)
+    (G.expansion === Expansion.MK2 || !Est.isMajor(est))
+  );
+};
+
+/**
+ * @param G
+ * @returns True if the current player can skip the office action. Can only be
+ * done in Machi Koro 2.
+ */
+export const canSkipOffice = (G: MachikoroG): boolean => {
+  return (
+    (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.OfficeTake) &&
+    // only in Machi Koro 2
+    G.expansion === Expansion.MK2
   );
 };
 
@@ -403,13 +415,32 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
   }
 
   const player = parseInt(ctx.currentPlayer);
-  if (!G.officeGiveEst) {
+  if (G.officeGiveEst === null) {
     throw Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
   }
   Est.transfer(G, { from: player, to: opponent, est: G.officeGiveEst });
   Est.transfer(G, { from: opponent, to: player, est });
   Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
+  G.officeGiveEst = null; // cleanup
+  switchState(context);
+
+  return;
+};
+
+/**
+ * Skip the office action. Can only be done in Machi Koro 2.
+ * @param context
+ * @returns
+ */
+const skipOffice: Move<MachikoroG> = (context) => {
+  const { G } = context;
+  if (!canSkipOffice(G)) {
+    return INVALID_MOVE;
+  }
+
+  G.officeGiveEst = null; // cleanup
+  G.doOffice = 0;
   switchState(context);
 
   return;
@@ -541,14 +572,18 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     let multiplier = 1;
     if (Est.isEqual(est, Est.CheeseFactory)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
-    } else if (Est.isEqual(est, Est.FurnitureFactory)) {
+    } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
     } else if (Est.isEqual(est, Est.FarmersMarket)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
     } else if (Est.isEqual(est, Est.FlowerShop)) {
       multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden);
-    } else if (Est.isEqual(est, Est.FoodWarehouse)) {
+    } else if (Est.isEqual(est, Est.FlowerShop2)) {
+      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden2);
+    } else if (Est.isEqual(est, Est.FoodWarehouse) || Est.isEqual(est, Est.FoodWarehouse2)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
+    } else if (Est.isEqual(est, Est.Winery2)) {
+      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
     }
 
     const amount = earnings * multiplier * count;
@@ -558,34 +593,40 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   // Do Purple establishments.
   const purpleEsts = allEsts.filter((est) => est.color === EstColor.Purple && est.rolls.includes(roll));
   for (const est of purpleEsts) {
-    if (Est.countOwned(G, currentPlayer, est) === 0) {
+    const count = Est.countOwned(G, currentPlayer, est);
+    if (count === 0) {
       continue;
     }
 
     // each purple establishment has its own effect
-    if (Est.isEqual(est, Est.Stadium)) {
+    // for Machi Koro 1, `count` should always be 1 here
+    if (Est.isEqual(est, Est.Stadium) || Est.isEqual(est, Est.Stadium2)) {
       for (const opponent of getPreviousPlayers(ctx)) {
-        take(G, { from: opponent, to: currentPlayer }, est.earn, est.name);
+        const amount = est.earn * count;
+        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
-      G.doTV = true;
-    } else if (Est.isEqual(est, Est.Office)) {
-      G.doOffice = true;
+      G.doTV = count;
+    } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
+      G.doOffice = count;
     } else if (Est.isEqual(est, Est.Publisher)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
         const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
-        const amount = (n_cups + n_shops) * est.earn;
+        const amount = est.earn * (n_cups + n_shops) * count;
         take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
-    } else if (Est.isEqual(est, Est.TaxOffice)) {
+    } else if (Est.isEqual(est, Est.TaxOffice) || Est.isEqual(est, Est.TaxOffice2)) {
       for (const opponent of getPreviousPlayers(ctx)) {
-        const opp_coins = getCoins(G, opponent);
-        if (opp_coins < Est.TaxOffice.earn) {
-          continue;
+        // in Machi Koro 2, each copy of the tax office activates
+        for (let i = 0; i < count; i++) {
+          const opp_coins = getCoins(G, opponent);
+          if (opp_coins < est.earn) {
+            break;
+          }
+          const amount = Math.floor(opp_coins / 2);
+          take(G, { from: opponent, to: currentPlayer }, amount, est.name);
         }
-        const amount = Math.floor(opp_coins / 2);
-        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     }
   }
@@ -683,11 +724,11 @@ const getTunaRoll = (context: FnContext<MachikoroG>): number => {
 const switchState = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const player = parseInt(ctx.currentPlayer);
-  if (G.doTV) {
-    G.doTV = false;
+  if (G.doTV > 0) {
+    G.doTV -= 1;
     G.turnState = TurnState.TV;
-  } else if (G.doOffice) {
-    G.doOffice = false;
+  } else if (G.doOffice > 0) {
+    G.doOffice -= 1;
     G.turnState = TurnState.OfficeGive;
   } else {
     // city hall before buying
@@ -734,8 +775,8 @@ const newTurnG = {
   roll: null,
   numRolls: 0,
   secondTurn: false,
-  doTV: false,
-  doOffice: false,
+  doTV: 0,
+  doOffice: 0,
   officeGiveEst: null,
   justBoughtEst: null,
   justBoughtLand: null,
@@ -845,6 +886,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     doTV: doTV,
     doOfficeGive: doOfficeGive,
     doOfficeTake: doOfficeTake,
+    skipOffice: skipOffice,
     endTurn: endTurn,
   },
 

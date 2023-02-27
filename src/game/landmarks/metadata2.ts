@@ -65,8 +65,7 @@ export const Publisher2: Landmark = {
   _id: 6,
   name: 'Publisher',
   miniName: 'Publisher',
-  description:
-    'Take 1 coin from each opponent for each ' + EstType.Shop + ' establishment they own (builder only).',
+  description: 'Take 1 coin from each opponent for each ' + EstType.Shop + ' establishment they own (builder only).',
   coins: 1, // coins taken per Shop establishment
   cost: [10, 14, 22],
 };
@@ -184,8 +183,7 @@ export const TVStation2: Landmark = {
   _id: 19,
   name: 'TV Station',
   miniName: 'TV Station',
-  description:
-    'Take 1 coin from each opponent for each ' + EstType.Cup + ' establishment they own (builder only).',
+  description: 'Take 1 coin from each opponent for each ' + EstType.Cup + ' establishment they own (builder only).',
   coins: 1, // coins taken per Cup establishment
   cost: [12, 16, 22],
 };

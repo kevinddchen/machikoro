@@ -17,7 +17,7 @@ export * from './types';
  * @returns True if the establishments are the same.
  */
 export const isEqual = (a: Establishment, b: Establishment): boolean => {
-  return a._id === b._id;
+  return a._id === b._id && a._expId === b._expId;
 };
 
 /**
@@ -314,6 +314,6 @@ const isUpper = (est: Establishment): boolean => {
  * @param est
  * @returns True if the establishment is major (purple).
  */
-const isMajor = (est: Establishment): boolean => {
+export const isMajor = (est: Establishment): boolean => {
   return est.color === EstColor.Purple;
 };
