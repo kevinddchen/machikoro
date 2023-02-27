@@ -330,7 +330,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @returns Elements for creating a new match.
    */
   private renderCreateMatch = (): JSX.Element => {
-
     // prettier-ignore
     const numPlayersOptions = [
       <option key='0' value='2'>2 Players</option>,

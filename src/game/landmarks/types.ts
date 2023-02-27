@@ -7,9 +7,9 @@
  * @prop {string} name - Display name.
  * @prop {string} miniName - Display name in the player info.
  * @prop {string} description - Tooltip text.
- * @prop {number[]} _cost - Cost to buy. In Machi Koro 2, the cost depends on
- * the number of landmarks already owned. Do not use this property; use the
- * `cost` function instead.
+ * @prop {number[]} cost - Cost to buy. In Machi Koro 2, the cost depends on
+ * the number of landmarks already owned. It is recommended to use the `cost`
+ * function instead of accessing this array.
  * @prop {number|null} coins - Context depends on the landmark. May indicate
  * coins earned, bonus coins earned, etc.
  * @prop {number} _id - Unique id used to enumerate landmarks.
@@ -18,7 +18,7 @@ export interface Landmark {
   readonly name: string;
   readonly miniName: string;
   readonly description: string;
-  readonly _cost: number[];
+  readonly cost: number[];
   readonly coins: number | null;
   readonly _id: number;
 }

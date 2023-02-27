@@ -64,9 +64,10 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const landColor = landColorToClass(canBuyLand);
 
       let landDescription = land.description;
-      // add cost to the description if the client does not own the landmark
-      if (clientPlayer === null || !Land.owns(G, clientPlayer, land)) {
-        landDescription += '\n\nCost: ' + Land.cost(G, land, clientPlayer).toString();
+      // for Machi Koro 1, add cost to the description if the client does not own the landmark
+      if (G.expansion !== Game.Expansion.MK2 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
+        // HACK: accessing cost array directly
+        landDescription += '\n\nCost: ' + land.cost[0].toString();
       }
 
       lands.push(

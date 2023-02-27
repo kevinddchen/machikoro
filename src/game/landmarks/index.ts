@@ -30,7 +30,7 @@ export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
 };
 
 /**
- * Returns true if the landmark is available for purchase. In Machi Koro 1, 
+ * Returns true if the landmark is available for purchase. In Machi Koro 1,
  * landmarks should always be available for purchase.
  * @param G
  * @param land
@@ -111,12 +111,12 @@ export const cost = (G: MachikoroG, land: Landmark, player: number | null): numb
   const { expansion } = G;
   if (expansion === Expansion.Base || expansion === Expansion.Harbor) {
     // Machi Koro 1 only has one cost
-    return land._cost[0];
+    return land.cost[0];
   } else if (expansion === Expansion.MK2) {
     // Machi Koro 2 landmark costs change based on the number of landmarks owned
     const landsOwned = player === null ? 0 : getAllOwned(G, player).length - 1; // -1 because city hall does not count
-    const costIdx = Math.min(Math.max(landsOwned, 0), land._cost.length - 1); // avoid array out of bounds
-    return land._cost[costIdx];
+    const costIdx = Math.min(Math.max(landsOwned, 0), land.cost.length - 1); // avoid array out of bounds
+    return land.cost[costIdx];
   } else {
     throw new Error(`Expansion '${expansion}' not implemented.`);
   }

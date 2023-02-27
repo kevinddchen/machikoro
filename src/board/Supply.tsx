@@ -5,8 +5,8 @@ import React from 'react';
 import classNames from 'classnames';
 
 import * as Game from 'game';
-import { estColorToClass, landColorToClass, rollsToString, landCostsToString } from './utils';
 import { Est, Land, MachikoroG } from 'game';
+import { estColorToClass, landColorToClass, landCostsToString, rollsToString } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -29,12 +29,14 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
 
     const table = new StackTable(5);
 
-    // manually filter out `CityHall2`, which should never appear in the supply
-    const lands = Land.getAllInUse(G).filter((land) => !Land.isEqual(land, Land.CityHall2));
+    const lands = Land.getAllInUse(G);
     for (let i = 0; i < lands.length; i++) {
       const land = lands[i];
+      // manually filter out `CityHall2`, which should never appear in the supply
+      if (Land.isEqual(land, Land.CityHall2)) {
+        continue;
+      }
 
-      const canBuyLand = isActive && Game.canBuyLand(G, ctx, land);
       const isAvailable = Land.isAvailable(G, land);
 
       // do not display the landmark in the supply if
@@ -44,9 +46,11 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
         continue;
       }
 
+      const canBuyLand = isActive && Game.canBuyLand(G, ctx, land);
       const landColor = landColorToClass(canBuyLand);
       const costsString = landCostsToString(land);
 
+      // use same CSS as establishments
       table.push(
         <td
           key={i}
@@ -72,9 +76,7 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
     for (let i = 0; i < ests.length; i++) {
       const est = ests[i];
 
-      const canBuyEst = isActive && Game.canBuyEst(G, ctx, est);
       const available = Est.countAvailable(G, est);
-      const remaining = Est.countRemaining(G, est);
 
       // do not display the establishment in the supply if
       // (i) it is not available, and
@@ -88,6 +90,8 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
         continue;
       }
 
+      const canBuyEst = isActive && Game.canBuyEst(G, ctx, est);
+      const remaining = Est.countRemaining(G, est);
       const estColor = estColorToClass(est.color, canBuyEst);
       const rollString = rollsToString(est);
 

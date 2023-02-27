@@ -11,7 +11,7 @@ export const CityHall2: Landmark = {
   miniName: 'City Hall',
   description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
   coins: 1,
-  _cost: [0, 0, 0],
+  cost: [0, 0, 0],
 };
 
 export const LoanOffice2: Landmark = {
@@ -22,7 +22,7 @@ export const LoanOffice2: Landmark = {
     'You can only build this landmark when you are the only player with no landmarks. ' +
     'Reduce the build cost of all landmarks by 2 coins (builder only).',
   coins: 2, // discount on landmarks
-  _cost: [10, 10, 10],
+  cost: [10, 10, 10],
 };
 
 export const FarmersMarket2: Landmark = {
@@ -31,7 +31,7 @@ export const FarmersMarket2: Landmark = {
   miniName: 'Farmers Mkt.',
   description: 'Your ' + EstType.Wheat + ' establishments earn +1 coin when activated (all players).',
   coins: 1, // bonus coins on establishment activation
-  _cost: [10, 14, 22],
+  cost: [10, 14, 22],
 };
 
 export const FrenchRestaurant2: Landmark = {
@@ -40,7 +40,7 @@ export const FrenchRestaurant2: Landmark = {
   miniName: 'French Rest.',
   description: 'Take 2 coins from each opponent (builder only; occurs once).',
   coins: 2,
-  _cost: [10, 14, 22],
+  cost: [10, 14, 22],
 };
 
 export const MovingCompany2: Landmark = {
@@ -49,7 +49,7 @@ export const MovingCompany2: Landmark = {
   miniName: 'Moving Co.',
   description: 'If you roll doubles, give 1 establishment to the previous player (all players).',
   coins: null,
-  _cost: [10, 14, 22],
+  cost: [10, 14, 22],
 };
 
 export const Observatory2: Landmark = {
@@ -58,7 +58,7 @@ export const Observatory2: Landmark = {
   miniName: 'Observatory',
   description: 'Reduce the build cost of "Launch Pad" by 5 coins (all players).',
   coins: 5, // discount on landmark
-  _cost: [10, 14, 22],
+  cost: [10, 14, 22],
 };
 
 export const Publisher2: Landmark = {
@@ -68,7 +68,7 @@ export const Publisher2: Landmark = {
   description:
     'Take 1 coin from each opponent for each ' + EstType.Shop + ' establishment they own (builder only; occurs once).',
   coins: 1, // coins taken per Shop establishment
-  _cost: [10, 14, 22],
+  cost: [10, 14, 22],
 };
 
 export const ShoppingMall2: Landmark = {
@@ -77,7 +77,7 @@ export const ShoppingMall2: Landmark = {
   miniName: 'Shopping Mall',
   description: 'Your ' + EstType.Shop + ' establishments earn +1 coin when activated (all players).',
   coins: 1, // bonus coins on establishment activation
-  _cost: [10, 14, 22],
+  cost: [10, 14, 22],
 };
 
 export const TechStartup: Landmark = {
@@ -86,7 +86,7 @@ export const TechStartup: Landmark = {
   miniName: 'Tech Startup',
   description: 'If you roll 12, receive 8 coins from the bank (all players).',
   coins: 8,
-  _cost: [10, 14, 22],
+  cost: [10, 14, 22],
 };
 
 export const Airport2: Landmark = {
@@ -95,7 +95,7 @@ export const Airport2: Landmark = {
   miniName: 'Airport',
   description: 'If you build nothing on your turn, receive 5 coins from the bank (all players).',
   coins: 5,
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const AmusementPark2: Landmark = {
@@ -104,7 +104,7 @@ export const AmusementPark2: Landmark = {
   miniName: 'Amuse. Park',
   description: 'If you roll doubles, take an extra turn (all players).',
   coins: null,
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const Charterhouse2: Landmark = {
@@ -113,7 +113,7 @@ export const Charterhouse2: Landmark = {
   miniName: 'Charterhouse',
   description: 'If you rolled 2 dice and received no coins, receive 3 coins from the bank (all players).',
   coins: 3,
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const ExhibitHall2: Landmark = {
@@ -122,7 +122,7 @@ export const ExhibitHall2: Landmark = {
   miniName: 'Exhibit Hall',
   description: 'From each opponent who has more than 10 coins, take half, rounded down (builder only; occurs once).',
   coins: 0, // (special case)
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const Forge2: Landmark = {
@@ -131,7 +131,7 @@ export const Forge2: Landmark = {
   miniName: 'Forge',
   description: 'Your ' + EstType.Gear + ' establishments earn +1 coin when activated (all players).',
   coins: 1, // bonus coins on establishment activation
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const Museum2: Landmark = {
@@ -140,7 +140,7 @@ export const Museum2: Landmark = {
   miniName: 'Museum',
   description: 'Take 3 coins from each opponent for each landmark they own (builder only; occurs once).',
   coins: 3, // coins taken per landmark
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const Park2: Landmark = {
@@ -150,7 +150,7 @@ export const Park2: Landmark = {
   description:
     "Redistribute all players' coins as evenly as possible, making up any difference with coins from the bank (occurs once).",
   coins: null,
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const RadioTower2: Landmark = {
@@ -159,7 +159,7 @@ export const RadioTower2: Landmark = {
   miniName: 'Radio Tower',
   description: 'Take another turn (builder only; occurs once).',
   coins: null,
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const SodaBottlingPlant2: Landmark = {
@@ -168,7 +168,7 @@ export const SodaBottlingPlant2: Landmark = {
   miniName: 'Soda Bt. Plant',
   description: 'Your ' + EstType.Cup + ' establishments earn +1 coin when activated (all players).',
   coins: 1, // bonus coins on establishment activation
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const Temple2: Landmark = {
@@ -177,7 +177,7 @@ export const Temple2: Landmark = {
   miniName: 'Temple',
   description: 'If you roll doubles, take 2 coins from each opponent (all players).',
   coins: 2,
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const TVStation2: Landmark = {
@@ -187,7 +187,7 @@ export const TVStation2: Landmark = {
   description:
     'Take 1 coin from each opponent for each ' + EstType.Cup + ' establishment they own (builder only; occurs once).',
   coins: 1, // coins taken per Cup establishment
-  _cost: [12, 16, 22],
+  cost: [12, 16, 22],
 };
 
 export const LaunchPad: Landmark = {
@@ -196,7 +196,7 @@ export const LaunchPad: Landmark = {
   miniName: 'Launch Pad',
   description: 'You win the game! (builder only)',
   coins: null,
-  _cost: [45, 38, 25],
+  cost: [45, 38, 25],
 };
 
 /**

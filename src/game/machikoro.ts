@@ -317,8 +317,8 @@ const buyEst: Move<MachikoroG> = (context, est: Establishment) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  Est.buy(G, player, est);
   setCoins(G, player, -est.cost);
+  Est.buy(G, player, est);
   G.justBoughtEst = est;
   Log.logBuy(G, est.name);
 
@@ -720,7 +720,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.MK2,
+  expansion: Expansion.Harbor,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,

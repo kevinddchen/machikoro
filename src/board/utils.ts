@@ -45,9 +45,9 @@ export const rollsToString = (est: Est.Establishment): string => {
 
 /**
  * Parse an establishment's costs into a printable format.
- * @param land 
+ * @param land
+ * @returns
  */
 export const landCostsToString = (land: Land.Landmark): string => {
-  // HACK: accessing private variable
-  return '$' + land._cost.map((cost) => cost.toString()).join('/');
+  return '$' + land.cost.map((cost) => cost.toString()).join('/');
 };
