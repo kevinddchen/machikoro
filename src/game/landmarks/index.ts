@@ -4,9 +4,10 @@
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
-import { Expansion, MachikoroG, SupplyVariant } from '../types';
+import { Expansion, expToVer, SupplyVariant, Version } from '../config';
 import { Landmark, LandmarkData } from './types';
-import { expToVer, Version } from '../config';
+import { MachikoroG } from '../types';
+
 
 export * from './metadata';
 export * from './metadata2';
@@ -52,7 +53,7 @@ export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
  */
 export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => {
   if (expToVer(G.expansion) !== land._ver) {
-    throw new Error(`Landmark '_ver' does not match the game version.`);
+    return false; // more convenient to not throw an error here
   }
   return G._landData!.owned[land._id][player];
 };
