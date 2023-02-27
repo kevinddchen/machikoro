@@ -92,7 +92,7 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
     // player has enough coins
     getCoins(G, player) >= est.cost &&
     // if playing Machi Koro 1 and establishment is major (purple), player does not already own it
-    (G.expansion !== Expansion.MK2 && Est.isMajor(est) ? Est.countOwned(G, player, est) === 0 : true)
+    (G.expansion === Expansion.MK2 || !Est.isMajor(est) || Est.countOwned(G, player, est) === 0)
   );
 };
 
@@ -143,8 +143,8 @@ export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): bo
     G.turnState === TurnState.OfficeGive &&
     // must own the establishment
     Est.countOwned(G, player, est) > 0 &&
-    // cannot give major (purple)
-    !Est.isMajor(est)
+    // if playing Machi Koro 1, cannot give major (purple)
+    (G.expansion === Expansion.MK2 || !Est.isMajor(est))
   );
 };
 
@@ -164,8 +164,21 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
     opponent !== player &&
     // opponent must own the establishment
     Est.countOwned(G, opponent, est) > 0 &&
-    // cannot take major (purple)
-    !Est.isMajor(est)
+    // if playing Machi Koro 1, cannot take major (purple)
+    (G.expansion === Expansion.MK2 || !Est.isMajor(est))
+  );
+};
+
+/**
+ * @param G 
+ * @returns True if the current player can skip the office action. Can only be
+ * done in Machi Koro 2.
+ */
+export const canSkipOffice = (G: MachikoroG): boolean => {
+  return (
+    (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.OfficeTake) &&
+    // only in Machi Koro 2
+    G.expansion === Expansion.MK2
   );
 };
 
@@ -402,17 +415,36 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
   }
 
   const player = parseInt(ctx.currentPlayer);
-  if (!G.officeGiveEst) {
+  if (G.officeGiveEst === null) {
     throw Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
   }
   Est.transfer(G, { from: player, to: opponent, est: G.officeGiveEst });
   Est.transfer(G, { from: opponent, to: player, est });
   Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
+  G.officeGiveEst = null; // cleanup
   switchState(context);
 
   return;
 };
+
+/**
+ * Skip the office action. Can only be done in Machi Koro 2.
+ * @param context 
+ * @returns 
+ */
+const skipOffice: Move<MachikoroG> = (context) => {
+  const { G } = context;
+  if (!canSkipOffice(G)) {
+    return INVALID_MOVE;
+  }
+
+  G.officeGiveEst = null; // cleanup
+  G.doOffice = 0;
+  switchState(context);
+
+  return;
+}
 
 /**
  * End the turn.
@@ -573,9 +605,9 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
         take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
-      G.doTV = true;
+      G.doTV = 1;
     } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
-      G.doOffice = true;
+      G.doOffice = count;
     } else if (Est.isEqual(est, Est.Publisher)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
@@ -691,11 +723,11 @@ const getTunaRoll = (context: FnContext<MachikoroG>): number => {
 const switchState = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const player = parseInt(ctx.currentPlayer);
-  if (G.doTV) {
-    G.doTV = false;
+  if (G.doTV > 0) {
+    G.doTV -= 1;
     G.turnState = TurnState.TV;
-  } else if (G.doOffice) {
-    G.doOffice = false;
+  } else if (G.doOffice > 0) {
+    G.doOffice -= 1;
     G.turnState = TurnState.OfficeGive;
   } else {
     // city hall before buying
@@ -742,8 +774,8 @@ const newTurnG = {
   roll: null,
   numRolls: 0,
   secondTurn: false,
-  doTV: false,
-  doOffice: false,
+  doTV: 0,
+  doOffice: 0,
   officeGiveEst: null,
   justBoughtEst: null,
   justBoughtLand: null,
@@ -853,6 +885,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     doTV: doTV,
     doOfficeGive: doOfficeGive,
     doOfficeTake: doOfficeTake,
+    skipOffice: skipOffice,
     endTurn: endTurn,
   },
 
