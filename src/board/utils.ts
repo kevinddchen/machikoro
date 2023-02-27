@@ -49,5 +49,6 @@ export const rollsToString = (est: Est.Establishment): string => {
  * @returns
  */
 export const landCostsToString = (land: Land.Landmark): string => {
+  // HACK: accessing cost array directly
   return '$' + land.cost.map((cost) => cost.toString()).join('/');
 };

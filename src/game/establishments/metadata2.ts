@@ -235,7 +235,7 @@ export const FoodWarehouse2: Establishment = {
 export const Mine2: Establishment = {
   _id: 19,
   name: 'Mine',
-  description: 'Receive 5 coins from the bank.',
+  description: 'Receive 6 coins from the bank.',
   cost: 4,
   earn: 6,
   rolls: [11, 12],

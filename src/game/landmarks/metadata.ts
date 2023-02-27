@@ -27,7 +27,7 @@ export const TrainStation: Landmark = {
   _id: 2,
   name: 'Train Station',
   miniName: 'Train Station',
-  description: 'You may throw 2 dice.',
+  description: 'You may roll 2 dice.',
   coins: null,
   cost: [4],
 };
@@ -45,7 +45,7 @@ export const AmusementPark: Landmark = {
   _id: 4,
   name: 'Amusement Park',
   miniName: 'Amuse. Park',
-  description: 'If you roll doubles, take an extra turn.',
+  description: 'If you roll doubles, take another turn after this one.',
   coins: null,
   cost: [16],
 };
