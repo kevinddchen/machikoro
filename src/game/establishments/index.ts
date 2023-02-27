@@ -314,6 +314,6 @@ const isUpper = (est: Establishment): boolean => {
  * @param est
  * @returns True if the establishment is major (purple).
  */
-const isMajor = (est: Establishment): boolean => {
+export const isMajor = (est: Establishment): boolean => {
   return est.color === EstColor.Purple;
 };

@@ -91,8 +91,8 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
     Est.countAvailable(G, est) > 0 &&
     // player has enough coins
     getCoins(G, player) >= est.cost &&
-    // if establishment is purple, player does not already own it
-    (est.color === EstColor.Purple ? Est.countOwned(G, player, est) === 0 : true)
+    // if playing Machi Koro 1 and establishment is major (purple), player does not already own it
+    (G.expansion !== Expansion.MK2 && Est.isMajor(est) ? Est.countOwned(G, player, est) === 0 : true)
   );
 };
 
@@ -139,13 +139,12 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
  */
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  // must pick own establishment that is not purple
   return (
     G.turnState === TurnState.OfficeGive &&
     // must own the establishment
     Est.countOwned(G, player, est) > 0 &&
-    // cannot give purple
-    est.color !== EstColor.Purple
+    // cannot give major (purple)
+    !Est.isMajor(est)
   );
 };
 
@@ -165,8 +164,8 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
     opponent !== player &&
     // opponent must own the establishment
     Est.countOwned(G, opponent, est) > 0 &&
-    // cannot take purple
-    est.color !== EstColor.Purple
+    // cannot take major (purple)
+    !Est.isMajor(est)
   );
 };
 
@@ -562,18 +561,20 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   // Do Purple establishments.
   const purpleEsts = allEsts.filter((est) => est.color === EstColor.Purple && est.rolls.includes(roll));
   for (const est of purpleEsts) {
-    if (Est.countOwned(G, currentPlayer, est) === 0) {
+    const count = Est.countOwned(G, currentPlayer, est);
+    if (count === 0) {
       continue;
     }
 
     // each purple establishment has its own effect
-    if (Est.isEqual(est, Est.Stadium)) {
+    if (Est.isEqual(est, Est.Stadium) || Est.isEqual(est, Est.Stadium2)) {
       for (const opponent of getPreviousPlayers(ctx)) {
-        take(G, { from: opponent, to: currentPlayer }, est.earn, est.name);
+        const amount = est.earn * count;
+        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
       G.doTV = true;
-    } else if (Est.isEqual(est, Est.Office)) {
+    } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
       G.doOffice = true;
     } else if (Est.isEqual(est, Est.Publisher)) {
       for (const opponent of getPreviousPlayers(ctx)) {
@@ -582,14 +583,17 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
         const amount = (n_cups + n_shops) * est.earn;
         take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
-    } else if (Est.isEqual(est, Est.TaxOffice)) {
+    } else if (Est.isEqual(est, Est.TaxOffice) || Est.isEqual(est, Est.TaxOffice2)) {
       for (const opponent of getPreviousPlayers(ctx)) {
-        const opp_coins = getCoins(G, opponent);
-        if (opp_coins < Est.TaxOffice.earn) {
-          continue;
+        // in Machi Koro 2, each copy of the tax office activates
+        for (let i = 0; i < count; i++) {
+          const opp_coins = getCoins(G, opponent);
+          if (opp_coins < est.earn) {
+            break;
+          }
+          const amount = Math.floor(opp_coins / 2);
+          take(G, { from: opponent, to: currentPlayer }, amount, est.name);
         }
-        const amount = Math.floor(opp_coins / 2);
-        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     }
   }
