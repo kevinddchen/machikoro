@@ -8,6 +8,7 @@ import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant } from '../types';
 
 export * from './metadata';
+export * from './metadata2';
 export * from './types';
 
 /**

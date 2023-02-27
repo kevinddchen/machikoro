@@ -108,6 +108,8 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     G.turnState === TurnState.Buy &&
     // landmark is in use
     Land.isInUse(G, land) &&
+    // landmark is available for purchase
+    Land.isAvailable(G, land) &&
     // player does not currently own the landmark
     !Land.owns(G, player, land) &&
     // player has enough coins
@@ -337,8 +339,9 @@ const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
+  setCoins(G, player, -Land.cost(G, land, player)); // must be before `Land.buy` since price depends on owned landmarks
   Land.buy(G, player, land);
-  setCoins(G, player, -Land.cost(G, land, player));
+  G.justBoughtLand = land;
   Log.logBuy(G, land.name);
 
   G.turnState = TurnState.End;
@@ -718,7 +721,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  */
 const debugSetupData = {
   expansion: Expansion.MK2,
-  supplyVariant: SupplyVariant.Hybrid,
+  supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,
 };
@@ -735,6 +738,7 @@ const newTurnG = {
   doOffice: false,
   officeGiveEst: null,
   justBoughtEst: null,
+  justBoughtLand: null,
   tunaRoll: null,
 };
 

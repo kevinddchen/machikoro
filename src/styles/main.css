@@ -19,10 +19,9 @@
   --est-maj: #782b82; /* Major Establishments (Base) */
   --est-maj-light: #ab7fb0; /* Major Establishments (Alt) */
 
-  --land-owned: #d9a16e; /* Landmark, when owned */
-  --land-canbuy: #ae5421; /* Landmark, when can buy */
-  /* --land-canbuy: #f5e387; */
-  --land-unowned: #ababab; /* Landmark, when unowned */
+  --land: #ae5421; /* Landmark (Base) */
+  --land-light: #d9a16e; /* Landmark (Alt) */
+  
 }
 
 /* DIV FORMATTING */
@@ -300,7 +299,7 @@ select {
 }
 
 .inactive {
-  filter: grayscale(1);
+  background-color: #a0a0a0 !important;
 }
 
 .button_active:after {
@@ -336,7 +335,7 @@ select {
 
 .tooltip {
   visibility: hidden;
-  width: 150px;
+  width: 140px;
   background-color: #555;
   color: #fff;
   font-size: 12px;
@@ -346,7 +345,7 @@ select {
   position: absolute;
   z-index: 1;
   left: 50%;
-  margin-left: -75px;
+  margin-left: -70px;
   opacity: 0;
   transition: opacity 0.3s;
   white-space: pre-line;
@@ -377,8 +376,8 @@ select {
 .est_td {
   padding: 3px;
   position: relative;
-  height: 110px;
-  width: 110px;
+  height: 120px;
+  width: 120px;
   border-radius: 8px;
 }
 
@@ -423,7 +422,7 @@ select {
   color: white;
   position: relative;
   margin: 0 auto;
-  top: -42px;
+  top: -45px;
   width: fit-content;
   padding-left: 3px;
   padding-right: 3px;
@@ -524,16 +523,12 @@ select {
   opacity: 1;
 }
 
-.land_img_owned {
-  background-color: var(--land-owned);
+.land_img {
+  background-color: var(--land);
 }
 
-.land_img_can_buy {
-  background-color: var(--land-canbuy);
-}
-
-.land_img_unowned {
-  background-color: var(--land-unowned);
+.land_img_light {
+  background-color: var(--land-light);
 }
 
 .mini_td {

@@ -28,14 +28,14 @@ export interface Landmark {
  * game. Should only be accessed within this module.
  * @prop {boolean[]} inUse - Array tracking which landmarks are in use. Indexed
  * by landmark ID.
+ * @prop {boolean[]} available - Array tracking which landmarks are available
+ * for purchase. Landmarks are always available in Machi Koro 1. Indexed by
+ * landmark ID.
  * @prop {boolean[][]} owned - Array tracking which landmarks are owned by each
  * player. Indexed by landmark ID then by player number.
- * @prop {boolean[]} inSupply2 - Array tracking which landmarks are available
- * for purchase from the supply. Only used for Machi Koro 2. Indexed by
- * landmark ID.
  */
 export interface LandmarkData {
   inUse: boolean[];
+  available: boolean[];
   owned: boolean[][];
-  inSupply2: boolean[];
 }

@@ -8,6 +8,7 @@ import { Expansion, MachikoroG, SupplyVariant } from '../types';
 import { Landmark, LandmarkData } from './types';
 
 export * from './metadata';
+export * from './metadata2';
 export * from './types';
 
 /**
@@ -29,12 +30,14 @@ export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
 };
 
 /**
+ * Returns true if the landmark is available for purchase. In Machi Koro 1, 
+ * landmarks should always be available for purchase.
  * @param G
  * @param land
- * @returns True if the landmark is available for purchase from the supply (Machi Koro 2).
+ * @returns
  */
-export const isInSupply2 = (G: MachikoroG, land: Landmark): boolean => {
-  return G._landData!.inSupply2[land._id];
+export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
+  return G._landData!.available[land._id];
 };
 
 /**
@@ -82,10 +85,10 @@ export const getAllInUse = (G: MachikoroG): Landmark[] => {
 
 /**
  * @param G
- * @returns List of all landmarks that are available for purchase from the supply (Machi Koro 2).
+ * @returns List of all landmarks that are available for purchase.
  */
-export const getAllInSupply2 = (G: MachikoroG): Landmark[] => {
-  return getAll(G).filter((land) => isInSupply2(G, land));
+export const getAllAvailable = (G: MachikoroG): Landmark[] => {
+  return getAll(G).filter((land) => isAvailable(G, land));
 };
 
 /**
@@ -127,6 +130,9 @@ export const cost = (G: MachikoroG, land: Landmark, player: number | null): numb
  */
 export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
   G._landData!.owned[land._id][player] = true;
+  if (G.expansion === Expansion.MK2) {
+    G._landData!.available[land._id] = false;
+  }
 };
 
 /**
@@ -135,23 +141,23 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
  */
 export const replenishSupply = (G: MachikoroG): void => {
   const { expansion, supplyVariant } = G;
+  const deck = G.secret._landDeck!;
+
   if (expansion !== Expansion.MK2) {
     return;
   }
-
-  const deck = G.secret._landDeck!;
 
   if (supplyVariant === SupplyVariant.Total) {
     // put all landmarks into the supply
     while (deck.length > 0) {
       const land = deck.pop()!;
-      G._landData!.inSupply2[land._id] = true;
+      G._landData!.available[land._id] = true;
     }
   } else if (supplyVariant === SupplyVariant.Variable || supplyVariant === SupplyVariant.Hybrid) {
     // put landmarks into the supply until there are 5 unique landmarks
-    while (deck.length > 0 && getAllInSupply2(G).length < Meta2._SUPPY_LIMIT_LANDMARK) {
+    while (deck.length > 0 && getAllAvailable(G).length < Meta2._SUPPY_LIMIT_LANDMARK) {
       const land = deck.pop()!;
-      G._landData!.inSupply2[land._id] = true;
+      G._landData!.available[land._id] = true;
     }
   } else {
     throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
@@ -170,10 +176,10 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   // initialize data structure
   const data: LandmarkData = {
     inUse: Array(numLands).fill(false),
+    available: Array(numLands).fill(false),
     owned: Array(numLands)
       .fill(null)
       .map(() => Array(numPlayers).fill(false)),
-    inSupply2: Array(numLands).fill(false),
   };
 
   // initialize landmarks in use, starting landmarks
@@ -195,6 +201,10 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   // populate landmarks in use
   for (const id of ids) {
     data.inUse[id] = true;
+    // in Machi Koro 1, landmarks are always available for purchase
+    if (expansion !== Expansion.MK2) {
+      data.available[id] = true;
+    }
   }
 
   // give each player their starting landmarks
@@ -204,8 +214,8 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     }
   }
 
-  // prepare deck
-  const deck = expansion === Expansion.MK2 ? lands.filter((land) => !isEqual(land, Meta2.CityHall2)) : null;
+  // prepare deck for Machi Koro 2. We manually exclude `CityHall2`.
+  const deck = expansion === Expansion.MK2 ? lands.filter((land) => !isEqual(land, Meta2.CityHall2)) : [];
 
   // update G
   G._landData = data;

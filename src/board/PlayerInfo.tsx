@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 import { estColorToClass, landColorToClass, rollsToString } from './utils';
+import { IN_PROD } from 'config';
 import StackTable from './StackTable';
 
 /**
@@ -50,13 +51,20 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     const lands = new StackTable(1);
     for (let i = 0; i < this.landmarks.length; i++) {
       const land = this.landmarks[i];
-      const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
       const owned = Land.owns(G, player, land);
 
-      const landColor = landColorToClass(owned, canBuyLand);
+      // for Machi Koro 2, only show owned landmarks
+      // but in development, we show everything for testing purposes
+      if (IN_PROD && G.expansion === Game.Expansion.MK2 && !owned) {
+        continue;
+      }
+
+      const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
+      const landIsGrey = !canBuyLand && !owned;
+      const landColor = landColorToClass(canBuyLand);
 
       let landDescription = land.description;
-      // for Machi Koro 1, add cost to the description if the client does not own the landmark
+      // add cost to the description if the client does not own the landmark
       if (clientPlayer === null || !Land.owns(G, clientPlayer, land)) {
         landDescription += '\n\nCost: ' + Land.cost(G, land, clientPlayer).toString();
       }
@@ -64,7 +72,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       lands.push(
         <td
           key={i}
-          className={classNames('mini_td', landColor, { clickable: canBuyLand })}
+          className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: canBuyLand })}
           onClick={() => moves.buyLand(land)}
         >
           <div className='mini_name'>{land.miniName}</div>
