@@ -12,7 +12,7 @@ import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
-import { Expansion, expToVer, SupplyVariant, Version } from './config';
+import { Expansion, SupplyVariant, Version, expToVer } from './config';
 import { MachikoroG, SetupData, TurnState } from './types';
 import { Landmark } from './landmarks';
 
@@ -443,8 +443,8 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
   if (G.officeGiveEst === null) {
     throw Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
   }
-  Est.transfer(G, { from: player, to: opponent}, G.officeGiveEst );
-  Est.transfer(G, { from: opponent, to: player}, est);
+  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
+  Est.transfer(G, { from: opponent, to: player }, est);
   Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
   G.officeGiveEst = null; // cleanup
@@ -791,7 +791,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.Harbor,
+  expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,

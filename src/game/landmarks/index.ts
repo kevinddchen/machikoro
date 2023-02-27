@@ -4,10 +4,9 @@
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
-import { Expansion, expToVer, SupplyVariant, Version } from '../config';
+import { Expansion, SupplyVariant, Version, expToVer } from '../config';
 import { Landmark, LandmarkData } from './types';
 import { MachikoroG } from '../types';
-
 
 export * from './metadata';
 export * from './metadata2';
@@ -114,8 +113,8 @@ export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
 };
 
 /**
- * @param G 
- * @param player 
+ * @param G
+ * @param player
  * @returns The number of landmarks built by the player, i.e. the number of
  * landmarks owned by the player other than "City Hall".
  */

@@ -39,6 +39,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
   render() {
     const { G, ctx, moves, isActive, player, clientPlayer, name } = this.props;
+    const ver = Game.expToVer(G.expansion);
     const currentPlayer = parseInt(ctx.currentPlayer);
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
@@ -53,7 +54,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const owned = Land.owns(G, player, land);
 
       // for Machi Koro 2, only show owned landmarks
-      if (G.expansion === Game.Expansion.MK2 && !owned) {
+      if (ver === Game.Version.MK2 && !owned) {
         continue;
       }
 
@@ -63,7 +64,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
       let landDescription = land.description;
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
-      if (G.expansion !== Game.Expansion.MK2 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
+      if (ver === Game.Version.MK1 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
         // HACK: accessing cost array directly
         landDescription += '\n\nCost: ' + land.cost[0].toString();
       }

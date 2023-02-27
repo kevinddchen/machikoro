@@ -5,7 +5,7 @@
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
-import { Expansion, expToVer, SupplyVariant, Version } from '../config';
+import { Expansion, SupplyVariant, Version, expToVer } from '../config';
 import { MachikoroG } from '../types';
 
 export * from './metadata';

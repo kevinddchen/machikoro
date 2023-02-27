@@ -23,7 +23,7 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
    */
   private renderLandTable = (): JSX.Element | null => {
     const { G, ctx, moves, isActive } = this.props;
-    if (G.expansion !== Game.Expansion.MK2) {
+    if (Game.expToVer(G.expansion) !== Game.Version.MK2) {
       return null;
     }
 
