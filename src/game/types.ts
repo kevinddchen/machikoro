@@ -3,7 +3,7 @@
 //
 
 import { Establishment, EstablishmentData } from './establishments/types';
-import { LandmarkData } from './landmarks/types';
+import { Landmark, LandmarkData } from './landmarks/types';
 import { LogEvent } from './log/types';
 
 /**
@@ -20,6 +20,7 @@ import { LogEvent } from './log/types';
  * @prop {boolean} doOffice - true if the current player will activate the office.
  * @prop {Establishment|null} officeGiveEst - the establishment picked for the office to give.
  * @prop {Establishment|null} justBoughtEst - the establishment just bought (for prettier rendering).
+ * @prop {Landmark|null} justBoughtLand - the landmark just bought (for prettier rendering in Machi Koro 2).
  * @prop {number|null} tunaRoll - the roll made for the tuna boat.
  * @prop {Secret} secret - game state that is not passed to clients.
  * @prop {number[]} _coins - coins for each player. Do not use this property;
@@ -40,6 +41,7 @@ export interface MachikoroG {
   doOffice: boolean;
   officeGiveEst: Establishment | null;
   justBoughtEst: Establishment | null;
+  justBoughtLand: Landmark | null;
   tunaRoll: number | null;
   secret: Secret;
   _coins: number[];
@@ -51,9 +53,11 @@ export interface MachikoroG {
 /**
  * Game state that is not passed to the clients
  * @prop {Establishment[][]|null} _decks - the establishment draw decks.
+ * @prop {Landmark[]|null} _landDeck - the landmark draw deck, for Machi Koro 2.
  */
 export interface Secret {
   _decks: Establishment[][] | null;
+  _landDeck: Landmark[] | null;
 }
 
 /**

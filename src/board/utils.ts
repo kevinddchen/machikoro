@@ -1,4 +1,4 @@
-import { Est } from 'game';
+import { Est, Land } from 'game';
 
 /**
  * Convert `Est.EstColor` to CSS class name.
@@ -23,17 +23,14 @@ export const estColorToClass = (color: Est.EstColor, darker: boolean): string =>
 
 /**
  * Return CSS class name for displaying a landmark.
- * @param owned
- * @param canBuy
+ * @param canBuy - If true, uses darker color.
  * @returns
  */
-export const landColorToClass = (owned: boolean, canBuy: boolean): string => {
-  if (owned) {
-    return 'land_img_owned';
-  } else if (canBuy) {
-    return 'land_img_can_buy';
+export const landColorToClass = (canBuy: boolean): string => {
+  if (canBuy) {
+    return 'land_img';
   } else {
-    return 'land_img_unowned';
+    return 'land_img_light';
   }
 };
 
@@ -44,4 +41,13 @@ export const landColorToClass = (owned: boolean, canBuy: boolean): string => {
  */
 export const rollsToString = (est: Est.Establishment): string => {
   return est.rolls.map((roll) => roll.toString()).join('; ');
+};
+
+/**
+ * Parse an establishment's costs into a printable format.
+ * @param land
+ * @returns
+ */
+export const landCostsToString = (land: Land.Landmark): string => {
+  return '$' + land.cost.map((cost) => cost.toString()).join('/');
 };

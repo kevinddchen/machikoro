@@ -19,10 +19,8 @@
   --est-maj: #782b82; /* Major Establishments (Base) */
   --est-maj-light: #ab7fb0; /* Major Establishments (Alt) */
 
-  --land-owned: #d9a16e; /* Landmark, when owned */
-  --land-canbuy: #ae5421; /* Landmark, when can buy */
-  /* --land-canbuy: #f5e387; */
-  --land-unowned: #ababab; /* Landmark, when unowned */
+  --land: #ae5421; /* Landmark (Base) */
+  --land-light: #d9a16e; /* Landmark (Alt) */
 }
 
 /* DIV FORMATTING */
@@ -300,7 +298,7 @@ select {
 }
 
 .inactive {
-  filter: grayscale(1);
+  background-color: #a0a0a0 !important;
 }
 
 .button_active:after {
@@ -336,7 +334,7 @@ select {
 
 .tooltip {
   visibility: hidden;
-  width: 120px;
+  width: 140px;
   background-color: #555;
   color: #fff;
   font-size: 12px;
@@ -346,7 +344,7 @@ select {
   position: absolute;
   z-index: 1;
   left: 50%;
-  margin-left: -60px;
+  margin-left: -70px;
   opacity: 0;
   transition: opacity 0.3s;
   white-space: pre-line;
@@ -357,7 +355,7 @@ select {
 }
 
 .mini_tooltip {
-  top: calc(100% + 7px);
+  top: calc(100% + 10px);
 }
 
 /* Tooltip arrow */
@@ -366,8 +364,8 @@ select {
   position: absolute;
   bottom: 100%;
   left: 50%;
-  margin-left: -7px;
-  border-width: 7px;
+  margin-left: -10px;
+  border-width: 10px;
   border-style: solid;
   border-color: transparent transparent #555 transparent;
 }
@@ -377,8 +375,8 @@ select {
 .est_td {
   padding: 3px;
   position: relative;
-  height: 125px;
-  width: 125px;
+  height: 120px;
+  width: 120px;
   border-radius: 8px;
 }
 
@@ -423,7 +421,7 @@ select {
   color: white;
   position: relative;
   margin: 0 auto;
-  top: -50px;
+  top: -45px;
   width: fit-content;
   padding-left: 3px;
   padding-right: 3px;
@@ -472,7 +470,7 @@ select {
 .log_box {
   border: double;
   font-size: 12px;
-  height: 700px;
+  height: 650px;
   overflow: auto;
   width: 250px;
 }
@@ -507,7 +505,7 @@ select {
 
 .name_div {
   background: white;
-  font-size: 16px;
+  font-size: 14px;
   overflow: hidden;
   width: 100%;
 }
@@ -524,16 +522,12 @@ select {
   opacity: 1;
 }
 
-.land_img_owned {
-  background-color: var(--land-owned);
+.land_img {
+  background-color: var(--land);
 }
 
-.land_img_can_buy {
-  background-color: var(--land-canbuy);
-}
-
-.land_img_unowned {
-  background-color: var(--land-unowned);
+.land_img_light {
+  background-color: var(--land-light);
 }
 
 .mini_td {

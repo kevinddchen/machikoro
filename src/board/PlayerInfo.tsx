@@ -50,24 +50,31 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     const lands = new StackTable(1);
     for (let i = 0; i < this.landmarks.length; i++) {
       const land = this.landmarks[i];
-      const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
       const owned = Land.owns(G, player, land);
 
-      const landColor = landColorToClass(owned, canBuyLand);
+      // for Machi Koro 2, only show owned landmarks
+      if (G.expansion === Game.Expansion.MK2 && !owned) {
+        continue;
+      }
+
+      const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
+      const landIsGrey = !canBuyLand && !owned;
+      const landColor = landColorToClass(canBuyLand);
 
       let landDescription = land.description;
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
-      if (clientPlayer === null || !Land.owns(G, clientPlayer, land)) {
-        landDescription += '\n\nCost: ' + Land.cost(G, land, clientPlayer).toString();
+      if (G.expansion !== Game.Expansion.MK2 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
+        // HACK: accessing cost array directly
+        landDescription += '\n\nCost: ' + land.cost[0].toString();
       }
 
       lands.push(
         <td
           key={i}
-          className={classNames('mini_td', landColor, { clickable: canBuyLand })}
+          className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: canBuyLand })}
           onClick={() => moves.buyLand(land)}
         >
-          <div className='mini_name'>{land.name}</div>
+          <div className='mini_name'>{land.miniName}</div>
           <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>
         </td>
       );
@@ -111,7 +118,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     }
 
     const nameDiv = (
-      <div className={classNames('name_text', { name_do_tv: canDoTV })} onClick={() => moves.doTV(player)}>
+      <div className={classNames('name_div', { name_do_tv: canDoTV })} onClick={() => moves.doTV(player)}>
         {name}
       </div>
     );

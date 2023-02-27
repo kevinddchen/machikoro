@@ -8,6 +8,7 @@ import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant } from '../types';
 
 export * from './metadata';
+export * from './metadata2';
 export * from './types';
 
 /**
@@ -81,6 +82,15 @@ const getAll = (G: MachikoroG): Establishment[] => {
  */
 export const getAllInUse = (G: MachikoroG): Establishment[] => {
   return getAll(G).filter((est) => isInUse(G, est));
+};
+
+/**
+ * @param G
+ * @returns List of all unique establishments that are available for purchase
+ * from the supply.
+ */
+export const getAllAvailable = (G: MachikoroG): Establishment[] => {
+  return getAll(G).filter((est) => countAvailable(G, est) > 0);
 };
 
 /**
@@ -306,13 +316,4 @@ const isUpper = (est: Establishment): boolean => {
  */
 const isMajor = (est: Establishment): boolean => {
   return est.color === EstColor.Purple;
-};
-
-/**
- * @param G
- * @returns List of all unique establishments that are available for purchase
- * from the supply.
- */
-const getAllAvailable = (G: MachikoroG): Establishment[] => {
-  return getAll(G).filter((est) => countAvailable(G, est) > 0);
 };

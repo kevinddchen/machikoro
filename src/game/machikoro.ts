@@ -108,6 +108,8 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     G.turnState === TurnState.Buy &&
     // landmark is in use
     Land.isInUse(G, land) &&
+    // landmark is available for purchase
+    Land.isAvailable(G, land) &&
     // player does not currently own the landmark
     !Land.owns(G, player, land) &&
     // player has enough coins
@@ -315,8 +317,8 @@ const buyEst: Move<MachikoroG> = (context, est: Establishment) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  Est.buy(G, player, est);
   setCoins(G, player, -est.cost);
+  Est.buy(G, player, est);
   G.justBoughtEst = est;
   Log.logBuy(G, est.name);
 
@@ -337,8 +339,9 @@ const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
+  setCoins(G, player, -Land.cost(G, land, player)); // must be before `Land.buy` since price depends on owned landmarks
   Land.buy(G, player, land);
-  setCoins(G, player, -Land.cost(G, land, player));
+  G.justBoughtLand = land;
   Log.logBuy(G, land.name);
 
   G.turnState = TurnState.End;
@@ -735,6 +738,7 @@ const newTurnG = {
   doOffice: false,
   officeGiveEst: null,
   justBoughtEst: null,
+  justBoughtLand: null,
   tunaRoll: null,
 };
 
@@ -763,7 +767,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       supplyVariant,
       _turnOrder,
       ...newTurnG,
-      secret: { _decks: null },
+      secret: { _decks: null, _landDeck: null },
       _coins,
       _estData: null,
       _landData: null,
@@ -775,9 +779,13 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     Est.initialize(G, numPlayers);
 
     // shuffle decks
-    const decks = G.secret._decks!;
-    for (let i = 0; i < decks.length; i++) {
-      decks[i] = random.Shuffle(decks[i]);
+    if (G.secret._decks !== null) {
+      for (let i = 0; i < G.secret._decks.length; i++) {
+        G.secret._decks[i] = random.Shuffle(G.secret._decks[i]);
+      }
+    }
+    if (G.secret._landDeck !== null) {
+      G.secret._landDeck = random.Shuffle(G.secret._landDeck);
     }
 
     return G;
@@ -804,6 +812,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
 
   turn: {
     onBegin: ({ G }) => {
+      Land.replenishSupply(G);
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
     },
