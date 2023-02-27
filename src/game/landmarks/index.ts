@@ -102,6 +102,16 @@ export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
 };
 
 /**
+ * @param G 
+ * @param player 
+ * @returns The number of landmarks built by the player, i.e. the number of
+ * landmarks owned by the player other than "City Hall".
+ */
+export const countBuilt = (G: MachikoroG, player: number): number => {
+  return getAllOwned(G, player).filter((land) => !isEqual(land, Meta2.CityHall2)).length;
+};
+
+/**
  * @param G
  * @param land
  * @param player
@@ -113,9 +123,9 @@ export const cost = (G: MachikoroG, land: Landmark, player: number): number => {
     // Machi Koro 1 only has one cost
     return land.cost[0];
   } else if (expansion === Expansion.MK2) {
-    // Machi Koro 2 landmark costs change based on the number of landmarks owned other than `CityHall2`
-    const landsOwned = getAllOwned(G, player).filter((land) => !isEqual(land, Meta2.CityHall2)).length;
-    const costIdx = Math.min(Math.max(landsOwned, 0), land.cost.length - 1); // avoid array out of bounds
+    // Machi Koro 2 landmark costs change based on the number of built landmarks
+    const built = countBuilt(G, player);
+    const costIdx = Math.min(Math.max(built, 0), land.cost.length - 1); // avoid array out of bounds
     return land.cost[costIdx];
   } else {
     throw new Error(`Expansion '${expansion}' not implemented.`);

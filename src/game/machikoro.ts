@@ -2,6 +2,8 @@
 // Implementation of Machikoro board game.
 //
 
+// TODO: implement Machi Koro 2 initial building rounds
+
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
@@ -197,6 +199,10 @@ export const canEndTurn = (G: MachikoroG): boolean => {
  */
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
+  if (G.expansion === Expansion.MK2) {
+    // a player has won if they have built 3 landmarks or "Launch Pad"
+    return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN; 
+  }
   // a player has won if they own all landmarks in use
   for (const land of Land.getAllInUse(G)) {
     if (!Land.owns(G, player, land)) {
@@ -761,7 +767,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.Harbor,
+  expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,

@@ -5,6 +5,11 @@
 import { EstType } from '../establishments/types';
 import { Landmark } from './types';
 
+/**
+ * Number of landmarks required to win the game.
+ */
+export const MK2_LANDMARKS_TO_WIN = 3;
+
 export const CityHall2: Landmark = {
   _id: 0,
   _expId: 1,
@@ -227,7 +232,6 @@ export const TVStation2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const LaunchPad2: Landmark = {
   _id: 20,
   _expId: 1,
