@@ -170,7 +170,7 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
 };
 
 /**
- * @param G 
+ * @param G
  * @returns True if the current player can skip the office action. Can only be
  * done in Machi Koro 2.
  */
@@ -430,8 +430,8 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
 
 /**
  * Skip the office action. Can only be done in Machi Koro 2.
- * @param context 
- * @returns 
+ * @param context
+ * @returns
  */
 const skipOffice: Move<MachikoroG> = (context) => {
   const { G } = context;
@@ -444,7 +444,7 @@ const skipOffice: Move<MachikoroG> = (context) => {
   switchState(context);
 
   return;
-}
+};
 
 /**
  * End the turn.
@@ -599,20 +599,21 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     }
 
     // each purple establishment has its own effect
+    // for Machi Koro 1, `count` should always be 1 here
     if (Est.isEqual(est, Est.Stadium) || Est.isEqual(est, Est.Stadium2)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         const amount = est.earn * count;
         take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
-      G.doTV = 1;
+      G.doTV = count;
     } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
       G.doOffice = count;
     } else if (Est.isEqual(est, Est.Publisher)) {
       for (const opponent of getPreviousPlayers(ctx)) {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
         const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
-        const amount = (n_cups + n_shops) * est.earn;
+        const amount = est.earn * (n_cups + n_shops) * count;
         take(G, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TaxOffice) || Est.isEqual(est, Est.TaxOffice2)) {
@@ -760,7 +761,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.MK2,
+  expansion: Expansion.Harbor,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,
