@@ -38,7 +38,7 @@ export const FrenchRestaurant2: Landmark = {
   _id: 3,
   name: 'French Restaurant',
   miniName: 'French Rest.',
-  description: 'Take 2 coins from each opponent (builder only; occurs once).',
+  description: 'Take 2 coins from each opponent (builder only).',
   coins: 2,
   cost: [10, 14, 22],
 };
@@ -66,7 +66,7 @@ export const Publisher2: Landmark = {
   name: 'Publisher',
   miniName: 'Publisher',
   description:
-    'Take 1 coin from each opponent for each ' + EstType.Shop + ' establishment they own (builder only; occurs once).',
+    'Take 1 coin from each opponent for each ' + EstType.Shop + ' establishment they own (builder only).',
   coins: 1, // coins taken per Shop establishment
   cost: [10, 14, 22],
 };
@@ -80,7 +80,7 @@ export const ShoppingMall2: Landmark = {
   cost: [10, 14, 22],
 };
 
-export const TechStartup: Landmark = {
+export const TechStartup2: Landmark = {
   _id: 8,
   name: 'Tech Startup',
   miniName: 'Tech Startup',
@@ -102,7 +102,7 @@ export const AmusementPark2: Landmark = {
   _id: 10,
   name: 'Amusement Park',
   miniName: 'Amuse. Park',
-  description: 'If you roll doubles, take an extra turn (all players).',
+  description: 'If you roll doubles, take another turn after this one (all players).',
   coins: null,
   cost: [12, 16, 22],
 };
@@ -111,7 +111,7 @@ export const Charterhouse2: Landmark = {
   _id: 11,
   name: 'Charterhouse',
   miniName: 'Charterhouse',
-  description: 'If you rolled 2 dice and received no coins, receive 3 coins from the bank (all players).',
+  description: 'If you roll 2 dice and receive no coins, receive 3 coins from the bank (all players).',
   coins: 3,
   cost: [12, 16, 22],
 };
@@ -120,8 +120,8 @@ export const ExhibitHall2: Landmark = {
   _id: 12,
   name: 'Exhibit Hall',
   miniName: 'Exhibit Hall',
-  description: 'From each opponent who has more than 10 coins, take half, rounded down (builder only; occurs once).',
-  coins: 0, // (special case)
+  description: 'From each opponent who has more than 10 coins, take half, rounded down (builder only).',
+  coins: 10, // This is not the coins taken, but the threshold for triggering the tax office
   cost: [12, 16, 22],
 };
 
@@ -138,7 +138,7 @@ export const Museum2: Landmark = {
   _id: 14,
   name: 'Museum',
   miniName: 'Museum',
-  description: 'Take 3 coins from each opponent for each landmark they own (builder only; occurs once).',
+  description: 'Take 3 coins from each opponent for each landmark they own (builder only).',
   coins: 3, // coins taken per landmark
   cost: [12, 16, 22],
 };
@@ -148,7 +148,7 @@ export const Park2: Landmark = {
   name: 'Park',
   miniName: 'Park',
   description:
-    "Redistribute all players' coins as evenly as possible, making up any difference with coins from the bank (occurs once).",
+    "Redistribute all players' coins as evenly as possible, making up any difference with coins from the bank.",
   coins: null,
   cost: [12, 16, 22],
 };
@@ -157,7 +157,7 @@ export const RadioTower2: Landmark = {
   _id: 16,
   name: 'Radio Tower',
   miniName: 'Radio Tower',
-  description: 'Take another turn (builder only; occurs once).',
+  description: 'Take another turn after this one (builder only).',
   coins: null,
   cost: [12, 16, 22],
 };
@@ -185,16 +185,16 @@ export const TVStation2: Landmark = {
   name: 'TV Station',
   miniName: 'TV Station',
   description:
-    'Take 1 coin from each opponent for each ' + EstType.Cup + ' establishment they own (builder only; occurs once).',
+    'Take 1 coin from each opponent for each ' + EstType.Cup + ' establishment they own (builder only).',
   coins: 1, // coins taken per Cup establishment
   cost: [12, 16, 22],
 };
 
-export const LaunchPad: Landmark = {
+export const LaunchPad2: Landmark = {
   _id: 20,
   name: 'Launch Pad',
   miniName: 'Launch Pad',
-  description: 'You win the game! (builder only)',
+  description: 'You win the game!',
   coins: null,
   cost: [45, 38, 25],
 };
@@ -211,7 +211,7 @@ export const _LANDMARKS2 = [
   Observatory2,
   Publisher2,
   ShoppingMall2,
-  TechStartup,
+  TechStartup2,
   Airport2,
   AmusementPark2,
   Charterhouse2,
@@ -223,7 +223,7 @@ export const _LANDMARKS2 = [
   SodaBottlingPlant2,
   Temple2,
   TVStation2,
-  LaunchPad,
+  LaunchPad2,
 ];
 
 /**
