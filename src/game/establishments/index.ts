@@ -17,7 +17,7 @@ export * from './types';
  * @returns True if the establishments are the same.
  */
 export const isEqual = (a: Establishment, b: Establishment): boolean => {
-  return a._id === b._id;
+  return a._id === b._id && a._expId === b._expId;
 };
 
 /**

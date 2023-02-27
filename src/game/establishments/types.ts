@@ -12,6 +12,7 @@
  * @prop {EstColor} color - The color of the establishment.
  * @prop {EstType|null} type - The type of the establishment (for combos, e.g. 'Animal').
  * @prop {number} _id - Unique id used to enumerate establishments.
+ * @prop {number} _expId - Used to distinguish Machi Koro 1 and 2 establishments.
  * @prop {number|null} _initial - The number of copies in the initial supply.
  * If null, then is equal to the number of players.
  */
@@ -24,6 +25,7 @@ export interface Establishment {
   readonly color: EstColor;
   readonly type: EstType | null;
   readonly _id: number;
+  readonly _expId: number;
   readonly _initial: number | null;
 }
 
