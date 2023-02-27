@@ -121,6 +121,7 @@ export const FlowerShop2: Establishment = {
   _initial: 3,
 };
 
+// TODO: implement
 export const Office2: Establishment = {
   _id: 9,
   _expId: 1,
@@ -147,6 +148,7 @@ export const CornField2: Establishment = {
   _initial: 5,
 };
 
+// TODO: implement
 export const Stadium2: Establishment = {
   _id: 11,
   _expId: 1,
@@ -186,6 +188,7 @@ export const FurnitureFactory2: Establishment = {
   _initial: 3,
 };
 
+// TODO: implement
 export const TaxOffice2: Establishment = {
   _id: 14,
   _expId: 1,

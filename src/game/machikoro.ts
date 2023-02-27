@@ -541,14 +541,18 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     let multiplier = 1;
     if (Est.isEqual(est, Est.CheeseFactory)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
-    } else if (Est.isEqual(est, Est.FurnitureFactory)) {
+    } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
     } else if (Est.isEqual(est, Est.FarmersMarket)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
     } else if (Est.isEqual(est, Est.FlowerShop)) {
       multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden);
-    } else if (Est.isEqual(est, Est.FoodWarehouse)) {
+    } else if (Est.isEqual(est, Est.FlowerShop2)) {
+      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden2);
+    } else if (Est.isEqual(est, Est.FoodWarehouse) || Est.isEqual(est, Est.FoodWarehouse2)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
+    } else if (Est.isEqual(est, Est.Winery2)) {
+      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
     }
 
     const amount = earnings * multiplier * count;
