@@ -3,10 +3,11 @@
 //
 
 import { EstColor, EstType, Establishment } from './types';
+import { Version } from '../config';
 
 export const SushiBar: Establishment = {
   _id: 0,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Sushi Bar',
   description: 'If you have a "Harbor", take 3 coins from the player who just rolled.',
   cost: 2,
@@ -19,7 +20,7 @@ export const SushiBar: Establishment = {
 
 export const WheatField: Establishment = {
   _id: 1,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Wheat Field',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
@@ -32,7 +33,7 @@ export const WheatField: Establishment = {
 
 export const Ranch: Establishment = {
   _id: 2,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Ranch',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
@@ -45,7 +46,7 @@ export const Ranch: Establishment = {
 
 export const Bakery: Establishment = {
   _id: 3,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Bakery',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
@@ -58,7 +59,7 @@ export const Bakery: Establishment = {
 
 export const Cafe: Establishment = {
   _id: 4,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Cafe',
   description: 'Take 1 coin from the player who just rolled.',
   cost: 2,
@@ -71,7 +72,7 @@ export const Cafe: Establishment = {
 
 export const FlowerGarden: Establishment = {
   _id: 5,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Flower Garden',
   description: 'Receive 1 coin from the bank.',
   cost: 2,
@@ -84,7 +85,7 @@ export const FlowerGarden: Establishment = {
 
 export const ConvenienceStore: Establishment = {
   _id: 6,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Convenience Store',
   description: 'Receive 3 coins from the bank.',
   cost: 2,
@@ -97,7 +98,7 @@ export const ConvenienceStore: Establishment = {
 
 export const Forest: Establishment = {
   _id: 7,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Forest',
   description: 'Receive 1 coin from the bank.',
   cost: 3,
@@ -110,7 +111,7 @@ export const Forest: Establishment = {
 
 export const FlowerShop: Establishment = {
   _id: 8,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Flower Shop',
   description: 'Receive 1 coin from the bank for each "Flower Garden" establishment you own.',
   cost: 1,
@@ -123,7 +124,7 @@ export const FlowerShop: Establishment = {
 
 export const PizzaJoint: Establishment = {
   _id: 9,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Pizza Joint',
   description: 'Take 1 coin from the player who just rolled.',
   cost: 1,
@@ -136,7 +137,7 @@ export const PizzaJoint: Establishment = {
 
 export const CheeseFactory: Establishment = {
   _id: 10,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Cheese Factory',
   description: 'Receive 3 coins from the bank for each ' + EstType.Animal + ' establishment you own.',
   cost: 5,
@@ -149,7 +150,7 @@ export const CheeseFactory: Establishment = {
 
 export const HamburgerStand: Establishment = {
   _id: 11,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Hamburger Stand',
   description: 'Take 1 coin from the player who just rolled.',
   cost: 1,
@@ -162,7 +163,7 @@ export const HamburgerStand: Establishment = {
 
 export const MackerelBoat: Establishment = {
   _id: 12,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Mackerel Boat',
   description: 'If you have a "Harbor", receive 3 coins from the bank.',
   cost: 2,
@@ -175,7 +176,7 @@ export const MackerelBoat: Establishment = {
 
 export const FurnitureFactory: Establishment = {
   _id: 13,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Furniture Factory',
   description: 'Receive 3 coins from the bank for each ' + EstType.Gear + ' establishment you own.',
   cost: 3,
@@ -188,7 +189,7 @@ export const FurnitureFactory: Establishment = {
 
 export const Mine: Establishment = {
   _id: 14,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Mine',
   description: 'Receive 5 coins from the bank.',
   cost: 6,
@@ -201,7 +202,7 @@ export const Mine: Establishment = {
 
 export const FamilyRestaurant: Establishment = {
   _id: 15,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Family Restaurant',
   description: 'Take 2 coins from the player who just rolled.',
   cost: 3,
@@ -214,7 +215,7 @@ export const FamilyRestaurant: Establishment = {
 
 export const AppleOrchard: Establishment = {
   _id: 16,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Apple Orchard',
   description: 'Receive 3 coins from the bank.',
   cost: 3,
@@ -227,7 +228,7 @@ export const AppleOrchard: Establishment = {
 
 export const FarmersMarket: Establishment = {
   _id: 17,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Farmers Market',
   description: 'Receive 2 coins from the bank for each ' + EstType.Wheat + ' establishment you own.',
   cost: 2,
@@ -240,7 +241,7 @@ export const FarmersMarket: Establishment = {
 
 export const FoodWarehouse: Establishment = {
   _id: 18,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Food Warehouse',
   description: 'Receive 2 coins from the bank for each ' + EstType.Cup + ' establishment you own.',
   cost: 2,
@@ -253,7 +254,7 @@ export const FoodWarehouse: Establishment = {
 
 export const TunaBoat: Establishment = {
   _id: 19,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Tuna Boat',
   description: 'Roll 2 dice. If you have a "Harbor", receive as many coins as the dice total from the bank.',
   cost: 5,
@@ -266,7 +267,7 @@ export const TunaBoat: Establishment = {
 
 export const Stadium: Establishment = {
   _id: 20,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Stadium',
   description: 'Take 2 coins from each opponent.',
   cost: 6,
@@ -279,7 +280,7 @@ export const Stadium: Establishment = {
 
 export const TVStation: Establishment = {
   _id: 21,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'TV Station',
   description: 'Take 5 coins from an opponent of your choice.',
   cost: 7,
@@ -292,7 +293,7 @@ export const TVStation: Establishment = {
 
 export const Office: Establishment = {
   _id: 22,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Business Center',
   description: 'Exchange a non-Major establishment with an opponent.',
   cost: 8,
@@ -305,7 +306,7 @@ export const Office: Establishment = {
 
 export const Publisher: Establishment = {
   _id: 23,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Publisher',
   description:
     'Take 1 coin from each opponent for each ' + EstType.Cup + ' and ' + EstType.Shop + ' establishment they own.',
@@ -319,7 +320,7 @@ export const Publisher: Establishment = {
 
 export const TaxOffice: Establishment = {
   _id: 24,
-  _expId: 0,
+  _ver: Version.MK1,
   name: 'Tax Office',
   description: 'From each opponent who has more than 10 coins, take half, rounded down.',
   cost: 4,
