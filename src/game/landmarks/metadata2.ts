@@ -7,6 +7,7 @@ import { Landmark } from './types';
 
 export const CityHall2: Landmark = {
   _id: 0,
+  _expId: 1,
   name: 'City Hall',
   miniName: 'City Hall',
   description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
@@ -14,8 +15,10 @@ export const CityHall2: Landmark = {
   cost: [0],
 };
 
+// TODO: implement
 export const LoanOffice2: Landmark = {
   _id: 1,
+  _expId: 1,
   name: 'Loan Office',
   miniName: 'Loan Office',
   description:
@@ -25,8 +28,10 @@ export const LoanOffice2: Landmark = {
   cost: [10],
 };
 
+// TODO: implement
 export const FarmersMarket2: Landmark = {
   _id: 2,
+  _expId: 1,
   name: 'Farmers Market',
   miniName: 'Farmers Mkt.',
   description: 'Your ' + EstType.Wheat + ' establishments earn +1 coin when activated (all players).',
@@ -34,8 +39,10 @@ export const FarmersMarket2: Landmark = {
   cost: [10, 14, 22],
 };
 
+// TODO: implement
 export const FrenchRestaurant2: Landmark = {
   _id: 3,
+  _expId: 1,
   name: 'French Restaurant',
   miniName: 'French Rest.',
   description: 'Take 2 coins from each opponent (builder only).',
@@ -43,8 +50,10 @@ export const FrenchRestaurant2: Landmark = {
   cost: [10, 14, 22],
 };
 
+// TODO: implement
 export const MovingCompany2: Landmark = {
   _id: 4,
+  _expId: 1,
   name: 'Moving Company',
   miniName: 'Moving Co.',
   description: 'If you roll doubles, give 1 establishment to the previous player (all players).',
@@ -52,8 +61,10 @@ export const MovingCompany2: Landmark = {
   cost: [10, 14, 22],
 };
 
+// TODO: implement
 export const Observatory2: Landmark = {
   _id: 5,
+  _expId: 1,
   name: 'Observatory',
   miniName: 'Observatory',
   description: 'Reduce the build cost of "Launch Pad" by 5 coins (all players).',
@@ -61,8 +72,10 @@ export const Observatory2: Landmark = {
   cost: [10, 14, 22],
 };
 
+// TODO: implement
 export const Publisher2: Landmark = {
   _id: 6,
+  _expId: 1,
   name: 'Publisher',
   miniName: 'Publisher',
   description: 'Take 1 coin from each opponent for each ' + EstType.Shop + ' establishment they own (builder only).',
@@ -70,8 +83,10 @@ export const Publisher2: Landmark = {
   cost: [10, 14, 22],
 };
 
+// TODO: implement
 export const ShoppingMall2: Landmark = {
   _id: 7,
+  _expId: 1,
   name: 'Shopping Mall',
   miniName: 'Shopping Mall',
   description: 'Your ' + EstType.Shop + ' establishments earn +1 coin when activated (all players).',
@@ -79,8 +94,10 @@ export const ShoppingMall2: Landmark = {
   cost: [10, 14, 22],
 };
 
+// TODO: implement
 export const TechStartup2: Landmark = {
   _id: 8,
+  _expId: 1,
   name: 'Tech Startup',
   miniName: 'Tech Startup',
   description: 'If you roll 12, receive 8 coins from the bank (all players).',
@@ -88,8 +105,10 @@ export const TechStartup2: Landmark = {
   cost: [10, 14, 22],
 };
 
+// TODO: implement
 export const Airport2: Landmark = {
   _id: 9,
+  _expId: 1,
   name: 'Airport',
   miniName: 'Airport',
   description: 'If you build nothing on your turn, receive 5 coins from the bank (all players).',
@@ -97,8 +116,10 @@ export const Airport2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const AmusementPark2: Landmark = {
   _id: 10,
+  _expId: 1,
   name: 'Amusement Park',
   miniName: 'Amuse. Park',
   description: 'If you roll doubles, take another turn after this one (all players).',
@@ -106,8 +127,10 @@ export const AmusementPark2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const Charterhouse2: Landmark = {
   _id: 11,
+  _expId: 1,
   name: 'Charterhouse',
   miniName: 'Charterhouse',
   description: 'If you roll 2 dice and receive no coins, receive 3 coins from the bank (all players).',
@@ -115,8 +138,10 @@ export const Charterhouse2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const ExhibitHall2: Landmark = {
   _id: 12,
+  _expId: 1,
   name: 'Exhibit Hall',
   miniName: 'Exhibit Hall',
   description: 'From each opponent who has more than 10 coins, take half, rounded down (builder only).',
@@ -124,8 +149,10 @@ export const ExhibitHall2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const Forge2: Landmark = {
   _id: 13,
+  _expId: 1,
   name: 'Forge',
   miniName: 'Forge',
   description: 'Your ' + EstType.Gear + ' establishments earn +1 coin when activated (all players).',
@@ -133,8 +160,10 @@ export const Forge2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const Museum2: Landmark = {
   _id: 14,
+  _expId: 1,
   name: 'Museum',
   miniName: 'Museum',
   description: 'Take 3 coins from each opponent for each landmark they own (builder only).',
@@ -142,8 +171,10 @@ export const Museum2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const Park2: Landmark = {
   _id: 15,
+  _expId: 1,
   name: 'Park',
   miniName: 'Park',
   description:
@@ -152,8 +183,10 @@ export const Park2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const RadioTower2: Landmark = {
   _id: 16,
+  _expId: 1,
   name: 'Radio Tower',
   miniName: 'Radio Tower',
   description: 'Take another turn after this one (builder only).',
@@ -161,8 +194,10 @@ export const RadioTower2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const SodaBottlingPlant2: Landmark = {
   _id: 17,
+  _expId: 1,
   name: 'Soda Bottling Plant',
   miniName: 'Soda Bt. Plant',
   description: 'Your ' + EstType.Cup + ' establishments earn +1 coin when activated (all players).',
@@ -170,8 +205,10 @@ export const SodaBottlingPlant2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const Temple2: Landmark = {
   _id: 18,
+  _expId: 1,
   name: 'Temple',
   miniName: 'Temple',
   description: 'If you roll doubles, take 2 coins from each opponent (all players).',
@@ -179,8 +216,10 @@ export const Temple2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const TVStation2: Landmark = {
   _id: 19,
+  _expId: 1,
   name: 'TV Station',
   miniName: 'TV Station',
   description: 'Take 1 coin from each opponent for each ' + EstType.Cup + ' establishment they own (builder only).',
@@ -188,8 +227,10 @@ export const TVStation2: Landmark = {
   cost: [12, 16, 22],
 };
 
+// TODO: implement
 export const LaunchPad2: Landmark = {
   _id: 20,
+  _expId: 1,
   name: 'Launch Pad',
   miniName: 'Launch Pad',
   description: 'You win the game!',

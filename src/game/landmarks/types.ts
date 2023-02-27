@@ -13,6 +13,7 @@
  * @prop {number|null} coins - Context depends on the landmark. May indicate
  * coins earned, bonus coins earned, etc.
  * @prop {number} _id - Unique id used to enumerate landmarks.
+ * @prop {number} _expId - Used to distinguish Machi Koro 1 and 2 landmarks.
  */
 export interface Landmark {
   readonly name: string;
@@ -21,6 +22,7 @@ export interface Landmark {
   readonly cost: number[];
   readonly coins: number | null;
   readonly _id: number;
+  readonly _expId: number;
 }
 
 /**

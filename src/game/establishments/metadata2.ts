@@ -121,7 +121,6 @@ export const FlowerShop2: Establishment = {
   _initial: 3,
 };
 
-// TODO: implement
 export const Office2: Establishment = {
   _id: 9,
   _expId: 1,
