@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 import { estColorToClass, landColorToClass, rollsToString } from './utils';
-import { IN_PROD } from 'config';
 import StackTable from './StackTable';
 
 /**
@@ -54,8 +53,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const owned = Land.owns(G, player, land);
 
       // for Machi Koro 2, only show owned landmarks
-      // but in development, we show everything for testing purposes
-      if (IN_PROD && G.expansion === Game.Expansion.MK2 && !owned) {
+      if (G.expansion === Game.Expansion.MK2 && !owned) {
         continue;
       }
 
