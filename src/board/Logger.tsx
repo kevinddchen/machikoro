@@ -113,7 +113,7 @@ export default class Logger extends React.Component<LogProps, object> {
         return `Game over! Winner: ${names[event.winner]}`;
       }
       default: {
-        console.error(`Unknown log event type: ${eventType}`);
+        console.error(`Log event '${eventType}' not implemented.`);
         return null;
       }
     }

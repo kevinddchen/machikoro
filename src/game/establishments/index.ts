@@ -5,7 +5,8 @@
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
-import { Expansion, MachikoroG, SupplyVariant } from '../types';
+import { Expansion, SupplyVariant, Version, expToVer } from '../config';
+import { MachikoroG } from '../types';
 
 export * from './metadata';
 export * from './metadata2';
@@ -17,7 +18,7 @@ export * from './types';
  * @returns True if the establishments are the same.
  */
 export const isEqual = (a: Establishment, b: Establishment): boolean => {
-  return a._id === b._id && a._expId === b._expId;
+  return a._id === b._id && a._ver === b._ver;
 };
 
 /**
@@ -26,7 +27,7 @@ export const isEqual = (a: Establishment, b: Establishment): boolean => {
  * @returns True if the establishment is in use for this game.
  */
 export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
-  return G._estData!.inUse[est._id];
+  return expToVer(G.expansion) === est._ver && G._estData!.inUse[est._id];
 };
 
 /**
@@ -36,6 +37,10 @@ export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
  * in the supply and deck.
  */
 export const countRemaining = (G: MachikoroG, est: Establishment): number => {
+  if (expToVer(G.expansion) !== est._ver) {
+    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
+    return 0;
+  }
   return G._estData!.remainingCount[est._id];
 };
 
@@ -46,6 +51,10 @@ export const countRemaining = (G: MachikoroG, est: Establishment): number => {
  * purchase from the supply.
  */
 export const countAvailable = (G: MachikoroG, est: Establishment): number => {
+  if (expToVer(G.expansion) !== est._ver) {
+    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
+    return 0;
+  }
   return G._estData!.availableCount[est._id];
 };
 
@@ -57,6 +66,10 @@ export const countAvailable = (G: MachikoroG, est: Establishment): number => {
  * player.
  */
 export const countOwned = (G: MachikoroG, player: number, est: Establishment): number => {
+  if (expToVer(G.expansion) !== est._ver) {
+    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
+    return 0;
+  }
   return G._estData!.ownedCount[est._id][player];
 };
 
@@ -66,12 +79,13 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
  * @returns
  */
 const getAll = (G: MachikoroG): Establishment[] => {
-  if (G.expansion === Expansion.Base || G.expansion === Expansion.Harbor) {
+  const version = expToVer(G.expansion);
+  if (version === Version.MK1) {
     return Meta._ESTABLISHMENTS;
-  } else if (G.expansion === Expansion.MK2) {
+  } else if (version === Version.MK2) {
     return Meta2._ESTABLISHMENTS2;
   } else {
-    throw new Error(`Expansion '${G.expansion}' not implemented.`);
+    throw new Error(`Version '${version}' not implemented.`);
   }
 };
 
@@ -124,6 +138,9 @@ export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): nu
  * @param est
  */
 export const buy = (G: MachikoroG, player: number, est: Establishment): void => {
+  if (expToVer(G.expansion) !== est._ver) {
+    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
+  }
   G._estData!.remainingCount[est._id] -= 1;
   G._estData!.availableCount[est._id] -= 1;
   G._estData!.ownedCount[est._id][player] += 1;
@@ -134,11 +151,14 @@ export const buy = (G: MachikoroG, player: number, est: Establishment): void => 
  * @param G
  * @param args.from - Source player.
  * @param args.to - Destination player.
- * @param args.est - Establishment in question.
+ * @param est - Establishment in question.
  */
-export const transfer = (G: MachikoroG, args: { from: number; to: number; est: Establishment }): void => {
-  G._estData!.ownedCount[args.est._id][args.from] -= 1;
-  G._estData!.ownedCount[args.est._id][args.to] += 1;
+export const transfer = (G: MachikoroG, args: { from: number; to: number }, est: Establishment): void => {
+  if (expToVer(G.expansion) !== est._ver) {
+    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
+  }
+  G._estData!.ownedCount[est._id][args.from] -= 1;
+  G._estData!.ownedCount[est._id][args.to] += 1;
 };
 
 /**
@@ -146,7 +166,8 @@ export const transfer = (G: MachikoroG, args: { from: number; to: number; est: E
  * @param G
  */
 export const replenishSupply = (G: MachikoroG): void => {
-  const { supplyVariant } = G;
+  const { expansion, supplyVariant } = G;
+  const version = expToVer(expansion);
   const decks = G.secret._decks!;
 
   if (supplyVariant === SupplyVariant.Total) {
@@ -174,19 +195,21 @@ export const replenishSupply = (G: MachikoroG): void => {
     ];
 
     let funcs: ((est: Establishment) => boolean)[];
-    if (G.expansion === Expansion.MK2) {
-      // prettier-ignore
-      funcs = [
-        isLower,
-        isUpper,
-      ]
-    } else {
+    if (version === Version.MK1) {
       // prettier-ignore
       funcs = [
         (est) => isLower(est) && !isMajor(est),
         (est) => isUpper(est) && !isMajor(est),
         isMajor,
       ]
+    } else if (version === Version.MK2) {
+      // prettier-ignore
+      funcs = [
+        isLower,
+        isUpper,
+      ]
+    } else {
+      throw new Error(`Version '${version}' not implemented.`);
     }
 
     for (let i = 0; i < decks.length; i++) {
@@ -206,6 +229,7 @@ export const replenishSupply = (G: MachikoroG): void => {
  */
 export const initialize = (G: MachikoroG, numPlayers: number): void => {
   const { expansion, supplyVariant } = G;
+  const version = expToVer(expansion);
   const ests = getAll(G);
   const numEsts = ests.length;
 
@@ -260,18 +284,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
     }
   } else if (supplyVariant === SupplyVariant.Hybrid) {
-    if (expansion === Expansion.MK2) {
-      // put all cards into two decks: lower and upper
-      decks = [[], []];
-      for (const id of ids) {
-        const est = ests[id];
-        if (isLower(est)) {
-          decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
-        } else {
-          decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
-        }
-      }
-    } else {
+    if (version === Version.MK1) {
       // put all cards into three decks: lower, upper, and major (purple)
       decks = [[], [], []];
       for (const id of ids) {
@@ -284,6 +297,19 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
           decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
         }
       }
+    } else if (version === Version.MK2) {
+      // put all cards into two decks: lower and upper
+      decks = [[], []];
+      for (const id of ids) {
+        const est = ests[id];
+        if (isLower(est)) {
+          decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+        } else {
+          decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+        }
+      }
+    } else {
+      throw new Error(`Version '${version}' not implemented.`);
     }
   } else {
     throw new Error(`Supply variant '${supplyVariant}' not implemented.`);

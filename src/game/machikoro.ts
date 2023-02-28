@@ -2,6 +2,8 @@
 // Implementation of Machikoro board game.
 //
 
+// TODO: implement Machi Koro 2 initial building rounds
+
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
@@ -10,7 +12,8 @@ import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
-import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState } from './types';
+import { Expansion, SupplyVariant, Version, expToVer } from './config';
+import { MachikoroG, SetupData, TurnState } from './types';
 import { Landmark } from './landmarks';
 
 export const GAME_NAME = 'machikoro';
@@ -53,8 +56,11 @@ export const canRoll = (G: MachikoroG, ctx: Ctx, n: number): boolean => {
  * to evaluate its outcome.
  */
 export const canCommitRoll = (G: MachikoroG): boolean => {
-  // need to have rolled the dice
-  return G.turnState === TurnState.Roll && G.numRolls > 0;
+  return (
+    G.turnState === TurnState.Roll &&
+    // need to have rolled the dice
+    G.numRolls > 0
+  );
 };
 
 /**
@@ -64,8 +70,13 @@ export const canCommitRoll = (G: MachikoroG): boolean => {
  */
 export const canAddTwo = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  // need to own harbor and roll a 10 or higher
-  return canCommitRoll(G) && Land.owns(G, player, Land.Harbor) && G.roll! >= 10; // G.roll not null via canCommitRoll() check
+  return (
+    canCommitRoll(G) &&
+    // need to own harbor
+    Land.owns(G, player, Land.Harbor) &&
+    // need to roll a 10 or higher
+    G.roll! >= 10
+  );
 };
 
 /**
@@ -85,6 +96,7 @@ export const noFurtherRollActions = (G: MachikoroG, ctx: Ctx): boolean => {
  */
 export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
+  const version = expToVer(G.expansion);
   return (
     G.turnState === TurnState.Buy &&
     // establishment is available for purchase
@@ -92,7 +104,7 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
     // player has enough coins
     getCoins(G, player) >= est.cost &&
     // if playing Machi Koro 1 and establishment is major (purple), player does not already own it
-    (G.expansion === Expansion.MK2 || !Est.isMajor(est) || Est.countOwned(G, player, est) === 0)
+    (version !== Version.MK1 || !Est.isMajor(est) || Est.countOwned(G, player, est) === 0)
   );
 };
 
@@ -106,8 +118,6 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
   const player = parseInt(ctx.currentPlayer);
   return (
     G.turnState === TurnState.Buy &&
-    // landmark is in use
-    Land.isInUse(G, land) &&
     // landmark is available for purchase
     Land.isAvailable(G, land) &&
     // player does not currently own the landmark
@@ -126,8 +136,11 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
  */
 export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  // cannot take from self
-  return G.turnState === TurnState.TV && opponent !== player;
+  return (
+    G.turnState === TurnState.TV &&
+    // cannot take from self
+    opponent !== player
+  );
 };
 
 /**
@@ -139,12 +152,13 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
  */
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
+  const version = expToVer(G.expansion);
   return (
     G.turnState === TurnState.OfficeGive &&
     // must own the establishment
     Est.countOwned(G, player, est) > 0 &&
     // if playing Machi Koro 1, cannot give major (purple)
-    (G.expansion === Expansion.MK2 || !Est.isMajor(est))
+    (version !== Version.MK1 || !Est.isMajor(est))
   );
 };
 
@@ -158,6 +172,7 @@ export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): bo
  */
 export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
+  const version = expToVer(G.expansion);
   return (
     G.turnState === TurnState.OfficeTake &&
     // cannot be take from self
@@ -165,7 +180,7 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
     // opponent must own the establishment
     Est.countOwned(G, opponent, est) > 0 &&
     // if playing Machi Koro 1, cannot take major (purple)
-    (G.expansion === Expansion.MK2 || !Est.isMajor(est))
+    (version !== Version.MK1 || !Est.isMajor(est))
   );
 };
 
@@ -175,10 +190,11 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
  * done in Machi Koro 2.
  */
 export const canSkipOffice = (G: MachikoroG): boolean => {
+  const version = expToVer(G.expansion);
   return (
     (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.OfficeTake) &&
     // only in Machi Koro 2
-    G.expansion === Expansion.MK2
+    version === Version.MK2
   );
 };
 
@@ -197,12 +213,21 @@ export const canEndTurn = (G: MachikoroG): boolean => {
  */
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  // a player has won if they own all landmarks in use
-  for (const land of Land.getAllInUse(G)) {
-    if (!Land.owns(G, player, land)) {
-      return false;
+  const version = expToVer(G.expansion);
+  if (version === Version.MK1) {
+    // a player has won if they own all landmarks in use
+    for (const land of Land.getAllInUse(G)) {
+      if (!Land.owns(G, player, land)) {
+        return false;
+      }
     }
+  } else if (version === Version.MK2) {
+    // a player has won if they have built 3 landmarks or "Launch Pad"
+    return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
+  } else {
+    throw new Error(`Version '${version}' not implemented.`);
   }
+
   return true;
 };
 
@@ -418,8 +443,8 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
   if (G.officeGiveEst === null) {
     throw Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
   }
-  Est.transfer(G, { from: player, to: opponent, est: G.officeGiveEst });
-  Est.transfer(G, { from: opponent, to: player, est });
+  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
+  Est.transfer(G, { from: opponent, to: player }, est);
   Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
   G.officeGiveEst = null; // cleanup
@@ -546,6 +571,11 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
         earnings = getTunaRoll(context);
       } else {
         earnings = est.earn;
+      }
+
+      // in Machi Koro 2, earnings are increased for certain establishment types
+      if (est.type === EstType.Wheat && Land.owns(G, player, Land.FarmersMarket2)) {
+        earnings += Land.FarmersMarket2.coins!;
       }
 
       const amount = earnings * count;
@@ -732,7 +762,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     G.turnState = TurnState.OfficeGive;
   } else {
     // city hall before buying
-    if (getCoins(G, player) === 0 && Land.isInUse(G, Land.CityHall)) {
+    if (getCoins(G, player) === 0 && Land.owns(G, player, Land.CityHall)) {
       setCoins(G, player, Land.CityHall.coins!);
       Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
     }
