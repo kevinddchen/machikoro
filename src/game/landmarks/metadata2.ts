@@ -34,7 +34,7 @@ export const LoanOffice2: Landmark = {
   cost: [10],
 };
 
-// TODO: test
+// TODO: implement
 export const FarmersMarket2: Landmark = {
   _id: 2,
   _ver: Version.MK2,
