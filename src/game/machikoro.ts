@@ -96,7 +96,7 @@ export const noFurtherRollActions = (G: MachikoroG, ctx: Ctx): boolean => {
  */
 export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const ver = expToVer(G.expansion);
+  const version = expToVer(G.expansion);
   return (
     G.turnState === TurnState.Buy &&
     // establishment is available for purchase
@@ -104,7 +104,7 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
     // player has enough coins
     getCoins(G, player) >= est.cost &&
     // if playing Machi Koro 1 and establishment is major (purple), player does not already own it
-    (ver !== Version.MK1 || !Est.isMajor(est) || Est.countOwned(G, player, est) === 0)
+    (version !== Version.MK1 || !Est.isMajor(est) || Est.countOwned(G, player, est) === 0)
   );
 };
 
@@ -152,13 +152,13 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
  */
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const ver = expToVer(G.expansion);
+  const version = expToVer(G.expansion);
   return (
     G.turnState === TurnState.OfficeGive &&
     // must own the establishment
     Est.countOwned(G, player, est) > 0 &&
     // if playing Machi Koro 1, cannot give major (purple)
-    (ver !== Version.MK1 || !Est.isMajor(est))
+    (version !== Version.MK1 || !Est.isMajor(est))
   );
 };
 
@@ -172,7 +172,7 @@ export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): bo
  */
 export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const ver = expToVer(G.expansion);
+  const version = expToVer(G.expansion);
   return (
     G.turnState === TurnState.OfficeTake &&
     // cannot be take from self
@@ -180,7 +180,7 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
     // opponent must own the establishment
     Est.countOwned(G, opponent, est) > 0 &&
     // if playing Machi Koro 1, cannot take major (purple)
-    (ver !== Version.MK1 || !Est.isMajor(est))
+    (version !== Version.MK1 || !Est.isMajor(est))
   );
 };
 
@@ -190,11 +190,11 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
  * done in Machi Koro 2.
  */
 export const canSkipOffice = (G: MachikoroG): boolean => {
-  const ver = expToVer(G.expansion);
+  const version = expToVer(G.expansion);
   return (
     (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.OfficeTake) &&
     // only in Machi Koro 2
-    ver === Version.MK2
+    version === Version.MK2
   );
 };
 
@@ -213,19 +213,19 @@ export const canEndTurn = (G: MachikoroG): boolean => {
  */
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const ver = expToVer(G.expansion);
-  if (ver === Version.MK1) {
+  const version = expToVer(G.expansion);
+  if (version === Version.MK1) {
     // a player has won if they own all landmarks in use
     for (const land of Land.getAllInUse(G)) {
       if (!Land.owns(G, player, land)) {
         return false;
       }
     }
-  } else if (ver === Version.MK2) {
+  } else if (version === Version.MK2) {
     // a player has won if they have built 3 landmarks or "Launch Pad"
     return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
   } else {
-    throw new Error(`Version '${ver}' not implemented.`);
+    throw new Error(`Version '${version}' not implemented.`);
   }
 
   return true;

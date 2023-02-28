@@ -31,8 +31,10 @@ export const Version = {
 export type Version = (typeof Version)[keyof typeof Version];
 
 /**
+ * Convert the expansion to the game version. "Base" and "Harbor" are both
+ * version 1, while "MK2" is version 2.
  * @param exp
- * @returns The version of the game for the expansion.
+ * @returns
  */
 export const expToVer = (exp: Expansion): Version => {
   if (exp === Expansion.Base || exp === Expansion.Harbor) {
