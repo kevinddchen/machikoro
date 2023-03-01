@@ -268,7 +268,7 @@ const rollTwo: Move<MachikoroG> = (context) => {
   const player = parseInt(ctx.currentPlayer);
   const dice = random.Die(6, 2);
 
-  // if player owns an amusement park, they get a second turn
+  // if roll doubles, get a second turn via amusement park
   if (Land.owns(G, player, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) {
     G.secondTurn = dice[0] === dice[1];
   }
@@ -833,18 +833,20 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   } else if (G.doOffice > 0) {
     G.doOffice -= 1;
     G.turnState = TurnState.OfficeGive;
-  } else if (getCoins(G, player) === 0) {
-    // city hall before buying
-    if (Land.owns(G, player, Land.CityHall)) {
-      addCoins(G, player, Land.CityHall.coins!);
-      Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
-    }
-    if (Land.owns(G, player, Land.CityHall2)) {
-      addCoins(G, player, Land.CityHall2.coins!);
-      Log.logEarn(G, player, Land.CityHall2.coins!, Land.CityHall2.name);
+  } else {
+    G.turnState = TurnState.Buy;
+    if (getCoins(G, player) === 0) {
+      // city hall before buying
+      if (Land.owns(G, player, Land.CityHall)) {
+        addCoins(G, player, Land.CityHall.coins!);
+        Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
+      }
+      if (Land.owns(G, player, Land.CityHall2)) {
+        addCoins(G, player, Land.CityHall2.coins!);
+        Log.logEarn(G, player, Land.CityHall2.coins!, Land.CityHall2.name);
+      }
     }
   }
-  G.turnState = TurnState.Buy;
 };
 
 /**
