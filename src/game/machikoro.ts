@@ -534,12 +534,19 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       }
 
       const count = Est.countOwned(G, opponent, est);
+      if (count === 0) {
+        continue;
+      }
 
       // all red establishments take `est.earn` coins from the player
       let earnings = est.earn;
-      // +1 coin if opponent owns Shopping Mall
+      // +1 coin to Cup type if opponent owns Shopping Mall
       if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
         earnings += Land.ShoppingMall.coins!;
+      }
+      // +1 coin to Cup type if any player owns Soda Bottling Plant (Machi Koro 2)
+      if (est.type === EstType.Cup && Land.isOwned(G, Land.SodaBottlingPlant2)) {
+        earnings += Land.SodaBottlingPlant2.coins!;
       }
 
       const amount = earnings * count;
@@ -573,9 +580,13 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
         earnings = est.earn;
       }
 
-      // in Machi Koro 2, earnings are increased for certain establishment types
-      if (est.type === EstType.Wheat && Land.owns(G, player, Land.FarmersMarket2)) {
+      // +1 to Wheat type if any player owns Farmers Market (Machi Koro 2)
+      if (est.type === EstType.Wheat && Land.isOwned(G, Land.FarmersMarket2)) {
         earnings += Land.FarmersMarket2.coins!;
+      }
+      // +1 to Gear type if any player owns Forge (Machi Koro 2)
+      if (est.type === EstType.Gear && Land.isOwned(G, Land.Forge2)) {
+        earnings += Land.Forge2.coins!;
       }
 
       const amount = earnings * count;
@@ -592,14 +603,18 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     }
 
     let earnings = est.earn;
-    // +1 coin to shops if player owns Shopping Mall
+    // +1 coin to Shop type if player owns Shopping Mall
     if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
       earnings += Land.ShoppingMall.coins!;
+    }
+    // +1 coin to Shop type if any player owns Shopping Mall (Machi Koro 2)
+    if (est.type === EstType.Shop && Land.isOwned(G, Land.ShoppingMall2)) {
+      earnings += Land.ShoppingMall2.coins!;
     }
 
     // by default a green establishment earns `multiplier * earnings = 1 * earnings`
     // but there are many special cases where `multiplier` is not 1.
-    let multiplier = 1;
+    let multiplier;
     if (Est.isEqual(est, Est.CheeseFactory)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
     } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
@@ -614,6 +629,8 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
     } else if (Est.isEqual(est, Est.Winery2)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
+    } else {
+      multiplier = 1;
     }
 
     const amount = earnings * multiplier * count;
@@ -791,7 +808,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.Harbor,
+  expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,

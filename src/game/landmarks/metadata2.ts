@@ -34,7 +34,6 @@ export const LoanOffice2: Landmark = {
   cost: [10],
 };
 
-// TODO: implement
 export const FarmersMarket2: Landmark = {
   _id: 2,
   _ver: Version.MK2,
@@ -89,7 +88,6 @@ export const Publisher2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const ShoppingMall2: Landmark = {
   _id: 7,
   _ver: Version.MK2,
@@ -155,7 +153,6 @@ export const ExhibitHall2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const Forge2: Landmark = {
   _id: 13,
   _ver: Version.MK2,
@@ -200,7 +197,6 @@ export const RadioTower2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const SodaBottlingPlant2: Landmark = {
   _id: 17,
   _ver: Version.MK2,
