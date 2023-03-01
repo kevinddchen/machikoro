@@ -107,7 +107,6 @@ export const TechStartup2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const Airport2: Landmark = {
   _id: 9,
   _ver: Version.MK2,

@@ -479,10 +479,16 @@ const endTurn: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  // a player earns coins via the airport if they did not buy anything
   const player = parseInt(ctx.currentPlayer);
-  if (G.turnState === TurnState.Buy && Land.owns(G, player, Land.Airport)) {
-    earn(G, player, Land.Airport.coins!, Land.Airport.name);
+
+  // a player earns coins via the airport if they did not buy anything
+  if (G.turnState === TurnState.Buy) {
+    if (Land.owns(G, player, Land.Airport)) {
+      earn(G, player, Land.Airport.coins!, Land.Airport.name);
+    }
+    if (Land.isOwned(G, Land.Airport2)) {
+      earn(G, player, Land.Airport2.coins!, Land.Airport2.name);
+    }
   }
 
   // check second turn
