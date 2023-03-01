@@ -349,7 +349,7 @@ const buyEst: Move<MachikoroG> = (context, est: Establishment) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  setCoins(G, player, -est.cost);
+  addCoins(G, player, -est.cost);
   Est.buy(G, player, est);
   G.justBoughtEst = est;
   Log.logBuy(G, est.name);
@@ -371,7 +371,7 @@ const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  setCoins(G, player, -Land.cost(G, land, player)); // must be before `Land.buy` since price depends on owned landmarks
+  addCoins(G, player, -Land.cost(G, land, player)); // must be before `Land.buy` since price depends on owned landmarks
   Land.buy(G, player, land);
   G.justBoughtLand = land;
   Log.logBuy(G, land.name);
@@ -502,12 +502,13 @@ const endTurn: Move<MachikoroG> = (context) => {
 //
 
 /**
- * Modify a player's coins by the given amount.
+ * Modify a player's coins by the given amount. No check is made as to whether
+ * the player's coins will go negative.
  * @param G
  * @param player
  * @param amount - Number of coins to give to the player. Can be negative.
  */
-const setCoins = (G: MachikoroG, player: number, amount: number): void => {
+const addCoins = (G: MachikoroG, player: number, amount: number): void => {
   G._coins[player] += amount;
 };
 
@@ -578,11 +579,11 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
         earnings = est.earn;
       }
 
-      // +1 to Wheat type if any player owns Farmers Market (Machi Koro 2)
+      // +1 coin to Wheat type if any player owns Farmers Market (Machi Koro 2)
       if (est.type === EstType.Wheat && Land.isOwned(G, Land.FarmersMarket2)) {
         earnings += Land.FarmersMarket2.coins!;
       }
-      // +1 to Gear type if any player owns Forge (Machi Koro 2)
+      // +1 coin to Gear type if any player owns Forge (Machi Koro 2)
       if (est.type === EstType.Gear && Land.isOwned(G, Land.Forge2)) {
         earnings += Land.Forge2.coins!;
       }
@@ -771,7 +772,7 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
  * @param name - Name of establishment or landmark activated.
  */
 const earn = (G: MachikoroG, player: number, amount: number, name: string): void => {
-  setCoins(G, player, amount);
+  addCoins(G, player, amount);
   if (amount > 0) {
     Log.logEarn(G, player, amount, name);
   }
@@ -789,8 +790,8 @@ const earn = (G: MachikoroG, player: number, amount: number, name: string): void
 const take = (G: MachikoroG, args: { from: number; to: number }, amount: number, name: string): void => {
   const { from, to } = args;
   const actual_amount = Math.min(amount, getCoins(G, from));
-  setCoins(G, from, -actual_amount);
-  setCoins(G, to, actual_amount);
+  addCoins(G, from, -actual_amount);
+  addCoins(G, to, actual_amount);
   if (actual_amount > 0) {
     Log.logTake(G, args, actual_amount, name);
   }
@@ -825,13 +826,13 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     G.doOffice -= 1;
     G.turnState = TurnState.OfficeGive;
   } else if (getCoins(G, player) === 0) {
-    // check city hall before buying
+    // city hall before buying
     if (Land.owns(G, player, Land.CityHall)) {
-      setCoins(G, player, Land.CityHall.coins!);
+      addCoins(G, player, Land.CityHall.coins!);
       Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
     }
     if (Land.owns(G, player, Land.CityHall2)) {
-      setCoins(G, player, Land.CityHall2.coins!);
+      addCoins(G, player, Land.CityHall2.coins!);
       Log.logEarn(G, player, Land.CityHall2.coins!, Land.CityHall2.name);
     }
   }
