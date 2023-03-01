@@ -3,7 +3,6 @@
 //
 
 // TODO: implement Machi Koro 2 initial building rounds
-// TODO: implement Machi Koro 2 roll 2 dice
 
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
@@ -41,12 +40,15 @@ export const getCoins = (G: MachikoroG, player: number): number => {
  * @returns True if the current player can roll `n` number of dice.
  */
 export const canRoll = (G: MachikoroG, ctx: Ctx, n: number): boolean => {
+  const version = expToVer(G.expansion);
   const player = parseInt(ctx.currentPlayer);
+  // can roll 2 dice if you own train station (Machi Koro 1) or are playing Machi Koro 2
+  const canRoll2 = Land.owns(G, player, Land.TrainStation) || version === Version.MK2;
   return (
     G.turnState === TurnState.Roll &&
-    // can always roll 1 die, can roll 2 if you own train station
-    (n === 1 || (n === 2 && Land.owns(G, player, Land.TrainStation))) &&
-    // can reroll if you own radio tower
+    // can always roll 1 die
+    (n === 1 || (n === 2 && canRoll2)) &&
+    // can reroll if you own radio tower (Machi Koro 1)
     (G.numRolls === 0 || (G.numRolls === 1 && Land.owns(G, player, Land.RadioTower)))
   );
 };
@@ -263,11 +265,11 @@ const rollTwo: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
+  const player = parseInt(ctx.currentPlayer);
   const dice = random.Die(6, 2);
 
   // if player owns an amusement park, they get a second turn
-  const player = parseInt(ctx.currentPlayer);
-  if (Land.owns(G, player, Land.AmusementPark)) {
+  if (Land.owns(G, player, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) {
     G.secondTurn = dice[0] === dice[1];
   }
 
