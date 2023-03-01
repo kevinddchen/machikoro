@@ -297,7 +297,7 @@ export const Office: Establishment = {
   name: 'Business Center',
   description: 'Exchange a non-Major establishment with an opponent.',
   cost: 8,
-  earn: 0,
+  earn: 0, // (special case)
   rolls: [6],
   color: EstColor.Purple,
   type: null,

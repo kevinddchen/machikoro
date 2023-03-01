@@ -44,7 +44,6 @@ export const FarmersMarket2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const FrenchRestaurant2: Landmark = {
   _id: 3,
   _ver: Version.MK2,
@@ -77,7 +76,6 @@ export const Observatory2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const Publisher2: Landmark = {
   _id: 6,
   _ver: Version.MK2,
@@ -142,7 +140,6 @@ export const Charterhouse2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const ExhibitHall2: Landmark = {
   _id: 12,
   _ver: Version.MK2,
@@ -163,13 +160,12 @@ export const Forge2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const Museum2: Landmark = {
   _id: 14,
   _ver: Version.MK2,
   name: 'Museum',
   miniName: 'Museum',
-  description: 'Take 3 coins from each opponent for each landmark they own (builder only).',
+  description: 'Take 3 coins from each opponent for each landmark they own, excluding "City Hall" (builder only).',
   coins: 3, // coins taken per landmark
   cost: [12, 16, 22],
 };
@@ -186,7 +182,6 @@ export const Park2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const RadioTower2: Landmark = {
   _id: 16,
   _ver: Version.MK2,
