@@ -735,6 +735,12 @@ const evalLandAction = (context: FnContext<MachikoroG>, land: Landmark): void =>
       const earnings = land.coins! * Land.countBuilt(G, opponent);
       take(G, { from: opponent, to: currentPlayer }, earnings, land.name);
     }
+  } else if (Land.isEqual(land, Land.TVStation2)) {
+    // take 1 coin for each Cup type establishment
+    for (const opponent of getPreviousPlayers(ctx)) {
+      const earnings = land.coins! * Est.countTypeOwned(G, opponent, EstType.Cup);
+      take(G, { from: opponent, to: currentPlayer }, earnings, land.name);
+    }
   }
 };
 

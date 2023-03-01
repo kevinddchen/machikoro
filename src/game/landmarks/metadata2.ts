@@ -211,7 +211,6 @@ export const Temple2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const TVStation2: Landmark = {
   _id: 19,
   _ver: Version.MK2,
