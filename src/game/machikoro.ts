@@ -42,13 +42,13 @@ export const getCoins = (G: MachikoroG, player: number): number => {
 export const canRoll = (G: MachikoroG, ctx: Ctx, n: number): boolean => {
   const version = expToVer(G.expansion);
   const player = parseInt(ctx.currentPlayer);
-  // can roll 2 dice if you own train station (Machi Koro 1) or are playing Machi Koro 2
+  // can roll 2 dice if you own Train Station (Machi Koro 1) or are playing Machi Koro 2
   const canRoll2 = Land.owns(G, player, Land.TrainStation) || version === Version.MK2;
   return (
     G.turnState === TurnState.Roll &&
     // can always roll 1 die
     (n === 1 || (n === 2 && canRoll2)) &&
-    // can reroll if you own radio tower (Machi Koro 1)
+    // can reroll if you own Radio Tower (Machi Koro 1)
     (G.numRolls === 0 || (G.numRolls === 1 && Land.owns(G, player, Land.RadioTower)))
   );
 };
@@ -696,7 +696,7 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
 const evalLandAction = (context: FnContext<MachikoroG>, land: Landmark): void => {
   const { G, ctx } = context;
   const version = expToVer(G.expansion);
-  const currentPlayer = parseInt(ctx.currentPlayer);
+  const player = parseInt(ctx.currentPlayer);
 
   // do nothing for Machi Koro 1
   if (version === Version.MK1) {
@@ -706,18 +706,18 @@ const evalLandAction = (context: FnContext<MachikoroG>, land: Landmark): void =>
   if (Land.isEqual(land, Land.RadioTower2)) {
     G.secondTurn = true;
   } else if (Land.isEqual(land, Land.LaunchPad2)) {
-    endGame(context, currentPlayer);
+    endGame(context, player);
   } else if (Land.isEqual(land, Land.FrenchRestaurant2)) {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
       const earnings = land.coins!;
-      take(G, { from: opponent, to: currentPlayer }, earnings, land.name);
+      take(G, { from: opponent, to: player }, earnings, land.name);
     }
   } else if (Land.isEqual(land, Land.Publisher2)) {
     // take 1 coin for each Shop type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
       const earnings = land.coins! * Est.countTypeOwned(G, opponent, EstType.Shop);
-      take(G, { from: opponent, to: currentPlayer }, earnings, land.name);
+      take(G, { from: opponent, to: player }, earnings, land.name);
     }
   } else if (Land.isEqual(land, Land.ExhibitHall2)) {
     // do tax office on each opponent
@@ -727,19 +727,19 @@ const evalLandAction = (context: FnContext<MachikoroG>, land: Landmark): void =>
         continue;
       }
       const earnings = Math.floor(opp_coins / 2);
-      take(G, { from: opponent, to: currentPlayer }, earnings, land.name);
+      take(G, { from: opponent, to: player }, earnings, land.name);
     }
   } else if (Land.isEqual(land, Land.Museum2)) {
     // take 3 coins for each landmark, except City Hall
     for (const opponent of getPreviousPlayers(ctx)) {
       const earnings = land.coins! * Land.countBuilt(G, opponent);
-      take(G, { from: opponent, to: currentPlayer }, earnings, land.name);
+      take(G, { from: opponent, to: player }, earnings, land.name);
     }
   } else if (Land.isEqual(land, Land.TVStation2)) {
     // take 1 coin for each Cup type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
       const earnings = land.coins! * Est.countTypeOwned(G, opponent, EstType.Cup);
-      take(G, { from: opponent, to: currentPlayer }, earnings, land.name);
+      take(G, { from: opponent, to: player }, earnings, land.name);
     }
   }
 };
@@ -842,7 +842,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   } else {
     G.turnState = TurnState.Buy;
     if (getCoins(G, player) === 0) {
-      // city hall before buying
+      // activate city hall before buying
       if (Land.owns(G, player, Land.CityHall)) {
         addCoins(G, player, Land.CityHall.coins!);
         Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
@@ -878,7 +878,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
 const debugSetupData = {
   expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
-  startCoins: 100,
+  startCoins: 99,
   randomizeTurnOrder: false,
 };
 
