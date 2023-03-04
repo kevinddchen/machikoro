@@ -25,7 +25,7 @@ import { LogEvent } from './log/types';
  * @prop {number|null} tunaRoll - the roll made for the tuna boat.
  * @prop {Secret} secret - game state that is not passed to clients.
  * @prop {number[]} _coins - coins for each player. Do not use this property;
- * use `getCoins` and `setCoins` instead.
+ * use `getCoins` and `addCoins` instead.
  * @prop {EstablishmentData|null} _estData - establishment data.
  * @prop {LandmarkData|null} _landData - landmark data.
  * @prop {LogEvent[]|null} _logBuffer - buffer of log lines.

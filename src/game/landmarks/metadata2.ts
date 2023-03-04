@@ -34,7 +34,6 @@ export const LoanOffice2: Landmark = {
   cost: [10],
 };
 
-// TODO: implement
 export const FarmersMarket2: Landmark = {
   _id: 2,
   _ver: Version.MK2,
@@ -45,7 +44,6 @@ export const FarmersMarket2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const FrenchRestaurant2: Landmark = {
   _id: 3,
   _ver: Version.MK2,
@@ -78,7 +76,6 @@ export const Observatory2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const Publisher2: Landmark = {
   _id: 6,
   _ver: Version.MK2,
@@ -89,7 +86,6 @@ export const Publisher2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const ShoppingMall2: Landmark = {
   _id: 7,
   _ver: Version.MK2,
@@ -111,7 +107,6 @@ export const TechStartup2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const Airport2: Landmark = {
   _id: 9,
   _ver: Version.MK2,
@@ -122,7 +117,6 @@ export const Airport2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const AmusementPark2: Landmark = {
   _id: 10,
   _ver: Version.MK2,
@@ -144,7 +138,6 @@ export const Charterhouse2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const ExhibitHall2: Landmark = {
   _id: 12,
   _ver: Version.MK2,
@@ -155,7 +148,6 @@ export const ExhibitHall2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const Forge2: Landmark = {
   _id: 13,
   _ver: Version.MK2,
@@ -166,13 +158,12 @@ export const Forge2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const Museum2: Landmark = {
   _id: 14,
   _ver: Version.MK2,
   name: 'Museum',
   miniName: 'Museum',
-  description: 'Take 3 coins from each opponent for each landmark they own (builder only).',
+  description: 'Take 3 coins from each opponent for each landmark they own, excluding "City Hall" (builder only).',
   coins: 3, // coins taken per landmark
   cost: [12, 16, 22],
 };
@@ -189,7 +180,6 @@ export const Park2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const RadioTower2: Landmark = {
   _id: 16,
   _ver: Version.MK2,
@@ -200,7 +190,6 @@ export const RadioTower2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const SodaBottlingPlant2: Landmark = {
   _id: 17,
   _ver: Version.MK2,
@@ -222,7 +211,6 @@ export const Temple2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const TVStation2: Landmark = {
   _id: 19,
   _ver: Version.MK2,
