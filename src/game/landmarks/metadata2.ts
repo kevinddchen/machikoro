@@ -199,7 +199,6 @@ export const SodaBottlingPlant2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const Temple2: Landmark = {
   _id: 18,
   _ver: Version.MK2,
