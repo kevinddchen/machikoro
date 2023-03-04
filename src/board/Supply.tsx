@@ -10,11 +10,20 @@ import { estColorToClass, landColorToClass, landCostsToString, rollsToString } f
 import StackTable from './StackTable';
 
 /**
+ * @extends BoardProps<MachikoroG>
+ * @prop {number | null} clientPlayer - Player ID of the client, or null if the
+ * client is not a player.
+ */
+interface SupplyProps extends BoardProps<MachikoroG> {
+  clientPlayer: number | null;
+}
+
+/**
  * Supply area, where players see and buy establishments
  * @prop {Establishment[]} establishments - List of establishments in use.
  */
-export default class Supply extends React.Component<BoardProps<MachikoroG>, object> {
-  constructor(props: BoardProps<MachikoroG>) {
+export default class Supply extends React.Component<SupplyProps, object> {
+  constructor(props: SupplyProps) {
     super(props);
   }
 
@@ -22,7 +31,7 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
    * Render the landmark supply. This returns nothing for Machi Koro 1.
    */
   private renderLandTable = (): JSX.Element | null => {
-    const { G, ctx, moves, isActive } = this.props;
+    const { G, ctx, moves, isActive, clientPlayer } = this.props;
     // return nothing for Machi Koro 1.
     if (Game.expToVer(G.expansion) === Game.Version.MK1) {
       return null;
@@ -49,7 +58,7 @@ export default class Supply extends React.Component<BoardProps<MachikoroG>, obje
 
       const canBuyLand = isActive && Game.canBuyLand(G, ctx, land);
       const landColor = landColorToClass(canBuyLand);
-      const costsString = landCostsToString(land);
+      const costsString = landCostsToString(G, land, clientPlayer);
 
       // use same CSS as establishments
       table.push(

@@ -65,7 +65,6 @@ export const MovingCompany2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const Observatory2: Landmark = {
   _id: 5,
   _ver: Version.MK2,

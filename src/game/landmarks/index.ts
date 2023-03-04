@@ -136,17 +136,40 @@ export const countBuilt = (G: MachikoroG, player: number): number => {
  */
 export const cost = (G: MachikoroG, land: Landmark, player: number): number => {
   const version = expToVer(G.expansion);
+  const landCostArray = costArray(G, land, player);
   if (version === Version.MK1) {
     // Machi Koro 1 only has one cost
-    return land.cost[0];
+    return landCostArray[0];
   } else if (version === Version.MK2) {
     // Machi Koro 2 landmark costs change based on the number of built landmarks
     const built = countBuilt(G, player);
     const costIdx = Math.min(Math.max(built, 0), land.cost.length - 1); // avoid array out of bounds
-    return land.cost[costIdx];
+    return landCostArray[costIdx];
   } else {
     throw new Error(`Version '${version}' not implemented.`);
   }
+};
+
+/**
+ * @param G
+ * @param land
+ * @param player
+ * @returns A copy of the cost array for the landmark. In Machi Koro 2, the
+ * cost array may change based on the number of built landmarks.
+ */
+export const costArray = (G: MachikoroG, land: Landmark, player: number | null): number[] => {
+  let arr = [...land.cost];
+
+  if (isEqual(land, Meta2.LaunchPad2) && isOwned(G, Meta2.Observatory2)) {
+    // if anyone owns Observatory, Launch Pad costs 5 fewer coins
+    arr = arr.map((cost) => cost - Meta2.Observatory2.coins!);
+  }
+  if (player !== null && owns(G, player, Meta2.LoanOffice2)) {
+    // if the player owns Loan Office, all landmarks cost 2 fewer coins
+    arr = arr.map((cost) => cost - Meta2.LoanOffice2.coins!);
+  }
+
+  return arr;
 };
 
 /**

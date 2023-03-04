@@ -1,4 +1,4 @@
-import { Est, Land } from 'game';
+import { Est, Land, MachikoroG } from 'game';
 
 /**
  * Convert `Est.EstColor` to CSS class name.
@@ -45,10 +45,12 @@ export const rollsToString = (est: Est.Establishment): string => {
 
 /**
  * Parse an establishment's costs into a printable format.
+ * @param G
  * @param land
+ * @param player
  * @returns
  */
-export const landCostsToString = (land: Land.Landmark): string => {
-  // HACK: accessing cost array directly
-  return '$' + land.cost.map((cost) => cost.toString()).join('/');
+export const landCostsToString = (G: MachikoroG, land: Land.Landmark, player: number | null): string => {
+  const landCostArray = Land.costArray(G, land, player);
+  return '$' + landCostArray.map((cost) => cost.toString()).join('/');
 };
