@@ -15,6 +15,7 @@ import { LogEvent } from './log/types';
  * this property; use `ctx.playOrder` instead.
  * @prop {TurnState} turnState - the current player's turn state.
  * @prop {number|null} roll - the current player's dice roll total.
+ * @prop {boolean} rollDoubles - true if the current player rolled doubles.
  * @prop {number} numRolls - the number of dice rolls made by the current player.
  * @prop {boolean} secondTurn - true if the current player can make another turn.
  * @prop {number} doTV - number of times the current player will activate the TV station.
@@ -36,6 +37,7 @@ export interface MachikoroG {
   readonly _turnOrder: string[];
   turnState: TurnState;
   roll: number | null;
+  rollDoubles: boolean;
   numRolls: number;
   secondTurn: boolean;
   doTV: number;

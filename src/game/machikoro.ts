@@ -246,6 +246,7 @@ const rollOne: Move<MachikoroG> = (context) => {
 
   G.roll = random.Die(6);
   G.numRolls += 1;
+  G.rollDoubles = false;
   Log.logRollOne(G, G.roll);
 
   if (noFurtherRollActions(G, ctx)) {
@@ -265,16 +266,10 @@ const rollTwo: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  const player = parseInt(ctx.currentPlayer);
   const dice = random.Die(6, 2);
-
-  // if roll doubles, get a second turn via amusement park
-  if (Land.owns(G, player, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) {
-    G.secondTurn = dice[0] === dice[1];
-  }
-
   G.roll = dice[0] + dice[1];
   G.numRolls += 1;
+  G.rollDoubles = dice[0] === dice[1];
   Log.logRollTwo(G, dice);
 
   if (noFurtherRollActions(G, ctx)) {
@@ -297,6 +292,7 @@ const debugRoll: Move<MachikoroG> = (context, roll: number) => {
 
   G.roll = roll;
   G.numRolls += 1;
+  G.rollDoubles = false;
   Log.logRollOne(G, roll);
 
   if (noFurtherRollActions(G, ctx)) {
@@ -685,6 +681,11 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     }
   }
 
+  // Do Landmarks.
+  if (Land.owns(G, currentPlayer, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) {
+    G.secondTurn = G.rollDoubles;
+  }
+
   // always switch state after committing role
   switchState(context);
 };
@@ -888,6 +889,7 @@ const debugSetupData = {
 const newTurnG = {
   turnState: TurnState.Roll,
   roll: null,
+  rollDoubles: false,
   numRolls: 0,
   secondTurn: false,
   doTV: 0,
