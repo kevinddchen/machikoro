@@ -119,6 +119,20 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
  */
 export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => {
   const player = parseInt(ctx.currentPlayer);
+
+  // Loan Office is the only landmark with an extra restriction on buying
+  const canBuyLoanOffice = () => {
+    if (Land.countBuilt(G, player) > 0) {
+      return false;
+    }
+    for (const opponent of getPreviousPlayers(ctx)) {
+      if (Land.countBuilt(G, opponent) === 0) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   return (
     G.turnState === TurnState.Buy &&
     // landmark is available for purchase
@@ -126,7 +140,9 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     // player does not currently own the landmark
     !Land.owns(G, player, land) &&
     // player has enough coins
-    getCoins(G, player) >= Land.cost(G, land, player)
+    getCoins(G, player) >= Land.cost(G, land, player) &&
+    // Loan Office has an extra restriction
+    (!Land.isEqual(land, Land.LoanOffice2) || canBuyLoanOffice())
   );
 };
 
