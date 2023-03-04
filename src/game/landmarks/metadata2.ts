@@ -21,7 +21,6 @@ export const CityHall2: Landmark = {
   cost: [0],
 };
 
-// TODO: implement
 export const LoanOffice2: Landmark = {
   _id: 1,
   _ver: Version.MK2,

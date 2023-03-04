@@ -68,6 +68,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
       if (version === Game.Version.MK1 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
         const landCostArray = Land.costArray(G, land, clientPlayer);
+        // Machi Koro 1 only has one cost
         landDescription += '\n\nCost: ' + landCostArray[0].toString();
       }
 
