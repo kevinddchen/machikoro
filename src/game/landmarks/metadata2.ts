@@ -96,7 +96,6 @@ export const ShoppingMall2: Landmark = {
   cost: [10, 14, 22],
 };
 
-// TODO: implement
 export const TechStartup2: Landmark = {
   _id: 8,
   _ver: Version.MK2,

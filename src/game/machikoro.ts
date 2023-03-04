@@ -685,6 +685,9 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   if (Land.owns(G, currentPlayer, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) {
     G.secondTurn = G.rollDoubles;
   }
+  if (Land.isOwned(G, Land.TechStartup2) && G.roll === 12) {
+    earn(G, currentPlayer, Land.TechStartup2.coins!, Land.TechStartup2.name);
+  }
 
   // always switch state after committing role
   switchState(context);
@@ -877,7 +880,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.Harbor,
+  expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,
