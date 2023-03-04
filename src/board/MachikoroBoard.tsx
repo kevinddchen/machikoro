@@ -60,6 +60,11 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
   };
 
   render() {
+    const { playerID } = this.props;
+
+    // Player ID of the client.
+    const clientPlayer = playerID === null ? null : parseInt(playerID);
+
     return (
       <div>
         <div className='div-column'>
@@ -70,7 +75,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
             <StatusBar {...this.props} names={this.names} />
           </div>
           <div className='div-row'>
-            <Supply {...this.props} />
+            <Supply {...this.props} clientPlayer={clientPlayer} />
           </div>
         </div>
         <div className='div-column'>{this.renderPlayerInfo()}</div>

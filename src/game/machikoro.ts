@@ -119,6 +119,20 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
  */
 export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => {
   const player = parseInt(ctx.currentPlayer);
+
+  // Loan Office is the only landmark with an extra restriction on buying
+  const canBuyLoanOffice = () => {
+    if (Land.countBuilt(G, player) > 0) {
+      return false;
+    }
+    for (const opponent of getPreviousPlayers(ctx)) {
+      if (Land.countBuilt(G, opponent) === 0) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   return (
     G.turnState === TurnState.Buy &&
     // landmark is available for purchase
@@ -126,7 +140,9 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     // player does not currently own the landmark
     !Land.owns(G, player, land) &&
     // player has enough coins
-    getCoins(G, player) >= Land.cost(G, land, player)
+    getCoins(G, player) >= Land.cost(G, land, player) &&
+    // Loan Office has an extra restriction
+    (!Land.isEqual(land, Land.LoanOffice2) || canBuyLoanOffice())
   );
 };
 
@@ -531,7 +547,7 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of redEsts) {
-      // sushi bar requires Harbor
+      // Sushi Bar requires Harbor
       if (Est.isEqual(est, Est.SushiBar) && !Land.owns(G, opponent, Land.Harbor)) {
         continue;
       }
@@ -561,7 +577,7 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   const blueEsts = allEsts.filter((est) => est.color === EstColor.Blue && est.rolls.includes(roll));
   for (const player of getNextPlayers(ctx)) {
     for (const est of blueEsts) {
-      // mackerel boat and tuna boat require Harbor
+      // Mackerel Boat and Tuna Boat require Harbor
       if (
         (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) &&
         !Land.owns(G, player, Land.Harbor)
@@ -571,10 +587,10 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
 
       const count = Est.countOwned(G, player, est);
       if (count === 0) {
-        continue; // avoids logging tuna boat roll when player has no tuna boats
+        continue; // avoids logging Tuna Boat roll when player has no tuna boats
       }
 
-      // tuna boat earnings are based off the tuna roll
+      // Tuna Boat earnings are based off the tuna roll
       // all other blue establishments receive `est.earn` coins from the bank
       let earnings;
       if (Est.isEqual(est, Est.TunaBoat)) {
@@ -651,6 +667,7 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     // each purple establishment has its own effect
     // for Machi Koro 1, `count` should always be 1 here
     if (Est.isEqual(est, Est.Stadium) || Est.isEqual(est, Est.Stadium2)) {
+      // take 2 coins from each opponent
       for (const opponent of getPreviousPlayers(ctx)) {
         const amount = est.earn * count;
         take(G, { from: opponent, to: currentPlayer }, amount, est.name);
@@ -660,6 +677,7 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
     } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
       G.doOffice = count;
     } else if (Est.isEqual(est, Est.Publisher)) {
+      // take 1 coin for each Cup and Shop type establishment
       for (const opponent of getPreviousPlayers(ctx)) {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
         const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
@@ -682,8 +700,19 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
   }
 
   // Do Landmarks.
-  if (Land.owns(G, currentPlayer, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) {
-    G.secondTurn = G.rollDoubles;
+  if ((Land.owns(G, currentPlayer, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) && G.rollDoubles) {
+    // if roll doubles, get second turn
+    G.secondTurn = true;
+  }
+  if (Land.isOwned(G, Land.TechStartup2) && G.roll === 12) {
+    // if roll 12, get 8 coins
+    earn(G, currentPlayer, Land.TechStartup2.coins!, Land.TechStartup2.name);
+  }
+  if (Land.isOwned(G, Land.Temple2) && G.rollDoubles) {
+    // take 2 coins from each opponent
+    for (const opponent of getPreviousPlayers(ctx)) {
+      take(G, { from: opponent, to: currentPlayer }, Land.Temple2.coins!, Land.Temple2.name);
+    }
   }
 
   // always switch state after committing role
@@ -705,20 +734,22 @@ const evalLandAction = (context: FnContext<MachikoroG>, land: Landmark): void =>
   }
 
   if (Land.isEqual(land, Land.RadioTower2)) {
+    // get second turn
     G.secondTurn = true;
   } else if (Land.isEqual(land, Land.LaunchPad2)) {
+    // win the game
     endGame(context, player);
   } else if (Land.isEqual(land, Land.FrenchRestaurant2)) {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
-      const earnings = land.coins!;
-      take(G, { from: opponent, to: player }, earnings, land.name);
+      const amount = land.coins!;
+      take(G, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.Publisher2)) {
     // take 1 coin for each Shop type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
-      const earnings = land.coins! * Est.countTypeOwned(G, opponent, EstType.Shop);
-      take(G, { from: opponent, to: player }, earnings, land.name);
+      const amount = land.coins! * Est.countTypeOwned(G, opponent, EstType.Shop);
+      take(G, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.ExhibitHall2)) {
     // do tax office on each opponent
@@ -727,20 +758,20 @@ const evalLandAction = (context: FnContext<MachikoroG>, land: Landmark): void =>
       if (opp_coins < land.coins!) {
         continue;
       }
-      const earnings = Math.floor(opp_coins / 2);
-      take(G, { from: opponent, to: player }, earnings, land.name);
+      const amount = Math.floor(opp_coins / 2);
+      take(G, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.Museum2)) {
     // take 3 coins for each landmark, except City Hall
     for (const opponent of getPreviousPlayers(ctx)) {
-      const earnings = land.coins! * Land.countBuilt(G, opponent);
-      take(G, { from: opponent, to: player }, earnings, land.name);
+      const amount = land.coins! * Land.countBuilt(G, opponent);
+      take(G, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.TVStation2)) {
     // take 1 coin for each Cup type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
-      const earnings = land.coins! * Est.countTypeOwned(G, opponent, EstType.Cup);
-      take(G, { from: opponent, to: player }, earnings, land.name);
+      const amount = land.coins! * Est.countTypeOwned(G, opponent, EstType.Cup);
+      take(G, { from: opponent, to: player }, amount, land.name);
     }
   }
 };

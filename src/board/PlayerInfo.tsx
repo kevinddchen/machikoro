@@ -44,8 +44,10 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
 
-    // NOTE: `player` is the player that we are rendering info for, and
-    // `currentPlayer` is the player whose turn it is in the game.
+    // NOTE: There are 3 different players to keep track of here:
+    // `player` is the player ID that this component is rendering info for.
+    // `clientPlayer` is the client's player ID
+    // `currentPlayer` is the player ID whose turn it is in the game.
 
     // landmarks
     const lands = new StackTable(1);
@@ -65,8 +67,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       let landDescription = land.description;
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
       if (version === Game.Version.MK1 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
-        // HACK: accessing cost array directly
-        landDescription += '\n\nCost: ' + land.cost[0].toString();
+        const landCostArray = Land.costArray(G, land, clientPlayer);
+        // Machi Koro 1 only has one cost
+        landDescription += '\n\nCost: ' + landCostArray[0].toString();
       }
 
       lands.push(
