@@ -1,3 +1,7 @@
+//
+// Enums related to game configuration.
+//
+
 /**
  * Expansion enum.
  */
@@ -45,3 +49,18 @@ export const expToVer = (exp: Expansion): Version => {
     throw new Error(`Expansion '${exp}' not implemented.`);
   }
 };
+
+/**
+ * Starting coins in Machi Koro 1.
+ */
+export const MK1_STARTING_COINS = 3;
+
+/**
+ * Starting coins in Machi Koro 2.
+ */
+export const MK2_STARTING_COINS = 5;
+
+/**
+ * Number of initial buy rounds in Machi Koro 2.
+ */
+export const MK2_INITIAL_BUY_ROUNDS = 3;

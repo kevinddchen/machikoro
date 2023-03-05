@@ -5,7 +5,17 @@ import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 import _ from 'lodash';
 
-import { Expansion, GAME_NAME, SetupData, SupplyVariant, Version, expToVer } from 'game';
+import {
+  Expansion,
+  GAME_NAME,
+  MK1_STARTING_COINS,
+  MK2_INITIAL_BUY_ROUNDS,
+  MK2_STARTING_COINS,
+  SetupData,
+  SupplyVariant,
+  Version,
+  expToVer,
+} from 'game';
 import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
@@ -153,11 +163,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     let initialBuyRounds;
     const version = expToVer(expansion);
     if (version === Version.MK1) {
-      startCoins = 3;
+      startCoins = MK1_STARTING_COINS;
       initialBuyRounds = 0;
     } else if (version === Version.MK2) {
-      startCoins = 5;
-      initialBuyRounds = 3;
+      startCoins = MK2_STARTING_COINS;
+      initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
     } else {
       throw new Error(`Version ${version} not implemented.`);
     }
