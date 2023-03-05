@@ -78,15 +78,18 @@ export interface SetupData {
 }
 
 /**
- * Turn state enum.
+ * Turn state enum. The order of the states in the game is reflected in the
+ * integer values--higher values are later in the game.
  */
 export const TurnState = {
-  Roll: 'Roll',
-  TV: 'TV',
-  OfficeGive: 'OfficeGive',
-  OfficeTake: 'OfficeTake',
-  Buy: 'Buy',
-  End: 'End',
+  Roll: 0,
+  ActivateEsts: 10,
+  TV: 11,
+  OfficeGive: 12,
+  OfficeTake: 13,
+  ActivateLands: 20,
+  Buy: 30,
+  End: 40,
 } as const;
 
 export type TurnState = (typeof TurnState)[keyof typeof TurnState];
