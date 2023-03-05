@@ -237,8 +237,8 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
     // a player has won if they own all landmarks in use
     return Land.getAllInUse(G).every((land) => Land.owns(G, player, land));
   } else if (version === Version.MK2) {
-    // a player has won if they have built 3 landmarks (excluding City Hall)
-    return Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
+    // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
+    return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
   } else {
     throw new Error(`Version '${version}' not implemented.`);
   }
@@ -793,12 +793,10 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
     return; // no land was just bought
   }
 
+  // Launch Pad is not activated here, but is checked as a win condition in `canEndGame`
   if (Land.isEqual(land, Land.RadioTower2)) {
     // get second turn
     G.secondTurn = true;
-  } else if (Land.isEqual(land, Land.LaunchPad2)) {
-    // win the game
-    endGame(context, player);
   } else if (Land.isEqual(land, Land.FrenchRestaurant2)) {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
