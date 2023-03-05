@@ -43,7 +43,7 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
             className={classNames('button', { button_active: canAddTwo }, { button_hide: !canAddTwo })}
             onClick={() => moves.addTwo()}
           >
-            Keep ({G.roll! + 2})
+            Keep ({G.roll + 2})
           </button>
 
           <button

@@ -78,7 +78,7 @@ export const canAddTwo = (G: MachikoroG, ctx: Ctx): boolean => {
     // need to own harbor
     Land.owns(G, player, Land.Harbor) &&
     // need to roll a 10 or higher
-    G.roll! >= 10
+    G.roll >= 10
   );
 };
 
@@ -262,8 +262,9 @@ const rollOne: Move<MachikoroG> = (context) => {
   }
 
   G.roll = random.Die(6);
-  G.numRolls += 1;
   G.rollDoubles = false;
+  G.numDice = 1;
+  G.numRolls += 1;
   Log.logRollOne(G, G.roll);
 
   if (noFurtherRollActions(G, ctx)) {
@@ -285,8 +286,9 @@ const rollTwo: Move<MachikoroG> = (context) => {
 
   const dice = random.Die(6, 2);
   G.roll = dice[0] + dice[1];
-  G.numRolls += 1;
   G.rollDoubles = dice[0] === dice[1];
+  G.numDice = 2;
+  G.numRolls += 1;
   Log.logRollTwo(G, dice);
 
   if (noFurtherRollActions(G, ctx)) {
@@ -309,9 +311,15 @@ const debugRoll: Move<MachikoroG> = (context, die1: number, die2 = 0) => {
   }
 
   G.roll = die1 + die2;
-  G.numRolls += 1;
   G.rollDoubles = die1 == die2;
-  Log.logRollTwo(G, [die1, die2]);
+  G.numRolls += 1;
+  if (die2 === 0) {
+    G.numDice = 1;
+    Log.logRollOne(G, die1);
+  } else {
+    G.numDice = 2;
+    Log.logRollTwo(G, [die1, die2]);
+  }
 
   if (noFurtherRollActions(G, ctx)) {
     switchState(context);
@@ -345,8 +353,8 @@ const addTwo: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  G.roll! += 2;
-  Log.logAddTwo(G, G.roll!);
+  G.roll += 2;
+  Log.logAddTwo(G, G.roll);
 
   switchState(context);
 
@@ -409,7 +417,7 @@ const doTV: Move<MachikoroG> = (context, opponent: number) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  take(G, { from: opponent, to: player }, Est.TVStation.earn, Est.TVStation.name);
+  take(G, ctx, { from: opponent, to: player }, Est.TVStation.earn, Est.TVStation.name);
 
   switchState(context);
 
@@ -506,10 +514,10 @@ const endTurn: Move<MachikoroG> = (context) => {
   // a player earns coins via the airport if they did not buy anything
   if (G.turnState === TurnState.Buy) {
     if (Land.owns(G, player, Land.Airport)) {
-      earn(G, player, Land.Airport.coins!, Land.Airport.name);
+      earn(G, ctx, player, Land.Airport.coins!, Land.Airport.name);
     }
     if (Land.isOwned(G, Land.Airport2)) {
-      earn(G, player, Land.Airport2.coins!, Land.Airport2.name);
+      earn(G, ctx, player, Land.Airport2.coins!, Land.Airport2.name);
     }
   }
 
@@ -613,7 +621,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
 const activateEsts = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const currentPlayer = parseInt(ctx.currentPlayer);
-  const roll = G.roll!;
+  const roll = G.roll;
 
   // Do Red establishments.
   const allEsts = Est.getAllInUse(G);
@@ -642,7 +650,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       }
 
       const amount = earnings * count;
-      take(G, { from: currentPlayer, to: opponent }, amount, est.name);
+      take(G, ctx, { from: currentPlayer, to: opponent }, amount, est.name);
     }
   }
 
@@ -682,7 +690,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       }
 
       const amount = earnings * count;
-      earn(G, player, amount, est.name);
+      earn(G, ctx, player, amount, est.name);
     }
   }
 
@@ -726,7 +734,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
     }
 
     const amount = earnings * multiplier * count;
-    earn(G, currentPlayer, amount, est.name);
+    earn(G, ctx, currentPlayer, amount, est.name);
   }
 
   // Do Purple establishments.
@@ -743,7 +751,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       // take 2 coins from each opponent
       for (const opponent of getPreviousPlayers(ctx)) {
         const amount = est.earn * count;
-        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
+        take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
       G.doTV = count;
@@ -755,7 +763,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
         const n_cups = Est.countTypeOwned(G, opponent, EstType.Cup);
         const n_shops = Est.countTypeOwned(G, opponent, EstType.Shop);
         const amount = est.earn * (n_cups + n_shops) * count;
-        take(G, { from: opponent, to: currentPlayer }, amount, est.name);
+        take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TaxOffice) || Est.isEqual(est, Est.TaxOffice2)) {
       for (const opponent of getPreviousPlayers(ctx)) {
@@ -766,7 +774,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
             break;
           }
           const amount = Math.floor(opp_coins / 2);
-          take(G, { from: opponent, to: currentPlayer }, amount, est.name);
+          take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
         }
       }
     }
@@ -787,17 +795,22 @@ const activateLands = (context: FnContext<MachikoroG>): void => {
   }
   if (Land.isOwned(G, Land.TechStartup2) && G.roll === 12) {
     // if roll 12, get 8 coins
-    earn(G, player, Land.TechStartup2.coins!, Land.TechStartup2.name);
+    earn(G, ctx, player, Land.TechStartup2.coins!, Land.TechStartup2.name);
   }
   if (Land.isOwned(G, Land.Temple2) && G.rollDoubles) {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
-      take(G, { from: opponent, to: player }, Land.Temple2.coins!, Land.Temple2.name);
+      take(G, ctx, { from: opponent, to: player }, Land.Temple2.coins!, Land.Temple2.name);
     }
   }
   if (Land.isOwned(G, Land.MovingCompany2) && G.rollDoubles && Est.getAllOwned(G, player).length > 0) {
     // give 1 establishment to previous player
     G.doMovingCompany = true;
+  }
+  if (Land.isOwned(G, Land.Charterhouse2) && G.numDice === 2 && !G.receivedCoins) {
+    // NOTE: this must be the last landmark to activate!
+    // get 3 coins from the bank
+    earn(G, ctx, player, Land.Charterhouse2.coins!, Land.Charterhouse2.name);
   }
 };
 
@@ -822,13 +835,13 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
       const amount = land.coins!;
-      take(G, { from: opponent, to: player }, amount, land.name);
+      take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.Publisher2)) {
     // take 1 coin for each Shop type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
       const amount = land.coins! * Est.countTypeOwned(G, opponent, EstType.Shop);
-      take(G, { from: opponent, to: player }, amount, land.name);
+      take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.ExhibitHall2)) {
     // do tax office on each opponent
@@ -838,20 +851,27 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
         continue;
       }
       const amount = Math.floor(opp_coins / 2);
-      take(G, { from: opponent, to: player }, amount, land.name);
+      take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.Museum2)) {
     // take 3 coins for each landmark, except City Hall
     for (const opponent of getPreviousPlayers(ctx)) {
       const amount = land.coins! * Land.countBuilt(G, opponent);
-      take(G, { from: opponent, to: player }, amount, land.name);
+      take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.TVStation2)) {
     // take 1 coin for each Cup type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
       const amount = land.coins! * Est.countTypeOwned(G, opponent, EstType.Cup);
-      take(G, { from: opponent, to: player }, amount, land.name);
+      take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
+  } else if (Land.isEqual(land, Land.Park2)) {
+    // redistribute everyone's coins evenly
+    // HACK: directly accessing coins array
+    const totalCoins = G._coins.reduce((a, b) => a + b, 0);
+    const coinsPerPlayer = Math.ceil(totalCoins / ctx.numPlayers);
+    G._coins.fill(coinsPerPlayer);
+    Log.logPark(G, coinsPerPlayer);
   }
 };
 
@@ -892,13 +912,18 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
 /**
  * Player earns coins from the bank, and the event is logged.
  * @param G
+ * @param ctx
  * @param player
  * @param amount - Number of coins. If zero, no log is created.
  * @param name - Name of establishment or landmark activated.
  */
-const earn = (G: MachikoroG, player: number, amount: number, name: string): void => {
+const earn = (G: MachikoroG, ctx: Ctx, player: number, amount: number, name: string): void => {
+  const currentPlayer = parseInt(ctx.currentPlayer);
   addCoins(G, player, amount);
   if (amount > 0) {
+    if (currentPlayer === player) {
+      G.receivedCoins = true;
+    }
     Log.logEarn(G, player, amount, name);
   }
 };
@@ -906,18 +931,23 @@ const earn = (G: MachikoroG, player: number, amount: number, name: string): void
 /**
  * Player takes coins from another player, and the event is logged.
  * @param G
+ * @param ctx
  * @param args.from - Coins are taken from this player
  * @param args.to - Coins are given to this player
  * @param amount - Number of coins. If zero, no log is created. Actual money
  * taken will never exceed the amount `args.from` has.
  * @param name - Name of establishment or landmark activated.
  */
-const take = (G: MachikoroG, args: { from: number; to: number }, amount: number, name: string): void => {
+const take = (G: MachikoroG, ctx: Ctx, args: { from: number; to: number }, amount: number, name: string): void => {
+  const currentPlayer = parseInt(ctx.currentPlayer);
   const { from, to } = args;
   const actual_amount = Math.min(amount, getCoins(G, from));
   addCoins(G, from, -actual_amount);
   addCoins(G, to, actual_amount);
   if (actual_amount > 0) {
+    if (currentPlayer === to) {
+      G.receivedCoins = true;
+    }
     Log.logTake(G, args, actual_amount, name);
   }
 };
@@ -968,8 +998,9 @@ const debugSetupData = {
  */
 const newTurnG = {
   turnState: TurnState.Roll,
-  roll: null,
+  roll: 0,
   rollDoubles: false,
+  numDice: 0,
   numRolls: 0,
   secondTurn: false,
   doTV: 0,
@@ -978,6 +1009,7 @@ const newTurnG = {
   officeGiveEst: null,
   justBoughtEst: null,
   justBoughtLand: null,
+  receivedCoins: false,
   tunaRoll: null,
 };
 

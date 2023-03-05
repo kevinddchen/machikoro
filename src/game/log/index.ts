@@ -132,6 +132,15 @@ export const logMovingCompany = (G: MachikoroG, est_name: string, opponent: numb
 };
 
 /**
+ * Log the effect of the Park landmark.
+ * @param G
+ * @param coins - Number of coins all players end up with.
+ */
+export const logPark = (G: MachikoroG, coins: number): void => {
+  G._logBuffer!.push({ eventType: LogEventType.Park, coins });
+};
+
+/**
  * Log the tuna roll for the turn.
  * @param G
  * @param roll - The sum value of the two dice.
