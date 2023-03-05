@@ -389,7 +389,7 @@ export const _BASE_ESTABLISHMENTS = [
 export const _HARBOR_ESTABLISHMENTS = _ESTABLISHMENTS.map((est) => est._id);
 
 /**
- * Establishments a player starts with.
+ * Establishments a player starts with in Machi Koro 1.
  */
 export const _STARTING_ESTABLISHMENTS = [WheatField._id, Bakery._id];
 

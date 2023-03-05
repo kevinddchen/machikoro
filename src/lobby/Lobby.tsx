@@ -5,10 +5,19 @@ import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 import _ from 'lodash';
 
-import { Expansion, GAME_NAME, SetupData, SupplyVariant, Version, expToVer } from 'game';
+import {
+  Expansion,
+  GAME_NAME,
+  MK1_STARTING_COINS,
+  MK2_INITIAL_BUY_ROUNDS,
+  MK2_STARTING_COINS,
+  SetupData,
+  SupplyVariant,
+  Version,
+  expToVer,
+} from 'game';
 import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
-import { IN_PROD } from 'config';
 import { MatchInfo } from './types';
 
 /**
@@ -73,8 +82,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       connected: false,
       matches: null,
       // default values for new game
-      numPlayers: 4,
-      expansion: Expansion.Harbor,
+      numPlayers: 2,
+      expansion: Expansion.Base,
       supplyVariant: SupplyVariant.Hybrid,
     };
     this.authenticator = new Authenticator();
@@ -154,11 +163,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     let initialBuyRounds;
     const version = expToVer(expansion);
     if (version === Version.MK1) {
-      startCoins = 3;
+      startCoins = MK1_STARTING_COINS;
       initialBuyRounds = 0;
     } else if (version === Version.MK2) {
-      startCoins = 5;
-      initialBuyRounds = 3;
+      startCoins = MK2_STARTING_COINS;
+      initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
     } else {
       throw new Error(`Version ${version} not implemented.`);
     }
@@ -353,16 +362,10 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     // prettier-ignore
     const expansionOptions = [
-      <option key='0' value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>,
-      <option key='1' value={Expansion.Base}>{expansionName(Expansion.Base)}</option>,
+      <option key='0' value={Expansion.Base}>{expansionName(Expansion.Base)}</option>,
+      <option key='1' value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>,
+      <option key='2' value={Expansion.MK2}>{expansionName(Expansion.MK2)}</option>
     ];
-    // TODO: enable Machi Koro 2 in production
-    if (!IN_PROD) {
-      // prettier-ignore
-      expansionOptions.push(
-        <option key='2' value={Expansion.MK2}>{expansionName(Expansion.MK2)}</option>
-      );
-    }
 
     // prettier-ignore
     const supplyVariantOptions = [

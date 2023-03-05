@@ -97,6 +97,6 @@ export const _HARBOR_LANDMARKS = _LANDMARKS.map((landmark) => landmark._id);
 export const _BASE_STARTING_LANDMARKS: number[] = [];
 
 /**
- * Landmarks a player starts with in the Base expansion.
+ * Landmarks a player starts with in the Harbor expansion.
  */
 export const _HARBOR_STARTING_LANDMARKS = [CityHall._id];
