@@ -78,8 +78,9 @@ export interface SetupData {
 }
 
 /**
- * Turn state enum. The order of the states in the game is reflected in the
- * integer values--higher values are later in the game.
+ * Turn state enum. The order of the states in the turn is reflected in the
+ * integer values--higher values are later in the turn. Integers divisible by
+ * 10 are 
  */
 export const TurnState = {
   Roll: 0,
@@ -89,6 +90,7 @@ export const TurnState = {
   OfficeTake: 13,
   ActivateLands: 20,
   Buy: 30,
+  ActivateBoughtLand: 31,
   End: 40,
 } as const;
 
