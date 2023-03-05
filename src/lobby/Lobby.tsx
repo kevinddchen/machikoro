@@ -8,7 +8,6 @@ import _ from 'lodash';
 import { Expansion, GAME_NAME, SetupData, SupplyVariant, Version, expToVer } from 'game';
 import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
-import { IN_PROD } from 'config';
 import { MatchInfo } from './types';
 
 /**
@@ -73,8 +72,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       connected: false,
       matches: null,
       // default values for new game
-      numPlayers: 4,
-      expansion: Expansion.Harbor,
+      numPlayers: 2,
+      expansion: Expansion.Base,
       supplyVariant: SupplyVariant.Hybrid,
     };
     this.authenticator = new Authenticator();
@@ -353,16 +352,10 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     // prettier-ignore
     const expansionOptions = [
-      <option key='0' value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>,
-      <option key='1' value={Expansion.Base}>{expansionName(Expansion.Base)}</option>,
+      <option key='0' value={Expansion.Base}>{expansionName(Expansion.Base)}</option>,
+      <option key='1' value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>,
+      <option key='2' value={Expansion.MK2}>{expansionName(Expansion.MK2)}</option>
     ];
-    // TODO: enable Machi Koro 2 in production
-    if (!IN_PROD) {
-      // prettier-ignore
-      expansionOptions.push(
-        <option key='2' value={Expansion.MK2}>{expansionName(Expansion.MK2)}</option>
-      );
-    }
 
     // prettier-ignore
     const supplyVariantOptions = [
