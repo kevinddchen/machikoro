@@ -498,6 +498,8 @@ const endTurn: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
+  const { initialBuyRounds } = G;
+  const { phase, turn, numPlayers } = ctx;
   const player = parseInt(ctx.currentPlayer);
 
   // a player earns coins via the airport if they did not buy anything
@@ -508,6 +510,11 @@ const endTurn: Move<MachikoroG> = (context) => {
     if (Land.isOwned(G, Land.Airport2)) {
       earn(G, ctx, player, Land.Airport2.coins!, Land.Airport2.name);
     }
+  }
+
+  // end initial buying phase after `initialBuyRounds` rounds
+  if (phase === "initialBuyPhase" && turn === initialBuyRounds * numPlayers) {
+    events.endPhase();
   }
 
   // check second turn
@@ -1083,7 +1090,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
 
-      if (phase === 'initialBuy') {
+      if (phase === "initialBuyPhase") {
         G.turnState = TurnState.Buy;
       }
     },
@@ -1121,17 +1128,17 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
   },
 
   phases: {
-    initialBuy: {
+    initialBuyPhase: {
       moves: {
         buyEst,
         buyLand,
         endTurn,
       },
-      endIf: ({ G, ctx }) => {
-        // end initial buying phase after `initialBuyRounds` rounds
-        const { initialBuyRounds } = G;
-        const { turn, numPlayers } = ctx;
-        return turn > initialBuyRounds * numPlayers;
+      onBegin: ({ G, events }) => {
+        // end phase immediately if no initial buying rounds
+        if (G.initialBuyRounds === 0) {
+          events.endPhase();
+        }
       },
       start: true,
     },
