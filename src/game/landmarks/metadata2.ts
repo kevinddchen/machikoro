@@ -123,7 +123,6 @@ export const AmusementPark2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const Charterhouse2: Landmark = {
   _id: 11,
   _ver: Version.MK2,

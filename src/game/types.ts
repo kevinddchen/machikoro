@@ -14,8 +14,9 @@ import { LogEvent } from './log/types';
  * @prop {string[]} _turnOrder - the order of players in the game. Do not use
  * this property; use `ctx.playOrder` instead.
  * @prop {TurnState} turnState - the current player's turn state.
- * @prop {number|null} roll - the current player's dice roll total.
+ * @prop {number} roll - the current player's dice roll total.
  * @prop {boolean} rollDoubles - true if the current player rolled doubles.
+ * @prop {number} numDice - the number of dice rolled by the current player.
  * @prop {number} numRolls - the number of dice rolls made by the current player.
  * @prop {boolean} secondTurn - true if the current player can make another turn.
  * @prop {number} doTV - number of times the current player will activate the TV Station.
@@ -24,6 +25,7 @@ import { LogEvent } from './log/types';
  * @prop {Establishment|null} officeGiveEst - the establishment picked for the Office to give.
  * @prop {Establishment|null} justBoughtEst - the establishment just bought.
  * @prop {Landmark|null} justBoughtLand - the landmark just bought.
+ * @prop {boolean} receivedCoins - true if the current player has received coins this turn.
  * @prop {number|null} tunaRoll - the roll made for the tuna boat.
  * @prop {Secret} secret - game state that is not passed to clients.
  * @prop {number[]} _coins - coins for each player. Do not use this property;
@@ -37,8 +39,9 @@ export interface MachikoroG {
   readonly supplyVariant: SupplyVariant;
   readonly _turnOrder: string[];
   turnState: TurnState;
-  roll: number | null;
+  roll: number;
   rollDoubles: boolean;
+  numDice: number;
   numRolls: number;
   secondTurn: boolean;
   doTV: number;
@@ -47,6 +50,7 @@ export interface MachikoroG {
   officeGiveEst: Establishment | null;
   justBoughtEst: Establishment | null;
   justBoughtLand: Landmark | null;
+  receivedCoins: boolean;
   tunaRoll: number | null;
   secret: Secret;
   _coins: number[];
