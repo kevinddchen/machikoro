@@ -22,7 +22,7 @@ import { LogEvent } from './log/types';
  * @prop {number} doOffice - number of times the current player will activate the office.
  * @prop {Establishment|null} officeGiveEst - the establishment picked for the office to give.
  * @prop {Establishment|null} justBoughtEst - the establishment just bought (for prettier rendering).
- * @prop {Landmark|null} justBoughtLand - the landmark just bought (for prettier rendering in Machi Koro 2).
+ * @prop {Landmark|null} justBoughtLand - the landmark just bought (for activating in Machi Koro 2).
  * @prop {number|null} tunaRoll - the roll made for the tuna boat.
  * @prop {Secret} secret - game state that is not passed to clients.
  * @prop {number[]} _coins - coins for each player. Do not use this property;
@@ -79,8 +79,7 @@ export interface SetupData {
 
 /**
  * Turn state enum. The order of the states in the turn is reflected in the
- * integer values--higher values are later in the turn. Integers divisible by
- * 10 are 
+ * integer values--higher values are later in the turn.
  */
 export const TurnState = {
   Roll: 0,

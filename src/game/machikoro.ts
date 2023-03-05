@@ -530,7 +530,7 @@ const addCoins = (G: MachikoroG, player: number, amount: number): void => {
 };
 
 /**
- * This function controls the flow of the turn's state. This should be called 
+ * This function controls the flow of the turn's state. This should be called
  * at the end of all Moves.
  * @param context
  */
