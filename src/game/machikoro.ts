@@ -311,7 +311,7 @@ const debugRoll: Move<MachikoroG> = (context, die1: number, die2 = 0) => {
   G.roll = die1 + die2;
   G.numRolls += 1;
   G.rollDoubles = die1 == die2;
-  Log.logRollOne(G, die1 + die2);
+  Log.logRollTwo(G, [die1, die2]);
 
   if (noFurtherRollActions(G, ctx)) {
     switchState(context);
@@ -430,19 +430,15 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
   // HACK: this is also used for Moving Company
 
   if (G.turnState === TurnState.OfficeGive) {
-
     G.officeGiveEst = est;
     // change game state directly instead of calling `switchState`
     G.turnState = TurnState.OfficeTake;
-
   } else if (G.turnState === TurnState.MovingCompany) {
-
     const player = parseInt(ctx.currentPlayer);
-    const prevPlayer = getPreviousPlayer(ctx);
-    Est.transfer(G, {from: player, to: prevPlayer}, est);
+    const prevPlayer = getPreviousPlayers(ctx)[0];
+    Est.transfer(G, { from: player, to: prevPlayer }, est);
     Log.logMovingCompany(G, est.name, prevPlayer);
     switchState(context);
-
   } else {
     throw new Error(`Unexpected error: 'doOfficeGive' called in an unexpected state ${G.turnState}.`);
   }
@@ -800,7 +796,7 @@ const activateLands = (context: FnContext<MachikoroG>): void => {
     }
   }
   if (Land.isOwned(G, Land.MovingCompany2) && G.rollDoubles && Est.getAllOwned(G, player).length > 0) {
-    // move 1 establishment to previous player
+    // give 1 establishment to previous player
     G.doMovingCompany = true;
   }
 };
@@ -891,18 +887,6 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
     backwards.push(parseInt(ctx.playOrder[shifted_i]));
   }
   return backwards;
-};
-
-/**
- * Return the previous player in the play order.
- * @param ctx 
- * @returns
- */
-const getPreviousPlayer = (ctx: Ctx): number => {
-  const current = ctx.playOrderPos;
-  const N = ctx.numPlayers;
-  const shifted_i = (((current - 1) % N) + N) % N; // JS modulo is negative
-  return parseInt(ctx.playOrder[shifted_i]);
 };
 
 /**
