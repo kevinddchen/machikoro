@@ -975,10 +975,11 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
 /**
  * Set-up data for debug mode.
  */
-const debugSetupData = {
+const debugSetupData: SetupData = {
   expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
+  initialBuyRounds: 1,
   randomizeTurnOrder: false,
 };
 
@@ -1009,7 +1010,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     if (!setupData) {
       setupData = debugSetupData;
     }
-    const { expansion, supplyVariant, startCoins, randomizeTurnOrder } = setupData;
+    const { expansion, supplyVariant, startCoins, initialBuyRounds, randomizeTurnOrder } = setupData;
     const { numPlayers } = ctx;
 
     // initialize coins
@@ -1025,6 +1026,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     const G: MachikoroG = {
       expansion,
       supplyVariant,
+      initialBuyRounds,
       _turnOrder,
       ...newTurnG,
       secret: { _decks: null, _landDeck: null },
@@ -1053,7 +1055,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
 
   validateSetupData: (setupData, numPlayers) => {
     if (setupData) {
-      const { expansion, supplyVariant, startCoins } = setupData;
+      const { expansion, supplyVariant, initialBuyRounds, startCoins } = setupData;
       if (!Object.values(Expansion).includes(expansion)) {
         return `Unknown expansion: ${expansion}`;
       }
@@ -1063,6 +1065,9 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       if (!Number.isInteger(startCoins) || startCoins < 0) {
         return `Number of starting coins, ${startCoins}, must be a non-negative integer`;
       }
+      if (!Number.isInteger(initialBuyRounds) || initialBuyRounds < 0) {
+        return `Number of initial buying rounds, ${initialBuyRounds}, must be a non-negative integer`;
+      }
     }
     if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5)) {
       return `Number of players, ${numPlayers}, must be an integer between 2 to 5.`;
@@ -1071,10 +1076,16 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
   },
 
   turn: {
-    onBegin: ({ G }) => {
+    onBegin: ({ G, ctx }) => {
+      const { phase } = ctx;
+
       Land.replenishSupply(G);
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
+
+      if (phase === 'initialBuy') {
+        G.turnState = TurnState.Buy;
+      }
     },
     order: TurnOrder.CUSTOM_FROM('_turnOrder'),
   },
@@ -1100,13 +1111,30 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       move: addTwo,
       undoable: false,
     },
-    buyEst: buyEst,
-    buyLand: buyLand,
-    doTV: doTV,
-    doOfficeGive: doOfficeGive,
-    doOfficeTake: doOfficeTake,
-    skipOffice: skipOffice,
-    endTurn: endTurn,
+    buyEst,
+    buyLand,
+    doTV,
+    doOfficeGive,
+    doOfficeTake,
+    skipOffice,
+    endTurn,
+  },
+
+  phases: {
+    initialBuy: {
+      moves: {
+        buyEst,
+        buyLand,
+        endTurn,
+      },
+      endIf: ({ G, ctx }) => {
+        // end initial buying phase after `initialBuyRounds` rounds
+        const { initialBuyRounds } = G;
+        const { turn, numPlayers } = ctx;
+        return turn > initialBuyRounds * numPlayers;
+      },
+      start: true,
+    },
   },
 
   plugins: [Log.LogxPlugin],
