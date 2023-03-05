@@ -443,7 +443,7 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
     switchState(context);
 
   } else {
-    throw new Error('Unexpected error: `doOfficeGive` called in an unexpected state.');
+    throw new Error(`Unexpected error: 'doOfficeGive' called in an unexpected state ${G.turnState}.`);
   }
 
   return;
