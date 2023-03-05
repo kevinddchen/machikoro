@@ -170,10 +170,11 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
  * as part of the office action.
  */
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
+  // HACK: this is also used for Moving Company
   const player = parseInt(ctx.currentPlayer);
   const version = expToVer(G.expansion);
   return (
-    G.turnState === TurnState.OfficeGive &&
+    (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.MovingCompany) &&
     // must own the establishment
     Est.countOwned(G, player, est) > 0 &&
     // if playing Machi Koro 1, cannot give major (purple)
@@ -426,10 +427,24 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
   if (!canDoOfficeGive(G, ctx, est)) {
     return INVALID_MOVE;
   }
+  // HACK: this is also used for Moving Company
 
-  G.officeGiveEst = est;
-  // change game state directly instead of calling `switchState`
-  G.turnState = TurnState.OfficeTake;
+  if (G.turnState === TurnState.OfficeGive) {
+
+    G.officeGiveEst = est;
+    // change game state directly instead of calling `switchState`
+    G.turnState = TurnState.OfficeTake;
+
+  } else if (G.turnState === TurnState.MovingCompany) {
+
+    const player = parseInt(ctx.currentPlayer);
+    const prevPlayer = getPreviousPlayer(ctx);
+    Est.transfer(G, {from: player, to: prevPlayer}, est);
+    switchState(context);
+
+  } else {
+    throw new Error('Unexpected error: `doOfficeGive` called in an unexpected state.');
+  }
 
   return;
 };
@@ -449,7 +464,7 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
 
   const player = parseInt(ctx.currentPlayer);
   if (G.officeGiveEst === null) {
-    throw Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
+    throw new Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
   }
   Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
   Est.transfer(G, { from: opponent, to: player }, est);
@@ -538,23 +553,28 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const player = parseInt(ctx.currentPlayer);
 
-  if (G.turnState === TurnState.Roll) {
+  if (G.turnState < TurnState.ActivateEsts) {
     G.turnState = TurnState.ActivateEsts;
     activateEsts(context);
   }
   if (G.doTV > 0) {
     G.turnState = TurnState.TV;
     G.doTV -= 1;
-    return; // break and exit early
+    return; // await player action
   }
   if (G.doOffice > 0) {
     G.turnState = TurnState.OfficeGive;
-    G.doOffice -= 1; // Office may be done multiple times
-    return; // break and exit early
+    G.doOffice -= 1;
+    return; // await player action
   }
   if (G.turnState < TurnState.ActivateLands) {
     G.turnState = TurnState.ActivateLands;
     activateLands(context);
+  }
+  if (G.doMovingCompany) {
+    G.turnState = TurnState.MovingCompany;
+    G.doMovingCompany = false;
+    return; // await player action
   }
   if (G.turnState < TurnState.Buy) {
     G.turnState = TurnState.Buy;
@@ -571,7 +591,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
       }
     }
 
-    return; // break and exit early
+    return; // await player action
   }
   if (G.turnState < TurnState.ActivateBoughtLand) {
     G.turnState = TurnState.ActivateBoughtLand;
@@ -585,7 +605,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   }
   if (G.turnState < TurnState.End) {
     G.turnState = TurnState.End;
-    return; // break and exit early
+    return; // await player action
   }
 };
 
@@ -762,21 +782,25 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
  */
 const activateLands = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
-  const currentPlayer = parseInt(ctx.currentPlayer);
+  const player = parseInt(ctx.currentPlayer);
 
-  if ((Land.owns(G, currentPlayer, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) && G.rollDoubles) {
+  if ((Land.owns(G, player, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) && G.rollDoubles) {
     // if roll doubles, get second turn
     G.secondTurn = true;
   }
   if (Land.isOwned(G, Land.TechStartup2) && G.roll === 12) {
     // if roll 12, get 8 coins
-    earn(G, currentPlayer, Land.TechStartup2.coins!, Land.TechStartup2.name);
+    earn(G, player, Land.TechStartup2.coins!, Land.TechStartup2.name);
   }
   if (Land.isOwned(G, Land.Temple2) && G.rollDoubles) {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
-      take(G, { from: opponent, to: currentPlayer }, Land.Temple2.coins!, Land.Temple2.name);
+      take(G, { from: opponent, to: player }, Land.Temple2.coins!, Land.Temple2.name);
     }
+  }
+  if (Land.isOwned(G, Land.MovingCompany2) && G.rollDoubles && Est.getAllOwned(G, player).length > 0) {
+    // move 1 establishment to previous player
+    G.doMovingCompany = true;
   }
 };
 
@@ -869,6 +893,18 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
 };
 
 /**
+ * Return the previous player in the play order.
+ * @param ctx 
+ * @returns
+ */
+const getPreviousPlayer = (ctx: Ctx): number => {
+  const current = ctx.playOrderPos;
+  const N = ctx.numPlayers;
+  const shifted_i = (((current - 1) % N) + N) % N; // JS modulo is negative
+  return parseInt(ctx.playOrder[shifted_i]);
+};
+
+/**
  * Player earns coins from the bank, and the event is logged.
  * @param G
  * @param player
@@ -953,6 +989,7 @@ const newTurnG = {
   secondTurn: false,
   doTV: 0,
   doOffice: 0,
+  doMovingCompany: false,
   officeGiveEst: null,
   justBoughtEst: null,
   justBoughtLand: null,
