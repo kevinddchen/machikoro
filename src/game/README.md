@@ -19,6 +19,6 @@ Some concepts of _boardgame.io_ which are commonly used:
 
 To help organize the code, this directory also contains some submodules that handle certain parts of the game.
 
-- `Est` manages establishments.
-- `Land` manages landmarks.
-- `Log` manages logging.
+- [Est](establishments/) manages establishments.
+- [Land](landmarks/) manages landmarks.
+- [Log](log/) manages logging.
