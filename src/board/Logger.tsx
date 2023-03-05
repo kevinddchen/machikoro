@@ -89,7 +89,7 @@ export default class Logger extends React.Component<LogProps, object> {
         return `\trolled ${roll} (${dice})`;
       }
       case Log.LogEventType.AddTwo: {
-        return `\tchanged roll to ${event.roll}`;
+        return `\tchanged roll to ${event.roll} (Harbor)`;
       }
       case Log.LogEventType.Earn: {
         const { player, amount, name } = event;
@@ -104,7 +104,11 @@ export default class Logger extends React.Component<LogProps, object> {
       }
       case Log.LogEventType.Office: {
         const { player_est_name, opponent_est_name, opponent } = event;
-        return `\texchanged ${player_est_name} for ${opponent_est_name} with ${names[opponent]}`;
+        return `\texchanged ${player_est_name} for ${opponent_est_name} with ${names[opponent]} (Business Center)`;
+      }
+      case Log.LogEventType.MovingCompany: {
+        const { est_name, opponent } = event;
+        return `\tgave ${est_name} to ${names[opponent]} (Moving Company)`;
       }
       case Log.LogEventType.TunaRoll: {
         return `\t(Tuna boat roll: ${event.roll})`;

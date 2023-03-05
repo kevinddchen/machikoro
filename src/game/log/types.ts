@@ -13,6 +13,7 @@ export const LogEventType = {
   Take: 'Take',
   Buy: 'Buy',
   Office: 'Office',
+  MovingCompany: 'MovingCompany',
   TunaRoll: 'TunaRoll',
   EndGame: 'EndGame',
 } as const;

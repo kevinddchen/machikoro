@@ -440,6 +440,7 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
     const player = parseInt(ctx.currentPlayer);
     const prevPlayer = getPreviousPlayer(ctx);
     Est.transfer(G, {from: player, to: prevPlayer}, est);
+    Log.logMovingCompany(G, est.name, prevPlayer);
     switchState(context);
 
   } else {
