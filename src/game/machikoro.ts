@@ -2,8 +2,6 @@
 // Implementation of Machikoro board game.
 //
 
-// TODO: implement Machi Koro 2 initial building rounds
-
 import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';

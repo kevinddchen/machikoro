@@ -104,6 +104,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
       const estColor = estColorToClass(est.color, canDoOffice);
       const rollString = rollsToString(est);
+      const estDescription = est.name + '\n\n' + est.description;
 
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
@@ -115,7 +116,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           >
             <div className='mini_roll'>{rollString}</div>
             <div className='mini_type'>{est.type}</div>
-            <div className={classNames('tooltip', 'mini_tooltip')}>{est.name}</div>
+            <div className={classNames('tooltip', 'mini_tooltip')}>{estDescription}</div>
           </td>
         );
       }
