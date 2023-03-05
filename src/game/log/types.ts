@@ -16,6 +16,7 @@ export const LogEventType = {
   MovingCompany: 'MovingCompany',
   Park: 'Park',
   TunaRoll: 'TunaRoll',
+  EndInitialBuyPhase: 'EndInitialBuyPhase',
   EndGame: 'EndGame',
 } as const;
 

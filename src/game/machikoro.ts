@@ -120,18 +120,8 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
 export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => {
   const player = parseInt(ctx.currentPlayer);
 
-  // Loan Office is the only landmark with an extra restriction on buying
-  const canBuyLoanOffice = () => {
-    if (Land.countBuilt(G, player) > 0) {
-      return false;
-    }
-    for (const opponent of getPreviousPlayers(ctx)) {
-      if (Land.countBuilt(G, opponent) === 0) {
-        return false;
-      }
-    }
-    return true;
-  };
+  const canBuyLoanOffice = (): boolean =>
+    Land.countBuilt(G, player) === 0 && getPreviousPlayers(ctx).every((opponent) => Land.countBuilt(G, opponent) > 0);
 
   return (
     G.turnState === TurnState.Buy &&
@@ -141,7 +131,7 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     !Land.owns(G, player, land) &&
     // player has enough coins
     getCoins(G, player) >= Land.cost(G, land, player) &&
-    // Loan Office has an extra restriction
+    // Loan Office has an extra restriction: must be only player without built landmarks
     (!Land.isEqual(land, Land.LoanOffice2) || canBuyLoanOffice())
   );
 };
@@ -509,6 +499,8 @@ const endTurn: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
+  const { initialBuyRounds } = G;
+  const { phase, turn, numPlayers } = ctx;
   const player = parseInt(ctx.currentPlayer);
 
   // a player earns coins via the airport if they did not buy anything
@@ -519,6 +511,12 @@ const endTurn: Move<MachikoroG> = (context) => {
     if (Land.isOwned(G, Land.Airport2)) {
       earn(G, ctx, player, Land.Airport2.coins!, Land.Airport2.name);
     }
+  }
+
+  // end initial buying phase after `initialBuyRounds` rounds
+  if (phase === 'initialBuyPhase' && turn === initialBuyRounds * numPlayers) {
+    Log.logEndInitialBuyPhase(G);
+    events.endPhase();
   }
 
   // check second turn
@@ -808,7 +806,7 @@ const activateLands = (context: FnContext<MachikoroG>): void => {
     G.doMovingCompany = true;
   }
   if (Land.isOwned(G, Land.Charterhouse2) && G.numDice === 2 && !G.receivedCoins) {
-    // NOTE: this must be the last landmark to activate!
+    // NOTE: this must activate after all money-earning landmarks!
     // get 3 coins from the bank
     earn(G, ctx, player, Land.Charterhouse2.coins!, Land.Charterhouse2.name);
   }
@@ -986,10 +984,11 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
 /**
  * Set-up data for debug mode.
  */
-const debugSetupData = {
-  expansion: Expansion.MK2,
+const debugSetupData: SetupData = {
+  expansion: Expansion.Harbor,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
+  initialBuyRounds: 0,
   randomizeTurnOrder: false,
 };
 
@@ -1020,7 +1019,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     if (!setupData) {
       setupData = debugSetupData;
     }
-    const { expansion, supplyVariant, startCoins, randomizeTurnOrder } = setupData;
+    const { expansion, supplyVariant, startCoins, initialBuyRounds, randomizeTurnOrder } = setupData;
     const { numPlayers } = ctx;
 
     // initialize coins
@@ -1036,6 +1035,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     const G: MachikoroG = {
       expansion,
       supplyVariant,
+      initialBuyRounds,
       _turnOrder,
       ...newTurnG,
       secret: { _decks: null, _landDeck: null },
@@ -1064,7 +1064,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
 
   validateSetupData: (setupData, numPlayers) => {
     if (setupData) {
-      const { expansion, supplyVariant, startCoins } = setupData;
+      const { expansion, supplyVariant, initialBuyRounds, startCoins } = setupData;
       if (!Object.values(Expansion).includes(expansion)) {
         return `Unknown expansion: ${expansion}`;
       }
@@ -1074,6 +1074,9 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       if (!Number.isInteger(startCoins) || startCoins < 0) {
         return `Number of starting coins, ${startCoins}, must be a non-negative integer`;
       }
+      if (!Number.isInteger(initialBuyRounds) || initialBuyRounds < 0) {
+        return `Number of initial buying rounds, ${initialBuyRounds}, must be a non-negative integer`;
+      }
     }
     if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5)) {
       return `Number of players, ${numPlayers}, must be an integer between 2 to 5.`;
@@ -1082,10 +1085,16 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
   },
 
   turn: {
-    onBegin: ({ G }) => {
+    onBegin: ({ G, ctx }) => {
+      const { phase } = ctx;
+
       Land.replenishSupply(G);
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
+
+      if (phase === 'initialBuyPhase') {
+        G.turnState = TurnState.Buy;
+      }
     },
     order: TurnOrder.CUSTOM_FROM('_turnOrder'),
   },
@@ -1111,13 +1120,30 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       move: addTwo,
       undoable: false,
     },
-    buyEst: buyEst,
-    buyLand: buyLand,
-    doTV: doTV,
-    doOfficeGive: doOfficeGive,
-    doOfficeTake: doOfficeTake,
-    skipOffice: skipOffice,
-    endTurn: endTurn,
+    buyEst,
+    buyLand,
+    doTV,
+    doOfficeGive,
+    doOfficeTake,
+    skipOffice,
+    endTurn,
+  },
+
+  phases: {
+    initialBuyPhase: {
+      moves: {
+        buyEst,
+        buyLand,
+        endTurn,
+      },
+      onBegin: ({ G, events }) => {
+        // end phase immediately if no initial buying rounds
+        if (G.initialBuyRounds === 0) {
+          events.endPhase();
+        }
+      },
+      start: true,
+    },
   },
 
   plugins: [Log.LogxPlugin],

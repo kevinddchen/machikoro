@@ -11,6 +11,7 @@ import { LogEvent } from './log/types';
  * The `G` object containing all game state variables.
  * @prop {Expansion} expansion - the expansion of the game.
  * @prop {SupplyVariant} supplyVariant - the supply variant of the game.
+ * @prop {number} initialBuyRounds - the number of rounds of initial buying.
  * @prop {string[]} _turnOrder - the order of players in the game. Do not use
  * this property; use `ctx.playOrder` instead.
  * @prop {TurnState} turnState - the current player's turn state.
@@ -37,6 +38,7 @@ import { LogEvent } from './log/types';
 export interface MachikoroG {
   readonly expansion: Expansion;
   readonly supplyVariant: SupplyVariant;
+  readonly initialBuyRounds: number;
   readonly _turnOrder: string[];
   turnState: TurnState;
   roll: number;
@@ -74,12 +76,14 @@ export interface Secret {
  * @prop {Expansion} expansion - Expansion of the game.
  * @prop {SupplyVariant} supplyVariant - Supply variant of the game.
  * @prop {number} startCoins - Number of coins each player starts with.
+ * @prop {number} initialBuyRounds - Number of rounds of initial buying.
  * @prop {boolean} randomizeTurnOrder - True if the turn order should be randomized.
  */
 export interface SetupData {
   expansion: Expansion;
   supplyVariant: SupplyVariant;
   startCoins: number;
+  initialBuyRounds: number;
   randomizeTurnOrder: boolean;
 }
 
