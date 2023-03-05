@@ -68,7 +68,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
       }
       case Game.TurnState.MovingCompany: {
         if (isActive) {
-          msg = 'Moving company: Select an establishment to give.';
+          msg = 'Moving company: Select one of your establishments to give.';
         } else {
           msg = currentPlayerName + ' is making a move: Moving company';
         }
