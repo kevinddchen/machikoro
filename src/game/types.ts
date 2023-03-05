@@ -18,11 +18,12 @@ import { LogEvent } from './log/types';
  * @prop {boolean} rollDoubles - true if the current player rolled doubles.
  * @prop {number} numRolls - the number of dice rolls made by the current player.
  * @prop {boolean} secondTurn - true if the current player can make another turn.
- * @prop {number} doTV - number of times the current player will activate the TV station.
- * @prop {number} doOffice - number of times the current player will activate the office.
- * @prop {Establishment|null} officeGiveEst - the establishment picked for the office to give.
- * @prop {Establishment|null} justBoughtEst - the establishment just bought (for prettier rendering).
- * @prop {Landmark|null} justBoughtLand - the landmark just bought (for prettier rendering in Machi Koro 2).
+ * @prop {number} doTV - number of times the current player will activate the TV Station.
+ * @prop {number} doOffice - number of times the current player will activate the Office.
+ * @prop {boolean} doMovingCompany - true if the current player will activate the Moving Company.
+ * @prop {Establishment|null} officeGiveEst - the establishment picked for the Office to give.
+ * @prop {Establishment|null} justBoughtEst - the establishment just bought.
+ * @prop {Landmark|null} justBoughtLand - the landmark just bought.
  * @prop {number|null} tunaRoll - the roll made for the tuna boat.
  * @prop {Secret} secret - game state that is not passed to clients.
  * @prop {number[]} _coins - coins for each player. Do not use this property;
@@ -42,6 +43,7 @@ export interface MachikoroG {
   secondTurn: boolean;
   doTV: number;
   doOffice: number;
+  doMovingCompany: boolean;
   officeGiveEst: Establishment | null;
   justBoughtEst: Establishment | null;
   justBoughtLand: Landmark | null;
@@ -79,8 +81,7 @@ export interface SetupData {
 
 /**
  * Turn state enum. The order of the states in the turn is reflected in the
- * integer values--higher values are later in the turn. Integers divisible by
- * 10 are 
+ * integer values--higher values are later in the turn.
  */
 export const TurnState = {
   Roll: 0,
@@ -89,6 +90,7 @@ export const TurnState = {
   OfficeGive: 12,
   OfficeTake: 13,
   ActivateLands: 20,
+  MovingCompany: 21,
   Buy: 30,
   ActivateBoughtLand: 31,
   End: 40,

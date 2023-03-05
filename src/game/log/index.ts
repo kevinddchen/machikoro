@@ -122,6 +122,16 @@ export const logOffice = (
 };
 
 /**
+ * Log the effect of the Moving Company landmark.
+ * @param G
+ * @param est_name
+ * @param opponent
+ */
+export const logMovingCompany = (G: MachikoroG, est_name: string, opponent: number): void => {
+  G._logBuffer!.push({ eventType: LogEventType.MovingCompany, est_name, opponent });
+};
+
+/**
  * Log the tuna roll for the turn.
  * @param G
  * @param roll - The sum value of the two dice.

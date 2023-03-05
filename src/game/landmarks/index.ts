@@ -123,7 +123,7 @@ export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
  */
 export const countBuilt = (G: MachikoroG, player: number): number => {
   if (expToVer(G.expansion) !== Version.MK2) {
-    throw new Error(`countBuilt() is only implemented for Machi Koro 2.`);
+    throw new Error('`countBuilt()` is only implemented for Machi Koro 2.');
   }
   return getAllOwned(G, player).filter((land) => !isEqual(land, Meta2.CityHall2)).length;
 };
