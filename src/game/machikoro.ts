@@ -237,8 +237,8 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
     // a player has won if they own all landmarks in use
     return Land.getAllInUse(G).every((land) => Land.owns(G, player, land));
   } else if (version === Version.MK2) {
-    // a player has won if they have built 3 landmarks (excluding City Hall)
-    return Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
+    // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
+    return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
   } else {
     throw new Error(`Version '${version}' not implemented.`);
   }
@@ -266,7 +266,7 @@ const rollOne: Move<MachikoroG> = (context) => {
   Log.logRollOne(G, G.roll);
 
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(context);
+    switchState(context);
   }
 
   return;
@@ -289,7 +289,7 @@ const rollTwo: Move<MachikoroG> = (context) => {
   Log.logRollTwo(G, dice);
 
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(context);
+    switchState(context);
   }
 
   return;
@@ -298,21 +298,22 @@ const rollTwo: Move<MachikoroG> = (context) => {
 /**
  * Force the outcome of the dice roll. This move is removed in production.
  * @param context
- * @param roll - Desired dice total.
+ * @param die1 - Desired first die value.
+ * @param die2 - Desired second die value. If not provided, defaults to 0.
  */
-const debugRoll: Move<MachikoroG> = (context, roll: number) => {
+const debugRoll: Move<MachikoroG> = (context, die1: number, die2 = 0) => {
   const { G, ctx } = context;
   if (!canRoll(G, ctx, 1)) {
     return INVALID_MOVE;
   }
 
-  G.roll = roll;
+  G.roll = die1 + die2;
   G.numRolls += 1;
-  G.rollDoubles = false;
-  Log.logRollOne(G, roll);
+  G.rollDoubles = die1 == die2;
+  Log.logRollOne(G, die1 + die2);
 
   if (noFurtherRollActions(G, ctx)) {
-    commitRoll(context);
+    switchState(context);
   }
 
   return;
@@ -328,7 +329,7 @@ const keepRoll: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  commitRoll(context);
+  switchState(context);
 
   return;
 };
@@ -343,10 +344,10 @@ const addTwo: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  G.roll! += 2; // G.roll is not null via canAddTwo() check
+  G.roll! += 2;
   Log.logAddTwo(G, G.roll!);
 
-  commitRoll(context);
+  switchState(context);
 
   return;
 };
@@ -368,7 +369,7 @@ const buyEst: Move<MachikoroG> = (context, est: Establishment) => {
   G.justBoughtEst = est;
   Log.logBuy(G, est.name);
 
-  G.turnState = TurnState.End;
+  switchState(context);
 
   return;
 };
@@ -390,14 +391,8 @@ const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
   G.justBoughtLand = land;
   Log.logBuy(G, land.name);
 
-  if (canEndGame(G, ctx)) {
-    endGame(context, player);
-  }
+  switchState(context);
 
-  // in Machi Koro 2, buying landmarks can have an immediate effect
-  evalLandAction(context, land);
-
-  G.turnState = TurnState.End;
   return;
 };
 
@@ -433,6 +428,7 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
   }
 
   G.officeGiveEst = est;
+  // change game state directly instead of calling `switchState`
   G.turnState = TurnState.OfficeTake;
 
   return;
@@ -512,6 +508,7 @@ const endTurn: Move<MachikoroG> = (context) => {
     events.endTurn();
   }
 
+  // no `switchState` because turn has ended.
   return;
 };
 
@@ -533,11 +530,70 @@ const addCoins = (G: MachikoroG, player: number, amount: number): void => {
 };
 
 /**
- * Evaluate the outcome of the roll by performing establishment actions. This
- * function controls the execution of the establishments.
+ * This function controls the flow of the turn's state. This should be called 
+ * at the end of all Moves.
  * @param context
  */
-const commitRoll = (context: FnContext<MachikoroG>): void => {
+const switchState = (context: FnContext<MachikoroG>): void => {
+  const { G, ctx } = context;
+  const player = parseInt(ctx.currentPlayer);
+
+  if (G.turnState === TurnState.Roll) {
+    G.turnState = TurnState.ActivateEsts;
+    activateEsts(context);
+  }
+  if (G.doTV > 0) {
+    G.turnState = TurnState.TV;
+    G.doTV -= 1;
+    return; // break and exit early
+  }
+  if (G.doOffice > 0) {
+    G.turnState = TurnState.OfficeGive;
+    G.doOffice -= 1; // Office may be done multiple times
+    return; // break and exit early
+  }
+  if (G.turnState < TurnState.ActivateLands) {
+    G.turnState = TurnState.ActivateLands;
+    activateLands(context);
+  }
+  if (G.turnState < TurnState.Buy) {
+    G.turnState = TurnState.Buy;
+
+    // activate city hall before buying
+    if (getCoins(G, player) === 0) {
+      if (Land.owns(G, player, Land.CityHall)) {
+        addCoins(G, player, Land.CityHall.coins!);
+        Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
+      }
+      if (Land.owns(G, player, Land.CityHall2)) {
+        addCoins(G, player, Land.CityHall2.coins!);
+        Log.logEarn(G, player, Land.CityHall2.coins!, Land.CityHall2.name);
+      }
+    }
+
+    return; // break and exit early
+  }
+  if (G.turnState < TurnState.ActivateBoughtLand) {
+    G.turnState = TurnState.ActivateBoughtLand;
+
+    // first, check if game is over
+    if (canEndGame(G, ctx)) {
+      endGame(context, player);
+    }
+
+    activateBoughtLand(context);
+  }
+  if (G.turnState < TurnState.End) {
+    G.turnState = TurnState.End;
+    return; // break and exit early
+  }
+};
+
+/**
+ * Activate establishments.
+ * @param context
+ */
+const activateEsts = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const currentPlayer = parseInt(ctx.currentPlayer);
   const roll = G.roll!;
@@ -698,8 +754,16 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       }
     }
   }
+};
 
-  // Do Landmarks.
+/**
+ * Activate continuous effect landmarks.
+ * @param context
+ */
+const activateLands = (context: FnContext<MachikoroG>): void => {
+  const { G, ctx } = context;
+  const currentPlayer = parseInt(ctx.currentPlayer);
+
   if ((Land.owns(G, currentPlayer, Land.AmusementPark) || Land.isOwned(G, Land.AmusementPark2)) && G.rollDoubles) {
     // if roll doubles, get second turn
     G.secondTurn = true;
@@ -714,31 +778,25 @@ const commitRoll = (context: FnContext<MachikoroG>): void => {
       take(G, { from: opponent, to: currentPlayer }, Land.Temple2.coins!, Land.Temple2.name);
     }
   }
-
-  // always switch state after committing role
-  switchState(context);
 };
 
 /**
- * Evaluate the effect of a landmark that was just bought. This function does
- * nothing for Machi Koro 1.
+ * Activate landmark that was just bought, if it has an immediate effect.
+ * @param context
  */
-const evalLandAction = (context: FnContext<MachikoroG>, land: Landmark): void => {
+const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
-  const version = expToVer(G.expansion);
+  const land = G.justBoughtLand;
   const player = parseInt(ctx.currentPlayer);
 
-  // do nothing for Machi Koro 1
-  if (version === Version.MK1) {
-    return;
+  if (land === null) {
+    return; // no land was just bought
   }
 
+  // Launch Pad is not activated here, but is checked as a win condition in `canEndGame`
   if (Land.isEqual(land, Land.RadioTower2)) {
     // get second turn
     G.secondTurn = true;
-  } else if (Land.isEqual(land, Land.LaunchPad2)) {
-    // win the game
-    endGame(context, player);
   } else if (Land.isEqual(land, Land.FrenchRestaurant2)) {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
@@ -858,36 +916,6 @@ const getTunaRoll = (context: FnContext<MachikoroG>): number => {
 };
 
 /**
- * To be run after the roll is commited and after doing TV or Office. Checks if
- * TV or Office needs to be performed, and changes the game state accordingly.
- * @param context
- */
-const switchState = (context: FnContext<MachikoroG>): void => {
-  const { G, ctx } = context;
-  const player = parseInt(ctx.currentPlayer);
-  if (G.doTV > 0) {
-    G.doTV -= 1;
-    G.turnState = TurnState.TV;
-  } else if (G.doOffice > 0) {
-    G.doOffice -= 1;
-    G.turnState = TurnState.OfficeGive;
-  } else {
-    G.turnState = TurnState.Buy;
-    if (getCoins(G, player) === 0) {
-      // activate city hall before buying
-      if (Land.owns(G, player, Land.CityHall)) {
-        addCoins(G, player, Land.CityHall.coins!);
-        Log.logEarn(G, player, Land.CityHall.coins!, Land.CityHall.name);
-      }
-      if (Land.owns(G, player, Land.CityHall2)) {
-        addCoins(G, player, Land.CityHall2.coins!);
-        Log.logEarn(G, player, Land.CityHall2.coins!, Land.CityHall2.name);
-      }
-    }
-  }
-};
-
-/**
  * End the game.
  * @param context
  * @param winner - ID of the winning player.
@@ -908,7 +936,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData = {
-  expansion: Expansion.Harbor,
+  expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   randomizeTurnOrder: false,
