@@ -117,6 +117,9 @@ export default class Logger extends React.Component<LogProps, object> {
       case Log.LogEventType.TunaRoll: {
         return `\t(Tuna boat roll: ${event.roll})`;
       }
+      case Log.LogEventType.EndInitialBuyPhase: {
+        return `(End of initial build phase)`;
+      }
       case Log.LogEventType.EndGame: {
         return `Game over! Winner: ${names[event.winner]}`;
       }

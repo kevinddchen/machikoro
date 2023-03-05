@@ -150,6 +150,14 @@ export const logTunaRoll = (G: MachikoroG, roll: number): void => {
 };
 
 /**
+ * Log the end of the initial buy phase.
+ * @param G 
+ */
+export const logEndInitialBuyPhase = (G: MachikoroG): void => {
+  G._logBuffer!.push({ eventType: LogEventType.EndInitialBuyPhase });
+};
+
+/**
  * Log the winner of the game.
  * @param G
  * @param winner - ID of the winning player.
