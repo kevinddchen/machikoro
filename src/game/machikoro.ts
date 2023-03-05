@@ -120,19 +120,6 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
 export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => {
   const player = parseInt(ctx.currentPlayer);
 
-  // Loan Office is the only landmark with an extra restriction on buying
-  const canBuyLoanOffice = () => {
-    if (Land.countBuilt(G, player) > 0) {
-      return false;
-    }
-    for (const opponent of getPreviousPlayers(ctx)) {
-      if (Land.countBuilt(G, opponent) === 0) {
-        return false;
-      }
-    }
-    return true;
-  };
-
   return (
     G.turnState === TurnState.Buy &&
     // landmark is available for purchase
@@ -141,8 +128,10 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     !Land.owns(G, player, land) &&
     // player has enough coins
     getCoins(G, player) >= Land.cost(G, land, player) &&
-    // Loan Office has an extra restriction
-    (!Land.isEqual(land, Land.LoanOffice2) || canBuyLoanOffice())
+    // Loan Office has an extra restriction: must be only player without built landmarks
+    (!Land.isEqual(land, Land.LoanOffice2) ||
+      (Land.countBuilt(G, player) === 0 &&
+        getPreviousPlayers(ctx).every((opponent) => Land.countBuilt(G, opponent) > 0)))
   );
 };
 
@@ -808,7 +797,7 @@ const activateLands = (context: FnContext<MachikoroG>): void => {
     G.doMovingCompany = true;
   }
   if (Land.isOwned(G, Land.Charterhouse2) && G.numDice === 2 && !G.receivedCoins) {
-    // NOTE: this must be the last landmark to activate!
+    // NOTE: this must activate after all money-earning landmarks!
     // get 3 coins from the bank
     earn(G, ctx, player, Land.Charterhouse2.coins!, Land.Charterhouse2.name);
   }

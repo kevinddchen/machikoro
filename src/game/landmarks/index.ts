@@ -155,7 +155,7 @@ export const cost = (G: MachikoroG, land: Landmark, player: number): number => {
  * @param land
  * @param player
  * @returns A copy of the cost array for the landmark. In Machi Koro 2, the
- * cost array may change based on the number of built landmarks.
+ * cost array may change based on the built landmarks.
  */
 export const costArray = (G: MachikoroG, land: Landmark, player: number | null): number[] => {
   let arr = [...land.cost];
