@@ -865,6 +865,13 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
       const amount = land.coins! * Est.countTypeOwned(G, opponent, EstType.Cup);
       take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
+  } else if (Land.isEqual(land, Land.Park2)) {
+    // redistribute everyone's coins evenly
+    // HACK: directly accessing coins array
+    const totalCoins = G._coins.reduce((a, b) => a + b, 0);
+    const coinsPerPlayer = Math.ceil(totalCoins / ctx.numPlayers);
+    G._coins.fill(coinsPerPlayer);
+    Log.logPark(G, coinsPerPlayer);
   }
 };
 
@@ -982,7 +989,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
 const debugSetupData = {
   expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
-  startCoins: 12,
+  startCoins: 99,
   randomizeTurnOrder: false,
 };
 

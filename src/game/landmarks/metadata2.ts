@@ -163,7 +163,6 @@ export const Museum2: Landmark = {
   cost: [12, 16, 22],
 };
 
-// TODO: implement
 export const Park2: Landmark = {
   _id: 15,
   _ver: Version.MK2,
