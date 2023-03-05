@@ -120,6 +120,9 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
 export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => {
   const player = parseInt(ctx.currentPlayer);
 
+  const canBuyLoanOffice = (): boolean =>
+    Land.countBuilt(G, player) === 0 && getPreviousPlayers(ctx).every((opponent) => Land.countBuilt(G, opponent) > 0);
+
   return (
     G.turnState === TurnState.Buy &&
     // landmark is available for purchase
@@ -129,9 +132,7 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
     // player has enough coins
     getCoins(G, player) >= Land.cost(G, land, player) &&
     // Loan Office has an extra restriction: must be only player without built landmarks
-    (!Land.isEqual(land, Land.LoanOffice2) ||
-      (Land.countBuilt(G, player) === 0 &&
-        getPreviousPlayers(ctx).every((opponent) => Land.countBuilt(G, opponent) > 0)))
+    (!Land.isEqual(land, Land.LoanOffice2) || canBuyLoanOffice())
   );
 };
 
@@ -513,7 +514,7 @@ const endTurn: Move<MachikoroG> = (context) => {
   }
 
   // end initial buying phase after `initialBuyRounds` rounds
-  if (phase === "initialBuyPhase" && turn === initialBuyRounds * numPlayers) {
+  if (phase === 'initialBuyPhase' && turn === initialBuyRounds * numPlayers) {
     Log.logEndInitialBuyPhase(G);
     events.endPhase();
   }
@@ -984,10 +985,10 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  expansion: Expansion.MK2,
+  expansion: Expansion.Harbor,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
-  initialBuyRounds: 1,
+  initialBuyRounds: 0,
   randomizeTurnOrder: false,
 };
 
@@ -1091,7 +1092,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       Est.replenishSupply(G);
       Object.assign(G, newTurnG);
 
-      if (phase === "initialBuyPhase") {
+      if (phase === 'initialBuyPhase') {
         G.turnState = TurnState.Buy;
       }
     },

@@ -151,7 +151,7 @@ export const logTunaRoll = (G: MachikoroG, roll: number): void => {
 
 /**
  * Log the end of the initial buy phase.
- * @param G 
+ * @param G
  */
 export const logEndInitialBuyPhase = (G: MachikoroG): void => {
   G._logBuffer!.push({ eventType: LogEventType.EndInitialBuyPhase });
