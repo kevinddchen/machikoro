@@ -4,7 +4,7 @@ import { MatchInfo } from './types';
  * Internal version number for the authentication system. Bump this number to
  * clear all previously stored credentials from the client browser.
  */
-const AUTH_VERSION = 1;
+const AUTH_VERSION = 2;
 
 /**
  * Key where the authentication version is stored in local storage.
@@ -47,7 +47,8 @@ export default class Authenticator {
    */
   saveMatchInfo(matchInfo: MatchInfo): void {
     const { matchID, playerID, credentials } = matchInfo;
-    const storageString = playerID + '_' + credentials;
+    // credentials use the characters [a-zA-Z0-9_-]
+    const storageString = playerID + '.' + credentials;
     localStorage.setItem(matchID, storageString);
   }
 
@@ -68,7 +69,7 @@ export default class Authenticator {
     if (storageString === null) {
       return null;
     }
-    const split = storageString.split('_');
+    const split = storageString.split('.');
     const playerID = split[0];
     const credentials = split[1];
     return { matchID, playerID, credentials };
