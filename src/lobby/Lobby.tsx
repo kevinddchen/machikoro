@@ -16,7 +16,7 @@ import {
   Version,
   expToVer,
 } from 'game';
-import { countPlayers, expansionName, seatIsOccupied, supplyVariantName } from './utils';
+import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
@@ -199,79 +199,43 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @param matchID
    */
   private joinMatch = async (matchID: string): Promise<void> => {
+    const { name, lobbyClient } = this.props;
     const { connected } = this.state;
 
     if (!connected) {
       return;
     }
 
-    // try to join the match
-    let matchInfo: MatchInfo;
-    if (this.authenticator.hasMatchInfo(matchID) || (await this.joinMatchNoCredentials(matchID))) {
-      matchInfo = this.authenticator.fetchMatchInfo(matchID)!;
-    } else {
-      // specific error messages should have been displayed, so no feedback is needed here
+    // first, try to join the match on saved credentials
+    if (this.authenticator.hasMatchInfo(matchID)) {
+      const matchInfo = this.authenticator.fetchMatchInfo(matchID)!;
+      this.props.setMatchInfo(matchInfo);
+      // this will trigger `Matchmaker` to switch to the waiting room
       return;
     }
 
-    // this will trigger `Matchmaker` to switch to the waiting room
-    this.props.setMatchInfo(matchInfo);
-  };
+    // second, try to join the match by creating new credentials
 
-  /**
-   * Join a match by creating new credentials.
-   * @param matchID
-   * @returns True on success, false on failure.
-   */
-  private joinMatchNoCredentials = async (matchID: string): Promise<boolean> => {
-    const { name, lobbyClient } = this.props;
-    const { connected } = this.state;
-
-    if (!connected || !this.validateName()) {
-      return false;
-    }
-
-    let match: LobbyAPI.Match;
-    try {
-      match = await lobbyClient.getMatch(GAME_NAME, matchID);
-    } catch (e) {
-      this.props.setErrorMessage('Error when joining match. Try again.');
-      console.error('(joinMatchNoCredentials)', e);
-      return false;
-    }
-
-    let playerID: string | null = null;
-    // look for an available seat
-    for (let seat = 0; seat < match.players.length; seat++) {
-      if (seatIsOccupied(match.players[seat])) {
-        // if seat is occupied, check the player does not share same name
-        if (match.players[seat].name === name) {
-          this.props.setErrorMessage('Name already taken.');
-          return false;
-        }
-      } else if (playerID === null) {
-        // if haven't already found a seat, sit
-        playerID = seat.toString();
-      }
-    }
-
-    // check if could not find a seat
-    if (playerID === null) {
-      this.props.setErrorMessage('No free seats available.');
-      return false;
+    if (!this.validateName()) {
+      return;
     }
 
     // try to join match
     let joinedMatch: LobbyAPI.JoinedMatch;
     try {
-      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerID, playerName: name });
+      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name });
     } catch (e) {
       this.props.setErrorMessage('Error when joining match. Try again.');
       console.error('(joinMatchNoCredentials)', e);
-      return false;
+      return;
     }
-    this.authenticator.saveMatchInfo({ matchID, playerID, credentials: joinedMatch.playerCredentials });
-    return true;
+
+    const { playerID, playerCredentials: credentials } = joinedMatch;
+    const matchInfo: MatchInfo = { matchID, playerID, credentials };
+    this.authenticator.saveMatchInfo(matchInfo);
+    this.props.setMatchInfo(matchInfo);
+    // this will trigger `Matchmaker` to switch to the waiting room
+    return;
   };
 
   /**
