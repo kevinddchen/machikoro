@@ -171,6 +171,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     } else {
       throw new Error(`Version ${version} not implemented.`);
     }
+
     const setupData: SetupData = {
       expansion,
       supplyVariant,
@@ -189,7 +190,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       return;
     }
 
-    console.log(`Created match '${createdMatch.matchID}'.`);
     // after creating the match, try to join
     await this.joinMatch(createdMatch.matchID);
   };
@@ -271,7 +271,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       return false;
     }
     this.authenticator.saveMatchInfo({ matchID, playerID, credentials: joinedMatch.playerCredentials });
-    console.log(`Saved credentials for match '${matchID}', seat ${playerID}.`);
     return true;
   };
 
@@ -298,7 +297,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     const { name, updateIntervalMs } = this.props;
     const { numPlayers, expansion, supplyVariant } = this.state;
 
-    console.log('Joined lobby.');
     this.props.clearErrorMessage();
 
     // set default values
@@ -320,7 +318,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   }
 
   componentWillUnmount() {
-    console.log('Leaving lobby...');
     if (this.fetchInterval) {
       clearInterval(this.fetchInterval);
     }
