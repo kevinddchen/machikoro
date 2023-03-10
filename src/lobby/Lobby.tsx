@@ -237,6 +237,23 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   };
 
   /**
+   * Spectate the match corresponding to `matchID`.
+   * @param matchID
+   */
+  private spectateMatch = async (matchID: string): Promise<void> => {
+    const { connected } = this.state;
+
+    if (!connected) {
+      return;
+    }
+
+    const matchInfo: MatchInfo = { matchID, playerID: '', credentials: '' };
+    this.props.setMatchInfo(matchInfo);
+    // this will trigger `Matchmaker` to switch to the waiting room
+    return;
+  };
+
+  /**
    * Check if entered name is valid. Sets error message if not.
    * @returns True if `this.props.name` is OK.
    */
@@ -378,17 +395,22 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
         // Button to join the room
         let button: JSX.Element | null = null;
-
-        // Able to rejoin the room (e.g. joined before, but closed browser)
         if (this.authenticator.hasMatchInfo(matchID)) {
+          // Able to rejoin the room (e.g. joined before, but closed browser)
           button = (
             <button className='button' onClick={() => this.joinMatch(matchID)}>
               Rejoin
             </button>
           );
-
+        } else if (numActivePlayers === numPlayers) {
+          // Room is full; can only spectate
+          button = (
+            <button className='button' onClick={() => this.spectateMatch(matchID)}>
+              Spectate
+            </button>
+          );
+        } else {
           // Room is not full; able to join the room as new player
-        } else if (numActivePlayers !== numPlayers) {
           button = (
             <button className='button' onClick={() => this.joinMatch(matchID)}>
               Join
