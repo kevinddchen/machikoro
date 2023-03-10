@@ -29,14 +29,14 @@ We recommend using [VS Code](https://code.visualstudio.com/) as your code editor
 Some contribution guidelines:
 
 - Run `npm run lint:fix` to run code linting and check for syntax errors.
-- Run `npm run prettier` to autoformat the code.
+- Run `npm run prettier:fix` to autoformat the code.
 
 ### Run locally in debug mode
 
 In a terminal window, run the following command:
 
 ```bash
-npm run serve
+npm run serve:dev
 ```
 
 This will start the game server.
@@ -63,7 +63,7 @@ npm run build
 Once the app has been built, you start the game server by running the same command as above,
 
 ```bash
-npm run serve
+npm run serve:prod
 ```
 
 The app will be hosted at `localhost:80`.
