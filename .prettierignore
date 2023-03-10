@@ -1,2 +1,3 @@
 .github/
+.package-lock.json
 build/
