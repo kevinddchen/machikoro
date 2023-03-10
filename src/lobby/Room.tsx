@@ -129,7 +129,6 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     }
 
     this.authenticator.deleteMatchInfo(matchID);
-    console.log(`Deleted credentials for match '${matchID}', seat ${playerID}.`);
 
     // this will trigger `Matchmaker` to switch to the lobby
     this.props.clearMatchInfo();
@@ -138,9 +137,8 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const { matchInfo, updateIntervalMs } = this.props;
+    const { updateIntervalMs } = this.props;
 
-    console.log(`Joined room for match '${matchInfo.matchID}'.`);
     this.props.clearErrorMessage();
 
     this.fetchMatch();
@@ -148,7 +146,6 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   }
 
   componentWillUnmount() {
-    console.log('Leaving room...');
     if (this.fetchInterval) {
       clearInterval(this.fetchInterval);
     }
