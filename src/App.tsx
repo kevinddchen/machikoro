@@ -4,7 +4,7 @@ import { Client } from 'boardgame.io/react';
 import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 
-import { PORT, IN_PROD } from 'config';
+import { IN_PROD, PORT } from 'config';
 import { MatchInfo, Matchmaker, debugMatchInfo } from 'lobby';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';
@@ -23,7 +23,7 @@ interface AppState {
  * @prop {string} serverOrigin - URL of the server.
  */
 export default class App extends React.Component<object, AppState> {
-  private serverOrigin: string;  
+  private serverOrigin: string;
 
   constructor(props: object) {
     super(props);

@@ -18,11 +18,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "serve": "ts-node-dev ./src/server.ts",
-    "serve:prod": "ts-node -T ./src/server.ts",
+    "serve:dev": "ts-node-dev ./src/server.ts",
+    "serve:prod": "ts-node --transpileOnly ./src/server.ts",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prettier": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,md}\""
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
   },
   "eslintConfig": {
     "extends": [

@@ -2,9 +2,9 @@
 
 This is an implementation of the Machi Koro board game.
 
--   [Base game rules](https://www.fgbradleys.com/rules/rules2/MachiKoro-rules.pdf).
--   [Harbor expansion rules](https://www.gokids.com.tw/tsaiss/gokids/rules/MK%20HABOR%20RULE%20EN.pdf).
--   [Machi Koro 2 rules](https://tesera.ru/images/items/1959687/machi-koro-2_Rulebook-FINAL.pdf).
+- [Base game rules](https://www.fgbradleys.com/rules/rules2/MachiKoro-rules.pdf).
+- [Harbor expansion rules](https://www.gokids.com.tw/tsaiss/gokids/rules/MK%20HABOR%20RULE%20EN.pdf).
+- [Machi Koro 2 rules](https://tesera.ru/images/items/1959687/machi-koro-2_Rulebook-FINAL.pdf).
 
 This app was developed using the React framework and the <a href="https://boardgame.io/">boardgame.io</a> game engine.
 
