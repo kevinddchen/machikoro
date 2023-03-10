@@ -72,11 +72,19 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         landDescription += '\n\nCost: ' + landCostArray[0].toString();
       }
 
+      // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
+      let onClickEvent: () => void;
+      if (player === clientPlayer) {
+        onClickEvent = () => moves.buyLand(land);
+      } else {
+        onClickEvent = () => void 0;
+      }
+
       lands.push(
         <td
           key={i}
           className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: canBuyLand })}
-          onClick={() => moves.buyLand(land)}
+          onClick={onClickEvent}
         >
           <div className='mini_name'>{land.miniName}</div>
           <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>
