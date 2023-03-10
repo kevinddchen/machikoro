@@ -214,13 +214,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       return;
     }
 
-    // second, try to join the match by creating new credentials
-
     if (!this.validateName()) {
       return;
     }
 
-    // try to join match
+    // second, try to join the match by creating new credentials
     let joinedMatch: LobbyAPI.JoinedMatch;
     try {
       joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name });
