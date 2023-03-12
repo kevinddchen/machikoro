@@ -11,7 +11,6 @@
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
     "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^4.9.5"
   },
   "scripts": {
@@ -24,12 +23,6 @@
     "lint:fix": "eslint --fix .",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write ."
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -52,7 +45,9 @@
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "eslint": "^8.35.0",
+    "eslint-config-react": "^1.1.7",
     "eslint-plugin-react": "^7.32.2",
-    "prettier": "^2.8.3"
+    "prettier": "^2.8.3",
+    "ts-node-dev": "^2.0.0"
   }
 }
