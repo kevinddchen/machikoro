@@ -293,7 +293,11 @@ const rollTwo: Move<MachikoroG> = (context) => {
  * @param die1 - Desired first die value.
  * @param die2 - Desired second die value. If not provided, defaults to 0.
  */
-const debugRoll: Move<MachikoroG> = (context, die1: number, die2 = 0) => {
+const debugRoll: Move<MachikoroG> = (
+  context,
+  die1: number,
+  die2: number = 0 // eslint-disable-line @typescript-eslint/no-inferrable-types
+) => {
   const { G, ctx } = context;
   if (!canRoll(G, ctx, 1)) {
     return INVALID_MOVE;

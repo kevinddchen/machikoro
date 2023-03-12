@@ -32,10 +32,9 @@ export const LogxPlugin: Plugin<Record<string, never>, Record<string, never>, Ma
       const wrappedFn: typeof fn = ({ G, log, ...rest }, ...args) => {
         // initialize empty log buffer
         G = { ...G, _logBuffer: [] };
-        // NOTE: boardgame.io uses `any` in their API here, so we have to ignore some eslint rules.
+        // NOTE: this seems to be the correct type annotation of `moveResult`, but it's not guaranteed.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
         const moveResult: MachikoroG | typeof INVALID_MOVE = fn({ G, log, ...rest }, ...args);
-        // NOTE: this seems to be the correct type annotation of `moveResult`, but it's not guaranteed.
         if (moveResult === INVALID_MOVE) {
           return INVALID_MOVE;
         }
