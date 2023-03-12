@@ -1022,10 +1022,10 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     const { numPlayers } = ctx;
 
     // initialize coins
-    const _coins = Array<number>(numPlayers).fill(startCoins);
+    const _coins = Array.from({ length: numPlayers }, () => startCoins);
 
     // initialize turn order
-    let _turnOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
+    let _turnOrder = Array.from({ length: numPlayers }, (_, i) => i.toString());
     if (randomizeTurnOrder) {
       _turnOrder = random.Shuffle(_turnOrder);
     }

@@ -236,12 +236,10 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   // initialize data structure
   const data: EstablishmentData = {
-    inUse: Array<boolean>(numEsts).fill(false),
-    remainingCount: Array<number>(numEsts).fill(0),
-    availableCount: Array<number>(numEsts).fill(0),
-    ownedCount: Array<Array<number>>(numEsts)
-      .fill([])
-      .map(() => Array<number>(numPlayers).fill(0)),
+    inUse: Array.from({ length: numEsts }, () => false),
+    remainingCount: Array.from({ length: numEsts }, () => 0),
+    availableCount: Array.from({ length: numEsts }, () => 0),
+    ownedCount: Array.from({ length: numEsts }, () => Array.from({ length: numPlayers }, () => 0)),
   };
 
   // get establishments in use, starting establishments
@@ -282,7 +280,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     decks = [[]];
     for (const id of ids) {
       const est = ests[id];
-      decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+      decks[0].push(...Array.from({ length: data.remainingCount[id] }, () => est));
     }
   } else if (supplyVariant === SupplyVariant.Hybrid) {
     if (version === Version.MK1) {
@@ -291,11 +289,11 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       for (const id of ids) {
         const est = ests[id];
         if (isMajor(est)) {
-          decks[2].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[2].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         } else if (isLower(est)) {
-          decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[0].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         } else {
-          decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[1].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         }
       }
     } else if (version === Version.MK2) {
@@ -304,9 +302,9 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       for (const id of ids) {
         const est = ests[id];
         if (isLower(est)) {
-          decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[0].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         } else {
-          decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[1].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         }
       }
     } else {

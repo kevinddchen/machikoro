@@ -436,8 +436,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
                 {numActivePlayers} / {numPlayers} players
               </div>
               <div className='lobby-div-row'>
-                {Array<string>(numActivePlayers).fill('X')}
-                {Array<string>(numPlayers - numActivePlayers).fill('O')}
+                {Array.from({ length: numActivePlayers }, () => 'X')}
+                {Array.from({ length: numPlayers - numActivePlayers }, () => 'O')}
               </div>
             </div>
             <div className='lobby-div-col'>{button}</div>
