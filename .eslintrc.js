@@ -6,9 +6,9 @@ module.exports = {
   },
 
   extends: [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
     // "plugin:@typescript-eslint/recommended-requiring-type-checking",
   ],
 
@@ -24,10 +24,9 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
 
-  plugins: [
-    'react',
-    '@typescript-eslint',
-  ],
+  plugins: ['react', '@typescript-eslint'],
+
+  root: true,
 
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
@@ -35,9 +34,10 @@ module.exports = {
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
     'sort-imports': [
-      'warn',
+      'error',
       {
-        'allowSeparatedGroups': true,
+        // ignoreCase: true,
+        allowSeparatedGroups: true,
       },
     ],
   },
