@@ -1022,7 +1022,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     const { numPlayers } = ctx;
 
     // initialize coins
-    const _coins = Array(numPlayers).fill(startCoins);
+    const _coins = Array<number>(numPlayers).fill(startCoins);
 
     // initialize turn order
     let _turnOrder = [...Array(numPlayers).keys()].map((x) => x.toString());

@@ -236,12 +236,12 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   // initialize data structure
   const data: EstablishmentData = {
-    inUse: Array(numEsts).fill(false),
-    remainingCount: Array(numEsts).fill(0),
-    availableCount: Array(numEsts).fill(0),
-    ownedCount: Array(numEsts)
-      .fill(null)
-      .map(() => Array(numPlayers).fill(0)),
+    inUse: Array<boolean>(numEsts).fill(false),
+    remainingCount: Array<number>(numEsts).fill(0),
+    availableCount: Array<number>(numEsts).fill(0),
+    ownedCount: Array<Array<number>>(numEsts)
+      .fill([])
+      .map(() => Array<number>(numPlayers).fill(0)),
   };
 
   // get establishments in use, starting establishments

@@ -15,7 +15,7 @@ import Supply from './Supply';
  */
 const initializeNames = (matchData: { id: number; name?: string }[]): string[] => {
   const numPlayers = matchData.length;
-  const names: string[] = Array(numPlayers).fill('');
+  const names: string[] = Array<string>(numPlayers).fill('');
   for (const { id, name } of matchData) {
     const displayName = name ? name : `player_${id}`; // use a default name if none is provided
     names[id] = displayName;

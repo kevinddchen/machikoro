@@ -233,11 +233,11 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   // initialize data structure
   const data: LandmarkData = {
-    inUse: Array(numLands).fill(false),
-    available: Array(numLands).fill(false),
-    owned: Array(numLands)
-      .fill(null)
-      .map(() => Array(numPlayers).fill(false)),
+    inUse: Array<boolean>(numLands).fill(false),
+    available: Array<boolean>(numLands).fill(false),
+    owned: Array<Array<boolean>>(numLands)
+      .fill([])
+      .map(() => Array<boolean>(numPlayers).fill(false)),
   };
 
   // initialize landmarks in use, starting landmarks
