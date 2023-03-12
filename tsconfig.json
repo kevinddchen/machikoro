@@ -3,7 +3,7 @@
     "target": "es6",
     "module": "CommonJS",
     "baseUrl": "./src",
-    
+
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
