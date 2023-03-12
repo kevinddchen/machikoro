@@ -9,7 +9,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
-    // "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
   ],
 
   parser: '@typescript-eslint/parser',
@@ -29,14 +29,11 @@ module.exports = {
   root: true,
 
   rules: {
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'off',
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
     'sort-imports': [
       'error',
       {
-        // ignoreCase: true,
         allowSeparatedGroups: true,
       },
     ],
