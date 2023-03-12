@@ -1041,7 +1041,7 @@ export const Machikoro: Game<MachikoroG, Record<string, never>, SetupData> = {
       _coins,
       _estData: null,
       _landData: null,
-      _logBuffer: null,
+      _logBuffer: [],
     };
 
     // initialize landmark and establishment data
