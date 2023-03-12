@@ -24,7 +24,7 @@ export * from './types';
  * On the client, this array of `LogEvent` objects are retrieved from where it
  * can be parsed.
  */
-export const LogxPlugin: Plugin<any, any, MachikoroG> = {
+export const LogxPlugin: Plugin<Record<string, never>, Record<string, never>, MachikoroG> = {
   name: 'logx',
 
   fnWrap: (fn, fnType) => {

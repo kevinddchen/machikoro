@@ -1011,7 +1011,7 @@ const newTurnG = {
   tunaRoll: null,
 };
 
-export const Machikoro: Game<MachikoroG, any, SetupData> = {
+export const Machikoro: Game<MachikoroG, Record<string, never>, SetupData> = {
   name: GAME_NAME,
 
   setup: ({ ctx, random }, setupData) => {
