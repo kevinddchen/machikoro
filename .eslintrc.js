@@ -32,7 +32,7 @@ module.exports = {
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
     'sort-imports': [
-      'error',
+      'warn',
       {
         allowSeparatedGroups: true,
       },

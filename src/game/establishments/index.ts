@@ -7,6 +7,7 @@ import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, SupplyVariant, Version, expToVer } from '../config';
 import { MachikoroG } from '../types';
+import { assertUnreachable } from 'common';
 
 export * from './metadata';
 export * from './metadata2';
@@ -85,7 +86,7 @@ const getAll = (G: MachikoroG): Establishment[] => {
   } else if (version === Version.MK2) {
     return Meta2._ESTABLISHMENTS2;
   } else {
-    throw new Error(`Version '${version}' not implemented.`);
+    return assertUnreachable(version);
   }
 };
 
@@ -209,7 +210,7 @@ export const replenishSupply = (G: MachikoroG): void => {
         isUpper,
       ]
     } else {
-      throw new Error(`Version '${version}' not implemented.`);
+      return assertUnreachable(version);
     }
 
     for (let i = 0; i < decks.length; i++) {
@@ -219,7 +220,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       }
     }
   } else {
-    throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
+    return assertUnreachable(supplyVariant);
   }
 };
 
@@ -256,7 +257,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     ids = Meta2._MK2_ESTABLISHMENTS;
     starting = Meta2._MK2_STARTING_ESTABLISHMENTS;
   } else {
-    throw new Error(`Expansion '${expansion}' not implemented.`);
+    return assertUnreachable(expansion);
   }
 
   // populate establishments in use
@@ -309,10 +310,10 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
         }
       }
     } else {
-      throw new Error(`Version '${version}' not implemented.`);
+      return assertUnreachable(version);
     }
   } else {
-    throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
+    return assertUnreachable(supplyVariant);
   }
 
   // update G

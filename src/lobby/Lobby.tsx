@@ -19,6 +19,7 @@ import {
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
+import { assertUnreachable } from 'common';
 
 /**
  * @prop {string} name - Name of the player.
@@ -169,7 +170,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       startCoins = MK2_STARTING_COINS;
       initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
     } else {
-      throw new Error(`Version ${version} not implemented.`);
+      return assertUnreachable(version);
     }
 
     const setupData: SetupData = {

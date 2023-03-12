@@ -13,6 +13,7 @@ import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, SupplyVariant, Version, expToVer } from './config';
 import { MachikoroG, SetupData, TurnState } from './types';
 import { Landmark } from './landmarks';
+import { assertUnreachable } from 'common';
 
 export const GAME_NAME = 'machikoro';
 
@@ -229,7 +230,7 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
     // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
     return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
   } else {
-    throw new Error(`Version '${version}' not implemented.`);
+    return assertUnreachable(version);
   }
 };
 

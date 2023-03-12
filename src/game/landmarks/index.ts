@@ -7,6 +7,7 @@ import * as Meta2 from './metadata2';
 import { Expansion, SupplyVariant, Version, expToVer } from '../config';
 import { Landmark, LandmarkData } from './types';
 import { MachikoroG } from '../types';
+import { assertUnreachable } from 'common';
 
 export * from './metadata';
 export * from './metadata2';
@@ -84,7 +85,7 @@ const getAll = (G: MachikoroG): Landmark[] => {
   } else if (version === Version.MK2) {
     return Meta2._LANDMARKS2;
   } else {
-    throw new Error(`Version '${version}' not implemented.`);
+    return assertUnreachable(version);
   }
 };
 
@@ -146,7 +147,7 @@ export const cost = (G: MachikoroG, land: Landmark, player: number): number => {
     const costIdx = Math.min(Math.max(built, 0), land.cost.length - 1); // avoid array out of bounds
     return landCostArray[costIdx];
   } else {
-    throw new Error(`Version '${version}' not implemented.`);
+    return assertUnreachable(version);
   }
 };
 
@@ -216,7 +217,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       G._landData!.available[land._id] = true;
     }
   } else {
-    throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
+    return assertUnreachable(supplyVariant);
   }
 };
 
@@ -252,7 +253,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     ids = Meta2._MK2_LANDMARKS;
     starting = Meta2._MK2_STARTING_LANDMARKS;
   } else {
-    throw new Error(`Expansion '${expansion}' not implemented.`);
+    return assertUnreachable(expansion);
   }
 
   // populate landmarks in use

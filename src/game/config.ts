@@ -2,6 +2,8 @@
 // Enums related to game configuration.
 //
 
+import { assertUnreachable } from 'common';
+
 /**
  * Expansion enum.
  */
@@ -46,7 +48,7 @@ export const expToVer = (exp: Expansion): Version => {
   } else if (exp === Expansion.MK2) {
     return Version.MK2;
   } else {
-    throw new Error(`Expansion '${exp}' not implemented.`);
+    return assertUnreachable(exp);
   }
 };
 
