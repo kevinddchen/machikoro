@@ -988,7 +988,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  expansion: Expansion.Harbor,
+  expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
@@ -1015,7 +1015,7 @@ const newTurnG = {
   tunaRoll: null,
 };
 
-export const Machikoro: Game<MachikoroG, Record<string, never>, SetupData> = {
+export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
   name: GAME_NAME,
 
   setup: ({ ctx, random }, setupData) => {
