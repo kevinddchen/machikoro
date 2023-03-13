@@ -23,10 +23,9 @@ export const LogEventType = {
 export type LogEventType = (typeof LogEventType)[keyof typeof LogEventType];
 
 /**
- * A `LogEvent` is an object that that stores a `LogEventType` together with
- * any metadata that is needed to be logged.
+ * A `BaseLogEvent` is an object that that stores a `LogEventType` together
+ * with any metadata that is needed to be logged.
  */
-export interface LogEvent {
-  readonly eventType: LogEventType;
-  [key: string]: any;
+export interface BaseLogEvent {
+  readonly type: LogEventType;
 }
