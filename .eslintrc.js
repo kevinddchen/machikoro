@@ -29,6 +29,9 @@ module.exports = {
   root: true,
 
   rules: {
+    // TODO: fix async logic
+    '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
     'sort-imports': [

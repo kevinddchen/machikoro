@@ -241,7 +241,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * Spectate the match corresponding to `matchID`.
    * @param matchID
    */
-  private spectateMatch = async (matchID: string): Promise<void> => {
+  private spectateMatch = (matchID: string): void => {
     const { connected } = this.state;
 
     if (!connected) {
