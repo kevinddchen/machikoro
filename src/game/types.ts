@@ -5,7 +5,7 @@
 import { Establishment, EstablishmentData } from './establishments/types';
 import { Expansion, SupplyVariant } from './config';
 import { Landmark, LandmarkData } from './landmarks/types';
-import { LogEvent } from './log/types';
+import { LogEvent } from './log';
 
 /**
  * The `G` object containing all game state variables.
