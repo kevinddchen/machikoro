@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Make more robust log event parsing
+
 import 'styles/main.css';
 
 import { BoardProps } from 'boardgame.io/react';
