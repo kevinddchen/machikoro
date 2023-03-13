@@ -278,7 +278,7 @@ const rollTwo: Move<MachikoroG> = (context) => {
   G.rollDoubles = dice[0] === dice[1];
   G.numDice = 2;
   G.numRolls += 1;
-  Log.logRollTwo(G, dice);
+  Log.logRollTwo(G, [dice[0], dice[1]]);
 
   if (noFurtherRollActions(G, ctx)) {
     switchState(context);
