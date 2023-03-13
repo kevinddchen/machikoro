@@ -21,8 +21,10 @@ interface StatusBarProps extends BoardProps<MachikoroG> {
 export default class StatusBar extends React.Component<StatusBarProps, object> {
   render() {
     const { G, ctx, isActive, names } = this.props;
-    const { currentPlayer, gameover } = ctx;
+    const { currentPlayer } = ctx;
     const currentPlayerName = names[parseInt(currentPlayer)];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { gameover } = ctx;
 
     let msg = '';
 
@@ -47,7 +49,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
       }
       case Game.TurnState.TV: {
         if (isActive) {
-          msg = 'TV station: Choose an opponent who has to give you ' + Game.Est.TVStation.earn + ' coins.';
+          msg = 'TV station: Choose an opponent who has to give you ' + Game.Est.TVStation.earn.toString() + ' coins.';
         } else {
           msg = currentPlayerName + ' is making a move: TV station';
         }
@@ -83,7 +85,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
         break;
       }
       default: {
-        msg = G.turnState + '...'; /* for debug */
+        msg = G.turnState.toString() + '...'; /* for debug */
       }
     }
 
