@@ -390,7 +390,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       // There are some matches
     } else {
       for (let i = 0; i < matches.length; i++) {
-        const { matchID, players, setupData } = matches[i];
+        const { matchID, players } = matches[i];
+        const setupData = matches[i].setupData as SetupData;
         const numActivePlayers = countPlayers(players);
         const numPlayers = players.length;
 
