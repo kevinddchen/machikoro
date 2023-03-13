@@ -6,7 +6,7 @@ import React from 'react';
 import { Server } from 'boardgame.io';
 import _ from 'lodash';
 
-import { Expansion, GAME_NAME, SupplyVariant } from 'game';
+import { Expansion, GAME_NAME, SetupData, SupplyVariant } from 'game';
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
@@ -96,7 +96,8 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     }
     // if player list has changed, update state
     if (!_.isEqual(match.players, players)) {
-      const { expansion, supplyVariant } = match.setupData;
+      const setupData = match.setupData as SetupData;
+      const { expansion, supplyVariant } = setupData;
       this.setState({ players: match.players, expansion, supplyVariant });
       // if seats are all full, start match now
       if (countPlayers(match.players) === match.players.length) {

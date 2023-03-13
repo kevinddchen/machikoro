@@ -58,7 +58,7 @@ export interface MachikoroG {
   _coins: number[];
   _estData: EstablishmentData | null;
   _landData: LandmarkData | null;
-  _logBuffer: LogEvent[] | null;
+  _logBuffer: LogEvent[];
 }
 
 /**

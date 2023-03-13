@@ -24,23 +24,26 @@ export * from './types';
  * On the client, this array of `LogEvent` objects are retrieved from where it
  * can be parsed.
  */
-export const LogxPlugin: Plugin<any, any, MachikoroG> = {
+export const LogxPlugin: Plugin<Record<string, never>, Record<string, never>, MachikoroG> = {
   name: 'logx',
 
   fnWrap: (fn, fnType) => {
     if (fnType === GameMethod.MOVE) {
-      return ({ G, log, ...rest }, ...args) => {
+      const wrappedFn: typeof fn = ({ G, log, ...rest }, ...args) => {
         // initialize empty log buffer
         G = { ...G, _logBuffer: [] };
-        const moveResult = fn({ G, log, ...rest }, ...args);
+        // NOTE: this seems to be the correct type annotation of `moveResult`, but it's not guaranteed.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
+        const moveResult: MachikoroG | typeof INVALID_MOVE = fn({ G, log, ...rest }, ...args);
         if (moveResult === INVALID_MOVE) {
           return INVALID_MOVE;
         }
         log.setMetadata(moveResult._logBuffer);
         // clear log buffer
-        G = { ...moveResult, _logBuffer: null };
+        G = { ...moveResult, _logBuffer: [] };
         return G;
       };
+      return wrappedFn;
     } else {
       return fn;
     }
@@ -53,7 +56,7 @@ export const LogxPlugin: Plugin<any, any, MachikoroG> = {
  * @param roll - The value of the die.
  */
 export const logRollOne = (G: MachikoroG, roll: number): void => {
-  G._logBuffer!.push({ eventType: LogEventType.RollOne, roll });
+  G._logBuffer.push({ eventType: LogEventType.RollOne, roll });
 };
 
 /**
@@ -62,7 +65,7 @@ export const logRollOne = (G: MachikoroG, roll: number): void => {
  * @param dice - The values of each die.
  */
 export const logRollTwo = (G: MachikoroG, dice: number[]): void => {
-  G._logBuffer!.push({ eventType: LogEventType.RollTwo, dice });
+  G._logBuffer.push({ eventType: LogEventType.RollTwo, dice });
 };
 
 /**
@@ -71,7 +74,7 @@ export const logRollTwo = (G: MachikoroG, dice: number[]): void => {
  * @param roll - The new value of the roll.
  */
 export const logAddTwo = (G: MachikoroG, roll: number): void => {
-  G._logBuffer!.push({ eventType: LogEventType.AddTwo, roll });
+  G._logBuffer.push({ eventType: LogEventType.AddTwo, roll });
 };
 
 /**
@@ -82,7 +85,7 @@ export const logAddTwo = (G: MachikoroG, roll: number): void => {
  * @param name - Name of establishment or landmark activated.
  */
 export const logEarn = (G: MachikoroG, player: number, amount: number, name: string): void => {
-  G._logBuffer!.push({ eventType: LogEventType.Earn, player, amount, name });
+  G._logBuffer.push({ eventType: LogEventType.Earn, player, amount, name });
 };
 
 /**
@@ -94,7 +97,7 @@ export const logEarn = (G: MachikoroG, player: number, amount: number, name: str
  * @param name - Name of establishment or landmark activated.
  */
 export const logTake = (G: MachikoroG, args: { from: number; to: number }, amount: number, name: string): void => {
-  G._logBuffer!.push({ eventType: LogEventType.Take, ...args, amount, name });
+  G._logBuffer.push({ eventType: LogEventType.Take, ...args, amount, name });
 };
 
 /**
@@ -103,7 +106,7 @@ export const logTake = (G: MachikoroG, args: { from: number; to: number }, amoun
  * @param name - Name of establishment or landmark activated.
  */
 export const logBuy = (G: MachikoroG, name: string): void => {
-  G._logBuffer!.push({ eventType: LogEventType.Buy, name });
+  G._logBuffer.push({ eventType: LogEventType.Buy, name });
 };
 
 /**
@@ -118,7 +121,7 @@ export const logOffice = (
   args: { player_est_name: string; opponent_est_name: string },
   opponent: number
 ): void => {
-  G._logBuffer!.push({ eventType: LogEventType.Office, ...args, opponent });
+  G._logBuffer.push({ eventType: LogEventType.Office, ...args, opponent });
 };
 
 /**
@@ -128,7 +131,7 @@ export const logOffice = (
  * @param opponent
  */
 export const logMovingCompany = (G: MachikoroG, est_name: string, opponent: number): void => {
-  G._logBuffer!.push({ eventType: LogEventType.MovingCompany, est_name, opponent });
+  G._logBuffer.push({ eventType: LogEventType.MovingCompany, est_name, opponent });
 };
 
 /**
@@ -137,7 +140,7 @@ export const logMovingCompany = (G: MachikoroG, est_name: string, opponent: numb
  * @param coins - Number of coins all players end up with.
  */
 export const logPark = (G: MachikoroG, coins: number): void => {
-  G._logBuffer!.push({ eventType: LogEventType.Park, coins });
+  G._logBuffer.push({ eventType: LogEventType.Park, coins });
 };
 
 /**
@@ -146,7 +149,7 @@ export const logPark = (G: MachikoroG, coins: number): void => {
  * @param roll - The sum value of the two dice.
  */
 export const logTunaRoll = (G: MachikoroG, roll: number): void => {
-  G._logBuffer!.push({ eventType: LogEventType.TunaRoll, roll });
+  G._logBuffer.push({ eventType: LogEventType.TunaRoll, roll });
 };
 
 /**
@@ -154,7 +157,7 @@ export const logTunaRoll = (G: MachikoroG, roll: number): void => {
  * @param G
  */
 export const logEndInitialBuyPhase = (G: MachikoroG): void => {
-  G._logBuffer!.push({ eventType: LogEventType.EndInitialBuyPhase });
+  G._logBuffer.push({ eventType: LogEventType.EndInitialBuyPhase });
 };
 
 /**
@@ -163,5 +166,5 @@ export const logEndInitialBuyPhase = (G: MachikoroG): void => {
  * @param winner - ID of the winning player.
  */
 export const logEndGame = (G: MachikoroG, winner: number): void => {
-  G._logBuffer!.push({ eventType: LogEventType.EndGame, winner });
+  G._logBuffer.push({ eventType: LogEventType.EndGame, winner });
 };

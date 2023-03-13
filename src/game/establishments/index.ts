@@ -7,6 +7,7 @@ import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, SupplyVariant, Version, expToVer } from '../config';
 import { MachikoroG } from '../types';
+import { assertUnreachable } from 'common';
 
 export * from './metadata';
 export * from './metadata2';
@@ -85,7 +86,7 @@ const getAll = (G: MachikoroG): Establishment[] => {
   } else if (version === Version.MK2) {
     return Meta2._ESTABLISHMENTS2;
   } else {
-    throw new Error(`Version '${version}' not implemented.`);
+    return assertUnreachable(version);
   }
 };
 
@@ -209,7 +210,7 @@ export const replenishSupply = (G: MachikoroG): void => {
         isUpper,
       ]
     } else {
-      throw new Error(`Version '${version}' not implemented.`);
+      return assertUnreachable(version);
     }
 
     for (let i = 0; i < decks.length; i++) {
@@ -219,7 +220,7 @@ export const replenishSupply = (G: MachikoroG): void => {
       }
     }
   } else {
-    throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
+    return assertUnreachable(supplyVariant);
   }
 };
 
@@ -235,12 +236,10 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
 
   // initialize data structure
   const data: EstablishmentData = {
-    inUse: Array(numEsts).fill(false),
-    remainingCount: Array(numEsts).fill(0),
-    availableCount: Array(numEsts).fill(0),
-    ownedCount: Array(numEsts)
-      .fill(null)
-      .map(() => Array(numPlayers).fill(0)),
+    inUse: Array.from({ length: numEsts }, () => false),
+    remainingCount: Array.from({ length: numEsts }, () => 0),
+    availableCount: Array.from({ length: numEsts }, () => 0),
+    ownedCount: Array.from({ length: numEsts }, () => Array.from({ length: numPlayers }, () => 0)),
   };
 
   // get establishments in use, starting establishments
@@ -256,7 +255,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     ids = Meta2._MK2_ESTABLISHMENTS;
     starting = Meta2._MK2_STARTING_ESTABLISHMENTS;
   } else {
-    throw new Error(`Expansion '${expansion}' not implemented.`);
+    return assertUnreachable(expansion);
   }
 
   // populate establishments in use
@@ -281,7 +280,7 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
     decks = [[]];
     for (const id of ids) {
       const est = ests[id];
-      decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+      decks[0].push(...Array.from({ length: data.remainingCount[id] }, () => est));
     }
   } else if (supplyVariant === SupplyVariant.Hybrid) {
     if (version === Version.MK1) {
@@ -290,11 +289,11 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       for (const id of ids) {
         const est = ests[id];
         if (isMajor(est)) {
-          decks[2].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[2].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         } else if (isLower(est)) {
-          decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[0].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         } else {
-          decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[1].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         }
       }
     } else if (version === Version.MK2) {
@@ -303,16 +302,16 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
       for (const id of ids) {
         const est = ests[id];
         if (isLower(est)) {
-          decks[0].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[0].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         } else {
-          decks[1].push(...Array<Establishment>(data.remainingCount[id]).fill(est));
+          decks[1].push(...Array.from({ length: data.remainingCount[id] }, () => est));
         }
       }
     } else {
-      throw new Error(`Version '${version}' not implemented.`);
+      return assertUnreachable(version);
     }
   } else {
-    throw new Error(`Supply variant '${supplyVariant}' not implemented.`);
+    return assertUnreachable(supplyVariant);
   }
 
   // update G

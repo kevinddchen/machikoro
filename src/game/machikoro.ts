@@ -13,6 +13,7 @@ import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, SupplyVariant, Version, expToVer } from './config';
 import { MachikoroG, SetupData, TurnState } from './types';
 import { Landmark } from './landmarks';
+import { assertUnreachable } from 'common';
 
 export const GAME_NAME = 'machikoro';
 
@@ -229,7 +230,7 @@ export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
     // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
     return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
   } else {
-    throw new Error(`Version '${version}' not implemented.`);
+    return assertUnreachable(version);
   }
 };
 
@@ -292,7 +293,11 @@ const rollTwo: Move<MachikoroG> = (context) => {
  * @param die1 - Desired first die value.
  * @param die2 - Desired second die value. If not provided, defaults to 0.
  */
-const debugRoll: Move<MachikoroG> = (context, die1: number, die2 = 0) => {
+const debugRoll: Move<MachikoroG> = (
+  context,
+  die1: number,
+  die2: number = 0 // eslint-disable-line @typescript-eslint/no-inferrable-types
+) => {
   const { G, ctx } = context;
   if (!canRoll(G, ctx, 1)) {
     return INVALID_MOVE;
@@ -983,7 +988,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  expansion: Expansion.Harbor,
+  expansion: Expansion.MK2,
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
@@ -1010,7 +1015,7 @@ const newTurnG = {
   tunaRoll: null,
 };
 
-export const Machikoro: Game<MachikoroG, any, SetupData> = {
+export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
   name: GAME_NAME,
 
   setup: ({ ctx, random }, setupData) => {
@@ -1021,10 +1026,10 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
     const { numPlayers } = ctx;
 
     // initialize coins
-    const _coins = Array(numPlayers).fill(startCoins);
+    const _coins = Array.from({ length: numPlayers }, () => startCoins);
 
     // initialize turn order
-    let _turnOrder = [...Array(numPlayers).keys()].map((x) => x.toString());
+    let _turnOrder = Array.from({ length: numPlayers }, (_, i) => i.toString());
     if (randomizeTurnOrder) {
       _turnOrder = random.Shuffle(_turnOrder);
     }
@@ -1040,7 +1045,7 @@ export const Machikoro: Game<MachikoroG, any, SetupData> = {
       _coins,
       _estData: null,
       _landData: null,
-      _logBuffer: null,
+      _logBuffer: [],
     };
 
     // initialize landmark and establishment data

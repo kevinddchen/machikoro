@@ -1,4 +1,5 @@
 import { Est, Land, MachikoroG } from 'game';
+import { assertUnreachable } from 'common';
 
 /**
  * Convert `Est.EstColor` to CSS class name.
@@ -17,7 +18,7 @@ export const estColorToClass = (color: Est.EstColor, darker: boolean): string =>
     case Est.EstColor.Purple:
       return darker ? 'est_img_maj' : 'est_img_maj_light';
     default:
-      throw new Error(`Invalid establishment color: ${color}`);
+      return assertUnreachable(color);
   }
 };
 

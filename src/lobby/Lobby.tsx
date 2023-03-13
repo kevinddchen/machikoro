@@ -19,6 +19,7 @@ import {
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
+import { assertUnreachable } from 'common';
 
 /**
  * @prop {string} name - Name of the player.
@@ -169,7 +170,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       startCoins = MK2_STARTING_COINS;
       initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
     } else {
-      throw new Error(`Version ${version} not implemented.`);
+      return assertUnreachable(version);
     }
 
     const setupData: SetupData = {
@@ -240,7 +241,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * Spectate the match corresponding to `matchID`.
    * @param matchID
    */
-  private spectateMatch = async (matchID: string): Promise<void> => {
+  private spectateMatch = (matchID: string): void => {
     const { connected } = this.state;
 
     if (!connected) {
@@ -389,7 +390,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       // There are some matches
     } else {
       for (let i = 0; i < matches.length; i++) {
-        const { matchID, players, setupData } = matches[i];
+        const { matchID, players } = matches[i];
+        const setupData = matches[i].setupData as SetupData;
         const numActivePlayers = countPlayers(players);
         const numPlayers = players.length;
 
@@ -435,8 +437,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
                 {numActivePlayers} / {numPlayers} players
               </div>
               <div className='lobby-div-row'>
-                {Array(numActivePlayers).fill('X')}
-                {Array(numPlayers - numActivePlayers).fill('O')}
+                {Array.from({ length: numActivePlayers }, () => 'X')}
+                {Array.from({ length: numPlayers - numActivePlayers }, () => 'O')}
               </div>
             </div>
             <div className='lobby-div-col'>{button}</div>
