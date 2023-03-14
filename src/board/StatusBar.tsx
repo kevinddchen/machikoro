@@ -6,6 +6,7 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { MachikoroG } from 'game';
+import { assertUnreachable } from 'common';
 
 /**
  * @extends BoardProps<MachikoroG>
@@ -19,80 +20,83 @@ interface StatusBarProps extends BoardProps<MachikoroG> {
  * Single-line message bar indicating current turn status.
  */
 export default class StatusBar extends React.Component<StatusBarProps, object> {
-  render() {
+  /**
+   * Returns the status message
+   */
+  private statusMessage = (): string => {
     const { G, ctx, isActive, names } = this.props;
-    const { currentPlayer } = ctx;
-    const currentPlayerName = names[parseInt(currentPlayer)];
+    const currentPlayerName = names[parseInt(ctx.currentPlayer)];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { gameover } = ctx;
+    const gameover: boolean = ctx.gameover ?? false;
 
-    let msg = '';
+    if (gameover) {
+      return 'Game over. ' + currentPlayerName + ' wins.';
+    }
 
     /* Check `game/machikoro.ts` for various possible states */
     switch (G.turnState) {
       case Game.TurnState.Roll: {
         if (isActive) {
-          msg = 'It is your turn. Select a roll option from above.';
+          return 'It is your turn. Select a roll option from above.';
         } else {
-          msg = 'It is ' + currentPlayerName + "'s turn to roll.";
+          return 'It is ' + currentPlayerName + "'s turn to roll.";
         }
-        break;
       }
       case Game.TurnState.Buy: {
         if (isActive) {
           /* to do: write function to check if landmarks can be built? */
-          msg = 'Purchase an establishment, build a landmark, or end your turn.';
+          return 'Purchase an establishment, build a landmark, or end your turn.';
         } else {
-          msg = currentPlayerName + ' is making a move...';
+          return currentPlayerName + ' is making a move...';
         }
-        break;
       }
       case Game.TurnState.TV: {
         if (isActive) {
-          msg = 'TV station: Choose an opponent who has to give you ' + Game.Est.TVStation.earn.toString() + ' coins.';
+          return 'TV station: Choose an opponent who has to give you ' + Game.Est.TVStation.earn.toString() + ' coins.';
         } else {
-          msg = currentPlayerName + ' is making a move: TV station';
+          return currentPlayerName + ' is making a move: TV station';
         }
-        break;
       }
       case Game.TurnState.OfficeGive:
       case Game.TurnState.OfficeTake: {
         if (isActive) {
           if (G.turnState === Game.TurnState.OfficeGive) {
-            msg = 'Business center: Select one of your establishments to exchange.';
+            return 'Business center: Select one of your establishments to exchange.';
           } else {
-            msg = "Business center: Select an opponent's establishment to exchange.";
+            return "Business center: Select an opponent's establishment to exchange.";
           }
         } else {
-          msg = currentPlayerName + ' is making a move: Business center';
+          return currentPlayerName + ' is making a move: Business center';
         }
-        break;
       }
       case Game.TurnState.MovingCompany: {
         if (isActive) {
-          msg = 'Moving company: Select one of your establishments to give.';
+          return 'Moving company: Select one of your establishments to give.';
         } else {
-          msg = currentPlayerName + ' is making a move: Moving company';
+          return currentPlayerName + ' is making a move: Moving company';
         }
-        break;
       }
       case Game.TurnState.End: {
         if (isActive) {
-          msg = 'No actions left. End turn?';
+          return 'No actions left. End turn?';
         } else {
-          msg = 'Waiting for ' + currentPlayerName + ' to end the turn...';
+          return 'Waiting for ' + currentPlayerName + ' to end the turn...';
         }
-        break;
+      }
+      case Game.TurnState.ActivateEsts:
+      case Game.TurnState.ActivateLands:
+      case Game.TurnState.ActivateBoughtLand: {
+        // these game states are transitionary, so the player should not see any message
+        return '';
       }
       default: {
-        msg = G.turnState.toString() + '...'; /* for debug */
+        return assertUnreachable(G.turnState);
       }
     }
-
-    if (gameover) {
-      msg = 'Game over. ' + currentPlayerName + ' wins.';
-    }
-
+  };
+  render() {
+    const { isActive } = this.props;
+    const msg = this.statusMessage();
     return <div className={classNames('status-bar', { 'status-bar-active': isActive })}>{msg}</div>;
   }
 }
