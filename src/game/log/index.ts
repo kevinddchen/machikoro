@@ -31,16 +31,19 @@ export const LogxPlugin: Plugin<Record<string, never>, Record<string, never>, Ma
       const wrappedFn: typeof fn = ({ G, log, ...rest }, ...args) => {
         // initialize empty log buffer
         G = { ...G, _logBuffer: [] };
-        // NOTE: this seems to be the correct type annotation of `moveResult`, but it's not guaranteed.
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
-        const moveResult: MachikoroG | typeof INVALID_MOVE = fn({ G, log, ...rest }, ...args);
+        const moveResult = fn({ G, log, ...rest }, ...args);
+
         if (moveResult === INVALID_MOVE) {
           return INVALID_MOVE;
         }
-        log.setMetadata(moveResult._logBuffer);
+
+        let newG = moveResult as MachikoroG;
+        log.setMetadata(newG._logBuffer);
         // clear log buffer
-        G = { ...moveResult, _logBuffer: [] };
-        return G;
+        newG = { ...newG, _logBuffer: [] };
+        return newG;
       };
       return wrappedFn;
     } else {
@@ -374,7 +377,7 @@ export const logEndGame = (G: MachikoroG, winner: number): void => {
  * @returns Displayed log text for the end of the game.
  */
 const parseEndGame = (logEvent: EndGame, names: string[]): string => {
-  return `Game over! Winner: ${names[logEvent.winner]}.`;
+  return `Game over! ${names[logEvent.winner]} wins!`;
 };
 
 // ----------------------------------------------------------------------------
