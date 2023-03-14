@@ -1,6 +1,3 @@
-/* eslint-disable */
-// TODO: Make more robust log event parsing
-
 import 'styles/main.css';
 
 import { BoardProps } from 'boardgame.io/react';
@@ -58,79 +55,19 @@ export default class Logger extends React.Component<LogProps, object> {
    * @returns An array of strings.
    */
   private parseLogEntry = (entry: LogEntry): string[] => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { metadata } = entry;
     if (!metadata) {
       return [];
     }
 
+    const { names } = this.props;
     const lines: string[] = [];
     for (const event of metadata as Log.LogEvent[]) {
-      const line = this.parseLogEvent(event);
-      if (line !== null) {
-        lines.push(line);
-      }
+      lines.push(Log.parseLogEvent(event, names));
     }
+
     return lines;
-  };
-
-  /**
-   * Parse a single `LogEvent` to its string.
-   * @param event
-   * @returns A string.
-   */
-  private parseLogEvent = (event: Log.LogEvent): string | null => {
-    const { names } = this.props;
-    const { eventType } = event;
-
-    switch (eventType) {
-      case Log.LogEventType.RollOne: {
-        return `\trolled ${event.roll}`;
-      }
-      case Log.LogEventType.RollTwo: {
-        const { dice } = event;
-        const roll = dice[0] + dice[1];
-        return `\trolled ${roll} (${dice})`;
-      }
-      case Log.LogEventType.AddTwo: {
-        return `\tchanged roll to ${event.roll} (Harbor)`;
-      }
-      case Log.LogEventType.Earn: {
-        const { player, amount, name } = event;
-        return `\t${names[player]} earned ${amount} coins (${name})`;
-      }
-      case Log.LogEventType.Take: {
-        const { from, to, amount, name } = event;
-        return `\t${names[from]} paid ${names[to]} ${amount} coins (${name})`;
-      }
-      case Log.LogEventType.Buy: {
-        return `\tbought ${event.name}`;
-      }
-      case Log.LogEventType.Office: {
-        const { player_est_name, opponent_est_name, opponent } = event;
-        return `\texchanged ${player_est_name} for ${opponent_est_name} with ${names[opponent]} (Business Center)`;
-      }
-      case Log.LogEventType.MovingCompany: {
-        const { est_name, opponent } = event;
-        return `\tgave ${est_name} to ${names[opponent]} (Moving Company)`;
-      }
-      case Log.LogEventType.Park: {
-        const { coins } = event;
-        return `\tredistributed ${coins} to each player (Park)`;
-      }
-      case Log.LogEventType.TunaRoll: {
-        return `\t(Tuna boat roll: ${event.roll})`;
-      }
-      case Log.LogEventType.EndInitialBuyPhase: {
-        return `(End of initial build phase)`;
-      }
-      case Log.LogEventType.EndGame: {
-        return `Game over! Winner: ${names[event.winner]}`;
-      }
-      default: {
-        console.error(`Log event '${eventType}' not implemented.`);
-        return null;
-      }
-    }
   };
 
   /**
