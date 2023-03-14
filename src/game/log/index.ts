@@ -377,7 +377,7 @@ export const logEndGame = (G: MachikoroG, winner: number): void => {
  * @returns Displayed log text for the end of the game.
  */
 const parseEndGame = (logEvent: EndGame, names: string[]): string => {
-  return `Game over! Winner: ${names[logEvent.winner]}.`;
+  return `Game over! ${names[logEvent.winner]} wins!`;
 };
 
 // ----------------------------------------------------------------------------

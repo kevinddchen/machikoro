@@ -30,7 +30,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
     const gameover: boolean = ctx.gameover ?? false;
 
     if (gameover) {
-      return 'Game over. ' + currentPlayerName + ' wins.';
+      return 'Game over! ' + currentPlayerName + ' wins!';
     }
 
     /* Check `game/machikoro.ts` for various possible states */
