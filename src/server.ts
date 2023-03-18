@@ -20,7 +20,7 @@ const server = Server({
 const frontEndAppBuildPath = path.resolve(__dirname, '../build');
 server.app.use(serve(frontEndAppBuildPath));
 
-server.run(PORT, () => {
+void server.run(PORT, () => {
   server.app.use(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     async (ctx, next) => await serve(frontEndAppBuildPath)(Object.assign(ctx, { path: 'index.html' }), next)
