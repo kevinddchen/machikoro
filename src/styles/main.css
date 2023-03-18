@@ -474,7 +474,8 @@ select {
 /* LOGS */
 
 .log_box {
-  border: double;
+  border: black solid;
+  border-radius: 8px;
   font-size: 12px;
   height: 650px;
   overflow: auto;
