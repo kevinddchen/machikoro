@@ -142,8 +142,8 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
     this.props.clearErrorMessage();
 
-    this.fetchMatch();
-    this.fetchInterval = setInterval(this.fetchMatch, updateIntervalMs);
+    this.fetchInterval = setInterval(() => void this.fetchMatch, updateIntervalMs);
+    void this.fetchMatch();
   }
 
   componentWillUnmount() {
@@ -172,7 +172,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
       if (id.toString() === matchInfo.playerID) {
         indicator = 'mm-td mm-td-active'; /* use css as indicator */
         button = (
-          <button className='button' onClick={this.leaveMatch}>
+          <button className='button' onClick={() => void this.leaveMatch}>
             Leave
           </button>
         );

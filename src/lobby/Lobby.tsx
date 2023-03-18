@@ -293,8 +293,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       this.supplyVariantRef.current.value = supplyVariant.toString();
     }
 
-    this.fetchMatches();
-    this.fetchInterval = setInterval(this.fetchMatches, updateIntervalMs);
+    this.fetchInterval = setInterval(() => void this.fetchMatches(), updateIntervalMs);
+    void this.fetchMatches();
   }
 
   componentWillUnmount() {
@@ -364,7 +364,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
           {supplyVariantOptions}
         </select>
-        <button className='button' onClick={this.createMatch}>
+        <button className='button' onClick={() => void this.createMatch()}>
           Create Room
         </button>
       </div>
@@ -400,7 +400,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         if (this.authenticator.hasMatchInfo(matchID)) {
           // Able to rejoin the room (e.g. joined before, but closed browser)
           button = (
-            <button className='button' onClick={() => this.joinMatch(matchID)}>
+            <button className='button' onClick={() => void this.joinMatch(matchID)}>
               Rejoin
             </button>
           );
@@ -414,7 +414,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         } else {
           // Room is not full; able to join the room as new player
           button = (
-            <button className='button' onClick={() => this.joinMatch(matchID)}>
+            <button className='button' onClick={() => void this.joinMatch(matchID)}>
               Join
             </button>
           );
