@@ -8,6 +8,7 @@ import { IN_PROD, PORT } from 'config';
 import { MatchInfo, Matchmaker, debugMatchInfo } from 'lobby';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';
+import { version } from 'version';
 
 /**
  * @prop {MatchInfo|null} matchInfo - Information a client needs to connect to a match.
@@ -89,6 +90,7 @@ export default class App extends React.Component<object, AppState> {
             <a href='https://github.com/kevinddchen/machikoro' target='_blank' rel='noreferrer'>
               <img src='./GitHub-Mark-Light-32px.png' alt='GitHub logo' />
             </a>
+            <div className='footer-div'>v{version}</div>
           </footer>
         </div>
       );
