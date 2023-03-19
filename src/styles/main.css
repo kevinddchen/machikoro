@@ -291,6 +291,12 @@ select {
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
+/* STACK TABLE FORMATTING */
+
+.stack-table {
+  margin: 0 auto;
+}
+
 /* ACTIONS & ITEM SELECTION */
 
 .clickable {
@@ -468,7 +474,8 @@ select {
 /* LOGS */
 
 .log_box {
-  border: double;
+  border: black solid;
+  border-radius: 8px;
   font-size: 12px;
   height: 650px;
   overflow: auto;
@@ -507,7 +514,7 @@ select {
   background: white;
   font-size: 14px;
   overflow: hidden;
-  width: 100%;
+  width: 90px;
 }
 
 .name_do_tv {
