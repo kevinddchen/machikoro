@@ -30,6 +30,7 @@ Some contribution guidelines:
 
 - Run `npm run lint:fix` to run code linting and check for syntax errors.
 - Run `npm run prettier:fix` to autoformat the code.
+- Run `npm run version:fix` to update the version in [src/version.ts](src/version.ts) with the version in [package.json](package.json).
 
 ### Run locally in debug mode
 
