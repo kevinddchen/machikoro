@@ -142,7 +142,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
     this.props.clearErrorMessage();
 
-    this.fetchInterval = setInterval(() => void this.fetchMatch, updateIntervalMs);
+    this.fetchInterval = setInterval(() => void this.fetchMatch(), updateIntervalMs);
     void this.fetchMatch();
   }
 

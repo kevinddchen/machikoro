@@ -522,6 +522,7 @@ select {
   font-size: 14px;
   overflow: hidden;
   width: 90px;
+  height: 16px;
 }
 
 .name_do_tv {
