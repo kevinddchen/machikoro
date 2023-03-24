@@ -22,8 +22,8 @@ import { MatchInfo } from './types';
 
 /**
  * Sort matches so newer matches are first.
- * @param matches 
- * @returns 
+ * @param matches
+ * @returns
  */
 const sortMatches = (matches: LobbyAPI.Match[]): LobbyAPI.Match[] => {
   return matches.sort((a, b) => b.createdAt - a.createdAt);
