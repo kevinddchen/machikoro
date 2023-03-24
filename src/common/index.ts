@@ -12,29 +12,25 @@ export const assertUnreachable = (_x: never): never => {
  * @param {number} timeLimit - Time limit to attempt function in milliseconds
  * @returns Resolved promise for async function call, or an error if time limit reached
  */
-export const asyncCallWithTimeout = async<T> (asyncPromise: Promise<T>, timeLimit: number): Promise<T> => {
-
+export const asyncCallWithTimeout = async <T>(asyncPromise: Promise<T>, timeLimit: number): Promise<T> => {
   let timeoutHandle: NodeJS.Timeout;
 
   const timeoutPromise = new Promise<never>((_resolve, reject) => {
-      timeoutHandle = setTimeout(
-          () => reject(new Error('Async call timeout limit reached')),
-          timeLimit
-      );
+    timeoutHandle = setTimeout(() => reject(new Error('Async call timeout limit reached')), timeLimit);
   });
 
-  return Promise.race([asyncPromise, timeoutPromise]).then(result => {
-      clearTimeout(timeoutHandle);
-      return result;
-  })
-}
+  return Promise.race([asyncPromise, timeoutPromise]).then((result) => {
+    clearTimeout(timeoutHandle);
+    return result;
+  });
+};
 
 /**
  * Catches errors and prints to console in development.
- * @param e 
+ * @param error
  */
-export const defaultErrorCatcher = (e: Error): void => {
+export const defaultErrorCatcher = (error: Error): void => {
   if (!IN_PROD) {
-    console.error(e);
+    console.error(error);
   }
-}
+};
