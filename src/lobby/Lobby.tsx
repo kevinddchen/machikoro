@@ -21,6 +21,15 @@ import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
 /**
+ * Sort matches so newer matches are first.
+ * @param matches 
+ * @returns 
+ */
+const sortMatches = (matches: LobbyAPI.Match[]): LobbyAPI.Match[] => {
+  return matches.sort((a, b) => b.createdAt - a.createdAt);
+};
+
+/**
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
  * with server match management API.
@@ -124,9 +133,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     const { connected } = this.state;
 
     // try to fetch matches
-    let newMatchList: LobbyAPI.MatchList;
+    let matchList: LobbyAPI.MatchList;
     try {
-      newMatchList = await lobbyClient.listMatches(GAME_NAME);
+      matchList = await lobbyClient.listMatches(GAME_NAME);
     } catch (e) {
       // we could not connect to the server
       if (window.location.protocol === 'https:') {
@@ -145,7 +154,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       this.setState({ connected: true });
     }
 
-    this.setState({ matches: newMatchList.matches });
+    this.setState({ matches: matchList.matches });
   };
 
   /**
@@ -394,7 +403,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @returns Elements displaying available matches.
    */
   private renderMatches = (): JSX.Element => {
-    const { matches } = this.state;
+    let { matches } = this.state;
 
     const tbody: JSX.Element[] = [];
 
@@ -408,6 +417,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
       // There are some matches
     } else {
+      // first, sort matches so newer ones are first
+      matches = sortMatches(matches);
       for (let i = 0; i < matches.length; i++) {
         const { matchID, players } = matches[i];
         const setupData = matches[i].setupData as SetupData;
