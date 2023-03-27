@@ -139,7 +139,7 @@ export const ExhibitHall2: Landmark = {
   name: 'Exhibit Hall',
   miniName: 'Exhibit Hall',
   description: 'From each opponent who has more than 10 coins, take half, rounded down (builder only).',
-  coins: 10, // This is not the coins taken, but the threshold for triggering the tax office
+  coins: 11, // This is not the coins taken, but the threshold for triggering the tax office
   cost: [12, 16, 22],
 };
 
