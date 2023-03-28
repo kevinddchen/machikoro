@@ -1,7 +1,7 @@
 import 'styles/main.css';
 
+import { LobbyClient, LobbyClientError } from 'boardgame.io/client';
 import { LobbyAPI } from 'boardgame.io';
-import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 
 import {
@@ -19,15 +19,6 @@ import { assertUnreachable, asyncCallWithTimeout, defaultErrorCatcher } from 'co
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
-
-/**
- * Sort matches so newer matches are first.
- * @param matches
- * @returns
- */
-const sortMatches = (matches: LobbyAPI.Match[]): LobbyAPI.Match[] => {
-  return matches.sort((a, b) => b.createdAt - a.createdAt);
-};
 
 /**
  * @prop {string} name - Name of the player.
@@ -142,10 +133,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         // common reason is that HTTPS is not supported yet
         this.props.setErrorMessage('You must connect with `http` instead of `https`.');
       } else {
-        this.props.setErrorMessage('Connecting to server...');
+        this.props.setErrorMessage('Failed to connect to server...');
       }
       this.setState({ connected: false });
-      console.dir(e);
       throw e;
     }
 
@@ -163,15 +153,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @returns The match ID of the created match.
    */
   private createMatch = async (): Promise<string> => {
-    const { name, lobbyClient } = this.props;
+    const { lobbyClient } = this.props;
     const { connected, numPlayers, expansion, supplyVariant } = this.state;
 
     if (!connected) {
       throw new Error('Cannot create match: Not connected to server.');
-    }
-
-    if (!this.validateName(name)) {
-      throw new Error('Cannot create match: Name is invalid.');
     }
 
     // initialize setup data
@@ -228,17 +214,18 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       return;
     }
 
-    if (!this.validateName(name)) {
-      throw new Error('Cannot join match: Name is invalid.');
-    }
-
     // second, try to join the match by creating new credentials
     let joinedMatch: LobbyAPI.JoinedMatch;
     try {
       joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name });
     } catch (e) {
-      this.props.setErrorMessage('Error when joining match. Try again.');
-      console.dir(e);
+      if ((e as LobbyClientError).details) {
+        // if error has specific reason, display it
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        this.props.setErrorMessage((e as LobbyClientError).details);
+      } else {
+        this.props.setErrorMessage('Error when joining match. Try again.');
+      }
       throw e;
     }
 
@@ -273,22 +260,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     this.props.setMatchInfo(matchInfo);
     // this will trigger `Matchmaker` to switch to the waiting room
     return;
-  };
-
-  /**
-   * Check if entered name is valid. Sets error message if not.
-   * @returns True if `name` is OK.
-   */
-  private validateName = (name: string): boolean => {
-    if (name.length === 0) {
-      this.props.setErrorMessage('Please enter a name.');
-      return false;
-    }
-    if (name.length > 16) {
-      this.props.setErrorMessage('Name is too long.');
-      return false;
-    }
-    return true;
   };
 
   // --- React ----------------------------------------------------------------
@@ -516,3 +487,12 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     );
   }
 }
+
+/**
+ * Sort matches so newer matches are first.
+ * @param matches
+ * @returns
+ */
+const sortMatches = (matches: LobbyAPI.Match[]): LobbyAPI.Match[] => {
+  return matches.sort((a, b) => b.createdAt - a.createdAt);
+};

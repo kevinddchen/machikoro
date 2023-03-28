@@ -1,9 +1,6 @@
-// @ts-nocheck
-
 import { Origins, Server } from 'boardgame.io/server';
 import path from 'path';
 import serve from 'koa-static';
-import koaBody from 'koa-body';
 
 import { Machikoro } from '../game';
 import { PORT } from '../config';
