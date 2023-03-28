@@ -145,6 +145,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         this.props.setErrorMessage('Connecting to server...');
       }
       this.setState({ connected: false });
+      console.dir(e);
       throw e;
     }
 
@@ -237,6 +238,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name });
     } catch (e) {
       this.props.setErrorMessage('Error when joining match. Try again.');
+      console.dir(e);
       throw e;
     }
 
