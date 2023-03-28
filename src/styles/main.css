@@ -169,6 +169,10 @@
   font-size: 16px;
 }
 
+.footer-body {
+  margin-bottom: 50px;
+}
+
 /* MATCHMAKING */
 
 .mm-container {

@@ -105,7 +105,7 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
     }
 
     return (
-      <div>
+      <div className='footer-body'>
         {component}
         <div className='errorMessage'>{errorMessage}</div>
       </div>
