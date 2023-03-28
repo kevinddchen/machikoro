@@ -68,7 +68,7 @@ export const customJoinMatch = (server: Server): void => {
     const matchID = ctx.params.id;
 
     if (!playerName) {
-      ctx.throw(403, 'Name is required');
+      ctx.throw(403, 'Player name is required');
     }
 
     const { metadata } = await (server.db as StorageAPI.Async).fetch(matchID, {
