@@ -2,8 +2,9 @@ import { Origins, Server } from 'boardgame.io/server';
 import path from 'path';
 import serve from 'koa-static';
 
-import { Machikoro } from './game';
-import { PORT } from './config';
+import { Machikoro } from '../game';
+import { PORT } from '../config';
+import { customJoinMatch } from './joinMatch';
 
 // game server
 const server = Server({
@@ -16,13 +17,14 @@ const server = Server({
   ],
 });
 
-// Build path relative to the server.js file
-const frontEndAppBuildPath = path.resolve(__dirname, '../build');
+customJoinMatch(server);
+
+// Build path relative to this file
+const frontEndAppBuildPath = path.resolve(__dirname, '../../build');
 server.app.use(serve(frontEndAppBuildPath));
 
 void server.run(PORT, () => {
-  server.app.use(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    async (ctx, next) => await serve(frontEndAppBuildPath)(Object.assign(ctx, { path: 'index.html' }), next)
-  );
+  server.app.use(async (ctx, next) => {
+    await serve(frontEndAppBuildPath)(Object.assign(ctx, { path: 'index.html' }), next);
+  });
 });

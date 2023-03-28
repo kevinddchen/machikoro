@@ -169,6 +169,10 @@
   font-size: 16px;
 }
 
+.footer-body {
+  margin-bottom: 50px;
+}
+
 /* MATCHMAKING */
 
 .mm-container {
@@ -522,7 +526,7 @@ select {
   font-size: 14px;
   overflow: hidden;
   width: 90px;
-  height: 16px;
+  height: 20px;
 }
 
 .name_do_tv {
