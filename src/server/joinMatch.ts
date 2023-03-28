@@ -12,7 +12,7 @@
  * The code in this file were copied from:
  * https://github.com/boardgameio/boardgame.io/blob/d97ef0b5500de8dec0ff6d503759dc4b36565622/src/server/api.ts
  * https://github.com/boardgameio/boardgame.io/blob/d97ef0b5500de8dec0ff6d503759dc4b36565622/src/server/util.ts
- * 
+ *
  * TODO: Remove this file when the issue is resolved.
  */
 
