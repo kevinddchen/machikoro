@@ -193,7 +193,7 @@ export const TaxOffice2: Establishment = {
   name: 'Shopping District',
   description: 'From each opponent who has more than 10 coins, take half, rounded down.',
   cost: 3,
-  earn: 10, // This is not the coins taken, but the threshold for triggering the tax office
+  earn: 11, // This is not the coins taken, but the threshold for triggering the tax office
   rolls: [8, 9],
   color: EstColor.Purple,
   type: null,
