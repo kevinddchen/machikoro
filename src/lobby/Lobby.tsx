@@ -131,9 +131,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       // we could not connect to the server
       if (window.location.protocol === 'https:') {
         // common reason is that HTTPS is not supported yet
-        this.props.setErrorMessage('You must connect with `http` instead of `https`.');
+        this.props.setErrorMessage('You must connect with `http` instead of `https`');
       } else {
-        this.props.setErrorMessage('Failed to connect to server.');
+        this.props.setErrorMessage('Failed to connect to server');
       }
       this.setState({ connected: false });
       throw e;
@@ -153,11 +153,16 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    * @returns The match ID of the created match.
    */
   private createMatch = async (): Promise<string> => {
-    const { lobbyClient } = this.props;
+    const { name, lobbyClient } = this.props;
     const { connected, numPlayers, expansion, supplyVariant } = this.state;
 
     if (!connected) {
       throw new Error('Cannot create match: Not connected to server.');
+    }
+
+    if (name.length === 0) {
+      this.props.setErrorMessage('Player name is required');
+      throw new Error('Cannot create match: Player name is required');
     }
 
     // initialize setup data

@@ -88,7 +88,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     try {
       match = await lobbyClient.getMatch(GAME_NAME, matchInfo.matchID);
     } catch (e) {
-      this.props.setErrorMessage('Failed to connect to server.');
+      this.props.setErrorMessage('Failed to connect to server');
       this.setState({ connected: false });
       throw e;
     }
