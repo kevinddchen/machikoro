@@ -12,7 +12,7 @@ This app was developed using the React framework and the <a href="https://boardg
 
 ## Play
 
-The app is online and free to play at <a href="http://playmachikoro.herokuapp.com/">playmachikoro.herokuapp.com</a>.
+The app is online and free to play at <a href="https://playmachikoro.herokuapp.com/">playmachikoro.herokuapp.com</a>.
 
 ## Development
 
