@@ -128,13 +128,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     try {
       matchList = await lobbyClient.listMatches(GAME_NAME, { isGameover: false });
     } catch (e) {
-      // we could not connect to the server
-      if (window.location.protocol === 'https:') {
-        // common reason is that HTTPS is not supported yet
-        this.props.setErrorMessage('You must connect with `http` instead of `https`');
-      } else {
-        this.props.setErrorMessage('Failed to connect to server');
-      }
+      this.props.setErrorMessage('Failed to connect to server');
       this.setState({ connected: false });
       throw e;
     }

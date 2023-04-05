@@ -4,8 +4,8 @@ import { Client } from 'boardgame.io/react';
 import React from 'react';
 import { SocketIO } from 'boardgame.io/multiplayer';
 
-import { IN_PROD, PORT } from 'config';
 import { MatchInfo, Matchmaker, debugMatchInfo } from 'lobby';
+import { IN_PROD } from 'config';
 import { Machikoro } from 'game';
 import { MachikoroBoard } from 'board';
 import { version } from 'version';
@@ -29,7 +29,7 @@ export default class App extends React.Component<object, AppState> {
   constructor(props: object) {
     super(props);
     this.state = { matchInfo: null, play: false };
-    this.serverOrigin = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
+    this.serverOrigin = `${window.location.protocol}//${window.location.hostname}`;
   }
 
   private setMatchInfo = (matchInfo: MatchInfo): void => {
