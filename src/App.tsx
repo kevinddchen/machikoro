@@ -30,7 +30,6 @@ export default class App extends React.Component<object, AppState> {
     super(props);
     this.state = { matchInfo: null, play: false };
     this.serverOrigin = `${window.location.protocol}//${window.location.hostname}`;
-    console.log(this.serverOrigin);
   }
 
   private setMatchInfo = (matchInfo: MatchInfo): void => {

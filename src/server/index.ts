@@ -17,8 +17,6 @@ const server = Server({
   ],
 });
 
-console.log(PORT);
-
 customJoinMatch(server);
 
 // Build path relative to this file
