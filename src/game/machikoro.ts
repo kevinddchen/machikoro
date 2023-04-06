@@ -605,6 +605,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     // first, check if game is over
     if (canEndGame(G, ctx)) {
       endGame(context, player);
+      return;
     }
 
     activateBoughtLand(context);
