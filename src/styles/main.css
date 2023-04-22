@@ -531,6 +531,7 @@ select {
   overflow: hidden;
   width: 90px;
   height: 20px;
+  white-space: nowrap;
 }
 
 .name_do_tv {
