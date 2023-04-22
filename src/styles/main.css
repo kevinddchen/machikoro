@@ -341,6 +341,9 @@ select {
   margin: 5px;
   padding: 2px;
   text-align: center;
+  overflow: scroll;
+  width: 600px;
+  white-space: nowrap;
 }
 
 .status-bar-active {
