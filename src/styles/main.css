@@ -32,11 +32,17 @@
 
 .div-column {
   display: table-cell;
+  padding: 0px 1px;
 }
 
 .div-column-right {
   display: table-cell;
   text-align: right;
+  padding: 0px 1px;
+}
+
+.div-flex {
+  display: flex;
 }
 
 /* FONTS */
@@ -494,8 +500,6 @@ select {
 }
 
 .log_div {
-  align-items: center;
-  display: flex;
   max-height: 15px;
   white-space: pre;
 }
