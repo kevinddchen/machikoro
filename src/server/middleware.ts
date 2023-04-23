@@ -1,5 +1,6 @@
-import Router from '@koa/router';
 import { Server as ServerTypes, StorageAPI } from 'boardgame.io/dist/types/src/types';
+import Koa from 'koa';
+import Router from '@koa/router';
 
 import { createMatchBody, joinMatchBody } from 'lobby/Lobby';
 
@@ -14,17 +15,17 @@ import { createMatchBody, joinMatchBody } from 'lobby/Lobby';
  * @param callback - Takes the request body and returns the modified version.
  * @returns A middleware function, to be used in a Koa router.
  */
-const patchRequest = (callback: (ctx: ServerTypes.AppCtx, body: any) => Promise<any>) => {
-  return async (ctx: ServerTypes.AppCtx, next: () => Promise<any>) => {
+const patchRequest = (callback: (ctx: Koa.Context, body: object) => Promise<object>) => {
+  return async (ctx: Koa.Context, next: () => Promise<any>) => {
     // Read the request body.
-    const chunks: Uint8Array[] = [];
-    let chunk: Uint8Array;
-    while (null !== (chunk = ctx.req.read())) {
+    const chunks = [];
+    let chunk;
+    while (null !== (chunk = ctx.req.read() as Uint8Array)) {
       chunks.push(chunk);
     }
 
     const rawBody = Buffer.concat(chunks).toString('utf8');
-    const body = JSON.parse(rawBody);
+    const body = JSON.parse(rawBody) as object;
 
     const newBody = await callback(ctx, body);
     const rawNewBody = Buffer.from(JSON.stringify(newBody), 'utf8');
@@ -53,7 +54,7 @@ const sanitizePlayerName = (name: string): string => {
  * @param ctx
  * @param name
  */
-const validatePlayerName = (ctx: ServerTypes.AppCtx, name: string): void => {
+const validatePlayerName = (ctx: Koa.Context, name: string): void => {
   if (name.length === 0) {
     ctx.throw(403, 'Player name cannot be empty.');
   } else if ([...name].length > 16) {
@@ -75,30 +76,31 @@ interface Server {
  * @param server
  */
 export const addCustomMiddleware = (server: Server): void => {
-  const createMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: createMatchBody): Promise<object> => {
-    const { playerName } = body;
+  const createMatchMiddleware = async (ctx: Koa.Context, body: object): Promise<object> => {
+    const { playerName } = body as createMatchBody;
 
     if (!playerName) {
       ctx.throw(403, 'Player name is required.');
     }
 
     // Sanitize and validate player name.
-    const sanitizedPlayerName = sanitizePlayerName(playerName as string);
+    const sanitizedPlayerName = sanitizePlayerName(playerName);
     validatePlayerName(ctx, sanitizedPlayerName);
 
-    return body;
+    return Promise.resolve(body);
   };
 
-  const joinMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: joinMatchBody): Promise<object> => {
-    const { playerName } = body;
-    const matchID = ctx.params.id;
+  const joinMatchMiddleware = async (ctx: Koa.Context, body: object): Promise<object> => {
+    const { playerName } = body as joinMatchBody;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const matchID = ctx.params.id as string;
 
     if (!playerName) {
       ctx.throw(403, 'Player name is required.');
     }
 
     // Sanitize and validate player name.
-    const sanitizedPlayerName = sanitizePlayerName(playerName as string);
+    const sanitizedPlayerName = sanitizePlayerName(playerName);
     validatePlayerName(ctx, sanitizedPlayerName);
 
     // Check for duplicate player names.
