@@ -38,6 +38,26 @@ const patchRequest = (callback: (ctx: ServerTypes.AppCtx, body: object) => Promi
 }
 
 /**
+ * Remove whitespace and normalize unicode characters, for more reliable
+ * string equality checks.
+ * @param name 
+ * @returns 
+ */
+const sanitizePlayerName = (name: string): string => {
+  name = name.trim(); // remove whitespace
+  name = name.normalize(); // normalize unicode characters
+  return name;
+};
+
+const validatePlayerName = (ctx: ServerTypes.AppCtx, name: string): boolean => {
+  if (name.length === 0) {
+    ctx.throw(403, 'Player name cannot be empty.');
+  } else if ([...name].length > 16) {
+    ctx.throw(403, 'Player name too long.');
+  }
+};
+
+/**
  * Redefinition of interface returned from boardgame.io's `Server()`
  * function.
  * @prop {Router} router
@@ -51,11 +71,20 @@ interface Server {
  */
 export const addCustomMiddleware = (server: Server): void => {
 
-  // Before joining a match, validate the player name.
-  const validatePlayerName = async (ctx: ServerTypes.AppCtx, body: object): Promise<object> => {
-    console.log(body);
-    return body;
+  const joinMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: object): Promise<object> => {
+    let playerName = body.playerName as string;
+
+    if (!playerName) {
+      ctx.throw(403, 'Player name is required.');
+    }
+
+    // Sanitize and validate player name.
+    playerName = sanitizePlayerName(playerName);
+    validatePlayerName(ctx, playerName);
+
+    newBody = { playerName }
+    return newBody;
   };
 
-  server.router.post('/games/:name/:id/join', patchRequest(validatePlayerName));
+  server.router.post('/games/:name/:id/join', patchRequest(joinMatchMiddleware));
 };
