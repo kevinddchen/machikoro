@@ -32,11 +32,17 @@
 
 .div-column {
   display: table-cell;
+  padding: 0px 1px;
 }
 
 .div-column-right {
   display: table-cell;
   text-align: right;
+  padding: 0px 1px;
+}
+
+.div-flex {
+  display: flex;
 }
 
 /* FONTS */
@@ -335,6 +341,9 @@ select {
   margin: 5px;
   padding: 2px;
   text-align: center;
+  overflow: scroll;
+  width: 600px;
+  white-space: nowrap;
 }
 
 .status-bar-active {
@@ -494,8 +503,6 @@ select {
 }
 
 .log_div {
-  align-items: center;
-  display: flex;
   max-height: 15px;
   white-space: pre;
 }
@@ -527,6 +534,7 @@ select {
   overflow: hidden;
   width: 90px;
   height: 20px;
+  white-space: nowrap;
 }
 
 .name_do_tv {

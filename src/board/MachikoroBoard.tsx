@@ -66,7 +66,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
     const clientPlayer = playerID === null ? null : parseInt(playerID);
 
     return (
-      <div>
+      <div className='div-flex'>
         <div className='div-column'>
           <div className='div-row'>
             <Buttons {...this.props} />
