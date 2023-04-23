@@ -3,20 +3,21 @@ import Koa from 'koa';
 import Router from '@koa/router';
 
 import { createMatchBody, joinMatchBody } from 'lobby/Lobby';
+import { MAX_PLAYER_NAME_LENGTH } from 'config';
 
 /**
- * This method returns middleware that reads the request body, runs a callback
- * on it to modify it, and then rewrites the request body with the modified
- * version. This is so that `boardgame.io` can parse the modified request body
- * afterwards.
+ * This function returns middleware that reads the request body, runs a
+ * callback on it to modify it, and then rewrites the request body with the
+ * modified version. This is so that `boardgame.io` can parse the modified
+ * request body afterwards.
  *
  * See https://github.com/boardgameio/boardgame.io/issues/1143 for more info
- * on why this is done this way.
+ * on why this is done this way and we do not use `koaBody()`.
  * @param callback - Takes the request body and returns the modified version.
  * @returns A middleware function, to be used in a Koa router.
  */
 const patchRequest = (callback: (ctx: Koa.Context, body: object) => Promise<object>) => {
-  return async (ctx: Koa.Context, next: () => Promise<any>) => {
+  return async (ctx: Koa.Context, next: () => Promise<void>) => {
     // Read the request body.
     const chunks = [];
     let chunk;
@@ -57,7 +58,7 @@ const sanitizePlayerName = (name: string): string => {
 const validatePlayerName = (ctx: Koa.Context, name: string): void => {
   if (name.length === 0) {
     ctx.throw(403, 'Player name cannot be empty.');
-  } else if ([...name].length > 16) {
+  } else if ([...name].length > MAX_PLAYER_NAME_LENGTH) {
     ctx.throw(403, 'Player name too long.');
   }
 };
@@ -76,6 +77,10 @@ interface Server {
  * @param server
  */
 export const addCustomMiddleware = (server: Server): void => {
+  //
+  // === Define middleware ===
+  //
+
   const createMatchMiddleware = async (ctx: Koa.Context, body: object): Promise<object> => {
     const { playerName } = body as createMatchBody;
 
@@ -118,6 +123,10 @@ export const addCustomMiddleware = (server: Server): void => {
     const newBody = { playerName: sanitizedPlayerName };
     return newBody;
   };
+
+  //
+  // === Add middleware ===
+  //
 
   server.router.post('/games/:name/create', patchRequest(createMatchMiddleware));
   server.router.post('/games/:name/:id/join', patchRequest(joinMatchMiddleware));

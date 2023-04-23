@@ -21,7 +21,7 @@ import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
 /**
- * Request body for creating a match.
+ * HTTP request body for creating a match.
  * @prop {string} playerName - Name of the player. This is not needed by
  * boardgame.io's API, but we add middleware to validate the player name.
  * @prop {number} numPlayers
@@ -34,7 +34,7 @@ export interface createMatchBody {
 }
 
 /**
- * Request body for joining a match.
+ * HTTP request body for joining a match.
  * @prop {string} playerName
  */
 export interface joinMatchBody {
