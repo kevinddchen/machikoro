@@ -28,7 +28,7 @@ const patchRequest = (callback: (ctx: ServerTypes.AppCtx, body: object) => Promi
     const body = JSON.parse(rawBody);
 
     const newBody = await callback(ctx, body);
-    const rawNewBody = JSON.stringify(newBody);
+    const rawNewBody = Buffer.from(JSON.stringify(newBody), 'utf8');
 
     // Rewrite the request body.
     ctx.req.unshift(rawNewBody);
@@ -73,6 +73,7 @@ export const addCustomMiddleware = (server: Server): void => {
 
   const joinMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: object): Promise<object> => {
     let playerName = body.playerName as string;
+    const matchID = ctx.params.id;
 
     if (!playerName) {
       ctx.throw(403, 'Player name is required.');
@@ -82,7 +83,18 @@ export const addCustomMiddleware = (server: Server): void => {
     playerName = sanitizePlayerName(playerName);
     validatePlayerName(ctx, playerName);
 
-    newBody = { playerName }
+    const { metadata } = await (server.db as StorageAPI.Async).fetch(matchID, { metadata: true });
+    if (!metadata) {
+      ctx.throw(404, 'Match ' + matchID + ' not found');
+    }
+
+    for (const player of Object.values(metadata.players)) {
+      if (player.name && player.name === playerName) {
+        ctx.throw(409, 'Player name already taken');
+      }
+    }
+
+    const newBody = { playerName }
     return newBody;
   };
 
