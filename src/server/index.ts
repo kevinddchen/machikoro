@@ -4,7 +4,7 @@ import serve from 'koa-static';
 
 import { Machikoro } from '../game';
 import { PORT } from '../config';
-import { customJoinMatch } from './joinMatch';
+import { addCustomMiddleware } from './middleware';
 
 // game server
 const server = Server({
@@ -17,7 +17,8 @@ const server = Server({
   ],
 });
 
-customJoinMatch(server);
+// run our middleware before any of boardgame.io's middleware
+addCustomMiddleware(server);
 
 // Build path relative to this file
 const frontEndAppBuildPath = path.resolve(__dirname, '../../build');
