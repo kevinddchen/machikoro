@@ -1,22 +1,21 @@
-// @ts-nocheck
-
 import Router from '@koa/router';
-import { Server as ServerTypes } from 'boardgame.io/dist/types/src/types';
+import { Server as ServerTypes, StorageAPI } from 'boardgame.io/dist/types/src/types';
+
+import { createMatchBody, joinMatchBody } from 'lobby/Lobby';
 
 /**
  * This method returns middleware that reads the request body, runs a callback
  * on it to modify it, and then rewrites the request body with the modified
  * version. This is so that `boardgame.io` can parse the modified request body
  * afterwards.
- * 
+ *
  * See https://github.com/boardgameio/boardgame.io/issues/1143 for more info
  * on why this is done this way.
  * @param callback - Takes the request body and returns the modified version.
  * @returns A middleware function, to be used in a Koa router.
  */
-const patchRequest = (callback: (ctx: ServerTypes.AppCtx, body: object) => Promise<object>) => {
+const patchRequest = (callback: (ctx: ServerTypes.AppCtx, body: any) => Promise<any>) => {
   return async (ctx: ServerTypes.AppCtx, next: () => Promise<any>) => {
-
     // Read the request body.
     const chunks: Uint8Array[] = [];
     let chunk: Uint8Array;
@@ -32,16 +31,16 @@ const patchRequest = (callback: (ctx: ServerTypes.AppCtx, body: object) => Promi
 
     // Rewrite the request body.
     ctx.req.unshift(rawNewBody);
-    ctx.req.headers["content-length"] = rawNewBody.length.toString();
+    ctx.req.headers['content-length'] = rawNewBody.length.toString();
     await next();
-  }
-}
+  };
+};
 
 /**
  * Remove whitespace and normalize unicode characters, for more reliable
  * string equality checks.
- * @param name 
- * @returns 
+ * @param name
+ * @returns
  */
 const sanitizePlayerName = (name: string): string => {
   name = name.trim(); // remove whitespace
@@ -49,7 +48,12 @@ const sanitizePlayerName = (name: string): string => {
   return name;
 };
 
-const validatePlayerName = (ctx: ServerTypes.AppCtx, name: string): boolean => {
+/**
+ * Check that a player's name is not empty and is not too long.
+ * @param ctx
+ * @param name
+ */
+const validatePlayerName = (ctx: ServerTypes.AppCtx, name: string): void => {
   if (name.length === 0) {
     ctx.throw(403, 'Player name cannot be empty.');
   } else if ([...name].length > 16) {
@@ -64,14 +68,14 @@ const validatePlayerName = (ctx: ServerTypes.AppCtx, name: string): boolean => {
  */
 interface Server {
   router: Router<any, ServerTypes.AppCtx>;
+  db: StorageAPI.Async | StorageAPI.Sync;
 }
 
 /**
  * @param server
  */
 export const addCustomMiddleware = (server: Server): void => {
-
-  const createMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: object): Promise<object> => {
+  const createMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: createMatchBody): Promise<object> => {
     const { playerName } = body;
 
     if (!playerName) {
@@ -85,7 +89,7 @@ export const addCustomMiddleware = (server: Server): void => {
     return body;
   };
 
-  const joinMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: object): Promise<object> => {
+  const joinMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: joinMatchBody): Promise<object> => {
     const { playerName } = body;
     const matchID = ctx.params.id;
 
@@ -109,7 +113,7 @@ export const addCustomMiddleware = (server: Server): void => {
       }
     }
 
-    const newBody = { playerName: sanitizedPlayerName }
+    const newBody = { playerName: sanitizedPlayerName };
     return newBody;
   };
 

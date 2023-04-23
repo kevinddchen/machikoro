@@ -21,6 +21,27 @@ import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
 /**
+ * Request body for creating a match.
+ * @prop {string} playerName - Name of the player. This is not needed by
+ * boardgame.io's API, but we add middleware to validate the player name.
+ * @prop {number} numPlayers
+ * @prop {SetupData} setupData
+ */
+export interface createMatchBody {
+  playerName: string;
+  numPlayers: number;
+  setupData: SetupData;
+}
+
+/**
+ * Request body for joining a match.
+ * @prop {string} playerName
+ */
+export interface joinMatchBody {
+  playerName: string;
+}
+
+/**
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
  * with server match management API.
@@ -179,7 +200,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     // try to create a match
     let createdMatch: LobbyAPI.CreatedMatch;
     try {
-      createdMatch = await lobbyClient.createMatch(GAME_NAME, { playerName: name, numPlayers, setupData });
+      createdMatch = await lobbyClient.createMatch(GAME_NAME, {
+        playerName: name,
+        numPlayers,
+        setupData,
+      } as createMatchBody);
     } catch (e) {
       if ((e as LobbyClientError).details) {
         // if error has specific reason, display it
@@ -217,7 +242,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     // second, try to join the match by creating new credentials
     let joinedMatch: LobbyAPI.JoinedMatch;
     try {
-      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name });
+      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name } as joinMatchBody);
     } catch (e) {
       if ((e as LobbyClientError).details) {
         // if error has specific reason, display it
