@@ -4,15 +4,15 @@ import Router from '@koa/router';
 import { Server as ServerTypes } from 'boardgame.io/dist/types/src/types';
 
 /**
- * This method returns a middleware function that reads the request body, runs
- * a callback on it to modify it, and then rewrites the request body with the
- * modified version. This is so that `boardgame.io` can parse the modified
- * request body afterwards.
+ * This method returns middleware that reads the request body, runs a callback
+ * on it to modify it, and then rewrites the request body with the modified
+ * version. This is so that `boardgame.io` can parse the modified request body
+ * afterwards.
  * 
  * See https://github.com/boardgameio/boardgame.io/issues/1143 for more info
  * on why this is done this way.
  * @param callback - Takes the request body and returns the modified version.
- * @returns A middleware function, to be used with a Koa router.
+ * @returns A middleware function, to be used in a Koa router.
  */
 const patchRequest = (callback: (ctx: ServerTypes.AppCtx, body: object) => Promise<object>) => {
   return async (ctx: ServerTypes.AppCtx, next: () => Promise<any>) => {
@@ -71,8 +71,22 @@ interface Server {
  */
 export const addCustomMiddleware = (server: Server): void => {
 
+  const createMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: object): Promise<object> => {
+    const { playerName } = body;
+
+    if (!playerName) {
+      ctx.throw(403, 'Player name is required.');
+    }
+
+    // Sanitize and validate player name.
+    const sanitizedPlayerName = sanitizePlayerName(playerName as string);
+    validatePlayerName(ctx, sanitizedPlayerName);
+
+    return body;
+  };
+
   const joinMatchMiddleware = async (ctx: ServerTypes.AppCtx, body: object): Promise<object> => {
-    let playerName = body.playerName as string;
+    const { playerName } = body;
     const matchID = ctx.params.id;
 
     if (!playerName) {
@@ -80,23 +94,25 @@ export const addCustomMiddleware = (server: Server): void => {
     }
 
     // Sanitize and validate player name.
-    playerName = sanitizePlayerName(playerName);
-    validatePlayerName(ctx, playerName);
+    const sanitizedPlayerName = sanitizePlayerName(playerName as string);
+    validatePlayerName(ctx, sanitizedPlayerName);
 
+    // Check for duplicate player names.
     const { metadata } = await (server.db as StorageAPI.Async).fetch(matchID, { metadata: true });
     if (!metadata) {
       ctx.throw(404, 'Match ' + matchID + ' not found');
     }
 
     for (const player of Object.values(metadata.players)) {
-      if (player.name && player.name === playerName) {
+      if (player.name && player.name === sanitizedPlayerName) {
         ctx.throw(409, 'Player name already taken');
       }
     }
 
-    const newBody = { playerName }
+    const newBody = { playerName: sanitizedPlayerName }
     return newBody;
   };
 
+  server.router.post('/games/:name/create', patchRequest(createMatchMiddleware));
   server.router.post('/games/:name/:id/join', patchRequest(joinMatchMiddleware));
 };

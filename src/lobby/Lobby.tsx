@@ -154,11 +154,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       throw new Error('Cannot create match: Not connected to server.');
     }
 
-    if (name.length === 0) {
-      this.props.setErrorMessage('Player name is required');
-      throw new Error('Cannot create match: Player name is required');
-    }
-
     // initialize setup data
     let startCoins;
     let initialBuyRounds;
@@ -184,9 +179,15 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     // try to create a match
     let createdMatch: LobbyAPI.CreatedMatch;
     try {
-      createdMatch = await lobbyClient.createMatch(GAME_NAME, { numPlayers, setupData });
+      createdMatch = await lobbyClient.createMatch(GAME_NAME, { playerName: name, numPlayers, setupData });
     } catch (e) {
-      this.props.setErrorMessage('Error when creating match. Try again.');
+      if ((e as LobbyClientError).details) {
+        // if error has specific reason, display it
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        this.props.setErrorMessage((e as LobbyClientError).details);
+      } else {
+        this.props.setErrorMessage('Error when creating match. Try again.');
+      }
       throw e;
     }
 
@@ -311,7 +312,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
           className='input-box'
           ref={this.nameRef}
           type='text'
-          maxLength={16}
           spellCheck='false'
           autoComplete='off'
           onChange={this.setName}
