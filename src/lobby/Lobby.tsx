@@ -15,6 +15,7 @@ import {
   Version,
   expToVer,
 } from 'game';
+import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 import { assertUnreachable } from 'common/typescript';
 
@@ -47,8 +48,6 @@ export interface joinMatchBody {
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
  * with server match management API.
- * @prop {number} updateIntervalMs - Match fetch request timer, in milliseconds.
- * @prop {number} fetchTimeoutMs - Timeout for fetching matches, in milliseconds.
  * @func setMatchInfo - Callback to set match info.
  * @func setName - Callback to set name.
  * @func setErrorMessage - Callback to set error message.
@@ -57,8 +56,6 @@ export interface joinMatchBody {
 interface LobbyProps {
   name: string;
   lobbyClient: LobbyClient;
-  updateIntervalMs: number;
-  fetchTimeoutMs: number;
   setMatchInfo: (matchInfo: MatchInfo) => void;
   setName: (name: string) => void;
   setErrorMessage: (errorMessage: string) => void;
@@ -96,11 +93,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   private numPlayersRef: React.RefObject<HTMLSelectElement>;
   private expansionRef: React.RefObject<HTMLSelectElement>;
   private supplyVariantRef: React.RefObject<HTMLSelectElement>;
-
-  static defaultProps = {
-    updateIntervalMs: 1000,
-    fetchTimeoutMs: 1000,
-  };
 
   constructor(props: LobbyProps) {
     super(props);
@@ -290,7 +282,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   // --- React ----------------------------------------------------------------
 
   componentDidMount() {
-    const { name, updateIntervalMs, fetchTimeoutMs } = this.props;
+    const { name } = this.props;
     const { numPlayers, expansion, supplyVariant } = this.state;
 
     this.props.clearErrorMessage();
@@ -311,11 +303,11 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     // create callback for fetching matches that runs periodically
     const callback = () => {
-      asyncCallWithTimeout(this.fetchMatches(), fetchTimeoutMs).catch(defaultErrorCatcher);
+      asyncCallWithTimeout(this.fetchMatches(), FETCH_TIMEOUT_MS).catch(defaultErrorCatcher);
     };
 
     callback();
-    this.fetchInterval = setInterval(callback, updateIntervalMs);
+    this.fetchInterval = setInterval(callback, FETCH_INTERVAL_MS);
   }
 
   componentWillUnmount() {
