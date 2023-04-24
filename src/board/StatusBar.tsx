@@ -26,8 +26,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
   private statusMessage = (): string => {
     const { G, ctx, isActive, names } = this.props;
     const currentPlayerName = names[parseInt(ctx.currentPlayer)];
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const gameover: boolean = ctx.gameover ?? false;
+    const gameover = Boolean(ctx.gameover);
 
     if (gameover) {
       return 'Game over! ' + currentPlayerName + ' wins!';

@@ -55,3 +55,11 @@ export function supplyVariantName(supplyVariant: SupplyVariant | null): string {
       return '??? Supply Variant';
   }
 }
+
+export interface IDetails {
+  details: string;
+}
+
+export const hasDetails = (obj: unknown): obj is IDetails => {
+  return (obj as IDetails)?.details !== undefined && typeof (obj as IDetails).details === 'string';
+};

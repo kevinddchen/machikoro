@@ -55,14 +55,14 @@ export default class Logger extends React.Component<LogProps, object> {
    * @returns An array of strings.
    */
   private parseLogEntry = (entry: LogEntry): string[] => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { metadata } = entry;
+    const metadata: unknown = entry.metadata;
     if (!metadata) {
       return [];
     }
 
     const { names } = this.props;
     const lines: string[] = [];
+    // TODO: as
     for (const event of metadata as Log.LogEvent[]) {
       lines.push(Log.parseLogEvent(event, names));
     }

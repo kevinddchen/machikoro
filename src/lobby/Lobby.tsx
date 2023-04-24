@@ -1,7 +1,7 @@
 import 'styles/main.css';
 
-import { LobbyClient, LobbyClientError } from 'boardgame.io/client';
 import { LobbyAPI } from 'boardgame.io';
+import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 
 import {
@@ -18,7 +18,7 @@ import {
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 import { assertUnreachable } from 'common/typescript';
 
-import { countPlayers, expansionName, supplyVariantName } from './utils';
+import { countPlayers, expansionName, hasDetails, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
@@ -208,10 +208,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         setupData,
       } as createMatchBody);
     } catch (e) {
-      if ((e as LobbyClientError).details) {
+      if (hasDetails(e)) {
         // if error has specific reason, display it
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.props.setErrorMessage((e as LobbyClientError).details);
+        this.props.setErrorMessage(e.details);
       } else {
         this.props.setErrorMessage('Error when creating match. Try again.');
       }
@@ -246,10 +245,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     try {
       joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name } as joinMatchBody);
     } catch (e) {
-      if ((e as LobbyClientError).details) {
+      if (hasDetails(e)) {
         // if error has specific reason, display it
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.props.setErrorMessage((e as LobbyClientError).details);
+        this.props.setErrorMessage(e.details);
       } else {
         this.props.setErrorMessage('Error when joining match. Try again.');
       }
@@ -447,6 +445,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
                 try {
                   this.spectateMatch(matchID);
                 } catch (e) {
+                  // TODO: as
                   defaultErrorCatcher(e as Error);
                 }
               }}

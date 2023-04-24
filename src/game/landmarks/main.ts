@@ -6,8 +6,8 @@ import { assertUnreachable } from 'common/typescript';
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
-import { Landmark, LandmarkData } from './types';
 import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
+import { Landmark, LandmarkData } from './types';
 import { expToVer } from '../utils';
 
 /**
