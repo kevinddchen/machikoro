@@ -1,6 +1,6 @@
 {
   "name": "machikoro",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "dependencies": {
     "boardgame.io": "^0.50.2",
