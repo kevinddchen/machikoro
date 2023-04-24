@@ -13,9 +13,24 @@ import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState, Version } from './types';
 import { Landmark } from './landmarks';
 import { assertUnreachable } from 'common';
-import { expToVer } from './config';
+import { expToVer } from './utils';
 
 export const GAME_NAME = 'machikoro';
+
+/**
+ * Starting coins in Machi Koro 1.
+ */
+export const MK1_STARTING_COINS = 3;
+
+/**
+ * Starting coins in Machi Koro 2.
+ */
+export const MK2_STARTING_COINS = 5;
+
+/**
+ * Number of initial buy rounds in Machi Koro 2.
+ */
+export const MK2_INITIAL_BUY_ROUNDS = 3;
 
 //
 // === Queries ===
