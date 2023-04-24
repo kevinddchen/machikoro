@@ -20,7 +20,7 @@ export const asyncCallWithTimeout = async <T>(asyncPromise: Promise<T>, timeLimi
 
 /**
  * Catches errors and logs to console.
- * @param error
+ * @param e
  */
 export const defaultErrorCatcher = (e: unknown): void => {
   console.error(e);
