@@ -30,8 +30,7 @@ export const LogxPlugin: Plugin<Record<string, never>, Record<string, never>, Ma
         // initialize empty log buffer
         G = { ...G, _logBuffer: [] };
 
-        // eslint-disable-next-line
-        const moveResult = fn({ G, log, ...rest }, ...args);
+        const moveResult = fn({ G, log, ...rest }, ...args); // eslint-disable-line
 
         if (moveResult === INVALID_MOVE) {
           return INVALID_MOVE;

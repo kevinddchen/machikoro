@@ -445,8 +445,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
                 try {
                   this.spectateMatch(matchID);
                 } catch (e) {
-                  // TODO: as
-                  defaultErrorCatcher(e as Error);
+                  defaultErrorCatcher(e);
                 }
               }}
             >

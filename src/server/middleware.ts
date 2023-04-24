@@ -84,10 +84,6 @@ export const addCustomMiddleware = (server: Server): void => {
   const createMatchMiddleware = async (ctx: Koa.Context, body: object): Promise<object> => {
     const { playerName } = body as createMatchBody;
 
-    if (!playerName) {
-      ctx.throw(403, 'Player name is required.');
-    }
-
     // Sanitize and validate player name.
     const sanitizedPlayerName = sanitizePlayerName(playerName);
     validatePlayerName(ctx, sanitizedPlayerName);
@@ -97,12 +93,7 @@ export const addCustomMiddleware = (server: Server): void => {
 
   const joinMatchMiddleware = async (ctx: Koa.Context, body: object): Promise<object> => {
     const { playerName } = body as joinMatchBody;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const matchID = ctx.params.id as string;
-
-    if (!playerName) {
-      ctx.throw(403, 'Player name is required.');
-    }
+    const matchID = ctx.params.id as string; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
 
     // Sanitize and validate player name.
     const sanitizedPlayerName = sanitizePlayerName(playerName);
