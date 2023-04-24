@@ -10,10 +10,10 @@ import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
-import { Expansion, SupplyVariant, Version, expToVer } from './config';
-import { MachikoroG, SetupData, TurnState } from './types';
+import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState, Version } from './types';
 import { Landmark } from './landmarks';
 import { assertUnreachable } from 'common';
+import { expToVer } from './config';
 
 export const GAME_NAME = 'machikoro';
 
