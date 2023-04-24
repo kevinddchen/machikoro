@@ -49,4 +49,3 @@ export const LogxPlugin: Plugin<Record<string, never>, Record<string, never>, Ma
     }
   },
 };
-  
