@@ -7,6 +7,7 @@ import { Server } from 'boardgame.io';
 
 import { Expansion, GAME_NAME, SetupData, SupplyVariant } from 'game';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common';
+
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';

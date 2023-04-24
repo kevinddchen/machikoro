@@ -1,3 +1,7 @@
+//
+// Types for matches.
+//
+
 /**
  * Information a client needs to connect to a match.
  * @prop {string} matchID - Identifies the match.

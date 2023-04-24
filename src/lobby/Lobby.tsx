@@ -16,6 +16,7 @@ import {
   expToVer,
 } from 'game';
 import { assertUnreachable, asyncCallWithTimeout, defaultErrorCatcher } from 'common';
+
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
