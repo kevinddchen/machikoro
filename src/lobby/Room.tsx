@@ -6,7 +6,9 @@ import React from 'react';
 import { Server } from 'boardgame.io';
 
 import { Expansion, GAME_NAME, SetupData, SupplyVariant } from 'game';
-import { asyncCallWithTimeout, defaultErrorCatcher } from 'common';
+import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
+import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
+
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
@@ -15,8 +17,6 @@ import { MatchInfo } from './types';
  * @prop {string} name - Name of the player.
  * @prop {LobbyClient} lobbyClient - `LobbyClient` instance used to interact
  * with server match management API.
- * @prop {number} updateIntervalMs - Match fetch request timer, in milliseconds.
- * @prop {number} fetchTimeoutMs - Timeout for fetching matches, in milliseconds.
  * @prop {MatchInfo} matchInfo - Information a client needs to connect to a match.
  * @func clearMatchInfo - Callback to clear match info.
  * @func startMatch - Callback to start match.
@@ -26,8 +26,6 @@ import { MatchInfo } from './types';
 interface RoomProps {
   name: string;
   lobbyClient: LobbyClient;
-  updateIntervalMs: number;
-  fetchTimeoutMs: number;
   matchInfo: MatchInfo;
   clearMatchInfo: () => void;
   startMatch: () => void;
@@ -55,11 +53,6 @@ interface RoomState {
 export default class Room extends React.Component<RoomProps, RoomState> {
   private fetchInterval?: NodeJS.Timeout;
   private authenticator: Authenticator;
-
-  static defaultProps = {
-    updateIntervalMs: 1000,
-    fetchTimeoutMs: 1000,
-  };
 
   constructor(props: RoomProps) {
     super(props);
@@ -139,17 +132,15 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   // --- React -----------------------------------------------------------------
 
   componentDidMount() {
-    const { updateIntervalMs, fetchTimeoutMs } = this.props;
-
     this.props.clearErrorMessage();
 
     // create callback for fetching match information that runs periodically
     const callback = () => {
-      asyncCallWithTimeout(this.fetchMatch(), fetchTimeoutMs).catch(defaultErrorCatcher);
+      asyncCallWithTimeout(this.fetchMatch(), FETCH_TIMEOUT_MS).catch(defaultErrorCatcher);
     };
 
     callback();
-    this.fetchInterval = setInterval(callback, updateIntervalMs);
+    this.fetchInterval = setInterval(callback, FETCH_INTERVAL_MS);
   }
 
   componentWillUnmount() {

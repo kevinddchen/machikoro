@@ -55,3 +55,16 @@ export function supplyVariantName(supplyVariant: SupplyVariant | null): string {
       return '??? Supply Variant';
   }
 }
+
+export interface IDetails {
+  details: string;
+}
+
+/**
+ * Returns true if the object has a `details` field that is a string.
+ * @param obj
+ * @returns
+ */
+export const hasDetails = (obj: unknown): obj is IDetails => {
+  return (obj as IDetails)?.details !== undefined && typeof (obj as IDetails).details === 'string';
+};

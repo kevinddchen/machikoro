@@ -55,19 +55,18 @@ export default class Logger extends React.Component<LogProps, object> {
    * @returns An array of strings.
    */
   private parseLogEntry = (entry: LogEntry): string[] => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { metadata } = entry;
-    if (!metadata) {
+    const metadata: unknown = entry.metadata;
+    const { names } = this.props;
+
+    if (isLogEventArray(metadata)) {
+      const lines: string[] = [];
+      for (const event of metadata) {
+        lines.push(Log.parseLogEvent(event, names));
+      }
+      return lines;
+    } else {
       return [];
     }
-
-    const { names } = this.props;
-    const lines: string[] = [];
-    for (const event of metadata as Log.LogEvent[]) {
-      lines.push(Log.parseLogEvent(event, names));
-    }
-
-    return lines;
   };
 
   /**
@@ -144,3 +143,12 @@ export default class Logger extends React.Component<LogProps, object> {
     );
   }
 }
+
+/**
+ * Returns true if the object is an array of `Log.LogEvent` objects.
+ * @param obj
+ * @returns
+ */
+const isLogEventArray = (obj: unknown): obj is Log.LogEvent[] => {
+  return Array.isArray(obj) && obj.every((e) => (e as Log.LogEvent)?.type !== undefined);
+};

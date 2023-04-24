@@ -1,10 +1,3 @@
-import { IN_PROD } from 'config';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const assertUnreachable = (_x: never): never => {
-  throw new Error('Unreachable code');
-};
-
 /**
  * https://gist.github.com/orangegrove1955/eba48b5243e5da3fd680e6f1a6cae87c#file-asynccallwithtimeout-js
  * Call an async function with a maximum time limit (in milliseconds) for the timeout
@@ -26,11 +19,9 @@ export const asyncCallWithTimeout = async <T>(asyncPromise: Promise<T>, timeLimi
 };
 
 /**
- * Catches errors and prints to console in development.
- * @param error
+ * Catches errors and logs to console.
+ * @param e
  */
-export const defaultErrorCatcher = (error: Error): void => {
-  if (!IN_PROD) {
-    console.error(error);
-  }
+export const defaultErrorCatcher = (e: unknown): void => {
+  console.error(e);
 };

@@ -30,18 +30,16 @@ export const LogxPlugin: Plugin<Record<string, never>, Record<string, never>, Ma
         // initialize empty log buffer
         G = { ...G, _logBuffer: [] };
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
-        const moveResult = fn({ G, log, ...rest }, ...args);
+        const moveResult = fn({ G, log, ...rest }, ...args); // eslint-disable-line
 
         if (moveResult === INVALID_MOVE) {
           return INVALID_MOVE;
         }
 
-        let newG = moveResult as MachikoroG;
-        log.setMetadata(newG._logBuffer);
-        // clear log buffer
-        newG = { ...newG, _logBuffer: [] };
-        return newG;
+        G = moveResult as MachikoroG;
+        log.setMetadata(G._logBuffer);
+
+        return G;
       };
       return wrappedFn;
     } else {

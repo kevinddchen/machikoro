@@ -6,7 +6,7 @@ import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
 
-import { assertUnreachable } from 'common';
+import { assertUnreachable } from 'common/typescript';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';

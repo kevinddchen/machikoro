@@ -1,4 +1,2 @@
 .eslintrc.js
 build/
-
-src/server/joinMatch.ts

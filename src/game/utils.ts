@@ -2,7 +2,7 @@
 // Enums related to game configuration.
 //
 
-import { assertUnreachable } from 'common';
+import { assertUnreachable } from 'common/typescript';
 
 import { Expansion, SetupData, SupplyVariant, Version } from './types';
 
