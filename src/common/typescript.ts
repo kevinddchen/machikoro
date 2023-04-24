@@ -1,4 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const assertUnreachable = (_x: never): never => {
+export const assertUnreachable = (_: never): never => {
   throw new Error('Unreachable code');
 };

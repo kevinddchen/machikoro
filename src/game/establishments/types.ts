@@ -64,7 +64,8 @@ export const EstColor = {
 export type EstColor = (typeof EstColor)[keyof typeof EstColor];
 
 /**
- * Establishment type enum.
+ * Establishment type enum. The emoji values are also used to display the type
+ * in text, e.g. on the establishment cards.
  */
 export const EstType = {
   Animal: '\u{1F42E}',
