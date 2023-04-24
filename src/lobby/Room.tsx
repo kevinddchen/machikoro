@@ -6,7 +6,7 @@ import React from 'react';
 import { Server } from 'boardgame.io';
 
 import { Expansion, GAME_NAME, SetupData, SupplyVariant } from 'game';
-import { asyncCallWithTimeout, defaultErrorCatcher } from 'common';
+import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';

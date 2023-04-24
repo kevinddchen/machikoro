@@ -1,5 +1,5 @@
 import { Est, Land, MachikoroG } from 'game';
-import { assertUnreachable } from 'common';
+import { assertUnreachable } from 'common/typescript';
 
 /**
  * Convert `Est.EstColor` to CSS class name.

@@ -15,7 +15,8 @@ import {
   Version,
   expToVer,
 } from 'game';
-import { assertUnreachable, asyncCallWithTimeout, defaultErrorCatcher } from 'common';
+import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
+import { assertUnreachable } from 'common/typescript';
 
 import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';

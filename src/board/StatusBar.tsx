@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { MachikoroG } from 'game';
-import { assertUnreachable } from 'common';
+import { assertUnreachable } from 'common/typescript';
 
 /**
  * @extends BoardProps<MachikoroG>

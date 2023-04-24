@@ -3,7 +3,7 @@ import path from 'path';
 import serve from 'koa-static';
 
 import { Machikoro } from '../game';
-import { PORT } from '../config';
+import { PORT } from '../common/config';
 import { addCustomMiddleware } from './middleware';
 
 // game server

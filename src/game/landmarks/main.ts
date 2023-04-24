@@ -2,7 +2,7 @@
 // Utility functions for landmarks.
 //
 
-import { assertUnreachable } from 'common';
+import { assertUnreachable } from 'common/typescript';
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';

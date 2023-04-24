@@ -3,7 +3,7 @@ import Koa from 'koa';
 import Router from '@koa/router';
 
 import { createMatchBody, joinMatchBody } from 'lobby/Lobby';
-import { MAX_PLAYER_NAME_LENGTH } from 'config';
+import { MAX_PLAYER_NAME_LENGTH } from 'common/config';
 
 /**
  * This function returns middleware that reads the request body, runs a

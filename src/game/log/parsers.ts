@@ -2,7 +2,7 @@
 // Parsing log entries.
 //
 
-import { assertUnreachable } from 'common';
+import { assertUnreachable } from 'common/typescript';
 
 import type { MachikoroG } from '../types';
 
