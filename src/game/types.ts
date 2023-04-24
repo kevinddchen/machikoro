@@ -2,10 +2,9 @@
 // Types for Machikoro game.
 //
 
-import { Establishment, EstablishmentData } from './establishments/types';
-import { Expansion, SupplyVariant } from './config';
-import { Landmark, LandmarkData } from './landmarks/types';
-import { LogEvent } from './log';
+import type { Establishment, EstablishmentData } from './establishments/types';
+import type { Landmark, LandmarkData } from './landmarks/types';
+import type { LogEvent } from './log';
 
 /**
  * The `G` object containing all game state variables.
@@ -105,3 +104,35 @@ export const TurnState = {
 } as const;
 
 export type TurnState = (typeof TurnState)[keyof typeof TurnState];
+
+/**
+ * Expansion enum.
+ */
+export const Expansion = {
+  Base: 'Base',
+  Harbor: 'Harbor',
+  MK2: 'MK2',
+} as const;
+
+export type Expansion = (typeof Expansion)[keyof typeof Expansion];
+
+/**
+ * Supply variant enum.
+ */
+export const SupplyVariant = {
+  Total: 'Total',
+  Variable: 'Variable',
+  Hybrid: 'Hybrid',
+} as const;
+
+export type SupplyVariant = (typeof SupplyVariant)[keyof typeof SupplyVariant];
+
+/**
+ * Version enum, for Machi Koro 1 or 2.
+ */
+export const Version = {
+  MK1: 1,
+  MK2: 2,
+} as const;
+
+export type Version = (typeof Version)[keyof typeof Version];

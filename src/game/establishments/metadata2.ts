@@ -3,7 +3,7 @@
 //
 
 import { EstColor, EstType, Establishment } from './types';
-import { Version } from '../config';
+import { Version } from '../types';
 
 export const SushiBar2: Establishment = {
   _id: 0,

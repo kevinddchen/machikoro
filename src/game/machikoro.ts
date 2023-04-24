@@ -6,16 +6,32 @@ import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
 
+import { assertUnreachable } from 'common';
+
 import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
-import { Expansion, SupplyVariant, Version, expToVer } from './config';
-import { MachikoroG, SetupData, TurnState } from './types';
+import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState, Version } from './types';
+import { expToVer, validateSetupData } from './utils';
 import { Landmark } from './landmarks';
-import { assertUnreachable } from 'common';
 
 export const GAME_NAME = 'machikoro';
+
+/**
+ * Starting coins in Machi Koro 1.
+ */
+export const MK1_STARTING_COINS = 3;
+
+/**
+ * Starting coins in Machi Koro 2.
+ */
+export const MK2_STARTING_COINS = 5;
+
+/**
+ * Number of initial buy rounds in Machi Koro 2.
+ */
+export const MK2_INITIAL_BUY_ROUNDS = 3;
 
 //
 // === Queries ===
@@ -1066,27 +1082,7 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
     return G;
   },
 
-  validateSetupData: (setupData, numPlayers) => {
-    if (setupData) {
-      const { expansion, supplyVariant, initialBuyRounds, startCoins } = setupData;
-      if (!Object.values(Expansion).includes(expansion)) {
-        return `Unknown expansion: ${expansion}`;
-      }
-      if (!Object.values(SupplyVariant).includes(supplyVariant)) {
-        return `Unknown supply variant: ${supplyVariant}`;
-      }
-      if (!Number.isInteger(startCoins) || startCoins < 0) {
-        return `Number of starting coins, ${startCoins}, must be a non-negative integer`;
-      }
-      if (!Number.isInteger(initialBuyRounds) || initialBuyRounds < 0) {
-        return `Number of initial buying rounds, ${initialBuyRounds}, must be a non-negative integer`;
-      }
-    }
-    if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5)) {
-      return `Number of players, ${numPlayers}, must be an integer between 2 to 5.`;
-    }
-    return;
-  },
+  validateSetupData: validateSetupData,
 
   turn: {
     onBegin: ({ G, ctx }) => {

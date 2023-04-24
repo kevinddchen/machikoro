@@ -2,7 +2,7 @@
 // Types for establishments.
 //
 
-import { Version } from '../config';
+import type { Version } from '../types';
 
 /**
  * Interface for establishment metadata.
