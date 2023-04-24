@@ -7,7 +7,6 @@
     "classnames": "^2.3.2",
     "genversion": "^3.1.1",
     "koa-static": "^5.0.0",
-    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
@@ -42,7 +41,6 @@
   },
   "devDependencies": {
     "@types/koa-static": "^4.0.2",
-    "@types/lodash": "^4.14.191",
     "@types/node": "^18.11.19",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
