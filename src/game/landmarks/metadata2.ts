@@ -4,7 +4,7 @@
 
 import { EstType } from '../establishments/types';
 import { Landmark } from './types';
-import { Version } from '../config';
+import { Version } from '../types';
 
 /**
  * Number of landmarks required to win the game.

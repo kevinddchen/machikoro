@@ -4,7 +4,7 @@
 
 import { EstType } from '../establishments/types';
 import { Landmark } from './types';
-import { Version } from '../config';
+import { Version } from '../types';
 
 export const CityHall: Landmark = {
   _id: 0,

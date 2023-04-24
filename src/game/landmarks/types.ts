@@ -2,7 +2,7 @@
 // Types for landmarks.
 //
 
-import { Version } from '../config';
+import type { Version } from '../types';
 
 /**
  * Interface for landmark metadata.
