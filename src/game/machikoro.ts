@@ -518,7 +518,7 @@ const endTurn: Move<MachikoroG> = (context) => {
 
   // end initial buying phase after `initialBuyRounds` rounds
   if (phase === 'initialBuyPhase' && turn === initialBuyRounds * numPlayers) {
-    Log.logEndInitialBuyPhase(G);
+    Log.logOtherEvent(G, '(End of initial build phase)');
     events.endPhase();
   }
 
