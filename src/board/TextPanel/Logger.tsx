@@ -137,8 +137,10 @@ export default class Logger extends React.Component<LogProps, object> {
     }
 
     return (
-      <div ref={this.textBoxRef} className='log_box'>
-        {tbody}
+      <div className='div-column'>
+        <div ref={this.textBoxRef} className='log_box'>
+          {tbody}
+        </div>
       </div>
     );
   }

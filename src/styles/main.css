@@ -502,10 +502,9 @@ select {
 }
 
 .log_box {
-  font-size: 12px;
   height: 600px;
-  overflow: auto;
   width: 250px;
+  overflow: auto;
 }
 
 .log_div {
@@ -515,19 +514,17 @@ select {
 
 .chat_entry {
   height: 100px;
-  width: 250px;
+  width: 244px;
 }
 
 .chat_box {
-  font-size: 12px;
-  height: 500px;
-  overflow: auto;
+  height: 490px;
   width: 250px;
+  overflow: auto;
 }
 
 .chat_div {
-  max-height: 15px;
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 /* PLAYER INFO */

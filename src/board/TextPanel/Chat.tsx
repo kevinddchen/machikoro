@@ -37,21 +37,18 @@ export default class Chat extends React.Component<ChatProps, object> {
   private parseChat = (): string[] => {
     const { chatMessages, names } = this.props;
 
-    console.log(chatMessages);
-
     const lines: string[] = [];
     for (const message of chatMessages) {
-      let sender: string;
-      if (message.sender === '') {
-        sender = '[spectator]';
-      } else {
-        sender = names[parseInt(message.sender)];
+      // when debugging, sometimes the sender is empty
+      if (message.sender.length === 0) {
+        continue;
       }
 
+      const sender = names[parseInt(message.sender)];
       const payload = (message.payload as string).trim();
 
       if (payload.length > 0) {
-        lines.push(`${sender}: ${payload}`);
+        lines.push(`\t${sender}: ${payload}`);
       }
     }
     return lines;
@@ -83,7 +80,7 @@ export default class Chat extends React.Component<ChatProps, object> {
 
     for (let i = 0; i < lines.length; i++) {
       tbody.push(
-        <div key={i} className='log_div'>
+        <div key={i} className='chat_div'>
           {lines[i]}
         </div>
       );
