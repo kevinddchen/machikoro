@@ -527,6 +527,10 @@ select {
   white-space: pre-wrap;
 }
 
+.textpanel_button_margin {
+  margin: 5px;
+}
+
 /* PLAYER INFO */
 
 .is_client {

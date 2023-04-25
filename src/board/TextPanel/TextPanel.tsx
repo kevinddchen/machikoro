@@ -71,7 +71,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     return (
       <div>
         <div className={classNames('div-row', 'textpanel_box')}>{this.renderToggledState()}</div>
-        <div className='div-row'>
+        <div className={classNames('div-row', 'textpanel_button_margin')}>
           <button
             className={classNames('button', { button_active: toggleState === ToggleState.Log })}
             onClick={() => this.setToggleState(ToggleState.Log)}
