@@ -4,10 +4,10 @@ import React from 'react';
 import { MachikoroG } from 'game';
 
 import Buttons from './Buttons';
-import Logger from './Logger';
 import PlayerInfo from './PlayerInfo';
 import StatusBar from './StatusBar';
 import Supply from './Supply';
+import TextPanel from './TextPanel';
 
 /**
  * Initialize the names array given the match data.
@@ -81,7 +81,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
         </div>
         <div className='div-column'>{this.renderPlayerInfo()}</div>
         <div className='div-column'>
-          <Logger {...this.props} names={this.names} />
+          <TextPanel {...this.props} names={this.names} />
         </div>
       </div>
     );

@@ -342,7 +342,7 @@ select {
   padding: 2px;
   text-align: center;
   overflow: scroll;
-  width: 600px;
+  max-width: 630px;
   white-space: nowrap;
 }
 
@@ -491,13 +491,19 @@ select {
   bottom: 5px;
 }
 
-/* LOGS */
+/* LOGS AND CHAT */
 
-.log_box {
+.textpanel_box {
   border: black solid;
   border-radius: 8px;
   font-size: 12px;
-  height: 650px;
+  height: 600px;
+  width: 250px;
+}
+
+.log_box {
+  font-size: 12px;
+  height: 600px;
   overflow: auto;
   width: 250px;
 }
