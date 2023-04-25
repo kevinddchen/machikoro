@@ -22,8 +22,8 @@ interface LogProps extends BoardProps<MachikoroG> {
  * `LogEvent` objects during the course of a move to log certain events, such
  * as the dice roll, how many coins a player takes, etc. All of these
  * `LogEvent` objects are parsed into strings and displayed in the log. See
- * 'src/game/log/index.ts' for more details on how these `LogEvent` objects are
- * created.
+ * 'src/game/log' for more details on how these `LogEvent` objects are
+ * created and parsed.
  * @prop {RefObject} textBoxRef - Reference to the log text box.
  */
 export default class Logger extends React.Component<LogProps, object> {

@@ -7,8 +7,12 @@ import classNames from 'classnames';
 import { MachikoroG } from 'game';
 import { assertUnreachable } from 'common/typescript';
 
+import Chat from './Chat';
 import Logger from './Logger';
 
+/**
+ * Toggle state between log and chat.
+ */
 const ToggleState = {
   Log: 'Log',
   Chat: 'Chat',
@@ -31,6 +35,9 @@ interface TextPanelState {
   toggleState: ToggleState;
 }
 
+/**
+ * Game log and chat, including buttons that toggle between them.
+ */
 export default class TextPanel extends React.Component<TextPanelProps, TextPanelState> {
   constructor(props: TextPanelProps) {
     super(props);
@@ -52,7 +59,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     if (toggleState === ToggleState.Log) {
       return <Logger {...this.props} names={names} />;
     } else if (toggleState === ToggleState.Chat) {
-      return null;
+      return <Chat {...this.props} />
     } else {
       return assertUnreachable(toggleState);
     }

@@ -513,6 +513,23 @@ select {
   white-space: pre;
 }
 
+.chat_entry {
+  height: 100px;
+  width: 250px;
+}
+
+.chat_box {
+  font-size: 12px;
+  height: 500px;
+  overflow: auto;
+  width: 250px;
+}
+
+.chat_div {
+  max-height: 15px;
+  white-space: pre;
+}
+
 /* PLAYER INFO */
 
 .is_client {
