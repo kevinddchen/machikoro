@@ -68,22 +68,28 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     const { toggleState } = this.state;
 
     return (
-      <div>
-        <div className={classNames('div-row', 'textpanel_box')}>{this.renderToggledState()}</div>
-        <div className={classNames('div-row', 'textpanel_button_margin')}>
-          <button
-            className={classNames('button', { button_active: toggleState === ToggleState.Log })}
-            onClick={() => this.setToggleState(ToggleState.Log)}
-          >
-            Log
-          </button>
-          <button
-            className={classNames('button', { button_active: toggleState === ToggleState.Chat })}
-            onClick={() => this.setToggleState(ToggleState.Chat)}
-          >
-            Chat
-          </button>
+      <div className='div-column'>
+        <div className='radio-inputs'>
+          <label className='radio'>
+            <input
+              type="radio" 
+              name="chatlog-select"
+              className={classNames({ button_active: toggleState === ToggleState.Log })}
+              onClick={() => this.setToggleState(ToggleState.Log)}
+            />
+            <span className="name">Game Log</span>
+          </label>
+          <label className='radio'>
+            <input
+              type="radio"
+              name="chatlog-select"
+              // className={classNames({ button_active: toggleState === ToggleState.Chat })}
+              onClick={() => this.setToggleState(ToggleState.Chat)}
+            />
+            <span className="name">Chat</span>
+          </label>
         </div>
+        <div className='textpanel-box'>{this.renderToggledState()}</div>
       </div>
     );
   }
