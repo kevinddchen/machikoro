@@ -573,10 +573,6 @@ select {
  sourced from https://uiverse.io/Yaya12085/rude-mouse-79*/
 .radio-inputs {
   background-color: #fff;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  box-shadow: 0 0 0px 2px rgba(0, 0, 0, 0.06);
-  box-sizing: border-box;
   color: #fff;
   display: flex;
   flex-wrap: wrap;
@@ -597,10 +593,10 @@ select {
 
 .radio-inputs .radio .name {
   align-items: center;
-/*  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  border: 0px solid black;
-  border-bottom: none;*/
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  box-shadow: 0 0 0px 2px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
   color: #000; 
   cursor: pointer;
   display: flex;
