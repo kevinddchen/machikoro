@@ -341,7 +341,7 @@ select {
   margin: 5px;
   padding: 2px;
   text-align: center;
-  overflow: scroll;
+/*  overflow: scroll;*/
   max-width: 630px;
   white-space: nowrap;
 }
@@ -499,6 +499,7 @@ select {
   font-size: 12px;
   height: 600px;
   width: 250px;
+  overflow-wrap: break-word;
 }
 
 .log_box {
@@ -509,12 +510,12 @@ select {
 
 .log_div {
   max-height: 15px;
-  white-space: pre;
+  white-space: pre;  /* white-space: pre-wrap to allow wrap */
 }
 
 .chat_entry {
   height: 100px;
-  width: 244px;
+  width: 242px;
 }
 
 .chat_box {
