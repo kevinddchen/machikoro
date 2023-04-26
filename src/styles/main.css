@@ -524,7 +524,7 @@ select {
 }
 
 .chat_div {
-  white-space: pre-wrap;
+  white-space: normal;
 }
 
 .textpanel_button_margin {
