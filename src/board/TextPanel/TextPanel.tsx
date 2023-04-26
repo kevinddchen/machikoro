@@ -53,13 +53,12 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
   // --- Render ---------------------------------------------------------------
 
   private renderToggledState = (): JSX.Element | null => {
-    const { names } = this.props;
     const { toggleState } = this.state;
 
     if (toggleState === ToggleState.Log) {
-      return <Logger {...this.props} names={names} />;
+      return <Logger {...this.props} />;
     } else if (toggleState === ToggleState.Chat) {
-      return <Chat {...this.props} />
+      return <Chat {...this.props} />;
     } else {
       return assertUnreachable(toggleState);
     }
