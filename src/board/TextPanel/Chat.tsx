@@ -19,12 +19,12 @@ interface ChatProps extends BoardProps<MachikoroG> {
  * @prop {RefObject} textBoxRef - Reference to the chat text box.
  */
 export default class Chat extends React.Component<ChatProps, object> {
-  // private entryBoxRef: React.RefObject<HTMLTextAreaElement>;
+  private entryBoxRef: React.RefObject<HTMLInputElement>;
   private textBoxRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: ChatProps) {
     super(props);
-    // this.entryBoxRef = React.createRef();
+    this.entryBoxRef = React.createRef();
     this.textBoxRef = React.createRef();
   }
 
@@ -54,29 +54,29 @@ export default class Chat extends React.Component<ChatProps, object> {
     return lines;
   };
 
-  // /**
-  //  * When 'Enter' is pressed in the chat entry box, send the message and clear.
-  //  * @param e
-  //  */
-  // private entryHandleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>): void => {
-  //   const { sendChatMessage } = this.props;
+  /**
+   * When 'Enter' is pressed in the chat entry box, send the message and clear.
+   * @param e
+   */
+  private entryHandleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    const { sendChatMessage } = this.props;
 
-  //   if (e.key === 'Enter' && !e.shiftKey) {
-  //     e.preventDefault();
-
-  //     // send the contents of the entry box as a message, then clear it
-  //     if (this.entryBoxRef.current) {
-  //       sendChatMessage(this.entryBoxRef.current.value);
-  //       this.entryBoxRef.current.value = '';
-  //     }
-  //   }
-  // };
+    if (e.key === 'Enter') {
+      // send the contents of the entry box as a message, then clear it
+      if (this.entryBoxRef.current) {
+        sendChatMessage(this.entryBoxRef.current.value);
+        this.entryBoxRef.current.value = '';
+      }
+    }
+  };
 
   // Send the chat message when button is pressed, then reset the field
   private sendChatMessageNow = (): void => {
     const { sendChatMessage } = this.props;
-    sendChatMessage((document.getElementById('chat-message') as HTMLInputElement).value);
-    (document.getElementById('chat-message') as HTMLInputElement).value ='';
+    if (this.entryBoxRef.current) {
+      sendChatMessage(this.entryBoxRef.current.value);
+      this.entryBoxRef.current.value = '';
+    }
   };
 
   // --- React ----------------------------------------------------------------
@@ -105,20 +105,18 @@ export default class Chat extends React.Component<ChatProps, object> {
     return (
       <div className='div-row'>
         <div className='chat-window' ref={this.textBoxRef}>
-          <ul className='message-list'>
-            {tbody}
-          </ul>
+          <ul className='message-list'>{tbody}</ul>
         </div>
         <div className='chat-input'>
-          <input 
+          <input
             id='chat-message'
             type='text'
             className='message-input'
-            placeholder='Type your message here'></input>
-          <button 
-            className='send-button'
-            onClick={this.sendChatMessageNow}
-          >
+            placeholder='Type your message here'
+            ref={this.entryBoxRef}
+            onKeyDown={(e) => this.entryHandleKeyDown(e)}
+          ></input>
+          <button className='send-button' onClick={this.sendChatMessageNow}>
             Send
           </button>
         </div>
