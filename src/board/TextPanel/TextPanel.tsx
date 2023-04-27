@@ -2,7 +2,6 @@ import 'styles/main.css';
 
 import { BoardProps } from 'boardgame.io/react';
 import React from 'react';
-import classNames from 'classnames';
 
 import { MachikoroG } from 'game';
 import { assertUnreachable } from 'common/typescript';
@@ -37,18 +36,35 @@ interface TextPanelState {
 
 /**
  * Game log and chat, including buttons that toggle between them.
+ * @prop {RefObject} logRadioRef - Reference to the log radio button.
+ * @prop {RefObject} chatRadioRef - Reference to the chat radio button.
  */
 export default class TextPanel extends React.Component<TextPanelProps, TextPanelState> {
+
+  private logRadioRef: React.RefObject<HTMLInputElement>;
+  private chatRadioRef: React.RefObject<HTMLInputElement>;
+
   constructor(props: TextPanelProps) {
     super(props);
     this.state = {
       toggleState: ToggleState.Log,
     };
+    this.logRadioRef = React.createRef();
+    this.chatRadioRef = React.createRef();
   }
 
   private setToggleState = (toggleState: ToggleState) => {
     this.setState({ toggleState });
   };
+
+  // --- React ----------------------------------------------------------------
+
+  componentDidMount() {
+    // by default, select log radio button
+    if (this.logRadioRef.current) {
+      this.logRadioRef.current.checked = true;
+    }
+  }
 
   // --- Render ---------------------------------------------------------------
 
@@ -65,8 +81,6 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
   };
 
   render() {
-    const { toggleState } = this.state;
-
     return (
       <div className='div-column'>
         <div className='radio-inputs'>
@@ -74,7 +88,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
             <input
               type="radio" 
               name="chatlog-select"
-              className={classNames({ button_active: toggleState === ToggleState.Log })}
+              ref={this.logRadioRef}
               onClick={() => this.setToggleState(ToggleState.Log)}
             />
             <span className="name">Game Log</span>
@@ -83,7 +97,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
             <input
               type="radio"
               name="chatlog-select"
-              // className={classNames({ button_active: toggleState === ToggleState.Chat })}
+              ref={this.chatRadioRef}
               onClick={() => this.setToggleState(ToggleState.Chat)}
             />
             <span className="name">Chat</span>
