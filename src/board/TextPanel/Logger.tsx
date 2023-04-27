@@ -120,6 +120,13 @@ export default class Logger extends React.Component<LogProps, object> {
     }
   }
 
+  componentDidMount() {
+    // scroll log box to bottom
+    if (this.textBoxRef.current) {
+      this.textBoxRef.current.scrollTop = this.textBoxRef.current.scrollHeight;
+    }
+  }
+
   // --- Render ---------------------------------------------------------------
 
   render() {

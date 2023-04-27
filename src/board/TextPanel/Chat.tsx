@@ -76,7 +76,14 @@ export default class Chat extends React.Component<ChatProps, object> {
   // --- React ----------------------------------------------------------------
 
   componentDidUpdate() {
-    // scroll log box to bottom
+    // scroll chat box to bottom
+    if (this.textBoxRef.current) {
+      this.textBoxRef.current.scrollTop = this.textBoxRef.current.scrollHeight;
+    }
+  }
+
+  componentDidMount() {
+    // scroll chat box to bottom
     if (this.textBoxRef.current) {
       this.textBoxRef.current.scrollTop = this.textBoxRef.current.scrollHeight;
     }
