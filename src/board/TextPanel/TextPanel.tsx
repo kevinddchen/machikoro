@@ -40,7 +40,6 @@ interface TextPanelState {
  * @prop {RefObject} chatRadioRef - Reference to the chat radio button.
  */
 export default class TextPanel extends React.Component<TextPanelProps, TextPanelState> {
-
   private logRadioRef: React.RefObject<HTMLInputElement>;
   private chatRadioRef: React.RefObject<HTMLInputElement>;
 
@@ -86,21 +85,21 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
         <div className='radio-inputs'>
           <label className='radio'>
             <input
-              type="radio" 
-              name="chatlog-select"
+              type='radio'
+              name='chatlog-select'
               ref={this.logRadioRef}
               onClick={() => this.setToggleState(ToggleState.Log)}
             />
-            <span className="name">Game Log</span>
+            <span className='name'>Game Log</span>
           </label>
           <label className='radio'>
             <input
-              type="radio"
-              name="chatlog-select"
+              type='radio'
+              name='chatlog-select'
               ref={this.chatRadioRef}
               onClick={() => this.setToggleState(ToggleState.Chat)}
             />
-            <span className="name">Chat</span>
+            <span className='name'>Chat</span>
           </label>
         </div>
         <div className='textpanel-box'>{this.renderToggledState()}</div>

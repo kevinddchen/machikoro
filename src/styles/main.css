@@ -493,17 +493,16 @@ select {
 /* LOGS AND CHAT */
 
 .log_box {
-  height: 584px;  /* textpanel-box height (600px) minus padding (16px) */
-  width: 284px;   /* textpanel-box width (300px) minus padding (16px) */
+  height: 584px; /* textpanel-box height (600px) minus padding (16px) */
+  width: 284px; /* textpanel-box width (300px) minus padding (16px) */
   padding: 8px 8px 8px 8px;
   overflow: auto;
 }
 
 .log_div {
   max-height: 18px;
-  white-space: pre;  /* white-space: pre-wrap to allow wrap */
+  white-space: pre; /* white-space: pre-wrap to allow wrap */
 }
-
 
 /* chatbox CSS from https://uiverse.io/ahmed150up/chilly-rattlesnake-8 */
 .textpanel-box {
@@ -511,7 +510,7 @@ select {
   width: 300px;
   background-color: #fff;
   border: black solid;
-/*  border-radius: 8px;*/
+  /*  border-radius: 8px;*/
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
@@ -528,8 +527,8 @@ select {
 }
 
 .chat-window {
-  height: 542px;   /* trial and error */
-  width: 284px;    /* textpanel-box width (300px) minus padding (16px) */
+  height: 542px; /* trial and error */
+  width: 284px; /* textpanel-box width (300px) minus padding (16px) */
   overflow-y: scroll;
   padding: 8px 8px 0px 8px;
 }
@@ -571,7 +570,6 @@ select {
   box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
 }
 
-
 /* radio buttons which serve as the chat header
  sourced from https://uiverse.io/Yaya12085/rude-mouse-79*/
 .radio-inputs {
@@ -580,7 +578,7 @@ select {
   display: flex;
   flex-wrap: wrap;
   font-size: 18px;
-  padding: none; 
+  padding: none;
   position: relative;
   width: 306px;
 }
@@ -600,7 +598,7 @@ select {
   border-top-right-radius: 8px;
   border: solid rgba(0, 0, 0, 0.2);
   border-bottom: none;
-  color: #000; 
+  color: #000;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -614,7 +612,7 @@ select {
   border: solid black;
   border-bottom: none;
   background-color: var(--primary);
-  color: #fff; 
+  color: #fff;
   font-weight: 600;
 }
 
