@@ -59,19 +59,13 @@ export default class Chat extends React.Component<ChatProps, object> {
    * @param e
    */
   private entryHandleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    const { sendChatMessage } = this.props;
-
     if (e.key === 'Enter') {
-      // send the contents of the entry box as a message, then clear it
-      if (this.entryBoxRef.current) {
-        sendChatMessage(this.entryBoxRef.current.value);
-        this.entryBoxRef.current.value = '';
-      }
+      this.sendChatAndClear();
     }
   };
 
-  // Send the chat message when button is pressed, then reset the field
-  private sendChatMessageNow = (): void => {
+  // Send the chat message and reset the field
+  private sendChatAndClear = (): void => {
     const { sendChatMessage } = this.props;
     if (this.entryBoxRef.current) {
       sendChatMessage(this.entryBoxRef.current.value);
@@ -116,7 +110,7 @@ export default class Chat extends React.Component<ChatProps, object> {
             ref={this.entryBoxRef}
             onKeyDown={(e) => this.entryHandleKeyDown(e)}
           ></input>
-          <button className='send-button' onClick={this.sendChatMessageNow}>
+          <button className='send-button' onClick={this.sendChatAndClear}>
             Send
           </button>
         </div>

@@ -341,7 +341,6 @@ select {
   margin: 5px;
   padding: 2px;
   text-align: center;
-/*  overflow: scroll;*/
   max-width: 630px;
   white-space: nowrap;
 }
