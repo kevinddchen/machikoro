@@ -25,6 +25,9 @@ cd machikoro
 npm install
 ```
 
+Note: If you are on Windows, you may need to install the `cross-env` package to avoid a `NODE_PATH` keyword issue when starting a local server. 
+- Run `npm install cross-env` to install the package.
+
 We recommend using [VS Code](https://code.visualstudio.com/) as your code editor.
 Some contribution guidelines:
 
