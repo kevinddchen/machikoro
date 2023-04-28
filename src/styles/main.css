@@ -341,8 +341,7 @@ select {
   margin: 5px;
   padding: 2px;
   text-align: center;
-  overflow: scroll;
-  width: 600px;
+  max-width: 630px;
   white-space: nowrap;
 }
 
@@ -491,20 +490,130 @@ select {
   bottom: 5px;
 }
 
-/* LOGS */
+/* LOGS AND CHAT */
 
 .log_box {
-  border: black solid;
-  border-radius: 8px;
-  font-size: 12px;
-  height: 650px;
+  height: 584px; /* textpanel-box height (600px) minus padding (16px) */
+  width: 284px; /* textpanel-box width (300px) minus padding (16px) */
+  padding: 8px 8px 8px 8px;
   overflow: auto;
-  width: 250px;
 }
 
 .log_div {
-  max-height: 15px;
-  white-space: pre;
+  max-height: 18px;
+  white-space: pre; /* white-space: pre-wrap to allow wrap */
+}
+
+/* chatbox CSS from https://uiverse.io/ahmed150up/chilly-rattlesnake-8 */
+.textpanel-box {
+  height: 600px;
+  width: 300px;
+  background-color: #fff;
+  border: black solid;
+  /*  border-radius: 8px;*/
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  overflow-wrap: break-word;
+}
+
+.chat-header {
+  background-color: #333;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  color: #fff;
+  font-size: 18px;
+  padding: 10px;
+}
+
+.chat-window {
+  height: 542px; /* trial and error */
+  width: 284px; /* textpanel-box width (300px) minus padding (16px) */
+  overflow-y: scroll;
+  padding: 8px 8px 0px 8px;
+}
+
+.message-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chat-input {
+  align-items: center;
+  border-top: 1px solid #ccc;
+  display: flex;
+  padding: 10px;
+}
+
+.message-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.send-button {
+  border: none;
+  outline: none;
+  background-color: #333;
+  color: #fff;
+  font-size: 14px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* radio buttons which serve as the chat header
+ sourced from https://uiverse.io/Yaya12085/rude-mouse-79*/
+.radio-inputs {
+  background-color: #fff;
+  color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 18px;
+  padding: none;
+  position: relative;
+  width: 306px;
+}
+
+.radio-inputs .radio {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.radio-inputs .radio input {
+  display: none;
+}
+
+.radio-inputs .radio .name {
+  align-items: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border: solid rgba(0, 0, 0, 0.2);
+  border-bottom: none;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  transition: all 0.25s ease-in-out;
+}
+
+.radio-inputs .radio input:checked + .name {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border: solid black;
+  border-bottom: none;
+  background-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
 }
 
 /* PLAYER INFO */
