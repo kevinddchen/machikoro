@@ -5,6 +5,7 @@
   "dependencies": {
     "boardgame.io": "^0.50.2",
     "classnames": "^2.3.2",
+    "cross-env": "^7.0.3",
     "genversion": "^3.1.1",
     "koa-static": "^5.0.0",
     "react": "^18.2.0",
@@ -18,8 +19,8 @@
     "prebuild": "npm run version:fix",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "serve:dev": "NODE_PATH=./src ts-node-dev ./src/server/index.ts",
-    "serve:prod": "NODE_PATH=./src ts-node --transpileOnly ./src/server/index.ts",
+    "serve:dev": "cross-env NODE_PATH=./src ts-node-dev ./src/server/index.ts",
+    "serve:prod": "cross-env NODE_PATH=./src ts-node --transpileOnly ./src/server/index.ts",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "prettier": "prettier --check .",
