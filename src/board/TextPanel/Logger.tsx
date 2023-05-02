@@ -4,7 +4,8 @@ import { BoardProps } from 'boardgame.io/react';
 import { LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { Log, MachikoroG } from 'game';
+import { Expansion, Log, MachikoroG } from 'game';
+import { assertUnreachable } from 'common/typescript';
 
 /**
  * @extends BoardProps<MachikoroG>
@@ -75,6 +76,8 @@ export default class Logger extends React.Component<LogProps, object> {
    * @returns An array of strings.
    */
   private parseLog = (log: LogEntry[]): string[] => {
+    const { G } = this.props;
+
     // remove undos
     const entries: LogEntry[] = [];
     for (const entry of log) {
@@ -86,6 +89,16 @@ export default class Logger extends React.Component<LogProps, object> {
     }
 
     let lines: string[] = [];
+
+    lines.push('Exansion: ' + this.expansionName(G.expansion));
+    lines.push('Supply Variant: ' + G.supplyVariant);
+    lines.push(' ');
+
+    // for MK2, add a line to indicate the start of the initial build phase
+    if (G.expansion === Expansion.MK2) {
+      lines.push('(Start of initial build phase)');
+    }
+
     // since there is no entry in the log for the first turn, we need to manually add it
     lines.push(this.logStartTurn(0, 0));
 
@@ -109,6 +122,18 @@ export default class Logger extends React.Component<LogProps, object> {
       }
     }
     return lines;
+  };
+
+  private expansionName = (expansion: Expansion): string => {
+    if (expansion === Expansion.Base) {
+      return 'Base';
+    } else if (expansion === Expansion.Harbor) {
+      return 'Harbor';
+    } else if (expansion === Expansion.MK2) {
+      return 'Machi Koro 2';
+    } else {
+      return assertUnreachable(expansion);
+    }
   };
 
   // --- React ----------------------------------------------------------------
