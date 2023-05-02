@@ -18,17 +18,12 @@ import { MAX_PLAYER_NAME_LENGTH } from 'common/config';
  */
 const patchRequest = (callback: (ctx: Koa.Context, body: object) => Promise<object>) => {
   return async (ctx: Koa.Context, next: () => Promise<void>) => {
-
-    console.dir(ctx.req);
-  
     // Read the request body.
     const chunks = [];
     let chunk;
     while (null !== (chunk = ctx.req.read() as Uint8Array)) {
       chunks.push(chunk);
     }
-
-    console.log(chunks);
 
     const rawBody = Buffer.concat(chunks).toString('utf8');
     const body = JSON.parse(rawBody) as object;
