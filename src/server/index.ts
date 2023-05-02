@@ -16,6 +16,9 @@ const server = Server({
   ],
 });
 
+// TODO: figure out how to add our custom middleware
+// addCustomMiddleware(server);
+
 // Build path relative to this file
 const frontEndAppBuildPath = path.resolve(__dirname, '../../build');
 server.app.use(serve(frontEndAppBuildPath));
