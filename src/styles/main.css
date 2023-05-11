@@ -369,25 +369,25 @@ select {
 /* TOOLTIP */
 
 .tooltip {
-  visibility: hidden;
-  width: 140px;
   background-color: #555;
+  border-radius: 6px;
   color: #fff;
   font-size: 12px;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
   left: 50%;
   margin-left: -70px;
   opacity: 0;
+  padding: 5px 3px;
+  position: absolute;
+  text-align: center;
   transition: opacity 0.3s;
+  visibility: hidden;
   white-space: pre-line;
+  width: 140px;
+  z-index: 1;
 }
 
 .est_tooltip {
-  top: 60px;
+  top: 85px;
 }
 
 .mini_tooltip {
@@ -665,11 +665,12 @@ select {
 
 .name_div {
   background: white;
+  border-radius: 8px;
   font-size: 18px;
-  padding: 4px; /* padding of name_do_tv & its border-width */
   overflow: hidden;
-  width: 90px;
+  padding: 4px; /* padding of name_do_tv & its border-width */
   white-space: nowrap;
+  width: 90px;
 }
 
 .name_do_tv {
