@@ -421,6 +421,10 @@ select {
   opacity: 1;
 }
 
+.est_td:active {
+  transform: scale(0.95);
+}
+
 .est_img_pri {
   background-color: var(--est-pri);
 }
