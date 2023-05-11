@@ -64,16 +64,19 @@ export const EstColor = {
 export type EstColor = (typeof EstColor)[keyof typeof EstColor];
 
 /**
- * Establishment type enum. The emoji values are also used to display the type
- * in text, e.g. on the establishment cards.
+ * Establishment type enum. 
+ * Some establishments an establishment type which is displayed as an icon
+ * on the establishment card. The icon is generated from the Material Symbols font
+ * (https://developers.google.com/fonts/docs/material_symbols).
+ * The following are the keywords used to identify each icon.
  */
 export const EstType = {
-  Animal: '\u{1F42E}',
-  Cup: '\u{2615}',
-  Gear: '\u{2699}\u{FE0F}',
-  Shop: '\u{1F3E0}',
-  Wheat: '\u{1F33E}',
-  Fruit: '\u{1F348}',
+  Animal: 'cruelty_free', //'\u{1F42E}',
+  Cup: 'coffee', //'\u{2615}',
+  Gear: 'settings', //\u{2699}\u{FE0F}',
+  Shop: 'house', //'\u{1F3E0}',
+  Wheat: 'psychiatry', //'\u{1F33E}',
+  Fruit: 'nutrition', //'\u{1F348}',
 } as const;
 
 export type EstType = (typeof EstType)[keyof typeof EstType];

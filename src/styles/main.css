@@ -45,9 +45,12 @@
   display: flex;
 }
 
-/* FONTS */
+/* 
+   FONTS
+   (Icons from Material Symbols are loaded as a font)
+*/
 
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=KoHo:wght@500&family=Sigmar+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=KoHo:wght@500&family=Sigmar+One&family=Material+Symbols+Outlined:wght@250&display=swap');
 
 * {
   font-family: 'KoHo', sans-serif;
@@ -443,18 +446,25 @@ select {
 }
 
 .est_roll {
-  color: white;
-  position: relative;
   margin: 0 auto;
-  top: -45px;
-  width: fit-content;
   padding-left: 3px;
   padding-right: 3px;
-  text-align: center;
+  position: relative;
+  top: -45px;
+  width: fit-content;
+}
+
+.est_roll_box {
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 2.5px;
+  color: white;
+  display: inline-block;
   font-size: 14px;
   font-weight: bolder;
-  border-style: solid;
-  border-radius: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
 }
 
 .est_type {
@@ -669,7 +679,7 @@ select {
 .mini_td {
   padding: 3px;
   position: relative;
-  width: 80px;
+  width: 100px;
   height: 20px;
   border-radius: 8px;
 }
@@ -680,25 +690,32 @@ select {
 }
 
 .mini_roll {
-  color: white;
-  position: relative;
   margin: 0 auto;
+  position: relative;
+  right: 8px;
+  top: -1px;
   width: fit-content;
+}
+
+.mini_roll_box {
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 2.5px;
+  color: white;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bolder;
   padding-left: 3px;
   padding-right: 3px;
   text-align: center;
-  font-size: 12px;
-  font-weight: bolder;
-  border-style: solid;
-  border-radius: 4px;
 }
 
 .mini_type {
   color: white;
   position: absolute;
   font-size: 12px;
-  right: 5px;
-  top: 5px;
+  right: 3px;
+  top: 3px;
 }
 
 .mini_name {

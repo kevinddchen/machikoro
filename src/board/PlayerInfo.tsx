@@ -115,6 +115,16 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const rollString = rollsToString(est);
       const estDescription = est.name + '\n\n' + est.description;
 
+      // place the rolls associated with each establishment in its own box
+      const estRollDisplay = []
+      const rollStringSplit = rollString.split("; ")
+      for (let i = 0; i < rollStringSplit.length; i++) {
+        if (i > 0) {
+          estRollDisplay.push(' ');
+        }
+        estRollDisplay.push(<div className='mini_roll_box'>{rollStringSplit[i]}</div>);
+      }
+
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
         minis.push(
@@ -123,8 +133,8 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
             className={classNames('mini_td', estColor, { clickable: canDoOffice })}
             onClick={() => doOffice(est)}
           >
-            <div className='mini_roll'>{rollString}</div>
-            <div className='mini_type'>{est.type}</div>
+            <div className='mini_roll'>{estRollDisplay}</div>
+            <div className='mini_type'><span className="material-symbols-outlined">{est.type}</span></div>
             <div className={classNames('tooltip', 'mini_tooltip')}>{estDescription}</div>
           </td>
         );

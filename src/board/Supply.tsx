@@ -106,14 +106,24 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const estColor = estColorToClass(est.color, canBuyEst);
       const rollString = rollsToString(est);
 
+      // place the rolls associated with each establishment in its own box
+      const estRollDisplay = []
+      const rollStringSplit = rollString.split("; ")
+      for (let i = 0; i < rollStringSplit.length; i++) {
+        if (i > 0) {
+          estRollDisplay.push(' ');
+        }
+        estRollDisplay.push(<div className='est_roll_box'>{rollStringSplit[i]}</div>);
+      }
+
       table.push(
         <td
           key={i}
           className={classNames('est_td', estColor, { inactive: available === 0 }, { clickable: canBuyEst })}
           onClick={() => moves.buyEst(est)}
         >
-          <div className='est_roll'>{rollString}</div>
-          <div className='est_type'>{est.type}</div>
+          <div className='est_roll'>{estRollDisplay}</div>
+          <div className='est_type'><span className="material-symbols-outlined">{est.type}</span></div>
           <div className='est_name'>{est.name}</div>
           <div className='est_cost'>${est.cost}</div>
           <div className='est_num'>
