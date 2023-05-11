@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass, rollsToString } from './utils';
+import { estColorToClass, landColorToClass} from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -112,12 +112,11 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
 
       const estColor = estColorToClass(est.color, canDoOffice);
-      const rollString = rollsToString(est);
+      const rollStringSplit = est.rolls.toString().split(",");
       const estDescription = est.name + '\n\n' + est.description;
 
       // place the rolls associated with each establishment in its own box
-      const estRollDisplay = []
-      const rollStringSplit = rollString.split("; ")
+      const estRollDisplay = [];
       for (let i = 0; i < rollStringSplit.length; i++) {
         if (i > 0) {
           estRollDisplay.push(' ');
