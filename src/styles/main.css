@@ -50,10 +50,19 @@
    (Icons from Material Symbols are loaded as a font)
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=KoHo:wght@500&family=Sigmar+One&family=Material+Symbols+Outlined:wght@250&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@900&family=KoHo:wght@500&family=Sigmar+One&family=Material+Symbols+Outlined:wght,FILL@250,0&display=swap');
 
 * {
   font-family: 'KoHo', sans-serif;
+}
+
+/* For changing font size of icons */
+span.dollar_player_money {
+  font-size: 22px;
+  vertical-align: middle;
+  color: var(--land-light);
+  font-variation-settings:
+    'wght' 400;
 }
 
 /* 
@@ -634,12 +643,12 @@ select {
 }
 
 .coin_num {
-  color: black;
-  font-size: 16px;
-  position: relative;
-  text-align: left;
-  left: 3px; /* to account for the padding */
-  top: 5px;
+  align-items: center;
+  color: var(--land);
+  display: flex;
+  font-size: 20px;
+  justify-content: center;
+  padding: 2px;
 }
 
 .land_td {
@@ -649,10 +658,10 @@ select {
 
 .name_div {
   background: white;
-  font-size: 14px;
+  font-size: 18px;
+  padding: 4px;    /* padding of name_do_tv & its border-width */
   overflow: hidden;
   width: 90px;
-  height: 20px;
   white-space: nowrap;
 }
 
@@ -661,6 +670,7 @@ select {
   border: red solid;
   border-radius: 8px;
   border-width: 3px;
+  padding: 1px;
 }
 
 .land_td:hover .tooltip {
@@ -692,7 +702,6 @@ select {
 .mini_roll {
   margin: 0 auto;
   position: relative;
-  right: 8px;
   top: -1px;
   width: fit-content;
 }
