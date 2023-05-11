@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass} from './utils';
+import { estColorToClass, landColorToClass } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -112,7 +112,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
 
       const estColor = estColorToClass(est.color, canDoOffice);
-      const rollStringSplit = est.rolls.toString().split(",");
+      const rollStringSplit = est.rolls.toString().split(',');
       const estDescription = est.name + '\n\n' + est.description;
 
       // place the rolls associated with each establishment in its own box
@@ -133,7 +133,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
             onClick={() => doOffice(est)}
           >
             <div className='mini_roll'>{estRollDisplay}</div>
-            <div className='mini_type'><span className="material-symbols-outlined">{est.type}</span></div>
+            <div className='mini_type'>
+              <span className='material-symbols-outlined'>{est.type}</span>
+            </div>
             <div className={classNames('tooltip', 'mini_tooltip')}>{estDescription}</div>
           </td>
         );
@@ -153,7 +155,8 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       <div className={classNames('div-column', border)}>
         <div>{nameDiv}</div>
         <div className='coin_num'>
-          <span className="material-symbols-outlined dollar_player_money">paid</span>{money}
+          <span className='material-symbols-outlined dollar_player_money'>paid</span>
+          {money}
         </div>
         <div>{lands.render()}</div>
         <div>{minis.render()}</div>

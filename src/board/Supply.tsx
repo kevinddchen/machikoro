@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass, landCostsToString} from './utils';
+import { estColorToClass, landColorToClass, landCostsToString } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -104,7 +104,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const canBuyEst = isActive && Game.canBuyEst(G, ctx, est);
       const remaining = Est.countRemaining(G, est);
       const estColor = estColorToClass(est.color, canBuyEst);
-      const rollStringSplit = est.rolls.toString().split(",");
+      const rollStringSplit = est.rolls.toString().split(',');
 
       // place the rolls associated with each establishment in its own box
       const estRollDisplay = [];
@@ -122,7 +122,9 @@ export default class Supply extends React.Component<SupplyProps, object> {
           onClick={() => moves.buyEst(est)}
         >
           <div className='est_roll'>{estRollDisplay}</div>
-          <div className='est_type'><span className="material-symbols-outlined">{est.type}</span></div>
+          <div className='est_type'>
+            <span className='material-symbols-outlined'>{est.type}</span>
+          </div>
           <div className='est_name'>{est.name}</div>
           <div className='est_cost'>${est.cost}</div>
           <div className='est_num'>

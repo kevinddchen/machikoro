@@ -64,7 +64,7 @@ export const EstColor = {
 export type EstColor = (typeof EstColor)[keyof typeof EstColor];
 
 /**
- * Establishment type enum. 
+ * Establishment type enum.
  * Some establishments an establishment type which is displayed as an icon
  * on the establishment card. The icon is generated from the Material Symbols font
  * (https://developers.google.com/fonts/docs/material_symbols).
