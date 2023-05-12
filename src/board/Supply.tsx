@@ -61,6 +61,20 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const landColor = landColorToClass(canBuyLand);
       const costsString = landCostsToString(G, land, clientPlayer);
 
+      // Split description string to extract the Material Symbol keywords.
+      // If there are more than 1 string, every even string is the keyword.
+      const landDescDisplay = [];
+      const landDescSplitString = land.description.split('::');
+      for (let i = 0; i < landDescSplitString.length; i++) {
+        if (Math.abs(i % 2)) {
+          landDescDisplay.push(
+            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{landDescSplitString[i]}</span>
+          );
+        } else {
+          landDescDisplay.push(landDescSplitString[i]);
+        }
+      }
+
       // use same CSS as establishments
       table.push(
         <td
@@ -70,7 +84,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
         >
           <div className='est_name'>{land.name}</div>
           <div className='est_cost'>{costsString}</div>
-          <div className={classNames('tooltip', 'est_tooltip')}>{land.description}</div>
+          <div className={classNames('tooltip', 'est_tooltip')}>{landDescDisplay}</div>
         </td>
       );
     }
