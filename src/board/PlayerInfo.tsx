@@ -183,7 +183,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       <div className={classNames('div-column', border)}>
         <div>{nameDiv}</div>
         <div className='coin_num'>
-          <span className='material-symbols-outlined dollar_player_money'>paid</span>
+          <span className={classNames('material-symbols-outlined', 'dollar_player_money')}>paid</span>
           {money}
         </div>
         <div>{lands.render()}</div>
