@@ -106,6 +106,18 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const estColor = estColorToClass(est.color, canBuyEst);
       const rollStringSplit = est.rolls.toString().split(',');
 
+      // Split description string to extract the Material Symbol keywords.
+      // If there are more than 1 string, every even string is the keyword.
+      const estDescDisplay = [];
+      const descSplitString = est.description.split('::');
+      for (let i = 0; i < descSplitString.length; i++) {
+        if (Math.abs(i % 2)) {
+          estDescDisplay.push(<span className='material-symbols-outlined tooltip_sym'>{descSplitString[i]}</span>);
+        } else {
+          estDescDisplay.push(descSplitString[i]);
+        }
+      }
+
       // place the rolls associated with each establishment in its own box
       const estRollDisplay = [];
       for (let i = 0; i < rollStringSplit.length; i++) {
@@ -123,14 +135,14 @@ export default class Supply extends React.Component<SupplyProps, object> {
         >
           <div className='est_roll'>{estRollDisplay}</div>
           <div className='est_type'>
-            <span className='material-symbols-outlined'>{est.type}</span>
+            <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
           </div>
           <div className='est_name'>{est.name}</div>
           <div className='est_cost'>${est.cost}</div>
           <div className='est_num'>
             {available}/{remaining}
           </div>
-          <div className={classNames('tooltip', 'est_tooltip')}>{est.description}</div>
+          <div className={classNames('tooltip', 'est_tooltip')}>{estDescDisplay}</div>
         </td>
       );
     }

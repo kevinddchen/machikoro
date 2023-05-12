@@ -56,14 +56,6 @@
   font-family: 'KoHo', sans-serif;
 }
 
-/* For changing font size of icons */
-span.dollar_player_money {
-  font-size: 22px;
-  vertical-align: middle;
-  color: var(--land-light);
-  font-variation-settings: 'wght' 400;
-}
-
 /* 
    BUTTONS
    (Used in both the lobby and the game)
@@ -386,6 +378,14 @@ select {
   z-index: 1;
 }
 
+/* font size for tooltip Material Symbols */
+span.tooltip_sym {
+  color: white;
+  font-size: 16px;
+  font-variation-settings: 'wght' 300;
+  vertical-align: middle;
+}
+
 .est_tooltip {
   top: 85px;
 }
@@ -656,6 +656,14 @@ select {
   font-size: 20px;
   justify-content: center;
   padding: 2px;
+}
+
+/* Font size of coin */
+span.dollar_player_money {
+  color: var(--land-light);
+  font-size: 22px;
+  font-variation-settings: 'wght' 400;
+  vertical-align: middle;
 }
 
 .land_td {

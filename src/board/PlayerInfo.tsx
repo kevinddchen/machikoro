@@ -115,6 +115,18 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const rollStringSplit = est.rolls.toString().split(',');
       const estDescription = est.name + '\n\n' + est.description;
 
+      // Split description string to extract the Material Symbol keywords.
+      // If there are more than 1 string, every even string is the keyword.
+      const estDescDisplay = [];
+      const descSplitString = estDescription.split('::');
+      for (let i = 0; i < descSplitString.length; i++) {
+        if (Math.abs(i % 2)) {
+          estDescDisplay.push(<span className='material-symbols-outlined tooltip_sym'>{descSplitString[i]}</span>);
+        } else {
+          estDescDisplay.push(descSplitString[i]);
+        }
+      }
+
       // place the rolls associated with each establishment in its own box
       const estRollDisplay = [];
       for (let i = 0; i < rollStringSplit.length; i++) {
@@ -134,9 +146,10 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           >
             <div className='mini_roll'>{estRollDisplay}</div>
             <div className='mini_type'>
-              <span className='material-symbols-outlined'>{est.type}</span>
+              <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
             </div>
-            <div className={classNames('tooltip', 'mini_tooltip')}>{estDescription}</div>
+            <div className={classNames('tooltip', 'mini_tooltip')}>{estDescDisplay}</div>
+            {/*<div className={classNames('tooltip', 'mini_tooltip')}>{estDesc2 ? estDesc2[1] : ''}</div>*/}
           </td>
         );
       }

@@ -68,15 +68,15 @@ export type EstColor = (typeof EstColor)[keyof typeof EstColor];
  * Some establishments an establishment type which is displayed as an icon
  * on the establishment card. The icon is generated from the Material Symbols font
  * (https://developers.google.com/fonts/docs/material_symbols).
- * The following are the keywords used to identify each icon.
+ * The following are the keywords used to identify each icon (padded with ::).
  */
 export const EstType = {
-  Animal: 'cruelty_free',
-  Cup: 'coffee',
-  Gear: 'settings',
-  Shop: 'house',
-  Wheat: 'psychiatry',
-  Fruit: 'nutrition',
+  Animal: '::cruelty_free::',
+  Cup: '::coffee::',
+  Gear: '::settings::',
+  Shop: '::house::',
+  Wheat: '::psychiatry::',
+  Fruit: '::nutrition::',
 } as const;
 
 export type EstType = (typeof EstType)[keyof typeof EstType];
