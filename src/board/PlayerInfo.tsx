@@ -73,6 +73,20 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         landDescription += '\n\nCost: ' + landCostArray[0].toString();
       }
 
+      // Split description string to extract the Material Symbol keywords.
+      // If there are more than 1 string, every even string is the keyword.
+      const landDescDisplay = [];
+      const landDescSplitString = landDescription.split('::');
+      for (let i = 0; i < landDescSplitString.length; i++) {
+        if (Math.abs(i % 2)) {
+          landDescDisplay.push(
+            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{landDescSplitString[i]}</span>
+          );
+        } else {
+          landDescDisplay.push(landDescSplitString[i]);
+        }
+      }
+
       // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
       let onClickEvent: () => void;
       if (player === clientPlayer) {
@@ -88,7 +102,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           onClick={onClickEvent}
         >
           <div className='mini_name'>{land.miniName}</div>
-          <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>
+          <div className={classNames('tooltip', 'mini_tooltip')}>{landDescDisplay}</div>
         </td>
       );
     }
