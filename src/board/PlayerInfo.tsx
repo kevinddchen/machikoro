@@ -121,7 +121,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const descSplitString = estDescription.split('::');
       for (let i = 0; i < descSplitString.length; i++) {
         if (Math.abs(i % 2)) {
-          estDescDisplay.push(<span className='material-symbols-outlined tooltip_sym'>{descSplitString[i]}</span>);
+          estDescDisplay.push(
+            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{descSplitString[i]}</span>
+          );
         } else {
           estDescDisplay.push(descSplitString[i]);
         }
@@ -149,7 +151,6 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
               <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
             </div>
             <div className={classNames('tooltip', 'mini_tooltip')}>{estDescDisplay}</div>
-            {/*<div className={classNames('tooltip', 'mini_tooltip')}>{estDesc2 ? estDesc2[1] : ''}</div>*/}
           </td>
         );
       }

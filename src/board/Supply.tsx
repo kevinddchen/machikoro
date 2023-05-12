@@ -112,7 +112,9 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const descSplitString = est.description.split('::');
       for (let i = 0; i < descSplitString.length; i++) {
         if (Math.abs(i % 2)) {
-          estDescDisplay.push(<span className='material-symbols-outlined tooltip_sym'>{descSplitString[i]}</span>);
+          estDescDisplay.push(
+            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{descSplitString[i]}</span>
+          );
         } else {
           estDescDisplay.push(descSplitString[i]);
         }
