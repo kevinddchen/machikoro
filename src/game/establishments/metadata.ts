@@ -60,7 +60,7 @@ export const Bakery: Establishment = {
 export const Cafe: Establishment = {
   _id: 4,
   _ver: Version.MK1,
-  name: 'Cafe',
+  name: 'Café',
   description: 'Take 1 coin from the player who just rolled.',
   cost: 2,
   earn: 1,
