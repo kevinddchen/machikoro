@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass, parseMaterialSymbols, formatRollBoxes } from './utils';
+import { estColorToClass, formatRollBoxes, landColorToClass, parseMaterialSymbols } from './utils';
 import StackTable from './StackTable';
 
 /**
