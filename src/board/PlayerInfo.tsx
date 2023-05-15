@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass } from './utils';
+import { estColorToClass, landColorToClass, parseMaterialSymbols, formatRollBoxes } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -65,27 +65,14 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const landIsGrey = !canBuyLand && !owned;
       const landColor = landColorToClass(canBuyLand);
 
-      let landDescription = land.description;
+      let landDescriptionUnparsed = land.description;
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
       if (version === Game.Version.MK1 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
         const landCostArray = Land.costArray(G, land, clientPlayer);
         // Machi Koro 1 only has one cost
-        landDescription += '\n\nCost: ' + landCostArray[0].toString();
+        landDescriptionUnparsed += '\n\nCost: ' + landCostArray[0].toString();
       }
-
-      // Split description string to extract the Material Symbol keywords.
-      // If there are more than 1 string, every even string is the keyword.
-      const landDescDisplay = [];
-      const landDescSplitString = landDescription.split('::');
-      for (let i = 0; i < landDescSplitString.length; i++) {
-        if (Math.abs(i % 2)) {
-          landDescDisplay.push(
-            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{landDescSplitString[i]}</span>
-          );
-        } else {
-          landDescDisplay.push(landDescSplitString[i]);
-        }
-      }
+      const landDescription = parseMaterialSymbols(landDescriptionUnparsed);
 
       // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
       let onClickEvent: () => void;
@@ -102,7 +89,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           onClick={onClickEvent}
         >
           <div className='mini_name'>{land.miniName}</div>
-          <div className={classNames('tooltip', 'mini_tooltip')}>{landDescDisplay}</div>
+          <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>
         </td>
       );
     }
@@ -126,31 +113,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
 
       const estColor = estColorToClass(est.color, canDoOffice);
-      const rollStringSplit = est.rolls.toString().split(',');
-      const estDescription = est.name + '\n\n' + est.description;
 
-      // Split description string to extract the Material Symbol keywords.
-      // If there are more than 1 string, every even string is the keyword.
-      const estDescDisplay = [];
-      const descSplitString = estDescription.split('::');
-      for (let i = 0; i < descSplitString.length; i++) {
-        if (Math.abs(i % 2)) {
-          estDescDisplay.push(
-            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{descSplitString[i]}</span>
-          );
-        } else {
-          estDescDisplay.push(descSplitString[i]);
-        }
-      }
-
-      // place the rolls associated with each establishment in its own box
-      const estRollDisplay = [];
-      for (let i = 0; i < rollStringSplit.length; i++) {
-        if (i > 0) {
-          estRollDisplay.push(' ');
-        }
-        estRollDisplay.push(<div className='mini_roll_box'>{rollStringSplit[i]}</div>);
-      }
+      const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
+      const estDescription = parseMaterialSymbols(est.name + '\n\n' + est.description);
 
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
@@ -160,11 +125,11 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
             className={classNames('mini_td', estColor, { clickable: canDoOffice })}
             onClick={() => doOffice(est)}
           >
-            <div className='mini_roll'>{estRollDisplay}</div>
+            <div className='mini_roll'>{estRollBoxes}</div>
             <div className='mini_type'>
               <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
             </div>
-            <div className={classNames('tooltip', 'mini_tooltip')}>{estDescDisplay}</div>
+            <div className={classNames('tooltip', 'mini_tooltip')}>{estDescription}</div>
           </td>
         );
       }

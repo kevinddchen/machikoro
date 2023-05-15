@@ -1,6 +1,8 @@
 import { Est, Land, MachikoroG } from 'game';
 import { assertUnreachable } from 'common/typescript';
 
+import classNames from 'classnames';
+
 /**
  * Convert `Est.EstColor` to CSS class name.
  * @param color
@@ -36,7 +38,7 @@ export const landColorToClass = (canBuy: boolean): string => {
 };
 
 /**
- * Parse an establishment's activation rolls into a printable format.
+ * Parse an establishment's activation rolls into a printable format. (may be unused)
  * @param est
  * @returns
  */
@@ -54,4 +56,41 @@ export const rollsToString = (est: Est.Establishment): string => {
 export const landCostsToString = (G: MachikoroG, land: Land.Landmark, player: number | null): string => {
   const landCostArray = Land.costArray(G, land, player);
   return '$' + landCostArray.map((cost) => cost.toString()).join('/');
+};
+
+/**
+ * Parses the Material Symbols in a description by splitting the string and extracting the keywords.
+ * @param description - string to be parsed
+ */
+export const parseMaterialSymbols = (description: string): Array<string | JSX.Element> => {
+  const parsedDescription = [];
+  const splitDescString = description.split('::');
+  for (let i = 0; i < splitDescString.length; i++) {
+    // If there is more than 1 string, every second string is a Material Symbol keyword.
+    if (Math.abs(i % 2)) {
+      parsedDescription.push(
+        <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{splitDescString[i]}</span>
+      );
+    } else {
+      parsedDescription.push(splitDescString[i]);
+    }
+  }
+  return parsedDescription;
+};
+
+/**
+ * Format the rolls associated with each establishment such that they are contained within its own box.
+ * @param rolls - string to be parsed
+ * @param subclass - keyword for CSS formatting
+ */
+export const formatRollBoxes = (rolls: number[], subclass: string): Array<string | JSX.Element> => {
+  const formattedRollBox = [];
+  const splitRollString = rolls.toString().split(',');
+  for (let i = 0; i < splitRollString.length; i++) {
+    if (i > 0) {
+      formattedRollBox.push(' ');
+    }
+    formattedRollBox.push(<div className={subclass}>{splitRollString[i]}</div>);
+  }
+  return formattedRollBox;
 };

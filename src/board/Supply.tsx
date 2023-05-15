@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass, landCostsToString } from './utils';
+import { estColorToClass, landColorToClass, landCostsToString, parseMaterialSymbols, formatRollBoxes } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -60,20 +60,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const canBuyLand = isActive && Game.canBuyLand(G, ctx, land);
       const landColor = landColorToClass(canBuyLand);
       const costsString = landCostsToString(G, land, clientPlayer);
-
-      // Split description string to extract the Material Symbol keywords.
-      // If there are more than 1 string, every even string is the keyword.
-      const landDescDisplay = [];
-      const landDescSplitString = land.description.split('::');
-      for (let i = 0; i < landDescSplitString.length; i++) {
-        if (Math.abs(i % 2)) {
-          landDescDisplay.push(
-            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{landDescSplitString[i]}</span>
-          );
-        } else {
-          landDescDisplay.push(landDescSplitString[i]);
-        }
-      }
+      const landDescription = parseMaterialSymbols(land.description);
 
       // use same CSS as establishments
       table.push(
@@ -84,7 +71,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
         >
           <div className='est_name'>{land.name}</div>
           <div className='est_cost'>{costsString}</div>
-          <div className={classNames('tooltip', 'est_tooltip')}>{landDescDisplay}</div>
+          <div className={classNames('tooltip', 'est_tooltip')}>{landDescription}</div>
         </td>
       );
     }
@@ -118,30 +105,9 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const canBuyEst = isActive && Game.canBuyEst(G, ctx, est);
       const remaining = Est.countRemaining(G, est);
       const estColor = estColorToClass(est.color, canBuyEst);
-      const rollStringSplit = est.rolls.toString().split(',');
 
-      // Split description string to extract the Material Symbol keywords.
-      // If there are more than 1 string, every even string is the keyword.
-      const estDescDisplay = [];
-      const descSplitString = est.description.split('::');
-      for (let i = 0; i < descSplitString.length; i++) {
-        if (Math.abs(i % 2)) {
-          estDescDisplay.push(
-            <span className={classNames('material-symbols-outlined', 'tooltip_sym')}>{descSplitString[i]}</span>
-          );
-        } else {
-          estDescDisplay.push(descSplitString[i]);
-        }
-      }
-
-      // place the rolls associated with each establishment in its own box
-      const estRollDisplay = [];
-      for (let i = 0; i < rollStringSplit.length; i++) {
-        if (i > 0) {
-          estRollDisplay.push(' ');
-        }
-        estRollDisplay.push(<div className='est_roll_box'>{rollStringSplit[i]}</div>);
-      }
+      const estRollBoxes = formatRollBoxes(est.rolls, 'est_roll_box');
+      const estDescription = parseMaterialSymbols(est.description);
 
       table.push(
         <td
@@ -149,7 +115,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
           className={classNames('est_td', estColor, { inactive: available === 0 }, { clickable: canBuyEst })}
           onClick={() => moves.buyEst(est)}
         >
-          <div className='est_roll'>{estRollDisplay}</div>
+          <div className='est_roll'>{estRollBoxes}</div>
           <div className='est_type'>
             <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
           </div>
@@ -158,7 +124,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
           <div className='est_num'>
             {available}/{remaining}
           </div>
-          <div className={classNames('tooltip', 'est_tooltip')}>{estDescDisplay}</div>
+          <div className={classNames('tooltip', 'est_tooltip')}>{estDescription}</div>
         </td>
       );
     }
