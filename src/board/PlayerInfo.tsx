@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass, rollsToString } from './utils';
+import { estColorToClass, formatRollBoxes, landColorToClass, parseMaterialSymbols } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -65,13 +65,14 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const landIsGrey = !canBuyLand && !owned;
       const landColor = landColorToClass(canBuyLand);
 
-      let landDescription = land.description;
+      let landDescriptionUnparsed = land.description;
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
       if (version === Game.Version.MK1 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
         const landCostArray = Land.costArray(G, land, clientPlayer);
         // Machi Koro 1 only has one cost
-        landDescription += '\n\nCost: ' + landCostArray[0].toString();
+        landDescriptionUnparsed += '\n\nCost: ' + landCostArray[0].toString();
       }
+      const landDescription = parseMaterialSymbols(landDescriptionUnparsed);
 
       // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
       let onClickEvent: () => void;
@@ -112,8 +113,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
 
       const estColor = estColorToClass(est.color, canDoOffice);
-      const rollString = rollsToString(est);
-      const estDescription = est.name + '\n\n' + est.description;
+
+      const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
+      const estDescription = parseMaterialSymbols(est.name + '\n\n' + est.description);
 
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
@@ -123,8 +125,10 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
             className={classNames('mini_td', estColor, { clickable: canDoOffice })}
             onClick={() => doOffice(est)}
           >
-            <div className='mini_roll'>{rollString}</div>
-            <div className='mini_type'>{est.type}</div>
+            <div className='mini_roll'>{estRollBoxes}</div>
+            <div className='mini_type'>
+              <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
+            </div>
             <div className={classNames('tooltip', 'mini_tooltip')}>{estDescription}</div>
           </td>
         );
@@ -142,8 +146,11 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
     return (
       <div className={classNames('div-column', border)}>
-        <div className='coin_num'>${money}</div>
         <div>{nameDiv}</div>
+        <div className='coin_num'>
+          <span className={classNames('material-symbols-outlined', 'dollar_player_money')}>paid</span>
+          {money}
+        </div>
         <div>{lands.render()}</div>
         <div>{minis.render()}</div>
       </div>

@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import * as Game from 'game';
 import { Est, Land, MachikoroG } from 'game';
 
-import { estColorToClass, landColorToClass, landCostsToString, rollsToString } from './utils';
+import { estColorToClass, formatRollBoxes, landColorToClass, landCostsToString, parseMaterialSymbols } from './utils';
 import StackTable from './StackTable';
 
 /**
@@ -60,6 +60,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const canBuyLand = isActive && Game.canBuyLand(G, ctx, land);
       const landColor = landColorToClass(canBuyLand);
       const costsString = landCostsToString(G, land, clientPlayer);
+      const landDescription = parseMaterialSymbols(land.description);
 
       // use same CSS as establishments
       table.push(
@@ -70,7 +71,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
         >
           <div className='est_name'>{land.name}</div>
           <div className='est_cost'>{costsString}</div>
-          <div className={classNames('tooltip', 'est_tooltip')}>{land.description}</div>
+          <div className={classNames('tooltip', 'est_tooltip')}>{landDescription}</div>
         </td>
       );
     }
@@ -104,7 +105,9 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const canBuyEst = isActive && Game.canBuyEst(G, ctx, est);
       const remaining = Est.countRemaining(G, est);
       const estColor = estColorToClass(est.color, canBuyEst);
-      const rollString = rollsToString(est);
+
+      const estRollBoxes = formatRollBoxes(est.rolls, 'est_roll_box');
+      const estDescription = parseMaterialSymbols(est.description);
 
       table.push(
         <td
@@ -112,14 +115,16 @@ export default class Supply extends React.Component<SupplyProps, object> {
           className={classNames('est_td', estColor, { inactive: available === 0 }, { clickable: canBuyEst })}
           onClick={() => moves.buyEst(est)}
         >
-          <div className='est_roll'>{rollString}</div>
-          <div className='est_type'>{est.type}</div>
+          <div className='est_roll'>{estRollBoxes}</div>
+          <div className='est_type'>
+            <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
+          </div>
           <div className='est_name'>{est.name}</div>
           <div className='est_cost'>${est.cost}</div>
           <div className='est_num'>
             {available}/{remaining}
           </div>
-          <div className={classNames('tooltip', 'est_tooltip')}>{est.description}</div>
+          <div className={classNames('tooltip', 'est_tooltip')}>{estDescription}</div>
         </td>
       );
     }
