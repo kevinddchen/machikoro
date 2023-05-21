@@ -3,6 +3,15 @@ import { Server } from 'boardgame.io';
 import { Expansion, SupplyVariant } from 'game';
 
 /**
+ * Function to assert type is not null to avoid using the non-null assertion operator "!".
+ */
+export function assertNonNull<T>(value: T | null | undefined): asserts value is T {
+  if (value == null) {
+    throw new Error(`Fatal error: value ${String(value)} must not be null/undefined.`);
+  }
+}
+
+/**
  * Currently, the most reliable way to check if a seat is occupied is to check
  * if the `PlayerMetadata` object contains the field 'name'. If yes, then it is
  * occupied.

@@ -7,6 +7,15 @@ import { assertUnreachable } from 'common/typescript';
 import { Expansion, SetupData, SupplyVariant, Version } from './types';
 
 /**
+ * Function to assert type is not null to avoid using the non-null assertion operator "!".
+ */
+export function assertNonNull<T>(value: T | null | undefined): asserts value is T {
+  if (value == null) {
+    throw new Error(`Fatal error: value ${String(value)} must not be null/undefined.`);
+  }
+}
+
+/**
  * Convert the expansion to the game version. "Base" and "Harbor" are both
  * version 1, while "MK2" is version 2.
  * @param exp

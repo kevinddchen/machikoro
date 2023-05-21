@@ -8,7 +8,18 @@ import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
-import { expToVer } from '../utils';
+import { assertNonNull, expToVer } from '../utils';
+
+/**
+ * Type guard to assert that G._estData is not null to avoid using the non-null assertion operator "!".
+ */
+function assertEstDataExists(
+  G: MachikoroG
+): asserts G is MachikoroG & { _estData: NonNullable<MachikoroG['_estData']> } {
+  if (G._estData === null || G._estData === undefined) {
+    throw new Error('G._estData is null or undefined.');
+  }
+}
 
 /**
  * @param a
@@ -25,7 +36,8 @@ export const isEqual = (a: Establishment, b: Establishment): boolean => {
  * @returns True if the establishment is in use for this game.
  */
 export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
-  return expToVer(G.expansion) === est._ver && G._estData!.inUse[est._id];
+  assertEstDataExists(G);
+  return expToVer(G.expansion) === est._ver && G._estData.inUse[est._id];
 };
 
 /**
@@ -39,7 +51,8 @@ export const countRemaining = (G: MachikoroG, est: Establishment): number => {
     console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
     return 0;
   }
-  return G._estData!.remainingCount[est._id];
+  assertEstDataExists(G);
+  return G._estData.remainingCount[est._id];
 };
 
 /**
@@ -53,7 +66,8 @@ export const countAvailable = (G: MachikoroG, est: Establishment): number => {
     console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
     return 0;
   }
-  return G._estData!.availableCount[est._id];
+  assertEstDataExists(G);
+  return G._estData.availableCount[est._id];
 };
 
 /**
@@ -68,7 +82,8 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
     console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
     return 0;
   }
-  return G._estData!.ownedCount[est._id][player];
+  assertEstDataExists(G);
+  return G._estData.ownedCount[est._id][player];
 };
 
 /**
@@ -139,9 +154,10 @@ export const buy = (G: MachikoroG, player: number, est: Establishment): void => 
   if (expToVer(G.expansion) !== est._ver) {
     throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
   }
-  G._estData!.remainingCount[est._id] -= 1;
-  G._estData!.availableCount[est._id] -= 1;
-  G._estData!.ownedCount[est._id][player] += 1;
+  assertEstDataExists(G);
+  G._estData.remainingCount[est._id] -= 1;
+  G._estData.availableCount[est._id] -= 1;
+  G._estData.ownedCount[est._id][player] += 1;
 };
 
 /**
@@ -155,8 +171,9 @@ export const transfer = (G: MachikoroG, args: { from: number; to: number }, est:
   if (expToVer(G.expansion) !== est._ver) {
     throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
   }
-  G._estData!.ownedCount[est._id][args.from] -= 1;
-  G._estData!.ownedCount[est._id][args.to] += 1;
+  assertEstDataExists(G);
+  G._estData.ownedCount[est._id][args.from] -= 1;
+  G._estData.ownedCount[est._id][args.to] += 1;
 };
 
 /**
@@ -166,19 +183,24 @@ export const transfer = (G: MachikoroG, args: { from: number; to: number }, est:
 export const replenishSupply = (G: MachikoroG): void => {
   const { expansion, supplyVariant } = G;
   const version = expToVer(expansion);
-  const decks = G.secret._decks!;
+  const decks = G.secret._decks;
+  assertNonNull(decks);
 
   if (supplyVariant === SupplyVariant.Total) {
     // put all establishments into the supply
     while (decks[0].length > 0) {
-      const est = decks[0].pop()!;
-      G._estData!.availableCount[est._id] += 1;
+      const est = decks[0].pop();
+      assertNonNull(est);
+      assertEstDataExists(G);
+      G._estData.availableCount[est._id] += 1;
     }
   } else if (supplyVariant === SupplyVariant.Variable) {
     // put establishments into the supply until there are ten unique establishments
     while (decks[0].length > 0 && getAllAvailable(G).length < Meta._VARIABLE_SUPPLY_LIMIT) {
-      const est = decks[0].pop()!;
-      G._estData!.availableCount[est._id] += 1;
+      const est = decks[0].pop();
+      assertNonNull(est);
+      assertEstDataExists(G);
+      G._estData.availableCount[est._id] += 1;
     }
   } else if (supplyVariant === SupplyVariant.Hybrid) {
     // put establishments into the supply until there are 5 unique
@@ -212,8 +234,10 @@ export const replenishSupply = (G: MachikoroG): void => {
 
     for (let i = 0; i < decks.length; i++) {
       while (decks[i].length > 0 && getAllAvailable(G).filter(funcs[i]).length < limits[i]) {
-        const est = decks[i].pop()!;
-        G._estData!.availableCount[est._id] += 1;
+        const est = decks[i].pop();
+        assertNonNull(est);
+        assertEstDataExists(G);
+        G._estData.availableCount[est._id] += 1;
       }
     }
   } else {
