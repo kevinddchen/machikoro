@@ -2,13 +2,24 @@
 // Utility functions for landmarks.
 //
 
-import { assertUnreachable } from 'common/typescript';
+import { assertNonNull, assertUnreachable } from 'common/typescript';
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
 import { Landmark, LandmarkData } from './types';
 import { expToVer } from '../utils';
+
+/**
+ * Type guard to assert that G._landData is not null to avoid using the non-null assertion operator "!".
+ */
+function assertLandDataExists(
+  G: MachikoroG
+): asserts G is MachikoroG & { _landData: NonNullable<MachikoroG['_landData']> } {
+  if (G._landData === null || G._landData === undefined) {
+    throw new Error('G._landData is null or undefined.');
+  }
+}
 
 /**
  * @param a
@@ -25,7 +36,8 @@ export const isEqual = (a: Landmark, b: Landmark): boolean => {
  * @returns True if the landmark is in use for this game.
  */
 export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
-  return expToVer(G.expansion) === land._ver && G._landData!.inUse[land._id];
+  assertLandDataExists(G);
+  return expToVer(G.expansion) === land._ver && G._landData.inUse[land._id];
 };
 
 /**
@@ -40,7 +52,8 @@ export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
     console.warn(`Landmark id=${land._id} ver=${land._ver} does not match the game expansion, ${G.expansion}.`);
     return false;
   }
-  return G._landData!.available[land._id];
+  assertLandDataExists(G);
+  return G._landData.available[land._id];
 };
 
 /**
@@ -54,7 +67,8 @@ export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => 
     // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
-  return G._landData!.owned[land._id][player];
+  assertLandDataExists(G);
+  return G._landData.owned[land._id][player];
 };
 
 /**
@@ -67,7 +81,8 @@ export const isOwned = (G: MachikoroG, land: Landmark): boolean => {
     // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
-  return G._landData!.owned[land._id].some((owned) => owned);
+  assertLandDataExists(G);
+  return G._landData.owned[land._id].some((owned) => owned);
 };
 
 /**
@@ -160,11 +175,13 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
 
   if (isEqual(land, Meta2.LaunchPad2) && isOwned(G, Meta2.Observatory2)) {
     // if anyone owns Observatory, Launch Pad costs 5 fewer coins
-    arr = arr.map((cost) => cost - Meta2.Observatory2.coins!);
+    assertNonNull(Meta2.Observatory2.coins);
+    arr = arr.map((cost) => cost - (Meta2.Observatory2.coins as number));
   }
   if (player !== null && owns(G, player, Meta2.LoanOffice2)) {
     // if the player owns Loan Office, all landmarks cost 2 fewer coins
-    arr = arr.map((cost) => cost - Meta2.LoanOffice2.coins!);
+    assertNonNull(Meta2.LoanOffice2.coins);
+    arr = arr.map((cost) => cost - (Meta2.LoanOffice2.coins as number));
   }
 
   return arr;
@@ -181,10 +198,11 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
   if (version !== land._ver) {
     throw new Error(`Landmark id=${land._id} ver=${land._ver} does not match the game expansion, ${G.expansion}.`);
   }
-  G._landData!.owned[land._id][player] = true;
+  assertLandDataExists(G);
+  G._landData.owned[land._id][player] = true;
   // in Machi Koro 2, each landmark can only be bought by one player
   if (version === Version.MK2) {
-    G._landData!.available[land._id] = false;
+    G._landData.available[land._id] = false;
   }
 };
 
@@ -194,7 +212,8 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
  */
 export const replenishSupply = (G: MachikoroG): void => {
   const { expansion, supplyVariant } = G;
-  const deck = G.secret._landDeck!;
+  const deck = G.secret._landDeck;
+  assertNonNull(deck);
 
   // skip if this is Machi Koro 1
   if (expToVer(expansion) === Version.MK1) {
@@ -204,14 +223,18 @@ export const replenishSupply = (G: MachikoroG): void => {
   if (supplyVariant === SupplyVariant.Total) {
     // put all landmarks into the supply
     while (deck.length > 0) {
-      const land = deck.pop()!;
-      G._landData!.available[land._id] = true;
+      const land = deck.pop();
+      assertNonNull(land);
+      assertLandDataExists(G);
+      G._landData.available[land._id] = true;
     }
   } else if (supplyVariant === SupplyVariant.Variable || supplyVariant === SupplyVariant.Hybrid) {
     // put landmarks into the supply until there are 5 unique landmarks
     while (deck.length > 0 && getAllAvailable(G).length < Meta2._SUPPY_LIMIT_LANDMARK) {
-      const land = deck.pop()!;
-      G._landData!.available[land._id] = true;
+      const land = deck.pop();
+      assertNonNull(land);
+      assertLandDataExists(G);
+      G._landData.available[land._id] = true;
     }
   } else {
     return assertUnreachable(supplyVariant);

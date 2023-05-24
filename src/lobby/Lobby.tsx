@@ -15,9 +15,12 @@ import {
   Version,
   expToVer,
 } from 'game';
-import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
+
+/* eslint-disable sort-imports */
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
-import { assertUnreachable } from 'common/typescript';
+import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
+import { assertNonNull, assertUnreachable } from 'common/typescript';
+/* eslint-enable sort-imports */
 
 import { countPlayers, expansionName, hasDetails, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
@@ -226,7 +229,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     // first, try to join the match on saved credentials
     if (this.authenticator.hasMatchInfo(matchID)) {
-      const matchInfo = this.authenticator.fetchMatchInfo(matchID)!;
+      const matchInfo = this.authenticator.fetchMatchInfo(matchID);
+      assertNonNull(matchInfo);
       this.props.setMatchInfo(matchInfo);
       // this will trigger `Matchmaker` to switch to the waiting room
       return;
