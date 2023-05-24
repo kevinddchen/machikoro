@@ -1166,5 +1166,6 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
 
   plugins: [Log.LogxPlugin],
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   playerView: PlayerView.STRIP_SECRETS!,
 };
