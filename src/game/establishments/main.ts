@@ -2,13 +2,13 @@
 // Utility functions for establishments.
 //
 
-import { assertUnreachable } from 'common/typescript';
+import { assertNonNull, assertUnreachable } from 'common/typescript';
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
-import { assertNonNull, expToVer } from '../utils';
+import { expToVer } from '../utils';
 
 /**
  * Type guard to assert that G._estData is not null to avoid using the non-null assertion operator "!".

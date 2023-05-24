@@ -6,14 +6,14 @@ import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
 
-import { assertUnreachable } from 'common/typescript';
+import { assertNonNull, assertUnreachable } from 'common/typescript';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState, Version } from './types';
-import { assertNonNull, expToVer, validateSetupData } from './utils';
+import { expToVer, validateSetupData } from './utils';
 import { Landmark } from './landmarks';
 
 export const GAME_NAME = 'machikoro';

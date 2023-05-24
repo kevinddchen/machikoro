@@ -2,13 +2,13 @@
 // Utility functions for landmarks.
 //
 
-import { assertUnreachable } from 'common/typescript';
+import { assertNonNull, assertUnreachable } from 'common/typescript';
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
 import { Landmark, LandmarkData } from './types';
-import { assertNonNull, expToVer } from '../utils';
+import { expToVer } from '../utils';
 
 /**
  * Type guard to assert that G._landData is not null to avoid using the non-null assertion operator "!".

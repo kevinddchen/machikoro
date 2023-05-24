@@ -9,7 +9,7 @@ import StatusBar from './StatusBar';
 import Supply from './Supply';
 import TextPanel from './TextPanel';
 
-import { assertNonNull } from './utils';
+import { assertNonNull } from 'common/typescript';
 
 /**
  * Initialize the names array given the match data.

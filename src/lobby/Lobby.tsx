@@ -17,9 +17,9 @@ import {
 } from 'game';
 import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
-import { assertUnreachable } from 'common/typescript';
+import { assertNonNull, assertUnreachable } from 'common/typescript';
 
-import { assertNonNull, countPlayers, expansionName, hasDetails, supplyVariantName } from './utils';
+import { countPlayers, expansionName, hasDetails, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 

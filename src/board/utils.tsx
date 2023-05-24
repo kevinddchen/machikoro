@@ -4,15 +4,6 @@ import { assertUnreachable } from 'common/typescript';
 import classNames from 'classnames';
 
 /**
- * Function to assert type is not null to avoid using the non-null assertion operator "!".
- */
-export function assertNonNull<T>(value: T | null | undefined): asserts value is T {
-  if (value == null) {
-    throw new Error(`Fatal error: value ${String(value)} must not be null/undefined.`);
-  }
-}
-
-/**
  * Convert `Est.EstColor` to CSS class name.
  * @param color
  * @param darker - If true, uses darker variant.
