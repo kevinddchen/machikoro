@@ -322,7 +322,7 @@ export const TaxOffice: Establishment = {
   _id: 24,
   _ver: Version.MK1,
   name: 'Tax Office',
-  description: 'From each opponent who has more than 10 coins, take half, rounded down.',
+  description: 'From each opponent who has 10 or more coins, take half, rounded down.',
   cost: 4,
   earn: 10, // This is not the coins taken, but the threshold for triggering the tax office
   rolls: [8, 9],
