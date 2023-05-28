@@ -4,6 +4,7 @@ import serve from 'koa-static';
 
 import { Machikoro } from '../game';
 import { PORT } from '../common/config';
+import { patchRoutes } from './patch';
 
 // game server
 const server = Server({
@@ -16,8 +17,7 @@ const server = Server({
   ],
 });
 
-// TODO: figure out how to add our custom middleware
-// addCustomMiddleware(server);
+patchRoutes(server);
 
 // Build path relative to this file
 const frontEndAppBuildPath = path.resolve(__dirname, '../../build');
