@@ -61,6 +61,9 @@ export const patchRoutes = (server: Any, games: Any): void => {
 
     // added: Sanitize and validate player name.
     let playerName = ctx.request.body.playerName;
+    if (!playerName) {
+      ctx.throw(403, 'Player name is required.');
+    }
     playerName = sanitizePlayerName(playerName);
     validatePlayerName(ctx, playerName);
     // (end of added code)
