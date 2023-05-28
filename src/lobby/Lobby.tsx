@@ -173,13 +173,15 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     };
 
     // try to create a match
+    const createMatchRequest: createMatchAPI = {
+      playerName: name,
+      numPlayers,
+      setupData,
+    };
+
     let createdMatch: LobbyAPI.CreatedMatch;
     try {
-      createdMatch = await lobbyClient.createMatch(GAME_NAME, {
-        playerName: name,
-        numPlayers,
-        setupData,
-      } as createMatchAPI);
+      createdMatch = await lobbyClient.createMatch(GAME_NAME, createMatchRequest);
     } catch (e) {
       if (hasDetails(e)) {
         // if error has specific reason, display it
@@ -215,9 +217,13 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     }
 
     // second, try to join the match by creating new credentials
+    const joinMatchRequest: joinMatchAPI = {
+      playerName: name,
+    };
+
     let joinedMatch: LobbyAPI.JoinedMatch;
     try {
-      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name } as joinMatchAPI);
+      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, joinMatchRequest);
     } catch (e) {
       if (hasDetails(e)) {
         // if error has specific reason, display it
