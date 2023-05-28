@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-nocheck
 
 /*
@@ -11,17 +12,18 @@
 /**
  * NOTE: We want to modify the `/games/:name/:id/join` route to add some custom
  * logic when joining a match. We are unable to add middleware because the
- * request body can only be parsed once using `koaBody`. For more details, see
- * https://github.com/boardgameio/boardgame.io/issues/1107.
+ * request body can only be parsed once using `koaBody()`. For details, see:
+ * - https://github.com/boardgameio/boardgame.io/issues/1107
+ * - https://github.com/boardgameio/boardgame.io/issues/1143
  *
  * Until this issue is resolved, we are replacing the route by copying the code
  * from the repo and making the necessary changes.
  *
  * The code in this file were copied from:
- * https://github.com/boardgameio/boardgame.io/blob/d97ef0b5500de8dec0ff6d503759dc4b36565622/src/server/api.ts
- * https://github.com/boardgameio/boardgame.io/blob/d97ef0b5500de8dec0ff6d503759dc4b36565622/src/server/util.ts
+ * - https://github.com/boardgameio/boardgame.io/blob/d97ef0b5500de8dec0ff6d503759dc4b36565622/src/server/api.ts
+ * - https://github.com/boardgameio/boardgame.io/blob/d97ef0b5500de8dec0ff6d503759dc4b36565622/src/server/util.ts
  *
- * TODO: Remove this file when the issue is resolved.
+ * TODO(kevinddchen): Remove this file when the issue is resolved.
  */
 
 import koaBody from 'koa-body';
@@ -48,11 +50,10 @@ const getFirstAvailablePlayerID = (players: Server.MatchData['players']): string
 };
 
 export const patchRoutes = (server: Any): void => {
-
   const auth = server.auth;
   const db = server.db;
   const router = server.router;
-  
+
   /**
    * Join a given match.
    *
@@ -73,9 +74,10 @@ export const patchRoutes = (server: Any): void => {
       ctx.throw(403, 'Player name is required.');
     }
 
-    // Added: Sanitize and validate player name.
+    // added: Sanitize and validate player name.
     playerName = sanitizePlayerName(playerName);
     validatePlayerName(ctx, playerName);
+    // (end of added code)
 
     const { metadata } = await (db as StorageAPI.Async).fetch(matchID, {
       metadata: true,
@@ -84,12 +86,13 @@ export const patchRoutes = (server: Any): void => {
       ctx.throw(404, 'Match ' + matchID + ' not found');
     }
 
-    // Added: Check for duplicate player names.
+    // added: Check for duplicate player names.
     for (const player of Object.values(metadata.players)) {
       if (player.name && player.name === playerName) {
         ctx.throw(409, 'Player name already taken');
       }
     }
+    // (end of added code)
 
     if (typeof playerID === 'undefined' || playerID === null) {
       playerID = getFirstAvailablePlayerID(metadata.players);
