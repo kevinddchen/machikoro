@@ -27,32 +27,69 @@
  */
 
 import koaBody from 'koa-body';
+import { nanoid } from 'nanoid';
+
+import { createMatch } from 'boardgame.io/internal';
 
 import { sanitizePlayerName, validatePlayerName } from './utils';
 
-/**
- * Given players, returns the count of players.
- */
-const getNumPlayers = (players: Server.MatchData['players']): number => Object.keys(players).length;
-
-/**
- * Given players, tries to find the ID of the first player that can be joined.
- * Returns `undefined` if there’s no available ID.
- */
-const getFirstAvailablePlayerID = (players: Server.MatchData['players']): string | undefined => {
-  const numPlayers = getNumPlayers(players);
-  // Try to get the first index available
-  for (let i = 0; i < numPlayers; i++) {
-    if (typeof players[i].name === 'undefined' || players[i].name === null) {
-      return String(i);
-    }
-  }
-};
-
-export const patchRoutes = (server: Any): void => {
+export const patchRoutes = (server: Any, games: Any): void => {
   const auth = server.auth;
   const db = server.db;
   const router = server.router;
+  const uuid = () => nanoid(11);
+
+  /**
+   * Create a new match of a given game.
+   *
+   * @param {string} name - The name of the game of the new match.
+   * @param {number} numPlayers - The number of players.
+   * @param {object} setupData - User-defined object that's available
+   *                             during game setup.
+   * @param {boolean} unlisted - Whether the match should be excluded from public listing.
+   * @return - The ID of the created match.
+   */
+  router.post('/games/:name/create', koaBody(), async (ctx) => {
+    // The name of the game (for example: tic-tac-toe).
+    const gameName = ctx.params.name;
+    // User-data to pass to the game setup function.
+    const setupData = ctx.request.body.setupData;
+    // Whether the game should be excluded from public listing.
+    const unlisted = ctx.request.body.unlisted;
+    // The number of players for this game instance.
+    const numPlayers = Number.parseInt(ctx.request.body.numPlayers);
+
+    // added: Sanitize and validate player name.
+    let playerName = ctx.request.body.playerName;
+    playerName = sanitizePlayerName(playerName);
+    validatePlayerName(ctx, playerName);
+    // (end of added code)
+
+    const game = games.find((g) => g.name === gameName);
+    if (!game) ctx.throw(404, 'Game ' + gameName + ' not found');
+
+    if (
+      ctx.request.body.numPlayers !== undefined &&
+      (Number.isNaN(numPlayers) ||
+        (game.minPlayers && numPlayers < game.minPlayers) ||
+        (game.maxPlayers && numPlayers > game.maxPlayers))
+    ) {
+      ctx.throw(400, 'Invalid numPlayers');
+    }
+
+    const matchID = await CreateMatch({
+      ctx,
+      db,
+      game,
+      numPlayers,
+      setupData,
+      uuid,
+      unlisted,
+    });
+
+    const body: LobbyAPI.CreatedMatch = { matchID };
+    ctx.body = body;
+  });
 
   /**
    * Join a given match.
@@ -123,5 +160,57 @@ export const patchRoutes = (server: Any): void => {
   };
 
   // patch routes
+  router.post('/games/:name/create', koaBody(), createMatch);
   router.post('/games/:name/:id/join', koaBody(), joinMatch);
+};
+
+/**
+ * Creates a new match.
+ *
+ * @param {object} db - The storage API.
+ * @param {object} game - The game config object.
+ * @param {number} numPlayers - The number of players.
+ * @param {object} setupData - User-defined object that's available
+ *                             during game setup.
+ * @param {object } lobbyConfig - Configuration options for the lobby.
+ * @param {boolean} unlisted - Whether the match should be excluded from public listing.
+ */
+const CreateMatch = async ({
+  ctx,
+  db,
+  uuid,
+  ...opts
+}: {
+  db: StorageAPI.Sync | StorageAPI.Async;
+  ctx: Koa.BaseContext;
+  uuid: () => string;
+} & Parameters<typeof createMatch>[0]): Promise<string> => {
+  const matchID = uuid();
+  const match = createMatch(opts);
+
+  if ('setupDataError' in match) {
+    ctx.throw(400, match.setupDataError);
+  } else {
+    await db.createMatch(matchID, match);
+    return matchID;
+  }
+};
+
+/**
+ * Given players, returns the count of players.
+ */
+const getNumPlayers = (players: Server.MatchData['players']): number => Object.keys(players).length;
+
+/**
+ * Given players, tries to find the ID of the first player that can be joined.
+ * Returns `undefined` if there’s no available ID.
+ */
+const getFirstAvailablePlayerID = (players: Server.MatchData['players']): string | undefined => {
+  const numPlayers = getNumPlayers(players);
+  // Try to get the first index available
+  for (let i = 0; i < numPlayers; i++) {
+    if (typeof players[i].name === 'undefined' || players[i].name === null) {
+      return String(i);
+    }
+  }
 };

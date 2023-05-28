@@ -6,9 +6,11 @@ import { Machikoro } from '../game';
 import { PORT } from '../common/config';
 import { patchRoutes } from './patch';
 
+const games = [Machikoro];
+
 // game server
 const server = Server({
-  games: [Machikoro],
+  games,
   origins: [
     // Allow your game site to connect.
     'https://playmachikoro.herokuapp.com',
@@ -17,7 +19,8 @@ const server = Server({
   ],
 });
 
-patchRoutes(server);
+// patch routes with some added validation
+patchRoutes(server, games);
 
 // Build path relative to this file
 const frontEndAppBuildPath = path.resolve(__dirname, '../../build');
