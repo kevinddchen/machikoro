@@ -11,7 +11,7 @@ export const IN_PROD = process.env.NODE_ENV === 'production';
 /**
  * Maximum player name length, in number of characters.
  */
-export const MAX_PLAYER_NAME_LENGTH = 16;
+export const MAX_PLAYER_NAME_LENGTH = 24;
 
 /**
  * Time between fetches for match updates in the Lobby and Room.

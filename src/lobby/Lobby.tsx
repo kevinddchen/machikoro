@@ -16,36 +16,14 @@ import {
   expToVer,
 } from 'game';
 
-/* eslint-disable sort-imports */
-import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
 import { assertNonNull, assertUnreachable } from 'common/typescript';
-/* eslint-enable sort-imports */
+import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
+import { createMatchAPI, joinMatchAPI } from 'server/api';
 
 import { countPlayers, expansionName, hasDetails, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
-
-/**
- * HTTP request body for creating a match.
- * @prop {string} playerName - Name of the player. This is not needed by
- * boardgame.io's API, but we add middleware to validate the player name.
- * @prop {number} numPlayers
- * @prop {SetupData} setupData
- */
-export interface createMatchBody {
-  playerName: string;
-  numPlayers: number;
-  setupData: SetupData;
-}
-
-/**
- * HTTP request body for joining a match.
- * @prop {string} playerName
- */
-export interface joinMatchBody {
-  playerName: string;
-}
 
 /**
  * @prop {string} name - Name of the player.
@@ -195,13 +173,15 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     };
 
     // try to create a match
+    const createMatchRequest: createMatchAPI = {
+      playerName: name,
+      numPlayers,
+      setupData,
+    };
+
     let createdMatch: LobbyAPI.CreatedMatch;
     try {
-      createdMatch = await lobbyClient.createMatch(GAME_NAME, {
-        playerName: name,
-        numPlayers,
-        setupData,
-      } as createMatchBody);
+      createdMatch = await lobbyClient.createMatch(GAME_NAME, createMatchRequest);
     } catch (e) {
       if (hasDetails(e)) {
         // if error has specific reason, display it
@@ -237,9 +217,13 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     }
 
     // second, try to join the match by creating new credentials
+    const joinMatchRequest: joinMatchAPI = {
+      playerName: name,
+    };
+
     let joinedMatch: LobbyAPI.JoinedMatch;
     try {
-      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, { playerName: name } as joinMatchBody);
+      joinedMatch = await lobbyClient.joinMatch(GAME_NAME, matchID, joinMatchRequest);
     } catch (e) {
       if (hasDetails(e)) {
         // if error has specific reason, display it
