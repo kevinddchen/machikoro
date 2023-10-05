@@ -8,7 +8,6 @@ import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
 import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
-import { expToVer } from '../utils';
 
 /**
  * Type guard to assert that G._estData is not null to avoid using the non-null assertion operator "!".
@@ -20,6 +19,29 @@ function assertEstDataExists(
     throw new Error('G._estData is null or undefined.');
   }
 }
+
+/**
+ * Maximum number of unique establishments in the supply for Variable Supply.
+ */
+export const _VARIABLE_SUPPLY_LIMIT = 10;
+
+/**
+ * Maximum number of unique establishments that activate with rolls <= 6 in the
+ * supply for Hybrid Supply.
+ */
+export const _HYBRID_SUPPY_LIMIT_LOWER = 5;
+
+/**
+ * Maximum number of unique establishments that activate with rolls > 6 in the
+ * supply for Hybrid Supply.
+ */
+export const _HYBRID_SUPPY_LIMIT_UPPER = 5;
+
+/**
+ * Maximum number of unique major (purple) establishments in the supply for
+ * Hybrid Supply.
+ */
+export const _HYBRID_SUPPY_LIMIT_MAJOR = 2;
 
 /**
  * @param a
@@ -37,7 +59,7 @@ export const isEqual = (a: Establishment, b: Establishment): boolean => {
  */
 export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
   assertEstDataExists(G);
-  return expToVer(G.expansion) === est._ver && G._estData.inUse[est._id];
+  return G.version === est._ver && G._estData.inUse[est._id];
 };
 
 /**
@@ -47,9 +69,8 @@ export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
  * in the supply and deck.
  */
 export const countRemaining = (G: MachikoroG, est: Establishment): number => {
-  if (expToVer(G.expansion) !== est._ver) {
-    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
-    return 0;
+  if (G.version !== est._ver) {
+    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
   }
   assertEstDataExists(G);
   return G._estData.remainingCount[est._id];
@@ -62,9 +83,8 @@ export const countRemaining = (G: MachikoroG, est: Establishment): number => {
  * purchase from the supply.
  */
 export const countAvailable = (G: MachikoroG, est: Establishment): number => {
-  if (expToVer(G.expansion) !== est._ver) {
-    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
-    return 0;
+  if (G.version !== est._ver) {
+    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
   }
   assertEstDataExists(G);
   return G._estData.availableCount[est._id];
@@ -78,9 +98,8 @@ export const countAvailable = (G: MachikoroG, est: Establishment): number => {
  * player.
  */
 export const countOwned = (G: MachikoroG, player: number, est: Establishment): number => {
-  if (expToVer(G.expansion) !== est._ver) {
-    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
-    return 0;
+  if (G.version !== est._ver) {
+    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
   }
   assertEstDataExists(G);
   return G._estData.ownedCount[est._id][player];
@@ -92,7 +111,7 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
  * @returns
  */
 const getAll = (G: MachikoroG): Establishment[] => {
-  const version = expToVer(G.expansion);
+  const version = G.version;
   if (version === Version.MK1) {
     return Meta._ESTABLISHMENTS;
   } else if (version === Version.MK2) {
@@ -138,7 +157,6 @@ export const getAllOwned = (G: MachikoroG, player: number): Establishment[] => {
  * the specified type.
  */
 export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): number => {
-  // prettier-ignore
   return getAll(G)
     .filter((est) => est.type === type)
     .reduce((acc, est) => acc + countOwned(G, player, est), 0);
@@ -151,8 +169,8 @@ export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): nu
  * @param est
  */
 export const buy = (G: MachikoroG, player: number, est: Establishment): void => {
-  if (expToVer(G.expansion) !== est._ver) {
-    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
+  if (G.version !== est._ver) {
+    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
   }
   assertEstDataExists(G);
   G._estData.remainingCount[est._id] -= 1;
@@ -168,8 +186,8 @@ export const buy = (G: MachikoroG, player: number, est: Establishment): void => 
  * @param est - Establishment in question.
  */
 export const transfer = (G: MachikoroG, args: { from: number; to: number }, est: Establishment): void => {
-  if (expToVer(G.expansion) !== est._ver) {
-    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game expansion, ${G.expansion}.`);
+  if (G.version !== est._ver) {
+    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
   }
   assertEstDataExists(G);
   G._estData.ownedCount[est._id][args.from] -= 1;
@@ -181,8 +199,7 @@ export const transfer = (G: MachikoroG, args: { from: number; to: number }, est:
  * @param G
  */
 export const replenishSupply = (G: MachikoroG): void => {
-  const { expansion, supplyVariant } = G;
-  const version = expToVer(expansion);
+  const { version, supplyVariant } = G;
   const decks = G.secret._decks;
   assertNonNull(decks);
 
@@ -196,7 +213,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     }
   } else if (supplyVariant === SupplyVariant.Variable) {
     // put establishments into the supply until there are ten unique establishments
-    while (decks[0].length > 0 && getAllAvailable(G).length < Meta._VARIABLE_SUPPLY_LIMIT) {
+    while (decks[0].length > 0 && getAllAvailable(G).length < _VARIABLE_SUPPLY_LIMIT) {
       const est = decks[0].pop();
       assertNonNull(est);
       assertEstDataExists(G);
@@ -207,27 +224,13 @@ export const replenishSupply = (G: MachikoroG): void => {
     // establishments with activation <= 6 and 5 establishments with activation
     // > 6 (and for Machi Koro 1, 2 major establishments).
 
-    // prettier-ignore
-    const limits = [
-      Meta._HYBRID_SUPPY_LIMIT_LOWER,
-      Meta._HYBRID_SUPPY_LIMIT_UPPER,
-      Meta._HYBRID_SUPPY_LIMIT_MAJOR,
-    ];
+    const limits = [_HYBRID_SUPPY_LIMIT_LOWER, _HYBRID_SUPPY_LIMIT_UPPER, _HYBRID_SUPPY_LIMIT_MAJOR];
 
     let funcs: ((est: Establishment) => boolean)[];
     if (version === Version.MK1) {
-      // prettier-ignore
-      funcs = [
-        (est) => isLower(est) && !isMajor(est),
-        (est) => isUpper(est) && !isMajor(est),
-        isMajor,
-      ]
+      funcs = [(est) => isLower(est) && !isMajor(est), (est) => isUpper(est) && !isMajor(est), isMajor];
     } else if (version === Version.MK2) {
-      // prettier-ignore
-      funcs = [
-        isLower,
-        isUpper,
-      ]
+      funcs = [isLower, isUpper];
     } else {
       return assertUnreachable(version);
     }
@@ -246,12 +249,11 @@ export const replenishSupply = (G: MachikoroG): void => {
 };
 
 /**
- * Initialize the landmark data for a game by modifying `G`.
+ * Initialize the establishment data for a game by modifying `G`.
  * @param G
  */
 export const initialize = (G: MachikoroG, numPlayers: number): void => {
-  const { expansion, supplyVariant } = G;
-  const version = expToVer(expansion);
+  const { version, expansions, supplyVariant } = G;
   const ests = getAll(G);
   const numEsts = ests.length;
 
@@ -266,17 +268,20 @@ export const initialize = (G: MachikoroG, numPlayers: number): void => {
   // get establishments in use, starting establishments
   let ids: number[];
   let starting: number[];
-  if (expansion === Expansion.Base) {
-    ids = Meta._BASE_ESTABLISHMENTS;
+  if (version === Version.MK1) {
+    ids = [];
+    if (expansions.includes(Expansion.Base)) {
+      ids.push(...Meta._BASE_ESTABLISHMENTS);
+    }
+    if (expansions.includes(Expansion.Harbor)) {
+      ids.push(...Meta._HARBOR_ESTABLISHMENTS);
+    }
     starting = Meta._STARTING_ESTABLISHMENTS;
-  } else if (expansion === Expansion.Harbor) {
-    ids = Meta._HARBOR_ESTABLISHMENTS;
-    starting = Meta._STARTING_ESTABLISHMENTS;
-  } else if (expansion === Expansion.MK2) {
+  } else if (version === Version.MK2) {
     ids = Meta2._MK2_ESTABLISHMENTS;
     starting = Meta2._MK2_STARTING_ESTABLISHMENTS;
   } else {
-    return assertUnreachable(expansion);
+    return assertUnreachable(version);
   }
 
   // populate establishments in use

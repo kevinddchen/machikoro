@@ -2,7 +2,7 @@
 // Types for establishments.
 //
 
-import type { Version } from '../types';
+import type { Expansion, Version } from '../types';
 
 /**
  * Interface for establishment metadata.
@@ -15,6 +15,7 @@ import type { Version } from '../types';
  * @prop {EstType|null} type - The type of the establishment (for combos, e.g. 'Animal').
  * @prop {number} _id - Unique id used to enumerate establishments.
  * @prop {Version} _ver - Used to distinguish Machi Koro 1 and 2 establishments.
+ * @prop {Expansion} _exp - For Machi Koro 1, the expansion the establishment belongs to.
  * @prop {number|null} _initial - The number of copies in the initial supply.
  * If null, then is equal to the number of players.
  */
@@ -28,6 +29,7 @@ export interface Establishment {
   readonly type: EstType | null;
   readonly _id: number;
   readonly _ver: Version;
+  readonly _exp: Expansion;
   readonly _initial: number | null;
 }
 

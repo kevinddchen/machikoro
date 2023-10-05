@@ -3,11 +3,12 @@
 //
 
 import { EstColor, EstType, Establishment } from './types';
-import { Version } from '../types';
+import { Expansion, Version } from '../types';
 
 export const SushiBar2: Establishment = {
   _id: 0,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Sushi Bar',
   description: 'Take 3 coins from the player who just rolled.',
   cost: 2,
@@ -21,6 +22,7 @@ export const SushiBar2: Establishment = {
 export const WheatField2: Establishment = {
   _id: 1,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Wheat Field',
   description: 'Receive 1 coin from the bank.',
   cost: 1,
@@ -34,6 +36,7 @@ export const WheatField2: Establishment = {
 export const Vineyard2: Establishment = {
   _id: 2,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Vineyard',
   description: 'Receive 2 coins from the bank.',
   cost: 1,
@@ -47,6 +50,7 @@ export const Vineyard2: Establishment = {
 export const Bakery2: Establishment = {
   _id: 3,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Bakery',
   description: 'Receive 2 coins from the bank.',
   cost: 1,
@@ -60,6 +64,7 @@ export const Bakery2: Establishment = {
 export const Cafe2: Establishment = {
   _id: 4,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Café',
   description: 'Take 2 coins from the player who just rolled.',
   cost: 1,
@@ -73,6 +78,7 @@ export const Cafe2: Establishment = {
 export const FlowerGarden2: Establishment = {
   _id: 5,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Flower Garden',
   description: 'Receive 2 coins from the bank.',
   cost: 2,
@@ -86,6 +92,7 @@ export const FlowerGarden2: Establishment = {
 export const ConvenienceStore2: Establishment = {
   _id: 6,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Convenience Store',
   description: 'Receive 3 coins from the bank.',
   cost: 1,
@@ -99,6 +106,7 @@ export const ConvenienceStore2: Establishment = {
 export const Forest2: Establishment = {
   _id: 7,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Forest',
   description: 'Receive 2 coins from the bank.',
   cost: 3,
@@ -112,6 +120,7 @@ export const Forest2: Establishment = {
 export const FlowerShop2: Establishment = {
   _id: 8,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Flower Shop',
   description: 'Receive 3 coins from the bank for each "Flower Garden" establishment you own.',
   cost: 1,
@@ -125,6 +134,7 @@ export const FlowerShop2: Establishment = {
 export const Office2: Establishment = {
   _id: 9,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Business Center',
   description: 'You may exchange an establishment with an opponent.',
   cost: 3,
@@ -138,6 +148,7 @@ export const Office2: Establishment = {
 export const CornField2: Establishment = {
   _id: 10,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Corn Field',
   description: 'Receive 3 coins from the bank.',
   cost: 2,
@@ -151,6 +162,7 @@ export const CornField2: Establishment = {
 export const Stadium2: Establishment = {
   _id: 11,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Stadium',
   description: 'Take 3 coins from each opponent.',
   cost: 3,
@@ -164,6 +176,7 @@ export const Stadium2: Establishment = {
 export const HamburgerStand2: Establishment = {
   _id: 12,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Hamburger Stand',
   description: 'Take 2 coins from the player who just rolled.',
   cost: 1,
@@ -177,6 +190,7 @@ export const HamburgerStand2: Establishment = {
 export const FurnitureFactory2: Establishment = {
   _id: 13,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Furniture Factory',
   description: 'Receive 4 coins from the bank for each ' + EstType.Gear + ' establishment you own.',
   cost: 4,
@@ -190,6 +204,7 @@ export const FurnitureFactory2: Establishment = {
 export const TaxOffice2: Establishment = {
   _id: 14,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Shopping District',
   description: 'From each opponent who has more than 10 coins, take half, rounded down.',
   cost: 3,
@@ -203,6 +218,7 @@ export const TaxOffice2: Establishment = {
 export const FamilyRestaurant2: Establishment = {
   _id: 15,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Family Restaurant',
   description: 'Take 2 coins from the player who just rolled.',
   cost: 2,
@@ -216,6 +232,7 @@ export const FamilyRestaurant2: Establishment = {
 export const Winery2: Establishment = {
   _id: 16,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Winery',
   description: 'Receive 3 coins from the bank for each ' + EstType.Fruit + ' establishment you own.',
   cost: 3,
@@ -229,6 +246,7 @@ export const Winery2: Establishment = {
 export const AppleOrchard2: Establishment = {
   _id: 17,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Apple Orchard',
   description: 'Receive 3 coins from the bank.',
   cost: 1,
@@ -242,6 +260,7 @@ export const AppleOrchard2: Establishment = {
 export const FoodWarehouse2: Establishment = {
   _id: 18,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Food Warehouse',
   description: 'Receive 2 coins from the bank for each ' + EstType.Cup + ' establishment you own.',
   cost: 2,
@@ -255,6 +274,7 @@ export const FoodWarehouse2: Establishment = {
 export const Mine2: Establishment = {
   _id: 19,
   _ver: Version.MK2,
+  _exp: Expansion.Base,
   name: 'Mine',
   description: 'Receive 6 coins from the bank.',
   cost: 4,
