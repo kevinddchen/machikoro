@@ -13,7 +13,7 @@ import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState, Version } from './types';
-import { expToVer, validateSetupData } from './utils';
+import { validateSetupData } from './utils';
 import { Landmark } from './landmarks';
 
 export const GAME_NAME = 'machikoro';
@@ -55,7 +55,7 @@ export const getCoins = (G: MachikoroG, player: number): number => {
  * @returns True if the current player can roll `n` number of dice.
  */
 export const canRoll = (G: MachikoroG, ctx: Ctx, n: number): boolean => {
-  const version = expToVer(G.expansion);
+  const version = G.version;
   const player = parseInt(ctx.currentPlayer);
   // can roll 2 dice if you own Train Station (Machi Koro 1) or are playing Machi Koro 2
   const canRoll2 = Land.owns(G, player, Land.TrainStation) || version === Version.MK2;
@@ -114,7 +114,7 @@ export const noFurtherRollActions = (G: MachikoroG, ctx: Ctx): boolean => {
  */
 export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const version = expToVer(G.expansion);
+  const version = G.version;
   return (
     G.turnState === TurnState.Buy &&
     // establishment is available for purchase
@@ -122,7 +122,7 @@ export const canBuyEst = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean 
     // player has enough coins
     getCoins(G, player) >= est.cost &&
     // if playing Machi Koro 1 and establishment is major (purple), player does not already own it
-    (version !== Version.MK1 || !Est.isMajor(est) || Est.countOwned(G, player, est) === 0)
+    !(version === Version.MK1 && Est.isMajor(est) && Est.countOwned(G, player, est) > 0)
   );
 };
 
@@ -177,7 +177,7 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   // HACK: this is also used for Moving Company
   const player = parseInt(ctx.currentPlayer);
-  const version = expToVer(G.expansion);
+  const version = G.version;
   return (
     (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.MovingCompany) &&
     // must own the establishment
@@ -197,7 +197,7 @@ export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): bo
  */
 export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const version = expToVer(G.expansion);
+  const version = G.version;
   return (
     G.turnState === TurnState.OfficeTake &&
     // cannot be take from self
@@ -215,7 +215,7 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
  * done in Machi Koro 2.
  */
 export const canSkipOffice = (G: MachikoroG): boolean => {
-  const version = expToVer(G.expansion);
+  const version = G.version;
   return (
     (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.OfficeTake) &&
     // only in Machi Koro 2
@@ -238,7 +238,7 @@ export const canEndTurn = (G: MachikoroG): boolean => {
  */
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const version = expToVer(G.expansion);
+  const version = G.version;
   if (version === Version.MK1) {
     // a player has won if they own all landmarks in use
     return Land.getAllInUse(G).every((land) => Land.owns(G, player, land));
@@ -1023,7 +1023,8 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  expansion: Expansion.MK2,
+  version: Version.MK2,
+  expansions: [Expansion.Base],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
@@ -1057,7 +1058,7 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
     if (!setupData) {
       setupData = debugSetupData;
     }
-    const { expansion, supplyVariant, startCoins, initialBuyRounds, randomizeTurnOrder } = setupData;
+    const { version, expansions, supplyVariant, startCoins, initialBuyRounds, randomizeTurnOrder } = setupData;
     const { numPlayers } = ctx;
 
     // initialize coins
@@ -1071,7 +1072,8 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
 
     // initialize `G` object
     const G: MachikoroG = {
-      expansion,
+      version,
+      expansions,
       supplyVariant,
       initialBuyRounds,
       _turnOrder,

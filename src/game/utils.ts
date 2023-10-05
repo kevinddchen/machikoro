@@ -2,25 +2,7 @@
 // Enums related to game configuration.
 //
 
-import { assertUnreachable } from 'common/typescript';
-
 import { Expansion, SetupData, SupplyVariant, Version } from './types';
-
-/**
- * Convert the expansion to the game version. "Base" and "Harbor" are both
- * version 1, while "MK2" is version 2.
- * @param exp
- * @returns
- */
-export const expToVer = (exp: Expansion): Version => {
-  if (exp === Expansion.Base || exp === Expansion.Harbor) {
-    return Version.MK1;
-  } else if (exp === Expansion.MK2) {
-    return Version.MK2;
-  } else {
-    return assertUnreachable(exp);
-  }
-};
 
 /**
  * Validate setup data. Returns a string if invalid.
@@ -30,9 +12,14 @@ export const expToVer = (exp: Expansion): Version => {
  */
 export const validateSetupData = (setupData: SetupData | undefined, numPlayers: number): string | undefined => {
   if (setupData) {
-    const { expansion, supplyVariant, initialBuyRounds, startCoins } = setupData;
-    if (!Object.values(Expansion).includes(expansion)) {
-      return `Unknown expansion: ${expansion}`;
+    const { version, expansions, supplyVariant, initialBuyRounds, startCoins } = setupData;
+    if (!Object.values(Version).includes(version)) {
+      return `Unknown version: ${version}`;
+    }
+    for (const expansion of expansions) {
+      if (!Object.values(Expansion).includes(expansion)) {
+        return `Unknown expansion: ${expansion}`;
+      }
     }
     if (!Object.values(SupplyVariant).includes(supplyVariant)) {
       return `Unknown supply variant: ${supplyVariant}`;
@@ -42,6 +29,14 @@ export const validateSetupData = (setupData: SetupData | undefined, numPlayers: 
     }
     if (!Number.isInteger(initialBuyRounds) || initialBuyRounds < 0) {
       return `Number of initial buying rounds, ${initialBuyRounds}, must be a non-negative integer`;
+    }
+    // Base expansion must always be included
+    if (!expansions.includes(Expansion.Base)) {
+      return `Base expansion must be included`;
+    }
+    // If Machi Koro 2, cannot contain additional expansions
+    if (version === Version.MK2 && expansions.length > 1) {
+      return `Machi Koro 2 cannot contain additional expansions`;
     }
   }
   if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5)) {
