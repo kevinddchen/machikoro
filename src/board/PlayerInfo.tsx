@@ -40,7 +40,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
   render() {
     const { G, ctx, moves, isActive, player, clientPlayer, name } = this.props;
-    const version = Game.expToVer(G.expansion);
+    const version = G.version;
     const currentPlayer = parseInt(ctx.currentPlayer);
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
