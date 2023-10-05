@@ -2,9 +2,9 @@
 // Game metadata for Machi Koro 2 landmarks.
 //
 
+import { Expansion, Version } from '../types';
 import { EstType } from '../establishments/types';
 import { Landmark } from './types';
-import { Expansion, Version } from '../types';
 
 /**
  * Number of landmarks required to win the game.

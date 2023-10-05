@@ -89,7 +89,7 @@ export const isOwned = (G: MachikoroG, land: Landmark): boolean => {
  * @returns
  */
 const getAll = (G: MachikoroG): Landmark[] => {
-  const version = G.version
+  const version = G.version;
   if (version === Version.MK1) {
     return Meta._LANDMARKS;
   } else if (version === Version.MK2) {
@@ -146,7 +146,7 @@ export const countBuilt = (G: MachikoroG, player: number): number => {
  * @returns The cost of the landmark for the player.
  */
 export const cost = (G: MachikoroG, land: Landmark, player: number): number => {
-  const { version } = G;
+  const version = G.version;
   const landCostArray = costArray(G, land, player);
   if (version === Version.MK1) {
     // Machi Koro 1 only has one cost
@@ -192,7 +192,7 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
  * @param land
  */
 export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
-  const { version } = G;
+  const version = G.version;
   if (version !== land._ver) {
     throw new Error(`Landmark id=${land._id} ver=${land._ver} does not match the game version, ${G.version}.`);
   }

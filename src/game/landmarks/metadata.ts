@@ -2,9 +2,9 @@
 // Game metadata for landmarks.
 //
 
+import { Expansion, Version } from '../types';
 import { EstType } from '../establishments/types';
 import { Landmark } from './types';
-import { Expansion, Version } from '../types';
 
 export const CityHall: Landmark = {
   _id: 0,

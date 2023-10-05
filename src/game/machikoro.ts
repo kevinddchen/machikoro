@@ -13,8 +13,8 @@ import * as Land from './landmarks';
 import * as Log from './log';
 import { EstColor, EstType, Establishment } from './establishments';
 import { Expansion, MachikoroG, SetupData, SupplyVariant, TurnState, Version } from './types';
-import { validateSetupData } from './utils';
 import { Landmark } from './landmarks';
+import { validateSetupData } from './utils';
 
 export const GAME_NAME = 'machikoro';
 

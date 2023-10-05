@@ -4,7 +4,7 @@
 
 import { assertUnreachable } from 'common/typescript';
 
-import { Expansion, Version, SupplyVariant } from './types';
+import { Expansion, SupplyVariant, Version } from './types';
 
 /**
  * @param version
@@ -62,7 +62,7 @@ export function expansionName(expansion: Expansion | null): string {
   } else if (expansion === Expansion.Harbor) {
     return 'Harbor Expansion';
   } else if (expansion === Expansion.Million) {
-    return 'Millionaire\'s Row Expansion';
+    return "Millionaire's Row Expansion";
   } else {
     return assertUnreachable(expansion);
   }
