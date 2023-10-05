@@ -1,3 +1,4 @@
+export * from './display';
 export * from './machikoro';
 export * from './types';
 export * as Est from './establishments';

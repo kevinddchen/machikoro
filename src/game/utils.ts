@@ -1,5 +1,5 @@
 //
-// Enums related to game configuration.
+// Private utility functions for game logic.
 //
 
 import { Expansion, SetupData, SupplyVariant, Version } from './types';
