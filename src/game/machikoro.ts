@@ -1023,8 +1023,8 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  version: Version.MK2,
-  expansions: [Expansion.Base],
+  version: Version.MK1,
+  expansions: [Expansion.Base, Expansion.Million],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,

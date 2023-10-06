@@ -13,7 +13,7 @@ import {
   SetupData,
   SupplyVariant,
   Version,
-  expansionName,
+  displayName,
   supplyVariantName,
   versionName,
 } from 'game';
@@ -116,9 +116,10 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   private setVersion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const version = parseInt(e.target.value) as Version;
     this.setState({ version: parseInt(e.target.value) as Version });
-    // disable expansions for Machi Koro 2
     if (version === Version.MK2) {
+      // disable expansions for Machi Koro 2
       this.setState({ useHarborExp: false, useMillionExp: false });
+      // uncheck the boxes
       if (this.harborExpRef.current) {
         this.harborExpRef.current.checked = false;
       }
@@ -376,13 +377,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    */
   private renderCreateMatch = (): JSX.Element => {
     // prettier-ignore
-    const versionOptions = 
-      <select ref={this.versionRef} onChange={this.setVersion}>
-        <option key='0' value={Version.MK1.toString()}>{versionName(Version.MK1)}</option>
-        <option key='1' value={Version.MK2.toString()}>{versionName(Version.MK2)}</option>
-      </select>
-
-    // prettier-ignore
     const numPlayersOptions = 
       <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
         <option key='0' value='2'>2 Players</option>,
@@ -391,8 +385,15 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         <option key='3' value='5'>5 Players</option>,
       </select>
 
+    // prettier-ignore
+    const versionOptions = 
+      <select ref={this.versionRef} onChange={this.setVersion}>
+        <option key='0' value={Version.MK1.toString()}>{versionName(Version.MK1)}</option>
+        <option key='1' value={Version.MK2.toString()}>{versionName(Version.MK2)}</option>
+      </select>
+
     // expansions cannot be toggled for Machi Koro 2
-    const expOptsDisabled = this.state.version === Version.MK2;
+    const expansionOptionsDisabled = this.state.version === Version.MK2;
     const expansionOptions = (
       <div style={{ textAlign: 'left' }}>
         <input
@@ -400,7 +401,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
           type='checkbox'
           ref={this.harborExpRef}
           onChange={this.toggleHarborExp}
-          disabled={expOptsDisabled}
+          disabled={expansionOptionsDisabled}
         />
         Harbor
         <br />
@@ -409,7 +410,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
           type='checkbox'
           ref={this.millionExpRef}
           onChange={this.toggleMillionExp}
-          disabled={expOptsDisabled}
+          disabled={expansionOptionsDisabled}
         />
         {"Millionaire's Row"}
       </div>
@@ -524,7 +525,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
               </div>
             </div>
             <div className='lobby-div-col lobby-div-col-width'>
-              <div className='lobby-div-row'>{expansionName(setupData.expansions[0])}</div>
+              <div className='lobby-div-row'>{displayName(setupData.version, setupData.expansions)}</div>
               <div className='lobby-div-row'>{supplyVariantName(setupData.supplyVariant)}</div>
             </div>
             <div className='lobby-div-col lobby-div-col-width'>

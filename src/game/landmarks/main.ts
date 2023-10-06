@@ -48,7 +48,8 @@ export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
  */
 export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
   if (G.version !== land._ver) {
-    throw new Error(`Landmark id=${land._id} ver=${land._ver} does not match the game version, ${G.version}.`);
+    console.warn(`Landmark id=${land._id} ver=${land._ver} does not match the game version, ${G.version}.`);
+    return false;
   }
   assertLandDataExists(G);
   return G._landData.available[land._id];
@@ -62,7 +63,7 @@ export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
  */
 export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => {
   if (G.version !== land._ver) {
-    // this is used often for hard-coded landmarks, so no need to throw error
+    // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
   assertLandDataExists(G);
@@ -76,7 +77,7 @@ export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => 
  */
 export const isOwned = (G: MachikoroG, land: Landmark): boolean => {
   if (G.version !== land._ver) {
-    // this is used often for hard-coded landmarks, so no need to throw error
+    // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
   assertLandDataExists(G);

@@ -70,7 +70,8 @@ export const isInUse = (G: MachikoroG, est: Establishment): boolean => {
  */
 export const countRemaining = (G: MachikoroG, est: Establishment): number => {
   if (G.version !== est._ver) {
-    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
+    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
+    return 0;
   }
   assertEstDataExists(G);
   return G._estData.remainingCount[est._id];
@@ -84,7 +85,8 @@ export const countRemaining = (G: MachikoroG, est: Establishment): number => {
  */
 export const countAvailable = (G: MachikoroG, est: Establishment): number => {
   if (G.version !== est._ver) {
-    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
+    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
+    return 0;
   }
   assertEstDataExists(G);
   return G._estData.availableCount[est._id];
@@ -99,7 +101,8 @@ export const countAvailable = (G: MachikoroG, est: Establishment): number => {
  */
 export const countOwned = (G: MachikoroG, player: number, est: Establishment): number => {
   if (G.version !== est._ver) {
-    throw new Error(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
+    console.warn(`Establishment id=${est._id} ver=${est._ver} does not match the game version, ${G.version}.`);
+    return 0;
   }
   assertEstDataExists(G);
   return G._estData.ownedCount[est._id][player];
