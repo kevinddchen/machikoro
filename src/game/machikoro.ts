@@ -646,7 +646,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
   const roll = G.roll;
 
   // Do Red establishments.
-  const allEsts = Est.getAllInUse(G);
+  const allEsts = Est.getAllInUse(G.version, G.expansions);
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of redEsts) {
@@ -1070,6 +1070,9 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
       _turnOrder = random.Shuffle(_turnOrder);
     }
 
+    // initialize landmark and establishment data
+    const { estData, estDecks } = Est.initialize(version, expansions, supplyVariant, numPlayers);
+
     // initialize `G` object
     const G: MachikoroG = {
       version,
@@ -1078,21 +1081,20 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
       initialBuyRounds,
       _turnOrder,
       ...newTurnG,
-      secret: { _decks: null, _landDeck: null },
+      secret: { estDecks, _landDeck: null },
       _coins,
-      _estData: null,
+      estData,
       _landData: null,
       _logBuffer: [],
     };
 
     // initialize landmark and establishment data
     Land.initialize(G, numPlayers);
-    Est.initialize(G, numPlayers);
 
     // shuffle decks
-    if (G.secret._decks !== null) {
-      for (let i = 0; i < G.secret._decks.length; i++) {
-        G.secret._decks[i] = random.Shuffle(G.secret._decks[i]);
+    if (G.secret.estDecks !== null) {
+      for (let i = 0; i < G.secret.estDecks.length; i++) {
+        G.secret.estDecks[i] = random.Shuffle(G.secret.estDecks[i]);
       }
     }
     if (G.secret._landDeck !== null) {

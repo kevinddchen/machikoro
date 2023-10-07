@@ -84,7 +84,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
 
     const table = new StackTable(5);
 
-    const ests = Est.getAllInUse(G);
+    const ests = Est.getAllInUse(G.version, G.expansions);
     for (let i = 0; i < ests.length; i++) {
       const est = ests[i];
 

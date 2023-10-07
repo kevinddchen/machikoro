@@ -57,7 +57,7 @@ export interface MachikoroG {
   tunaRoll: number | null;
   secret: Secret;
   _coins: number[];
-  _estData: EstablishmentData | null;
+  estData: EstablishmentData;
   _landData: LandmarkData | null;
   _logBuffer: LogEvent[];
 }
@@ -68,7 +68,7 @@ export interface MachikoroG {
  * @prop {Landmark[]|null} _landDeck - the landmark draw deck, for Machi Koro 2.
  */
 export interface Secret {
-  _decks: Establishment[][] | null;
+  estDecks: Establishment[][];
   _landDeck: Landmark[] | null;
 }
 
