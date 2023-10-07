@@ -8,7 +8,8 @@ import type { LogEvent } from './log';
 
 /**
  * The `G` object containing all game state variables.
- * @prop {Expansion} expansion - the expansion of the game.
+ * @prop {Version} version - the version of the game.
+ * @prop {Expansion[]} expansions - the expansions used in the game.
  * @prop {SupplyVariant} supplyVariant - the supply variant of the game.
  * @prop {number} initialBuyRounds - the number of rounds of initial buying.
  * @prop {string[]} _turnOrder - the order of players in the game. Do not use
@@ -35,7 +36,8 @@ import type { LogEvent } from './log';
  * @prop {LogEvent[]|null} _logBuffer - buffer of log lines.
  */
 export interface MachikoroG {
-  readonly expansion: Expansion;
+  readonly version: Version;
+  readonly expansions: Expansion[];
   readonly supplyVariant: SupplyVariant;
   readonly initialBuyRounds: number;
   readonly _turnOrder: string[];
@@ -72,14 +74,16 @@ export interface Secret {
 
 /**
  * Data needed to setup a game.
- * @prop {Expansion} expansion - Expansion of the game.
+ * @prop {Version} version - Version of the game.
+ * @prop {Expansion[]} expansions - Expansions used in the game.
  * @prop {SupplyVariant} supplyVariant - Supply variant of the game.
  * @prop {number} startCoins - Number of coins each player starts with.
  * @prop {number} initialBuyRounds - Number of rounds of initial buying.
  * @prop {boolean} randomizeTurnOrder - True if the turn order should be randomized.
  */
 export interface SetupData {
-  expansion: Expansion;
+  version: Version;
+  expansions: Expansion[];
   supplyVariant: SupplyVariant;
   startCoins: number;
   initialBuyRounds: number;
@@ -111,7 +115,7 @@ export type TurnState = (typeof TurnState)[keyof typeof TurnState];
 export const Expansion = {
   Base: 'Base',
   Harbor: 'Harbor',
-  MK2: 'MK2',
+  Million: "Millionaire's Row",
 } as const;
 
 export type Expansion = (typeof Expansion)[keyof typeof Expansion];

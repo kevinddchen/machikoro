@@ -2,13 +2,14 @@
 // Game metadata for landmarks.
 //
 
+import { Expansion, Version } from '../types';
 import { EstType } from '../establishments/types';
 import { Landmark } from './types';
-import { Version } from '../types';
 
 export const CityHall: Landmark = {
   _id: 0,
   _ver: Version.MK1,
+  _exp: Expansion.Harbor,
   name: 'City Hall',
   miniName: 'City Hall',
   description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
@@ -19,6 +20,7 @@ export const CityHall: Landmark = {
 export const Harbor: Landmark = {
   _id: 1,
   _ver: Version.MK1,
+  _exp: Expansion.Harbor,
   name: 'Harbor',
   miniName: 'Harbor',
   description: 'If the dice total is 10 or more, you may add 2 to the total.',
@@ -29,6 +31,7 @@ export const Harbor: Landmark = {
 export const TrainStation: Landmark = {
   _id: 2,
   _ver: Version.MK1,
+  _exp: Expansion.Base,
   name: 'Train Station',
   miniName: 'Train Station',
   description: 'You may roll 2 dice.',
@@ -39,6 +42,7 @@ export const TrainStation: Landmark = {
 export const ShoppingMall: Landmark = {
   _id: 3,
   _ver: Version.MK1,
+  _exp: Expansion.Base,
   name: 'Shopping Mall',
   miniName: 'Shopping Mall',
   description: 'Your ' + EstType.Cup + ' and ' + EstType.Shop + ' establishments earn +1 coin when activated.',
@@ -49,6 +53,7 @@ export const ShoppingMall: Landmark = {
 export const AmusementPark: Landmark = {
   _id: 4,
   _ver: Version.MK1,
+  _exp: Expansion.Base,
   name: 'Amusement Park',
   miniName: 'Amuse. Park',
   description: 'If you roll doubles, take another turn after this one.',
@@ -59,6 +64,7 @@ export const AmusementPark: Landmark = {
 export const RadioTower: Landmark = {
   _id: 5,
   _ver: Version.MK1,
+  _exp: Expansion.Base,
   name: 'Radio Tower',
   miniName: 'Radio Tower',
   description: 'Once per turn, you may roll again.',
@@ -69,6 +75,7 @@ export const RadioTower: Landmark = {
 export const Airport: Landmark = {
   _id: 6,
   _ver: Version.MK1,
+  _exp: Expansion.Harbor,
   name: 'Airport',
   miniName: 'Airport',
   description: 'If you build nothing on your turn, receive 10 coins from the bank.',
@@ -84,19 +91,14 @@ export const _LANDMARKS = [CityHall, Harbor, TrainStation, ShoppingMall, Amuseme
 /**
  * Landmarks used in the Base expansion.
  */
-export const _BASE_LANDMARKS = [TrainStation._id, ShoppingMall._id, AmusementPark._id, RadioTower._id];
+export const _BASE_LANDMARKS = _LANDMARKS.filter((land) => land._exp === Expansion.Base).map((land) => land._id);
 
 /**
- * Landmarks used in the Harbor expansion.
+ * Landmarks added in the Harbor expansion.
  */
-export const _HARBOR_LANDMARKS = _LANDMARKS.map((landmark) => landmark._id);
+export const _HARBOR_LANDMARKS = _LANDMARKS.filter((land) => land._exp === Expansion.Harbor).map((land) => land._id);
 
 /**
- * Landmarks a player starts with in the Base expansion.
- */
-export const _BASE_STARTING_LANDMARKS: number[] = [];
-
-/**
- * Landmarks a player starts with in the Harbor expansion.
+ * Additional landmarks a player starts with in the Harbor expansion.
  */
 export const _HARBOR_STARTING_LANDMARKS = [CityHall._id];

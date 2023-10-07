@@ -4,8 +4,7 @@ import { BoardProps } from 'boardgame.io/react';
 import { LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { Expansion, Log, MachikoroG } from 'game';
-import { assertUnreachable } from 'common/typescript';
+import { Log, MachikoroG, Version, displayName } from 'game';
 
 /**
  * @extends BoardProps<MachikoroG>
@@ -91,11 +90,11 @@ export default class Logger extends React.Component<LogProps, object> {
     let lines: string[] = [];
 
     lines.push('Game Configuration:');
-    lines.push('– ' + this.expansionName(G.expansion) + ' (' + G.supplyVariant + ' Supply)');
+    lines.push('– ' + displayName(G.version, G.expansions) + ' (' + G.supplyVariant + ' Supply)');
     lines.push(' ');
 
     // for MK2, add a line to indicate the start of the initial build phase
-    if (G.expansion === Expansion.MK2) {
+    if (G.version === Version.MK2) {
       lines.push('(Start of initial build phase)');
     }
 
@@ -122,18 +121,6 @@ export default class Logger extends React.Component<LogProps, object> {
       }
     }
     return lines;
-  };
-
-  private expansionName = (expansion: Expansion): string => {
-    if (expansion === Expansion.Base) {
-      return 'Base Expansion';
-    } else if (expansion === Expansion.Harbor) {
-      return 'Harbor Expansion';
-    } else if (expansion === Expansion.MK2) {
-      return 'Machi Koro 2';
-    } else {
-      return assertUnreachable(expansion);
-    }
   };
 
   // --- React ----------------------------------------------------------------

@@ -5,13 +5,13 @@ import { LobbyClient } from 'boardgame.io/client';
 import React from 'react';
 import { Server } from 'boardgame.io';
 
-import { Expansion, GAME_NAME, SetupData, SupplyVariant } from 'game';
+import { Expansion, GAME_NAME, SetupData, SupplyVariant, Version, displayName, supplyVariantName } from 'game';
 import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 
-import { countPlayers, expansionName, supplyVariantName } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
+import { countPlayers } from './utils';
 
 /**
  * @prop {string} name - Name of the player.
@@ -36,13 +36,15 @@ interface RoomProps {
 /**
  * @prop {string} name - Name of the player.
  * @prop {PlayerMetadata[]} players - List of metadata for players in the room.
- * @prop {Expansion|null} expansion - Expansion to play. This is initially null, but is fetched.
+ * @prop {Version|null} version - Version to play. This is initially null, but is fetched.
+ * @prop {Expansion[]|null} expansions - Expansions to play. This is initially null, but is fetched.
  * @prop {SupplyVariant|null} supplyVariant - Supply variant to use. This is initially null, but is fetched.
  */
 interface RoomState {
   connected: boolean;
   players: Server.PlayerMetadata[];
-  expansion: Expansion | null;
+  version: Version | null;
+  expansions: Expansion[] | null;
   supplyVariant: SupplyVariant | null;
 }
 
@@ -59,7 +61,8 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     this.state = {
       connected: false,
       players: [],
-      expansion: null,
+      version: null,
+      expansions: null,
       supplyVariant: null,
     };
     this.authenticator = new Authenticator();
@@ -97,8 +100,8 @@ export default class Room extends React.Component<RoomProps, RoomState> {
       this.setState({ connected: true });
     }
 
-    const { expansion, supplyVariant } = match.setupData as SetupData;
-    this.setState({ players: match.players, expansion, supplyVariant });
+    const { version, expansions, supplyVariant } = match.setupData as SetupData;
+    this.setState({ players: match.players, version, expansions, supplyVariant });
   };
 
   /**
@@ -191,7 +194,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
   render() {
     const { matchInfo } = this.props;
-    const { expansion, supplyVariant } = this.state;
+    const { version, expansions, supplyVariant } = this.state;
 
     return (
       <div>
@@ -202,7 +205,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
               <b>Room ID:</b> {matchInfo.matchID}
             </div>
             <div className='mm-div-cell'>
-              <b>{expansionName(expansion)}</b>
+              <b>{displayName(version, expansions)}</b>
             </div>
             <div className='mm-div-cell'>
               <b>{supplyVariantName(supplyVariant)}</b>

@@ -2,7 +2,7 @@
 // Types for landmarks.
 //
 
-import type { Version } from '../types';
+import type { Expansion, Version } from '../types';
 
 /**
  * Interface for landmark metadata.
@@ -16,6 +16,7 @@ import type { Version } from '../types';
  * coins earned, bonus coins earned, etc.
  * @prop {number} _id - Unique id used to enumerate landmarks.
  * @prop {Version} _ver - Used to distinguish Machi Koro 1 and 2 landmarks.
+ * @prop {Expansion} _exp - For Machi Koro 1, the expansion the landmark belongs to.
  */
 export interface Landmark {
   readonly name: string;
@@ -25,6 +26,7 @@ export interface Landmark {
   readonly coins: number | null;
   readonly _id: number;
   readonly _ver: Version;
+  readonly _exp: Expansion;
 }
 
 /**

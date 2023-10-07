@@ -34,7 +34,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
   private renderLandTable = (): JSX.Element | null => {
     const { G, ctx, moves, isActive, clientPlayer } = this.props;
     // return nothing for Machi Koro 1.
-    if (Game.expToVer(G.expansion) === Game.Version.MK1) {
+    if (G.version === Game.Version.MK1) {
       return null;
     }
 

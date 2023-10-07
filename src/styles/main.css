@@ -45,6 +45,10 @@
   display: flex;
 }
 
+.div-inline-flex {
+  display: inline-flex;
+}
+
 /* 
    FONTS
    (Icons from Material Symbols are loaded as a font)

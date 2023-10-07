@@ -13,7 +13,9 @@ import {
   SetupData,
   SupplyVariant,
   Version,
-  expToVer,
+  displayName,
+  supplyVariantName,
+  versionName,
 } from 'game';
 
 import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
@@ -21,7 +23,7 @@ import { assertNonNull, assertUnreachable } from 'common/typescript';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 import { createMatchAPI, joinMatchAPI } from 'server/api';
 
-import { countPlayers, expansionName, hasDetails, supplyVariantName } from './utils';
+import { countPlayers, hasDetails } from './utils';
 import Authenticator from './Authenticator';
 import { MatchInfo } from './types';
 
@@ -47,14 +49,18 @@ interface LobbyProps {
  * @prop {boolean} connected - Whether the client is connected to the server.
  * @prop {Match[]|null} matches - List of current matches hosted on the server.
  * @prop {number} numPlayers - Number of players for the match.
- * @prop {Expansion} expansion - Expansion to play.
+ * @prop {Version} version - Version to play.
+ * @prop {boolean} useHarborExp - Whether to use the harbor expansion.
+ * @prop {boolean} useMillionExp - Whether to use the millionaire's row expansion.
  * @prop {SupplyVariant} supplyVariant - Supply variant to use.
  */
 interface LobbyState {
   connected: boolean;
   matches: LobbyAPI.Match[] | null; // null means no matches fetched
   numPlayers: number;
-  expansion: Expansion;
+  version: Version;
+  useHarborExp: boolean;
+  useMillionExp: boolean;
   supplyVariant: SupplyVariant;
 }
 
@@ -63,7 +69,8 @@ interface LobbyState {
  * @prop {Authenticator} authenticator - Manages local credential storage and retrieval.
  * @prop {RefObject} nameRef - Reference to the name input element.
  * @prop {RefObject} numPlayersRef - Reference to the number of players select element.
- * @prop {RefObject} expansionRef - Reference to the expansion select element.
+ * @prop {RefObject} harborExpRef - Reference to the harbor expansion checkbox element.
+ * @prop {RefObject} millionExpRef - Reference to the millionaire's row expansion checkbox element.
  * @prop {RefObject} supplyVariantRef - Reference to the supply variant select element.
  */
 export default class Lobby extends React.Component<LobbyProps, LobbyState> {
@@ -72,7 +79,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   private nameRef: React.RefObject<HTMLInputElement>;
   private numPlayersRef: React.RefObject<HTMLSelectElement>;
-  private expansionRef: React.RefObject<HTMLSelectElement>;
+  private versionRef: React.RefObject<HTMLSelectElement>;
+  private harborExpRef: React.RefObject<HTMLInputElement>;
+  private millionExpRef: React.RefObject<HTMLInputElement>;
   private supplyVariantRef: React.RefObject<HTMLSelectElement>;
 
   constructor(props: LobbyProps) {
@@ -82,13 +91,17 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       matches: null,
       // default values for new game
       numPlayers: 2,
-      expansion: Expansion.Base,
+      version: Version.MK1,
+      useHarborExp: false,
+      useMillionExp: false,
       supplyVariant: SupplyVariant.Hybrid,
     };
     this.authenticator = new Authenticator();
     this.nameRef = React.createRef();
     this.numPlayersRef = React.createRef();
-    this.expansionRef = React.createRef();
+    this.versionRef = React.createRef();
+    this.harborExpRef = React.createRef();
+    this.millionExpRef = React.createRef();
     this.supplyVariantRef = React.createRef();
   }
 
@@ -100,8 +113,28 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     this.setState({ numPlayers: parseInt(e.target.value) });
   };
 
-  private setExpansion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    this.setState({ expansion: e.target.value as Expansion });
+  private setVersion = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+    const version = parseInt(e.target.value) as Version;
+    this.setState({ version: parseInt(e.target.value) as Version });
+    if (version === Version.MK2) {
+      // disable expansions for Machi Koro 2
+      this.setState({ useHarborExp: false, useMillionExp: false });
+      // uncheck the boxes
+      if (this.harborExpRef.current) {
+        this.harborExpRef.current.checked = false;
+      }
+      if (this.millionExpRef.current) {
+        this.millionExpRef.current.checked = false;
+      }
+    }
+  };
+
+  private toggleHarborExp = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({ useHarborExp: e.target.checked });
+  };
+
+  private toggleMillionExp = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({ useMillionExp: e.target.checked });
   };
 
   private setSupplyVariant = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -144,7 +177,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    */
   private createMatch = async (): Promise<string> => {
     const { name, lobbyClient } = this.props;
-    const { connected, numPlayers, expansion, supplyVariant } = this.state;
+    const { connected, numPlayers, version, useHarborExp, useMillionExp, supplyVariant } = this.state;
 
     if (!connected) {
       throw new Error('Cannot create match: Not connected to server.');
@@ -153,7 +186,6 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     // initialize setup data
     let startCoins;
     let initialBuyRounds;
-    const version = expToVer(expansion);
     if (version === Version.MK1) {
       startCoins = MK1_STARTING_COINS;
       initialBuyRounds = 0;
@@ -164,8 +196,17 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       return assertUnreachable(version);
     }
 
+    const expansions: Expansion[] = [Expansion.Base];
+    if (useHarborExp) {
+      expansions.push(Expansion.Harbor);
+    }
+    if (useMillionExp) {
+      expansions.push(Expansion.Million);
+    }
+
     const setupData: SetupData = {
-      expansion,
+      version,
+      expansions,
       supplyVariant,
       startCoins,
       initialBuyRounds,
@@ -271,7 +312,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
   componentDidMount() {
     const { name } = this.props;
-    const { numPlayers, expansion, supplyVariant } = this.state;
+    const { numPlayers, version, useHarborExp, useMillionExp, supplyVariant } = this.state;
 
     this.props.clearErrorMessage();
 
@@ -282,8 +323,14 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     if (this.numPlayersRef.current) {
       this.numPlayersRef.current.value = numPlayers.toString();
     }
-    if (this.expansionRef.current) {
-      this.expansionRef.current.value = expansion.toString();
+    if (this.versionRef.current) {
+      this.versionRef.current.value = version.toString();
+    }
+    if (this.harborExpRef.current) {
+      this.harborExpRef.current.checked = useHarborExp;
+    }
+    if (this.millionExpRef.current) {
+      this.millionExpRef.current.checked = useMillionExp;
     }
     if (this.supplyVariantRef.current) {
       this.supplyVariantRef.current.value = supplyVariant.toString();
@@ -330,48 +377,71 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    */
   private renderCreateMatch = (): JSX.Element => {
     // prettier-ignore
-    const numPlayersOptions = [
-      <option key='0' value='2'>2 Players</option>,
-      <option key='1' value='3'>3 Players</option>,
-      <option key='2' value='4'>4 Players</option>,
-      <option key='3' value='5'>5 Players</option>,
-    ];
+    const numPlayersOptions = 
+      <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
+        <option key='0' value='2'>2 Players</option>,
+        <option key='1' value='3'>3 Players</option>,
+        <option key='2' value='4'>4 Players</option>,
+        <option key='3' value='5'>5 Players</option>,
+      </select>
 
     // prettier-ignore
-    const expansionOptions = [
-      <option key='0' value={Expansion.Base}>{expansionName(Expansion.Base)}</option>,
-      <option key='1' value={Expansion.Harbor}>{expansionName(Expansion.Harbor)}</option>,
-      <option key='2' value={Expansion.MK2}>{expansionName(Expansion.MK2)}</option>
-    ];
+    const versionOptions = 
+      <select ref={this.versionRef} onChange={this.setVersion}>
+        <option key='0' value={Version.MK1.toString()}>{versionName(Version.MK1)}</option>
+        <option key='1' value={Version.MK2.toString()}>{versionName(Version.MK2)}</option>
+      </select>
+
+    // expansions cannot be toggled for Machi Koro 2
+    const expansionOptionsDisabled = this.state.version === Version.MK2;
+    const expansionOptions = (
+      <div style={{ textAlign: 'left' }}>
+        <input
+          key='0'
+          type='checkbox'
+          ref={this.harborExpRef}
+          onChange={this.toggleHarborExp}
+          disabled={expansionOptionsDisabled}
+        />
+        Harbor
+        <br />
+        <input
+          key='1'
+          type='checkbox'
+          ref={this.millionExpRef}
+          onChange={this.toggleMillionExp}
+          disabled={expansionOptionsDisabled}
+        />
+        {"Millionaire's Row"}
+      </div>
+    );
 
     // prettier-ignore
-    const supplyVariantOptions = [
-      <option key='0' value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>,
-      <option key='1' value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>,
-      <option key='2' value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
-    ];
+    const supplyVariantOptions =
+      <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
+        <option key='0' value={SupplyVariant.Hybrid}>{supplyVariantName(SupplyVariant.Hybrid)}</option>,
+        <option key='1' value={SupplyVariant.Variable}>{supplyVariantName(SupplyVariant.Variable)}</option>,
+        <option key='2' value={SupplyVariant.Total}>{supplyVariantName(SupplyVariant.Total)}</option>
+      </select>
 
     return (
       <div className='padded_div'>
         <span className='subtitle'>Create Room</span>
         <br />
-        <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
-          {numPlayersOptions}
-        </select>
-        <select ref={this.expansionRef} onChange={this.setExpansion}>
+        <div className='div-inline-flex'>
+          {versionOptions}
           {expansionOptions}
-        </select>
-        <select ref={this.supplyVariantRef} onChange={this.setSupplyVariant}>
           {supplyVariantOptions}
-        </select>
-        <button
-          className='button'
-          onClick={() => {
-            this.createAndJoinMatch().catch(defaultErrorCatcher);
-          }}
-        >
-          Create Room
-        </button>
+          {numPlayersOptions}
+          <button
+            className='button'
+            onClick={() => {
+              this.createAndJoinMatch().catch(defaultErrorCatcher);
+            }}
+          >
+            Create Room
+          </button>
+        </div>
       </div>
     );
   };
@@ -455,7 +525,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
               </div>
             </div>
             <div className='lobby-div-col lobby-div-col-width'>
-              <div className='lobby-div-row'>{expansionName(setupData.expansion)}</div>
+              <div className='lobby-div-row'>{displayName(setupData.version, setupData.expansions)}</div>
               <div className='lobby-div-row'>{supplyVariantName(setupData.supplyVariant)}</div>
             </div>
             <div className='lobby-div-col lobby-div-col-width'>
