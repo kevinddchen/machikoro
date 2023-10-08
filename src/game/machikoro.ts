@@ -645,16 +645,12 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
   const currentPlayer = parseInt(ctx.currentPlayer);
   const roll = G.roll;
 
-  // Do Red establishments.
   const allEsts = Est.getAllInUse(G.version, G.expansions);
+
+  // Do Red establishments.
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of redEsts) {
-      // Sushi Bar requires Harbor
-      if (Est.isEqual(est, Est.SushiBar) && !Land.owns(G, opponent, Land.Harbor)) {
-        continue;
-      }
-
       const count = Est.countOwned(G, opponent, est);
       if (count === 0) {
         continue;
@@ -662,6 +658,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
 
       // all red establishments take `est.earn` coins from the player
       let earnings = est.earn;
+
       // +1 coin to Cup type if opponent owns Shopping Mall
       if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
         assertNonNull(Land.ShoppingMall.coins);
@@ -673,7 +670,18 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
         earnings += Land.SodaBottlingPlant2.coins;
       }
 
-      const amount = earnings * count;
+      // by default a red establishment takes `multiplier * earnings = 1 * earnings`
+      // but there are special cases where `multiplier` is not 1.
+      let multiplier: number;
+      if (Est.isEqual(est, Est.SushiBar)) {
+        multiplier = Land.owns(G, opponent, Land.Harbor) ? 1 : 0;
+      } else if (Est.isEqual(est, Est.FrenchRestaurant)) {
+        multiplier = Land.countBuilt(G, currentPlayer) >= 2 ? 1 : 0;
+      } else {
+        multiplier = 1;
+      }
+
+      const amount = earnings * multiplier * count;
       take(G, ctx, { from: currentPlayer, to: opponent }, amount, est.name);
     }
   }
@@ -682,17 +690,24 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
   const blueEsts = allEsts.filter((est) => est.color === EstColor.Blue && est.rolls.includes(roll));
   for (const player of getNextPlayers(ctx)) {
     for (const est of blueEsts) {
-      // Mackerel Boat and Tuna Boat require Harbor
-      if (
-        (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) &&
-        !Land.owns(G, player, Land.Harbor)
-      ) {
-        continue;
-      }
-
       const count = Est.countOwned(G, player, est);
       if (count === 0) {
         continue; // avoids logging Tuna Boat roll when player has no tuna boats
+      }
+
+      // by default a blue establishment earns `multiplier * earnings = 1 * earnings`
+      // but there are special cases where `multiplier` is not 1.
+      let multiplier: number;
+      if (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) {
+        multiplier = Land.owns(G, player, Land.Harbor) ? 1 : 0;
+      } else if (Est.isEqual(est, Est.CornField)) {
+        multiplier = Land.countBuilt(G, player) < 2 ? 1 : 0;
+      } else {
+        multiplier = 1;
+      }
+
+      if (multiplier === 0) {
+        continue; // avoids logging Tuna Boat roll when player has no Harbor
       }
 
       // Tuna Boat earnings are based off the tuna roll
@@ -713,15 +728,6 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       if (est.type === EstType.Gear && Land.isOwned(G, Land.Forge2)) {
         assertNonNull(Land.Forge2.coins);
         earnings += Land.Forge2.coins;
-      }
-
-      // by default a blue establishment earns `multiplier * earnings = 1 * earnings`
-      // but there are special cases where `multiplier` is not 1.
-      let multiplier: number;
-      if (Est.isEqual(est, Est.CornField)) {
-        multiplier = Land.countBuilt(G, player) < 2 ? 1 : 0;
-      } else {
-        multiplier = 1;
       }
 
       const amount = earnings * multiplier * count;
