@@ -1,7 +1,7 @@
 # Machi Koro
 
 This is an implementation of the Machi Koro board game.
-The app was developed using the React framework and the <a href="https://boardgame.io/">boardgame.io</a> game engine.
+This app was developed using the React framework and the <a href="https://boardgame.io/">boardgame.io</a> game engine.
 
 **Disclaimer**: We do not own a license to the game.
 
@@ -10,18 +10,16 @@ The app was developed using the React framework and the <a href="https://boardga
 The app is online and free to play at <a href="https://playmachikoro.herokuapp.com/">playmachikoro.herokuapp.com</a>.
 
 ### Rules
+
 - [Base game rules](https://www.dropbox.com/s/ktmenu7uvn9kirn/Machi%20Koro%20Rulebook.pdf?dl=0).
 - [Expansions rules](https://www.dropbox.com/s/cesd1sxmd4n3twr/Machi%20Koro%20Expansions%20Rulebook.pdf?dl=0).
 - [Machi Koro 2 rules](https://www.dropbox.com/s/g6cfyld8i77djip/Machi%20Koro%202%20Rulebook.pdf?dl=0).
 
 ### Supply variants
+
 - **Total**: All establishments are available for purchase in the supply. This is the official supply variant of Machi Koro.
 - **Variable**: 10 establishments are available for purchase from the supply. This is the official supply variant of the expansions.
 - **Hybrid**: 5 establishments with rolls 1-6, 5 establishments with rolls 7+, and 2 major establishments are available for purchase from the supply. This is the official supply variant of Machi Koro 2.
-
-### Implementation details
-
-Since the game was implemented to be automatic as much as possible, there are unfortunately some plays that are not possible.
 
 ## Development
 

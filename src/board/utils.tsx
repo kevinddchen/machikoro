@@ -69,7 +69,9 @@ export const parseMaterialSymbols = (description: string): Array<string | JSX.El
     // If there is more than 1 string, every second string is a Material Symbol keyword.
     if (Math.abs(i % 2)) {
       parsedDescription.push(
-        <span key={i} className={classNames('material-symbols-outlined', 'tooltip_sym')}>{splitDescString[i]}</span>
+        <span key={i} className={classNames('material-symbols-outlined', 'tooltip_sym')}>
+          {splitDescString[i]}
+        </span>
       );
     } else {
       parsedDescription.push(splitDescString[i]);
@@ -90,7 +92,11 @@ export const formatRollBoxes = (rolls: number[], subclass: string): Array<string
     if (i > 0) {
       formattedRollBox.push(' ');
     }
-    formattedRollBox.push(<div key={i} className={subclass}>{splitRollString[i]}</div>);
+    formattedRollBox.push(
+      <div key={i} className={subclass}>
+        {splitRollString[i]}
+      </div>
+    );
   }
   return formattedRollBox;
 };

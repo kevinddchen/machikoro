@@ -642,8 +642,8 @@ export const _HARBOR_ESTABLISHMENTS = _ESTABLISHMENTS
  * Establishments added in the Millionaire's Row expansion.
  */
 export const _MILLION_ESTABLISHMENTS = _ESTABLISHMENTS
-.filter((est) => est.expansion === Expansion.Million)
-.map((est) => est._id);
+  .filter((est) => est.expansion === Expansion.Million)
+  .map((est) => est._id);
 
 /**
  * Establishments a player starts with in Machi Koro 1.

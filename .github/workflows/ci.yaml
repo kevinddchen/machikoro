@@ -27,3 +27,4 @@ jobs:
           npm run lint
           npm run prettier
           npm run version
+          CI=true npm run test
