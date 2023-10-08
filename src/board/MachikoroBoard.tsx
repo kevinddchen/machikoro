@@ -68,7 +68,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
       const player = parseInt(ctx.playOrder[i]);
 
       tbody.push(
-        <PlayerInfo key={i} {...this.props} player={player} clientPlayer={clientPlayer} name={this.names[player]} />
+        <PlayerInfo key={i} {...this.props} player={player} clientPlayer={clientPlayer} name={this.names[player]} />,
       );
     }
     return tbody;

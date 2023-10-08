@@ -72,7 +72,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
           <div className='est_name'>{land.name}</div>
           <div className='est_cost'>{costsString}</div>
           <div className={classNames('tooltip', 'est_tooltip')}>{landDescription}</div>
-        </td>
+        </td>,
       );
     }
 
@@ -125,7 +125,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
             {available}/{remaining}
           </div>
           <div className={classNames('tooltip', 'est_tooltip')}>{estDescription}</div>
-        </td>
+        </td>,
       );
     }
 

@@ -312,7 +312,7 @@ const rollTwo: Move<MachikoroG> = (context) => {
 const debugRoll: Move<MachikoroG> = (
   context,
   die1: number,
-  die2: number = 0 // eslint-disable-line @typescript-eslint/no-inferrable-types
+  die2: number = 0, // eslint-disable-line @typescript-eslint/no-inferrable-types
 ) => {
   const { G, ctx } = context;
   if (!canRoll(G, ctx, 1)) {

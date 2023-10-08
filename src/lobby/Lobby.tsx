@@ -538,7 +538,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
               </div>
             </div>
             <div className='lobby-div-col'>{button}</div>
-          </div>
+          </div>,
         );
       }
     }

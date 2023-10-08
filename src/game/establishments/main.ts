@@ -252,7 +252,7 @@ export const initialize = (
   version: Version,
   expansions: Expansion[],
   supplyVariant: SupplyVariant,
-  numPlayers: number
+  numPlayers: number,
 ): EstInitializeOutput => {
   const numEsts = getAll(version).length;
 

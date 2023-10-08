@@ -151,7 +151,7 @@ export default class Logger extends React.Component<LogProps, object> {
       tbody.push(
         <div key={i} className='log_div'>
           {lines[i]}
-        </div>
+        </div>,
       );
     }
 

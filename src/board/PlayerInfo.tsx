@@ -90,7 +90,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         >
           <div className='mini_name'>{land.miniName}</div>
           <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>
-        </td>
+        </td>,
       );
     }
 
@@ -130,7 +130,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
               <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
             </div>
             <div className={classNames('tooltip', 'mini_tooltip')}>{estDescription}</div>
-          </td>
+          </td>,
         );
       }
     }

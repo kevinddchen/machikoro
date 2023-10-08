@@ -71,7 +71,7 @@ export const parseMaterialSymbols = (description: string): Array<string | JSX.El
       parsedDescription.push(
         <span key={i} className={classNames('material-symbols-outlined', 'tooltip_sym')}>
           {splitDescString[i]}
-        </span>
+        </span>,
       );
     } else {
       parsedDescription.push(splitDescString[i]);
@@ -95,7 +95,7 @@ export const formatRollBoxes = (rolls: number[], subclass: string): Array<string
     formattedRollBox.push(
       <div key={i} className={subclass}>
         {splitRollString[i]}
-      </div>
+      </div>,
     );
   }
   return formattedRollBox;
