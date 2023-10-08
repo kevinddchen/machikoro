@@ -174,7 +174,6 @@ export const Forest: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const LoanOffice: Establishment = {
   _id: 12,
   version: Version.MK1,

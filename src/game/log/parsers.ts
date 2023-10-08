@@ -184,7 +184,13 @@ export const logEarn = (G: MachikoroG, player: number, amount: number, name: str
  */
 const parseEarn = (logEvent: Earn, names: string[]): string => {
   const { player, amount, name } = logEvent;
-  return `\t${names[player]} earned ${amount} coins (${name})`;
+  let text: string;
+  if (amount > 0) {
+    text = `\t${names[player]} earned ${amount} coins (${name})`;
+  } else {
+    text = `\t${names[player]} paid the bank ${-amount} coins (${name})`;
+  }
+  return text;
 };
 
 // ----------------------------------------------------------------------------

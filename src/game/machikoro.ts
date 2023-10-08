@@ -605,12 +605,11 @@ const switchState = (context: FnContext<MachikoroG>): void => {
 
     // activate city hall before buying
     if (getCoins(G, player) === 0) {
-      if (Land.owns(G, player, Land.CityHall)) {
+      if (G.version === Version.MK1 && Land.owns(G, player, Land.CityHall)) {
         assertNonNull(Land.CityHall.coins);
         addCoins(G, player, Land.CityHall.coins);
         Log.logEarn(G, player, Land.CityHall.coins, Land.CityHall.name);
-      }
-      if (Land.owns(G, player, Land.CityHall2)) {
+      } else if (G.version === Version.MK2 && Land.owns(G, player, Land.CityHall2)) {
         assertNonNull(Land.CityHall2.coins);
         addCoins(G, player, Land.CityHall2.coins);
         Log.logEarn(G, player, Land.CityHall2.coins, Land.CityHall2.name);
@@ -686,6 +685,14 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
     }
   }
 
+  // Do `LoanOffice` before `Forest` and `FlowerShop`
+  if (Est.isInUse(Est.LoanOffice, G.version, G.expansions) && Est.LoanOffice.rolls.includes(roll)) {
+    const count = Est.countOwned(G, currentPlayer, Est.LoanOffice);
+    const earnings = Est.LoanOffice.earn;
+    const amount = earnings * count;
+    earn(G, ctx, currentPlayer, amount, Est.LoanOffice.name);
+  }
+
   // Do Blue establishments.
   const blueEsts = allEsts.filter((est) => est.color === EstColor.Blue && est.rolls.includes(roll));
   for (const player of getNextPlayers(ctx)) {
@@ -738,6 +745,10 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
   // Do Green establishments.
   const greenEsts = allEsts.filter((est) => est.color === EstColor.Green && est.rolls.includes(roll));
   for (const est of greenEsts) {
+    if (Est.isEqual(est, Est.LoanOffice)) {
+      continue; // handled above
+    }
+
     const count = Est.countOwned(G, currentPlayer, est);
     if (count === 0) {
       continue;
@@ -972,12 +983,13 @@ const getPreviousPlayers = (ctx: Ctx): number[] => {
  */
 const earn = (G: MachikoroG, ctx: Ctx, player: number, amount: number, name: string): void => {
   const currentPlayer = parseInt(ctx.currentPlayer);
-  addCoins(G, player, amount);
-  if (amount > 0) {
-    if (currentPlayer === player) {
+  const actual_amount = Math.max(amount, -getCoins(G, player)); // handle when amount < 0
+  addCoins(G, player, actual_amount);
+  if (actual_amount !== 0) {
+    if (currentPlayer === player && actual_amount > 0) {
       G.receivedCoins = true;
     }
-    Log.logEarn(G, player, amount, name);
+    Log.logEarn(G, player, actual_amount, name);
   }
 };
 
@@ -1043,7 +1055,7 @@ const debugSetupData: SetupData = {
   version: Version.MK1,
   expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
   supplyVariant: SupplyVariant.Total,
-  startCoins: 99,
+  startCoins: 3,
   initialBuyRounds: 0,
   randomizeTurnOrder: false,
 };
