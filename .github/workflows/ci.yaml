@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  run-linters:
-    name: Run linters
+  ci:
+    name: Run continuous integration
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +22,14 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
 
-      - name: Run linters
+      - name: Run linter
         run: |
           npm run lint
+      
+      - name: Run tests
+        run: CI=true npm run test
+
+      - name: Run prettier
+        run: |
           npm run prettier
           npm run version
-          CI=true npm run test
