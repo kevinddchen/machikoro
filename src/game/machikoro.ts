@@ -757,6 +757,8 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
     } else if (Est.isEqual(est, Est.Winery2)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
+    } else if (Est.isEqual(est, Est.GeneralStore)) {
+      multiplier = Land.countBuilt(G, currentPlayer) < 2 ? 1 : 0;
     } else {
       multiplier = 1;
     }

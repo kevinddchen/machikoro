@@ -47,7 +47,6 @@ export const Ranch: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const GeneralStore: Establishment = {
   _id: 3,
   version: Version.MK1,

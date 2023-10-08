@@ -120,10 +120,8 @@ export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
  * landmarks owned by the player other than "City Hall".
  */
 export const countBuilt = (G: MachikoroG, player: number): number => {
-  if (G.version !== Version.MK2) {
-    throw new Error('`countBuilt()` is only implemented for Machi Koro 2.');
-  }
-  return getAllOwned(G, player).filter((land) => !isEqual(land, Meta2.CityHall2)).length;
+  return getAllOwned(G, player).filter((land) => !isEqual(land, Meta.CityHall) && !isEqual(land, Meta2.CityHall2))
+    .length;
 };
 
 /**
