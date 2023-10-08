@@ -264,7 +264,7 @@ interface Office extends BaseLogEvent {
 export const logOffice = (
   G: MachikoroG,
   args: { player_est_name: string; opponent_est_name: string },
-  opponent: number
+  opponent: number,
 ): void => {
   const logEvent: Office = { type: LogEventType.Office, ...args, opponent };
   G._logBuffer.push(logEvent);

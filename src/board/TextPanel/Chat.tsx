@@ -99,7 +99,7 @@ export default class Chat extends React.Component<ChatProps, object> {
       tbody.push(
         <div key={i} className='chat_div'>
           {lines[i]}
-        </div>
+        </div>,
       );
     }
 

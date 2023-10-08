@@ -1,11 +1,6 @@
 # Machi Koro
 
 This is an implementation of the Machi Koro board game.
-
-- [Base game rules](https://www.fgbradleys.com/rules/rules2/MachiKoro-rules.pdf).
-- [Harbor expansion rules](https://www.gokids.com.tw/tsaiss/gokids/rules/MK%20HABOR%20RULE%20EN.pdf).
-- [Machi Koro 2 rules](https://tesera.ru/images/items/1959687/machi-koro-2_Rulebook-FINAL.pdf).
-
 This app was developed using the React framework and the <a href="https://boardgame.io/">boardgame.io</a> game engine.
 
 **Disclaimer**: We do not own a license to the game.
@@ -13,6 +8,18 @@ This app was developed using the React framework and the <a href="https://boardg
 ## Play
 
 The app is online and free to play at <a href="https://playmachikoro.herokuapp.com/">playmachikoro.herokuapp.com</a>.
+
+### Rules
+
+- [Base game rules](https://www.dropbox.com/s/ktmenu7uvn9kirn/Machi%20Koro%20Rulebook.pdf?dl=0).
+- [Expansions rules](https://www.dropbox.com/s/cesd1sxmd4n3twr/Machi%20Koro%20Expansions%20Rulebook.pdf?dl=0).
+- [Machi Koro 2 rules](https://www.dropbox.com/s/g6cfyld8i77djip/Machi%20Koro%202%20Rulebook.pdf?dl=0).
+
+### Supply variants
+
+- **Total**: All establishments are available for purchase in the supply. This is the official supply variant of Machi Koro.
+- **Variable**: 10 establishments are available for purchase from the supply. This is the official supply variant of the expansions.
+- **Hybrid**: 5 establishments with rolls 1-6, 5 establishments with rolls 7+, and 2 major establishments are available for purchase from the supply. This is the official supply variant of Machi Koro 2.
 
 ## Development
 

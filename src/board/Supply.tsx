@@ -40,7 +40,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
 
     const table = new StackTable(5);
 
-    const lands = Land.getAllInUse(G);
+    const lands = Land.getAllInUse(G.version, G.expansions);
     for (let i = 0; i < lands.length; i++) {
       const land = lands[i];
       // manually filter out `CityHall2`, which should never appear in the supply
@@ -72,7 +72,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
           <div className='est_name'>{land.name}</div>
           <div className='est_cost'>{costsString}</div>
           <div className={classNames('tooltip', 'est_tooltip')}>{landDescription}</div>
-        </td>
+        </td>,
       );
     }
 
@@ -84,7 +84,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
 
     const table = new StackTable(5);
 
-    const ests = Est.getAllInUse(G);
+    const ests = Est.getAllInUse(G.version, G.expansions);
     for (let i = 0; i < ests.length; i++) {
       const est = ests[i];
 
@@ -125,7 +125,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
             {available}/{remaining}
           </div>
           <div className={classNames('tooltip', 'est_tooltip')}>{estDescription}</div>
-        </td>
+        </td>,
       );
     }
 

@@ -238,10 +238,10 @@ export const canEndTurn = (G: MachikoroG): boolean => {
  */
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const version = G.version;
+  const { version, expansions } = G;
   if (version === Version.MK1) {
     // a player has won if they own all landmarks in use
-    return Land.getAllInUse(G).every((land) => Land.owns(G, player, land));
+    return Land.getAllInUse(version, expansions).every((land) => Land.owns(G, player, land));
   } else if (version === Version.MK2) {
     // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
     return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
@@ -312,7 +312,7 @@ const rollTwo: Move<MachikoroG> = (context) => {
 const debugRoll: Move<MachikoroG> = (
   context,
   die1: number,
-  die2: number = 0 // eslint-disable-line @typescript-eslint/no-inferrable-types
+  die2: number = 0, // eslint-disable-line @typescript-eslint/no-inferrable-types
 ) => {
   const { G, ctx } = context;
   if (!canRoll(G, ctx, 1)) {
@@ -646,7 +646,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
   const roll = G.roll;
 
   // Do Red establishments.
-  const allEsts = Est.getAllInUse(G);
+  const allEsts = Est.getAllInUse(G.version, G.expansions);
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of redEsts) {
@@ -696,7 +696,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       }
 
       // Tuna Boat earnings are based off the tuna roll
-      // all other blue establishments receive `est.earn` coins from the bank
+      // all other blue establishments get `est.earn` coins from the bank
       let earnings;
       if (Est.isEqual(est, Est.TunaBoat)) {
         earnings = getTunaRoll(context);
@@ -794,11 +794,12 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
         take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TaxOffice) || Est.isEqual(est, Est.TaxOffice2)) {
+      const trigger = G.version === Version.MK1 ? Est.MK1_TAX_OFFICE_TRIGGER : Est.MK2_TAX_OFFICE_TRIGGER;
       for (const opponent of getPreviousPlayers(ctx)) {
         // in Machi Koro 2, each copy of the tax office activates
         for (let i = 0; i < count; i++) {
           const opp_coins = getCoins(G, opponent);
-          if (opp_coins < est.earn) {
+          if (opp_coins < trigger) {
             break;
           }
           const amount = Math.floor(opp_coins / 2);
@@ -880,8 +881,7 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
     // do tax office on each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
       const opp_coins = getCoins(G, opponent);
-      assertNonNull(land.coins);
-      if (opp_coins < land.coins) {
+      if (opp_coins < Land.MK2_EXHIBIT_HALL_TRIGGER) {
         continue;
       }
       const amount = Math.floor(opp_coins / 2);
@@ -1024,7 +1024,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  */
 const debugSetupData: SetupData = {
   version: Version.MK1,
-  expansions: [Expansion.Base, Expansion.Million],
+  expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
@@ -1070,6 +1070,10 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
       _turnOrder = random.Shuffle(_turnOrder);
     }
 
+    // initialize landmark and establishment data
+    const { estData, estDecks } = Est.initialize(version, expansions, supplyVariant, numPlayers);
+    const { landData, landDeck } = Land.initialize(version, expansions, numPlayers);
+
     // initialize `G` object
     const G: MachikoroG = {
       version,
@@ -1078,26 +1082,18 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
       initialBuyRounds,
       _turnOrder,
       ...newTurnG,
-      secret: { _decks: null, _landDeck: null },
+      secret: { estDecks, landDeck },
       _coins,
-      _estData: null,
-      _landData: null,
+      estData,
+      landData,
       _logBuffer: [],
     };
 
-    // initialize landmark and establishment data
-    Land.initialize(G, numPlayers);
-    Est.initialize(G, numPlayers);
-
     // shuffle decks
-    if (G.secret._decks !== null) {
-      for (let i = 0; i < G.secret._decks.length; i++) {
-        G.secret._decks[i] = random.Shuffle(G.secret._decks[i]);
-      }
+    for (let i = 0; i < G.secret.estDecks.length; i++) {
+      G.secret.estDecks[i] = random.Shuffle(G.secret.estDecks[i]);
     }
-    if (G.secret._landDeck !== null) {
-      G.secret._landDeck = random.Shuffle(G.secret._landDeck);
-    }
+    G.secret.landDeck = random.Shuffle(G.secret.landDeck);
 
     return G;
   },

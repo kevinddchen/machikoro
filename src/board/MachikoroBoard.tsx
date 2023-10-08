@@ -40,16 +40,27 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
     this.names = initializeNames(matchData);
   }
 
+  /**
+   * Get the client player ID.
+   * @returns Player ID of the client, or null if the client is not a player of
+   * this game (e.g. a spectator).
+   */
+  private getClientPlayer = (): number | null => {
+    const { playerID } = this.props;
+    if (playerID === null || playerID === '') {
+      return null;
+    }
+    return parseInt(playerID);
+  };
+
   // --- Render ---------------------------------------------------------------
 
   /**
    * @returns Elements displaying player information (e.g. coins, landmarks, establishments)
    */
   private renderPlayerInfo = (): JSX.Element[] => {
-    const { ctx, playerID } = this.props;
-
-    // Player ID of the client.
-    const clientPlayer = playerID === null ? null : parseInt(playerID);
+    const { ctx } = this.props;
+    const clientPlayer = this.getClientPlayer();
 
     const tbody: JSX.Element[] = [];
     for (let i = 0; i < this.names.length; i++) {
@@ -57,17 +68,14 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
       const player = parseInt(ctx.playOrder[i]);
 
       tbody.push(
-        <PlayerInfo key={i} {...this.props} player={player} clientPlayer={clientPlayer} name={this.names[player]} />
+        <PlayerInfo key={i} {...this.props} player={player} clientPlayer={clientPlayer} name={this.names[player]} />,
       );
     }
     return tbody;
   };
 
   render() {
-    const { playerID } = this.props;
-
-    // Player ID of the client.
-    const clientPlayer = playerID === null ? null : parseInt(playerID);
+    const clientPlayer = this.getClientPlayer();
 
     return (
       <div className='div-flex'>

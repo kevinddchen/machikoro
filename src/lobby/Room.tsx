@@ -186,7 +186,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
       tbody.push(
         <td className={indicator} key={seat}>
           {seat + 1}: {name} <br /> {button}
-        </td>
+        </td>,
       );
     }
     return tbody;
