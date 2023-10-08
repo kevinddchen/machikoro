@@ -242,7 +242,7 @@ interface EstInitializeOutput {
 }
 
 /**
- * Initialize the establishment data for a game by modifying `G`.
+ * Initialize the establishment data for a game.
  * @param version
  * @param expansions
  * @param supplyVariant

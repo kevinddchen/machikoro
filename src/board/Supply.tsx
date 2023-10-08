@@ -40,7 +40,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
 
     const table = new StackTable(5);
 
-    const lands = Land.getAllInUse(G);
+    const lands = Land.getAllInUse(G.version, G.expansions);
     for (let i = 0; i < lands.length; i++) {
       const land = lands[i];
       // manually filter out `CityHall2`, which should never appear in the supply

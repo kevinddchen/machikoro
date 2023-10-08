@@ -238,10 +238,10 @@ export const canEndTurn = (G: MachikoroG): boolean => {
  */
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
-  const version = G.version;
+  const { version, expansions } = G;
   if (version === Version.MK1) {
     // a player has won if they own all landmarks in use
-    return Land.getAllInUse(G).every((land) => Land.owns(G, player, land));
+    return Land.getAllInUse(version, expansions).every((land) => Land.owns(G, player, land));
   } else if (version === Version.MK2) {
     // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
     return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
@@ -1072,6 +1072,7 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
 
     // initialize landmark and establishment data
     const { estData, estDecks } = Est.initialize(version, expansions, supplyVariant, numPlayers);
+    const { landData, landDeck } = Land.initialize(version, expansions, numPlayers);
 
     // initialize `G` object
     const G: MachikoroG = {
@@ -1081,25 +1082,18 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
       initialBuyRounds,
       _turnOrder,
       ...newTurnG,
-      secret: { estDecks, _landDeck: null },
+      secret: { estDecks, landDeck },
       _coins,
       estData,
-      _landData: null,
+      landData,
       _logBuffer: [],
     };
 
-    // initialize landmark and establishment data
-    Land.initialize(G, numPlayers);
-
     // shuffle decks
-    if (G.secret.estDecks !== null) {
-      for (let i = 0; i < G.secret.estDecks.length; i++) {
-        G.secret.estDecks[i] = random.Shuffle(G.secret.estDecks[i]);
-      }
+    for (let i = 0; i < G.secret.estDecks.length; i++) {
+      G.secret.estDecks[i] = random.Shuffle(G.secret.estDecks[i]);
     }
-    if (G.secret._landDeck !== null) {
-      G.secret._landDeck = random.Shuffle(G.secret._landDeck);
-    }
+    G.secret.landDeck = random.Shuffle(G.secret.landDeck);
 
     return G;
   },

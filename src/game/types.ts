@@ -8,32 +8,32 @@ import type { LogEvent } from './log';
 
 /**
  * The `G` object containing all game state variables.
- * @prop {Version} version - the version of the game.
- * @prop {Expansion[]} expansions - the expansions used in the game.
- * @prop {SupplyVariant} supplyVariant - the supply variant of the game.
- * @prop {number} initialBuyRounds - the number of rounds of initial buying.
- * @prop {string[]} _turnOrder - the order of players in the game. Do not use
- * this property; use `ctx.playOrder` instead.
- * @prop {TurnState} turnState - the current player's turn state.
- * @prop {number} roll - the current player's dice roll total.
- * @prop {boolean} rollDoubles - true if the current player rolled doubles.
- * @prop {number} numDice - the number of dice rolled by the current player.
- * @prop {number} numRolls - the number of dice rolls made by the current player.
- * @prop {boolean} secondTurn - true if the current player can make another turn.
- * @prop {number} doTV - number of times the current player will activate the TV Station.
- * @prop {number} doOffice - number of times the current player will activate the Office.
- * @prop {boolean} doMovingCompany - true if the current player will activate the Moving Company.
- * @prop {Establishment|null} officeGiveEst - the establishment picked for the Office to give.
- * @prop {Establishment|null} justBoughtEst - the establishment just bought.
- * @prop {Landmark|null} justBoughtLand - the landmark just bought.
- * @prop {boolean} receivedCoins - true if the current player has received coins this turn.
- * @prop {number|null} tunaRoll - the roll made for the tuna boat.
- * @prop {Secret} secret - game state that is not passed to clients.
- * @prop {number[]} _coins - coins for each player. Do not use this property;
- * use `getCoins` and `addCoins` instead.
- * @prop {EstablishmentData|null} _estData - establishment data.
- * @prop {LandmarkData|null} _landData - landmark data.
- * @prop {LogEvent[]|null} _logBuffer - buffer of log lines.
+ * @prop version - the version of the game.
+ * @prop expansions - the expansions used in the game.
+ * @prop supplyVariant - the supply variant of the game.
+ * @prop initialBuyRounds - the number of rounds of initial buying.
+ * @prop _turnOrder - the order of players in the game. Do not use this
+ * property; use `ctx.playOrder` instead.
+ * @prop turnState - the current player's turn state.
+ * @prop roll - the current player's dice roll total.
+ * @prop rollDoubles - true if the current player rolled doubles.
+ * @prop numDice - the number of dice rolled by the current player.
+ * @prop numRolls - the number of dice rolls made by the current player.
+ * @prop secondTurn - true if the current player can make another turn.
+ * @prop doTV - number of times the current player will activate the TV Station.
+ * @prop doOffice - number of times the current player will activate the Office.
+ * @prop doMovingCompany - true if the current player will activate the Moving Company.
+ * @prop officeGiveEst - the establishment picked for the Office to give.
+ * @prop justBoughtEst - the establishment just bought.
+ * @prop justBoughtLand - the landmark just bought.
+ * @prop receivedCoins - true if the current player has received coins this turn.
+ * @prop tunaRoll - the roll made for the tuna boat.
+ * @prop secret - game state that is not passed to clients.
+ * @prop _coins - coins for each player. Do not use this property; use
+ * `getCoins` and `addCoins` instead.
+ * @prop estData - establishment data.
+ * @prop landData - landmark data.
+ * @prop _logBuffer - buffer of log lines.
  */
 export interface MachikoroG {
   readonly version: Version;
@@ -58,28 +58,28 @@ export interface MachikoroG {
   secret: Secret;
   _coins: number[];
   estData: EstablishmentData;
-  _landData: LandmarkData | null;
+  landData: LandmarkData;
   _logBuffer: LogEvent[];
 }
 
 /**
  * Game state that is not passed to the clients
- * @prop {Establishment[][]|null} _decks - the establishment draw decks.
- * @prop {Landmark[]|null} _landDeck - the landmark draw deck, for Machi Koro 2.
+ * @prop estDecks - the establishment draw decks.
+ * @prop landDeck - the landmark draw deck, for Machi Koro 2.
  */
 export interface Secret {
   estDecks: Establishment[][];
-  _landDeck: Landmark[] | null;
+  landDeck: Landmark[];
 }
 
 /**
  * Data needed to setup a game.
- * @prop {Version} version - Version of the game.
- * @prop {Expansion[]} expansions - Expansions used in the game.
- * @prop {SupplyVariant} supplyVariant - Supply variant of the game.
- * @prop {number} startCoins - Number of coins each player starts with.
- * @prop {number} initialBuyRounds - Number of rounds of initial buying.
- * @prop {boolean} randomizeTurnOrder - True if the turn order should be randomized.
+ * @prop version - Version of the game.
+ * @prop expansions - Expansions used in the game.
+ * @prop supplyVariant - Supply variant of the game.
+ * @prop startCoins - Number of coins each player starts with.
+ * @prop initialBuyRounds - Number of rounds of initial buying.
+ * @prop randomizeTurnOrder - True if the turn order should be randomized.
  */
 export interface SetupData {
   version: Version;

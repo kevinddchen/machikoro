@@ -10,33 +10,22 @@ import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
 import { Landmark, LandmarkData } from './types';
 
 /**
- * Type guard to assert that G._landData is not null to avoid using the non-null assertion operator "!".
- */
-function assertLandDataExists(
-  G: MachikoroG
-): asserts G is MachikoroG & { _landData: NonNullable<MachikoroG['_landData']> } {
-  if (G._landData === null || G._landData === undefined) {
-    throw new Error('G._landData is null or undefined.');
-  }
-}
-
-/**
  * @param a
  * @param b
  * @returns True if the landmarks are the same.
  */
 export const isEqual = (a: Landmark, b: Landmark): boolean => {
-  return a._id === b._id && a._ver === b._ver;
+  return a._id === b._id && a.version === b.version;
 };
 
 /**
- * @param G
  * @param land
+ * @param version
+ * @param expansions
  * @returns True if the landmark is in use for this game.
  */
-export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
-  assertLandDataExists(G);
-  return G.version === land._ver && G._landData.inUse[land._id];
+export const isInUse = (land: Landmark, version: Version, expansions: Expansion[]): boolean => {
+  return version === land.version && expansions.includes(land.expansion);
 };
 
 /**
@@ -47,12 +36,11 @@ export const isInUse = (G: MachikoroG, land: Landmark): boolean => {
  * @returns
  */
 export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
-  if (G.version !== land._ver) {
-    console.warn(`Landmark id=${land._id} ver=${land._ver} does not match the game version, ${G.version}.`);
+  if (G.version !== land.version) {
+    console.warn(`Landmark id=${land._id} ver=${land.version} does not match the game version, ${G.version}.`);
     return false;
   }
-  assertLandDataExists(G);
-  return G._landData.available[land._id];
+  return G.landData._available[land._id];
 };
 
 /**
@@ -62,12 +50,11 @@ export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
  * @returns True if the player owns the landmark.
  */
 export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => {
-  if (G.version !== land._ver) {
+  if (G.version !== land.version) {
     // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
-  assertLandDataExists(G);
-  return G._landData.owned[land._id][player];
+  return G.landData._owned[player][land._id];
 };
 
 /**
@@ -76,21 +63,19 @@ export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => 
  * @returns True if the landmark is owned by any player.
  */
 export const isOwned = (G: MachikoroG, land: Landmark): boolean => {
-  if (G.version !== land._ver) {
+  if (G.version !== land.version) {
     // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
-  assertLandDataExists(G);
-  return G._landData.owned[land._id].some((owned) => owned);
+  return G.landData._owned.some((ownedArr) => ownedArr[land._id]);
 };
 
 /**
  * Get all landmarks for Machi Koro 1 or 2.
- * @param G
+ * @param version
  * @returns
  */
-const getAll = (G: MachikoroG): Landmark[] => {
-  const version = G.version;
+const getAll = (version: Version): Landmark[] => {
   if (version === Version.MK1) {
     return Meta._LANDMARKS;
   } else if (version === Version.MK2) {
@@ -101,12 +86,13 @@ const getAll = (G: MachikoroG): Landmark[] => {
 };
 
 /**
- * @param G
+ * @param version
+ * @param expansions
  * @returns List of all landmarks that are in use for this game. The landmarks
  * are returned in the intended display order.
  */
-export const getAllInUse = (G: MachikoroG): Landmark[] => {
-  return getAll(G).filter((land) => isInUse(G, land));
+export const getAllInUse = (version: Version, expansions: Expansion[]): Landmark[] => {
+  return getAll(version).filter((land) => isInUse(land, version, expansions));
 };
 
 /**
@@ -114,7 +100,7 @@ export const getAllInUse = (G: MachikoroG): Landmark[] => {
  * @returns List of all landmarks that are available for purchase.
  */
 export const getAllAvailable = (G: MachikoroG): Landmark[] => {
-  return getAll(G).filter((land) => isAvailable(G, land));
+  return getAll(G.version).filter((land) => isAvailable(G, land));
 };
 
 /**
@@ -124,7 +110,7 @@ export const getAllAvailable = (G: MachikoroG): Landmark[] => {
  * returned in the intended display order.
  */
 export const getAllOwned = (G: MachikoroG, player: number): Landmark[] => {
-  return getAll(G).filter((land) => owns(G, player, land));
+  return getAll(G.version).filter((land) => owns(G, player, land));
 };
 
 /**
@@ -194,14 +180,13 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
  */
 export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
   const version = G.version;
-  if (version !== land._ver) {
-    throw new Error(`Landmark id=${land._id} ver=${land._ver} does not match the game version, ${G.version}.`);
+  if (version !== land.version) {
+    throw new Error(`Landmark id=${land._id} ver=${land.version} does not match the game version, ${G.version}.`);
   }
-  assertLandDataExists(G);
-  G._landData.owned[land._id][player] = true;
+  G.landData._owned[player][land._id] = true;
   // in Machi Koro 2, each landmark can only be bought by one player
   if (version === Version.MK2) {
-    G._landData.available[land._id] = false;
+    G.landData._available[land._id] = false;
   }
 };
 
@@ -211,8 +196,7 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
  */
 export const replenishSupply = (G: MachikoroG): void => {
   const { version, supplyVariant } = G;
-  const deck = G.secret._landDeck;
-  assertNonNull(deck);
+  const deck = G.secret.landDeck;
 
   // skip if this is Machi Koro 1
   if (version === Version.MK1) {
@@ -224,16 +208,14 @@ export const replenishSupply = (G: MachikoroG): void => {
     while (deck.length > 0) {
       const land = deck.pop();
       assertNonNull(land);
-      assertLandDataExists(G);
-      G._landData.available[land._id] = true;
+      G.landData._available[land._id] = true;
     }
   } else if (supplyVariant === SupplyVariant.Variable || supplyVariant === SupplyVariant.Hybrid) {
     // put landmarks into the supply until there are 5 unique landmarks
     while (deck.length > 0 && getAllAvailable(G).length < Meta2._MK2_LANDMARK_SUPPLY_LIMIT) {
       const land = deck.pop();
       assertNonNull(land);
-      assertLandDataExists(G);
-      G._landData.available[land._id] = true;
+      G.landData._available[land._id] = true;
     }
   } else {
     return assertUnreachable(supplyVariant);
@@ -241,68 +223,66 @@ export const replenishSupply = (G: MachikoroG): void => {
 };
 
 /**
- * Initialize the landmark data for a game by modifying `G`.
- * @param G
+ * Output of landmark initialization.
+ * @prop {LandmarkData} landData - The landmark data.
+ * @prop {Landmark[]} landDeck - The landmark deck, for Machi Koro 2
  */
-export const initialize = (G: MachikoroG, numPlayers: number): void => {
-  const { version, expansions } = G;
-  const lands = getAll(G);
-  const numLands = lands.length;
+interface LandInitializeOutput {
+  landData: LandmarkData;
+  landDeck: Landmark[];
+}
+
+/**
+ * Initialize the landmark data for a game.
+ * @param version
+ * @param expansions
+ * @param numPlayers
+ */
+export const initialize = (version: Version, expansions: Expansion[], numPlayers: number): LandInitializeOutput => {
+  const numLands = getAll(version).length;
 
   // initialize data structure
-  const data: LandmarkData = {
-    inUse: Array.from({ length: numLands }, () => false),
-    available: Array.from({ length: numLands }, () => false),
-    owned: Array.from({ length: numLands }, () => Array.from({ length: numPlayers }, () => false)),
+  const landData: LandmarkData = {
+    _available: Array.from({ length: numLands }, () => false),
+    _owned: Array.from({ length: numPlayers }, () => Array.from({ length: numLands }, () => false)),
   };
 
-  // initialize landmarks in use, starting landmarks
-  let ids: number[];
-  let starting: number[];
-  if (version === Version.MK1) {
-    ids = [];
-    starting = [];
-    if (expansions.includes(Expansion.Base)) {
-      ids.push(...Meta._BASE_LANDMARKS);
-    }
-    if (expansions.includes(Expansion.Harbor)) {
-      ids.push(...Meta._HARBOR_LANDMARKS);
-      starting.push(...Meta._HARBOR_STARTING_LANDMARKS);
-    }
-  } else if (version === Version.MK2) {
-    ids = Meta2._MK2_LANDMARKS;
-    starting = Meta2._MK2_STARTING_LANDMARKS;
-  } else {
-    return assertUnreachable(version);
-  }
-
   // populate landmarks in use
-  for (const id of ids) {
-    data.inUse[id] = true;
-    // in Machi Koro 1, landmarks are always available for purchase
-    if (version === Version.MK1) {
-      data.available[id] = true;
+  const inUse = getAllInUse(version, expansions);
+  // in Machi Koro 1, landmarks are always available for purchase
+  if (version === Version.MK1) {
+    for (const land of inUse) {
+      landData._available[land._id] = true;
     }
   }
 
   // give each player their starting landmarks
+  let starting: number[];
+  if (version === Version.MK1) {
+    starting = [];
+    if (expansions.includes(Expansion.Harbor)) {
+      starting.push(...Meta._HARBOR_STARTING_LANDMARKS);
+    }
+  } else if (version === Version.MK2) {
+    starting = Meta2._MK2_STARTING_LANDMARKS;
+  } else {
+    return assertUnreachable(version);
+  }
   for (const id of starting) {
     for (const player of Array(numPlayers).keys()) {
-      data.owned[id][player] = true;
+      landData._owned[player][id] = true;
     }
   }
 
   // prepare deck
-  let deck: Landmark[];
+  let landDeck: Landmark[];
   if (version === Version.MK1) {
-    deck = [];
+    landDeck = [];
   } else if (version === Version.MK2) {
-    deck = lands.filter((land) => !isEqual(land, Meta2.CityHall2)); // manually exclude `CityHall2`
+    landDeck = inUse.filter((land) => !isEqual(land, Meta2.CityHall2)); // manually exclude `CityHall2`
   } else {
     return assertUnreachable(version);
   }
 
-  // update G
-  G._landData = data;
-  G.secret._landDeck = deck;
+  return { landData, landDeck };
 };

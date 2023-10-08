@@ -35,7 +35,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
   constructor(props: PlayerInfoProps) {
     super(props);
     const { G } = this.props;
-    this.landmarks = Land.getAllInUse(G);
+    this.landmarks = Land.getAllInUse(G.version, G.expansions);
   }
 
   render() {

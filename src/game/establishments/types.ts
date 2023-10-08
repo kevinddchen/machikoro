@@ -6,6 +6,8 @@ import type { Expansion, Version } from '../types';
 
 /**
  * Interface for establishment metadata.
+ * @prop version - Used to distinguish Machi Koro 1 and 2 establishments.
+ * @prop expansion - For Machi Koro 1, the expansion the establishment belongs to.
  * @prop name - Display name.
  * @prop description - Tooltip text.
  * @prop cost - Cost to buy.
@@ -13,12 +15,12 @@ import type { Expansion, Version } from '../types';
  * @prop rolls - Which rolls activate the establishment.
  * @prop color - The color of the establishment.
  * @prop type - The type of the establishment (for combos, e.g. 'Animal').
- * @prop version - Used to distinguish Machi Koro 1 and 2 establishments.
- * @prop expansion - For Machi Koro 1, the expansion the establishment belongs to.
  * @prop _id - Unique id used to enumerate establishments.
  * @prop _initial - The number of copies in the initial supply. If null, then is equal to the number of players.
  */
 export interface Establishment {
+  readonly version: Version;
+  readonly expansion: Expansion;
   readonly name: string;
   readonly description: string;
   readonly cost: number;
@@ -26,8 +28,6 @@ export interface Establishment {
   readonly rolls: number[];
   readonly color: EstColor;
   readonly type: EstType | null;
-  readonly version: Version;
-  readonly expansion: Expansion;
   readonly _id: number;
   readonly _initial: number | null;
 }

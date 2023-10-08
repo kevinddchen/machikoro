@@ -13,8 +13,8 @@ export const MK2_LANDMARKS_TO_WIN = 3;
 
 export const CityHall2: Landmark = {
   _id: 0,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'City Hall',
   miniName: 'City Hall',
   description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
@@ -24,8 +24,8 @@ export const CityHall2: Landmark = {
 
 export const LoanOffice2: Landmark = {
   _id: 1,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Loan Office',
   miniName: 'Loan Office',
   description:
@@ -37,8 +37,8 @@ export const LoanOffice2: Landmark = {
 
 export const FarmersMarket2: Landmark = {
   _id: 2,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Farmers Market',
   miniName: 'Farmers Mkt.',
   description: 'Your ' + EstType.Wheat + ' establishments earn +1 coin when activated (all players).',
@@ -48,8 +48,8 @@ export const FarmersMarket2: Landmark = {
 
 export const FrenchRestaurant2: Landmark = {
   _id: 3,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'French Restaurant',
   miniName: 'French Rest.',
   description: 'Take 2 coins from each opponent (builder only).',
@@ -59,8 +59,8 @@ export const FrenchRestaurant2: Landmark = {
 
 export const MovingCompany2: Landmark = {
   _id: 4,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Moving Company',
   miniName: 'Moving Co.',
   description: 'If you roll doubles, give 1 establishment to the previous player (all players).',
@@ -70,8 +70,8 @@ export const MovingCompany2: Landmark = {
 
 export const Observatory2: Landmark = {
   _id: 5,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Observatory',
   miniName: 'Observatory',
   description: 'Reduce the build cost of "Launch Pad" by 5 coins (all players).',
@@ -81,8 +81,8 @@ export const Observatory2: Landmark = {
 
 export const Publisher2: Landmark = {
   _id: 6,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Publisher',
   miniName: 'Publisher',
   description: 'Take 1 coin from each opponent for each ' + EstType.Shop + ' establishment they own (builder only).',
@@ -92,8 +92,8 @@ export const Publisher2: Landmark = {
 
 export const ShoppingMall2: Landmark = {
   _id: 7,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Shopping Mall',
   miniName: 'Shopping Mall',
   description: 'Your ' + EstType.Shop + ' establishments earn +1 coin when activated (all players).',
@@ -103,8 +103,8 @@ export const ShoppingMall2: Landmark = {
 
 export const TechStartup2: Landmark = {
   _id: 8,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Tech Startup',
   miniName: 'Tech Startup',
   description: 'If you roll 12, receive 8 coins from the bank (all players).',
@@ -114,8 +114,8 @@ export const TechStartup2: Landmark = {
 
 export const Airport2: Landmark = {
   _id: 9,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Airport',
   miniName: 'Airport',
   description: 'If you build nothing on your turn, receive 5 coins from the bank (all players).',
@@ -125,8 +125,8 @@ export const Airport2: Landmark = {
 
 export const AmusementPark2: Landmark = {
   _id: 10,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Amusement Park',
   miniName: 'Amuse. Park',
   description: 'If you roll doubles, take another turn after this one (all players).',
@@ -136,8 +136,8 @@ export const AmusementPark2: Landmark = {
 
 export const Charterhouse2: Landmark = {
   _id: 11,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Charterhouse',
   miniName: 'Charterhouse',
   description: 'If you roll 2 dice and receive no coins, receive 3 coins from the bank (all players).',
@@ -147,8 +147,8 @@ export const Charterhouse2: Landmark = {
 
 export const ExhibitHall2: Landmark = {
   _id: 12,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Exhibit Hall',
   miniName: 'Exhibit Hall',
   description: 'From each opponent who has more than 10 coins, take half, rounded down (builder only).',
@@ -158,8 +158,8 @@ export const ExhibitHall2: Landmark = {
 
 export const Forge2: Landmark = {
   _id: 13,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Forge',
   miniName: 'Forge',
   description: 'Your ' + EstType.Gear + ' establishments earn +1 coin when activated (all players).',
@@ -169,8 +169,8 @@ export const Forge2: Landmark = {
 
 export const Museum2: Landmark = {
   _id: 14,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Museum',
   miniName: 'Museum',
   description: 'Take 3 coins from each opponent for each landmark they own, excluding "City Hall" (builder only).',
@@ -180,8 +180,8 @@ export const Museum2: Landmark = {
 
 export const Park2: Landmark = {
   _id: 15,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Park',
   miniName: 'Park',
   description:
@@ -192,8 +192,8 @@ export const Park2: Landmark = {
 
 export const RadioTower2: Landmark = {
   _id: 16,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Radio Tower',
   miniName: 'Radio Tower',
   description: 'Take another turn after this one (builder only).',
@@ -203,8 +203,8 @@ export const RadioTower2: Landmark = {
 
 export const SodaBottlingPlant2: Landmark = {
   _id: 17,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Soda Bottling Plant',
   miniName: 'Soda Bt. Plant',
   description: 'Your ' + EstType.Cup + ' establishments earn +1 coin when activated (all players).',
@@ -214,8 +214,8 @@ export const SodaBottlingPlant2: Landmark = {
 
 export const Temple2: Landmark = {
   _id: 18,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Temple',
   miniName: 'Temple',
   description: 'If you roll doubles, take 2 coins from each opponent (all players).',
@@ -225,8 +225,8 @@ export const Temple2: Landmark = {
 
 export const TVStation2: Landmark = {
   _id: 19,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'TV Station',
   miniName: 'TV Station',
   description: 'Take 1 coin from each opponent for each ' + EstType.Cup + ' establishment they own (builder only).',
@@ -236,8 +236,8 @@ export const TVStation2: Landmark = {
 
 export const LaunchPad2: Landmark = {
   _id: 20,
-  _ver: Version.MK2,
-  _exp: Expansion.Base,
+  version: Version.MK2,
+  expansion: Expansion.Base,
   name: 'Launch Pad',
   miniName: 'Launch Pad',
   description: 'You win the game!',
