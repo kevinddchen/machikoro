@@ -1,13 +1,14 @@
 import { expect, test } from '@jest/globals';
 
 import { Expansion, Version } from '../types';
-import { _BASE_ESTABLISHMENTS, _ESTABLISHMENTS, _HARBOR_ESTABLISHMENTS } from './metadata';
+import { _BASE_ESTABLISHMENTS, _ESTABLISHMENTS, _HARBOR_ESTABLISHMENTS, _MILLION_ESTABLISHMENTS } from './metadata';
 import { _ESTABLISHMENTS2 } from './metadata2';
 
 test('correct count', () => {
-  expect(_ESTABLISHMENTS.length).toBe(25);
+  expect(_ESTABLISHMENTS.length).toBe(39);
   expect(_BASE_ESTABLISHMENTS.length).toBe(15);
   expect(_HARBOR_ESTABLISHMENTS.length).toBe(10);
+  expect(_MILLION_ESTABLISHMENTS.length).toBe(14);
   expect(_ESTABLISHMENTS2.length).toBe(20);
 });
 

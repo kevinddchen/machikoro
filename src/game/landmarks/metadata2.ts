@@ -17,7 +17,7 @@ export const CityHall2: Landmark = {
   expansion: Expansion.Base,
   name: 'City Hall',
   miniName: 'City Hall',
-  description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
+  description: 'Immediately before buying establishments, if you have 0 coins, get 1 coin from the bank.',
   coins: 1,
   cost: [0],
 };
@@ -107,7 +107,7 @@ export const TechStartup2: Landmark = {
   expansion: Expansion.Base,
   name: 'Tech Startup',
   miniName: 'Tech Startup',
-  description: 'If you roll 12, receive 8 coins from the bank (all players).',
+  description: 'If you roll 12, get 8 coins from the bank (all players).',
   coins: 8,
   cost: [10, 14, 22],
 };
@@ -118,7 +118,7 @@ export const Airport2: Landmark = {
   expansion: Expansion.Base,
   name: 'Airport',
   miniName: 'Airport',
-  description: 'If you build nothing on your turn, receive 5 coins from the bank (all players).',
+  description: 'If you build nothing on your turn, get 5 coins from the bank (all players).',
   coins: 5,
   cost: [12, 16, 22],
 };
@@ -140,7 +140,7 @@ export const Charterhouse2: Landmark = {
   expansion: Expansion.Base,
   name: 'Charterhouse',
   miniName: 'Charterhouse',
-  description: 'If you roll 2 dice and receive no coins, receive 3 coins from the bank (all players).',
+  description: 'If you roll 2 dice and get no coins, get 3 coins from the bank (all players).',
   coins: 3,
   cost: [12, 16, 22],
 };
@@ -152,9 +152,11 @@ export const ExhibitHall2: Landmark = {
   name: 'Exhibit Hall',
   miniName: 'Exhibit Hall',
   description: 'From each opponent who has more than 10 coins, take half, rounded down (builder only).',
-  coins: 11, // This is not the coins taken, but the threshold for triggering the tax office
+  coins: 0, // (special case; determined by opponent coins)
   cost: [12, 16, 22],
 };
+
+export const MK2_EXHIBIT_HALL_TRIGGER = 11;
 
 export const Forge2: Landmark = {
   _id: 13,
@@ -173,7 +175,7 @@ export const Museum2: Landmark = {
   expansion: Expansion.Base,
   name: 'Museum',
   miniName: 'Museum',
-  description: 'Take 3 coins from each opponent for each landmark they own, excluding "City Hall" (builder only).',
+  description: 'Take 3 coins from each opponent for each landmark they have built (builder only).',
   coins: 3, // coins taken per landmark
   cost: [12, 16, 22],
 };

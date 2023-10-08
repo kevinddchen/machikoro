@@ -12,7 +12,7 @@ export const CityHall: Landmark = {
   expansion: Expansion.Harbor,
   name: 'City Hall',
   miniName: 'City Hall',
-  description: 'Immediately before buying establishments, if you have 0 coins, receive 1 coin from the bank.',
+  description: 'Immediately before buying establishments, if you have 0 coins, get 1 coin from the bank.',
   coins: 1,
   cost: [0],
 };
@@ -78,7 +78,7 @@ export const Airport: Landmark = {
   expansion: Expansion.Harbor,
   name: 'Airport',
   miniName: 'Airport',
-  description: 'If you build nothing on your turn, receive 10 coins from the bank.',
+  description: 'If you build nothing on your turn, get 10 coins from the bank.',
   coins: 10,
   cost: [30],
 };

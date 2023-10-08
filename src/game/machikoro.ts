@@ -696,7 +696,7 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       }
 
       // Tuna Boat earnings are based off the tuna roll
-      // all other blue establishments receive `est.earn` coins from the bank
+      // all other blue establishments get `est.earn` coins from the bank
       let earnings;
       if (Est.isEqual(est, Est.TunaBoat)) {
         earnings = getTunaRoll(context);
@@ -794,11 +794,12 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
         take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TaxOffice) || Est.isEqual(est, Est.TaxOffice2)) {
+      const trigger = G.version === Version.MK1 ? Est.MK1_TAX_OFFICE_TRIGGER : Est.MK2_TAX_OFFICE_TRIGGER;
       for (const opponent of getPreviousPlayers(ctx)) {
         // in Machi Koro 2, each copy of the tax office activates
         for (let i = 0; i < count; i++) {
           const opp_coins = getCoins(G, opponent);
-          if (opp_coins < est.earn) {
+          if (opp_coins < trigger) {
             break;
           }
           const amount = Math.floor(opp_coins / 2);
@@ -880,8 +881,7 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
     // do tax office on each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
       const opp_coins = getCoins(G, opponent);
-      assertNonNull(land.coins);
-      if (opp_coins < land.coins) {
+      if (opp_coins < Land.MK2_EXHIBIT_HALL_TRIGGER) {
         continue;
       }
       const amount = Math.floor(opp_coins / 2);
@@ -1024,7 +1024,7 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  */
 const debugSetupData: SetupData = {
   version: Version.MK1,
-  expansions: [Expansion.Base, Expansion.Million],
+  expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
