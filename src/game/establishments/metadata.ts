@@ -89,7 +89,6 @@ export const Cafe: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const CornField: Establishment = {
   _id: 6,
   version: Version.MK1,

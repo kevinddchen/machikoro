@@ -715,7 +715,16 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
         earnings += Land.Forge2.coins;
       }
 
-      const amount = earnings * count;
+      // by default a blue establishment earns `multiplier * earnings = 1 * earnings`
+      // but there are special cases where `multiplier` is not 1.
+      let multiplier: number;
+      if (Est.isEqual(est, Est.CornField)) {
+        multiplier = Land.countBuilt(G, player) < 2 ? 1 : 0;
+      } else {
+        multiplier = 1;
+      }
+
+      const amount = earnings * multiplier * count;
       earn(G, ctx, player, amount, est.name);
     }
   }
@@ -741,8 +750,8 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
     }
 
     // by default a green establishment earns `multiplier * earnings = 1 * earnings`
-    // but there are many special cases where `multiplier` is not 1.
-    let multiplier;
+    // but there are special cases where `multiplier` is not 1.
+    let multiplier: number;
     if (Est.isEqual(est, Est.CheeseFactory)) {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
     } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
