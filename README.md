@@ -27,6 +27,7 @@ Because this game was implemented to be automatic as much as possible, there are
 
 - `Demolition Company` cannot activate after `Corn Field`.
 - `Loan Office` cannot activate after `Forest` or `Flower Shop`.
+- `Moving Company` cannot activate before 
 
 ## Development
 

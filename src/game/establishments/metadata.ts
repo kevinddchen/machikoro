@@ -331,7 +331,6 @@ export const FamilyRestaurant: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const MovingCompany: Establishment = {
   _id: 23,
   version: Version.MK1,

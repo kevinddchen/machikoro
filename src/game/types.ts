@@ -22,8 +22,12 @@ import type { LogEvent } from './log';
  * @prop secondTurn - true if the current player can make another turn.
  * @prop doTV - number of times the current player will activate the TV Station.
  * @prop doOffice - number of times the current player will activate the Office.
- * @prop doMovingCompany - true if the current player will activate the Moving Company.
- * @prop officeGiveEst - the establishment picked for the Office to give.
+ * @prop doMovingCompany - number of times the current player will activate the
+ * Moving Company establishment (Machi Koro 1).
+ * @prop doMovingCompany2 - true if the current player will activate the Moving
+ * Company landmark (Machi Koro 2).
+ * @prop officeGiveEst - the establishment picked for the Office or Moving
+ * Company action to give.
  * @prop justBoughtEst - the establishment just bought.
  * @prop justBoughtLand - the landmark just bought.
  * @prop receivedCoins - true if the current player has received coins this turn.
@@ -49,7 +53,8 @@ export interface MachikoroG {
   secondTurn: boolean;
   doTV: number;
   doOffice: number;
-  doMovingCompany: boolean;
+  doMovingCompany: number;
+  doMovingCompany2: boolean;
   officeGiveEst: Establishment | null;
   justBoughtEst: Establishment | null;
   justBoughtLand: Landmark | null;
@@ -98,8 +103,8 @@ export const TurnState = {
   Roll: 0,
   ActivateRedEsts: 10,
   ActivateBlueGreenEsts: 11,
-  // MovingCompanyGive: 13,
-  // MovingCompanyPick: 14,
+  MovingCompanyGive: 13,
+  MovingCompanyOpp: 14,
   ActivatePurpleEsts: 15,
   TV: 16,
   OfficeGive: 17,
