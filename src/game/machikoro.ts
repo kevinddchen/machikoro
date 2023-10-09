@@ -172,14 +172,13 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
  * @param ctx
  * @param est
  * @returns True if the current player can pick the establishment to give up,
- * as part of the office action.
+ * as part of the Office or Moving Company action.
  */
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
-  // HACK: this is also used for Moving Company
   const player = parseInt(ctx.currentPlayer);
   const version = G.version;
   return (
-    (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.MovingCompany) &&
+    (G.turnState === TurnState.OfficeGive || G.turnState === TurnState.MovingCompany2) &&
     // must own the establishment
     Est.countOwned(G, player, est) > 0 &&
     // if playing Machi Koro 1, cannot give major (purple)
@@ -193,14 +192,14 @@ export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): bo
  * @param opponent
  * @param est
  * @returns True if the current player can take the opponent's establishment,
- * as a part of the office action.
+ * as a part of the Office action.
  */
 export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
   const version = G.version;
   return (
     G.turnState === TurnState.OfficeTake &&
-    // cannot be take from self
+    // cannot take from self
     opponent !== player &&
     // opponent must own the establishment
     Est.countOwned(G, opponent, est) > 0 &&
@@ -211,7 +210,7 @@ export const canDoOfficeTake = (G: MachikoroG, ctx: Ctx, opponent: number, est: 
 
 /**
  * @param G
- * @returns True if the current player can skip the office action. Can only be
+ * @returns True if the current player can skip the Office action. Can only be
  * done in Machi Koro 2.
  */
 export const canSkipOffice = (G: MachikoroG): boolean => {
@@ -434,8 +433,8 @@ const doTV: Move<MachikoroG> = (context, opponent: number) => {
 };
 
 /**
- * Activate the office establishment by picking an establishment you own to
- * give up.
+ * Activate Office or Moving Company action by picking an establishment you own
+ * to give up.
  * @param context
  * @param est
  */
@@ -444,13 +443,12 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
   if (!canDoOfficeGive(G, ctx, est)) {
     return INVALID_MOVE;
   }
-  // HACK: this is also used for Moving Company
 
   if (G.turnState === TurnState.OfficeGive) {
     G.officeGiveEst = est;
     // change game state directly instead of calling `switchState`
     G.turnState = TurnState.OfficeTake;
-  } else if (G.turnState === TurnState.MovingCompany) {
+  } else if (G.turnState === TurnState.MovingCompany2) {
     const player = parseInt(ctx.currentPlayer);
     const prevPlayer = getPreviousPlayers(ctx)[0];
     Est.transfer(G, { from: player, to: prevPlayer }, est);
@@ -577,32 +575,40 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const player = parseInt(ctx.currentPlayer);
 
-  if (G.turnState < TurnState.ActivateEsts) {
-    G.turnState = TurnState.ActivateEsts;
-    activateEsts(context);
+  if (G.turnState < TurnState.ActivateRedEsts) {
+    activateRedEsts(context);
   }
-  if (G.doTV > 0) {
-    G.turnState = TurnState.TV;
-    G.doTV -= 1;
-    return; // await player action
+  if (G.turnState < TurnState.ActivateBlueGreenEsts) {
+    activateBlueGreenEsts(context);
   }
-  if (G.doOffice > 0) {
-    G.turnState = TurnState.OfficeGive;
-    G.doOffice -= 1;
-    return; // await player action
+  if (G.turnState < TurnState.ActivatePurpleEsts) {
+    activatePurpleEsts(context);
+  }
+  if (G.turnState <= TurnState.TV) {
+    if (G.doTV > 0) {
+      G.doTV -= 1;
+      G.turnState = TurnState.TV;
+      return; // await player action
+    }
+  }
+  if (G.turnState <= TurnState.OfficeTake) {
+    if (G.doOffice > 0) {
+      G.doOffice -= 1;
+      G.turnState = TurnState.OfficeGive;
+      return; // await player action
+    }
   }
   if (G.turnState < TurnState.ActivateLands) {
-    G.turnState = TurnState.ActivateLands;
     activateLands(context);
   }
-  if (G.doMovingCompany) {
-    G.turnState = TurnState.MovingCompany;
-    G.doMovingCompany = false;
-    return; // await player action
+  if (G.turnState <= TurnState.MovingCompany2) {
+    if (G.doMovingCompany) {
+      G.doMovingCompany = false;
+      G.turnState = TurnState.MovingCompany2;
+      return; // await player action
+    }
   }
   if (G.turnState < TurnState.Buy) {
-    G.turnState = TurnState.Buy;
-
     // activate city hall before buying
     if (getCoins(G, player) === 0) {
       if (G.version === Version.MK1 && Land.owns(G, player, Land.CityHall)) {
@@ -616,11 +622,10 @@ const switchState = (context: FnContext<MachikoroG>): void => {
       }
     }
 
+    G.turnState = TurnState.Buy;
     return; // await player action
   }
   if (G.turnState < TurnState.ActivateBoughtLand) {
-    G.turnState = TurnState.ActivateBoughtLand;
-
     // first, check if game is over
     if (canEndGame(G, ctx)) {
       endGame(context, player);
@@ -636,17 +641,15 @@ const switchState = (context: FnContext<MachikoroG>): void => {
 };
 
 /**
- * Activate establishments.
+ * Activate red establishments.
  * @param context
  */
-const activateEsts = (context: FnContext<MachikoroG>): void => {
+const activateRedEsts = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const currentPlayer = parseInt(ctx.currentPlayer);
   const roll = G.roll;
-
   const allEsts = Est.getAllInUse(G.version, G.expansions);
 
-  // Do Red establishments.
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of redEsts) {
@@ -692,6 +695,17 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       take(G, ctx, { from: currentPlayer, to: opponent }, amount, est.name);
     }
   }
+}
+
+/**
+ * Activate blue and green establishments.
+ * @param context
+ */
+const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
+  const { G, ctx } = context;
+  const currentPlayer = parseInt(ctx.currentPlayer);
+  const roll = G.roll;
+  const allEsts = Est.getAllInUse(G.version, G.expansions);
 
   // Do `LoanOffice` before `Forest` and `FlowerShop`
   if (Est.isInUse(Est.LoanOffice, G.version, G.expansions) && Est.LoanOffice.rolls.includes(roll)) {
@@ -805,8 +819,18 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
     const amount = earnings * multiplier * count;
     earn(G, ctx, currentPlayer, amount, est.name);
   }
+}
 
-  // Do Purple establishments.
+/**
+ * Activate purple establishments.
+ * @param context
+ */
+const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
+  const { G, ctx } = context;
+  const currentPlayer = parseInt(ctx.currentPlayer);
+  const roll = G.roll;
+  const allEsts = Est.getAllInUse(G.version, G.expansions);
+
   const purpleEsts = allEsts.filter((est) => est.color === EstColor.Purple && est.rolls.includes(roll));
   for (const est of purpleEsts) {
     const count = Est.countOwned(G, currentPlayer, est);

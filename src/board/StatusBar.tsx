@@ -68,7 +68,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
           return currentPlayerName + ' is making a move: Business center';
         }
       }
-      case Game.TurnState.MovingCompany: {
+      case Game.TurnState.MovingCompany2: {
         if (isActive) {
           return 'Moving company: Select one of your establishments to give.';
         } else {
@@ -82,7 +82,9 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
           return 'Waiting for ' + currentPlayerName + ' to end the turn...';
         }
       }
-      case Game.TurnState.ActivateEsts:
+      case Game.TurnState.ActivateRedEsts:
+      case Game.TurnState.ActivateBlueGreenEsts:
+      case Game.TurnState.ActivatePurpleEsts:
       case Game.TurnState.ActivateLands:
       case Game.TurnState.ActivateBoughtLand: {
         // these game states are transitionary, so the player should not see any message
