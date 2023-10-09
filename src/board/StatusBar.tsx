@@ -51,7 +51,7 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
       }
       case Game.TurnState.TV: {
         if (isActive) {
-          return 'TV station: Choose an opponent who has to give you ' + Game.Est.TVStation.earn.toString() + ' coins.';
+          return 'TV station: Select an opponent who has to give you ' + Game.Est.TVStation.earn.toString() + ' coins.';
         } else {
           return currentPlayerName + ' is making a move: TV station';
         }
@@ -68,9 +68,17 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
           return currentPlayerName + ' is making a move: Business center';
         }
       }
-      case Game.TurnState.MovingCompany: {
+      case Game.TurnState.MovingCompanyGive:
+      case Game.TurnState.MovingCompany2: {
         if (isActive) {
           return 'Moving company: Select one of your establishments to give.';
+        } else {
+          return currentPlayerName + ' is making a move: Moving company';
+        }
+      }
+      case Game.TurnState.MovingCompanyOpp: {
+        if (isActive) {
+          return 'Moving company: Select an opponent who will receive your establishment.';
         } else {
           return currentPlayerName + ' is making a move: Moving company';
         }
@@ -82,7 +90,9 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
           return 'Waiting for ' + currentPlayerName + ' to end the turn...';
         }
       }
-      case Game.TurnState.ActivateEsts:
+      case Game.TurnState.ActivateRedEsts:
+      case Game.TurnState.ActivateBlueGreenEsts:
+      case Game.TurnState.ActivatePurpleEsts:
       case Game.TurnState.ActivateLands:
       case Game.TurnState.ActivateBoughtLand: {
         // these game states are transitionary, so the player should not see any message

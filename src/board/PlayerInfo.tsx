@@ -44,6 +44,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     const currentPlayer = parseInt(ctx.currentPlayer);
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
+    const canDoMovingCompany = isActive && Game.canDoMovingCompanyOpp(G, ctx, player);
 
     // NOTE: There are 3 different players to keep track of here:
     // `player` is the player ID that this component is rendering info for.
@@ -135,8 +136,17 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
     }
 
+    // player name
+    let onClickNameEvent: () => void;
+    if (canDoTV) {
+      onClickNameEvent = () => moves.doTV(player);
+    } else if (canDoMovingCompany) {
+      onClickNameEvent = () => moves.doMovingCompanyOpp(player);
+    } else {
+      onClickNameEvent = () => void 0;
+    }
     const nameDiv = (
-      <div className={classNames('name_div', { name_do_tv: canDoTV })} onClick={() => moves.doTV(player)}>
+      <div className={classNames('name_div', { name_do_tv: canDoTV || canDoMovingCompany })} onClick={onClickNameEvent}>
         {name}
       </div>
     );
