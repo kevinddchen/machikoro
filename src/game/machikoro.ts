@@ -655,8 +655,14 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
         continue;
       }
 
-      // all red establishments take `est.earn` coins from the player
-      let earnings = est.earn;
+      // Member's Only Club earnings are all coins from the opponent
+      // all other red establishments get `est.earn` coins from the bank
+      let earnings: number;
+      if (Est.isEqual(est, Est.MembersOnlyClub)) {
+        earnings = getCoins(G, currentPlayer);
+      } else {
+        earnings = est.earn;
+      }
 
       // +1 coin to Cup type if opponent owns Shopping Mall
       if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
@@ -676,6 +682,8 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
         multiplier = Land.owns(G, opponent, Land.Harbor) ? 1 : 0;
       } else if (Est.isEqual(est, Est.FrenchRestaurant)) {
         multiplier = Land.countBuilt(G, currentPlayer) >= 2 ? 1 : 0;
+      } else if (Est.isEqual(est, Est.MembersOnlyClub)) {
+        multiplier = Land.countBuilt(G, currentPlayer) >= 3 ? 1 : 0;
       } else {
         multiplier = 1;
       }

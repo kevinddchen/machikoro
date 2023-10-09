@@ -402,7 +402,6 @@ export const FoodWarehouse: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const MembersOnlyClub: Establishment = {
   _id: 28,
   version: Version.MK1,
