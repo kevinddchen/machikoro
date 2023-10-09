@@ -47,7 +47,6 @@ export const Ranch: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const GeneralStore: Establishment = {
   _id: 3,
   version: Version.MK1,
@@ -90,7 +89,6 @@ export const Cafe: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const CornField: Establishment = {
   _id: 6,
   version: Version.MK1,
@@ -148,7 +146,6 @@ export const DemolitionCompany: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const FrenchRestaurant: Establishment = {
   _id: 10,
   version: Version.MK1,
@@ -177,7 +174,6 @@ export const Forest: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const LoanOffice: Establishment = {
   _id: 12,
   version: Version.MK1,
@@ -220,7 +216,6 @@ export const PizzaJoint: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const Vineyard: Establishment = {
   _id: 15,
   version: Version.MK1,
@@ -365,7 +360,6 @@ export const AppleOrchard: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const SodaBottlingPlant: Establishment = {
   _id: 25,
   version: Version.MK1,
@@ -408,7 +402,6 @@ export const FoodWarehouse: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const MembersOnlyClub: Establishment = {
   _id: 28,
   version: Version.MK1,

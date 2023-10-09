@@ -21,6 +21,13 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 - **Variable**: 10 establishments are available for purchase from the supply. This is the official supply variant of the expansions.
 - **Hybrid**: 5 establishments with rolls 1-6, 5 establishments with rolls 7+, and 2 major establishments are available for purchase from the supply. This is the official supply variant of Machi Koro 2.
 
+### Implementation details
+
+Because this game was implemented to be automatic as much as possible, there are certain uncommon plays that are not possible.
+
+- `Loan Office` always activates before `Forest` and `Flower Shop`.
+- `Demolition Company` always activates before `Corn Field`.
+
 ## Development
 
 First, install [Node.js](https://nodejs.org/en/).
