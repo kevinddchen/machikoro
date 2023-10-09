@@ -831,7 +831,6 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
 
     if (Est.isEqual(est, Est.MovingCompany)) {
       G.doMovingCompany = count;
-      continue;
     }
 
     let earnings = est.earn;

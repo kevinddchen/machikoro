@@ -338,7 +338,7 @@ export const MovingCompany: Establishment = {
   name: 'Moving Company',
   description: 'Give a non-Major establishment to an opponent. Then get 4 coins from the bank.',
   cost: 2,
-  earn: 0,
+  earn: 4,
   rolls: [9, 10],
   color: EstColor.Green,
   type: null,

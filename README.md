@@ -25,9 +25,8 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 
 Because this game was implemented to be automatic as much as possible, there are certain uncommon plays that are not possible.
 
-- `Demolition Company` cannot activate after `Corn Field`.
 - `Loan Office` cannot activate after `Forest` or `Flower Shop`.
-- `Moving Company` cannot activate before 
+- `Moving Company` cannot activate before `Mine`, `Winery`, or `Apple Orchard`.
 
 ## Development
 
