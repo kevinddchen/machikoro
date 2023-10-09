@@ -628,6 +628,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     activateBlueGreenEsts(context);
   }
   if (G.turnState <= TurnState.MovingCompanyOpp) {
+    // can do multiple times
     if (G.doMovingCompany > 0) {
       G.doMovingCompany -= 1;
       G.turnState = TurnState.MovingCompanyGive;
@@ -637,14 +638,15 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   if (G.turnState < TurnState.ActivatePurpleEsts) {
     activatePurpleEsts(context);
   }
-  if (G.turnState <= TurnState.TV) {
-    if (G.doTV > 0) {
-      G.doTV -= 1;
+  if (G.turnState < TurnState.TV) {
+    if (G.doTV) {
+      G.doTV = false;
       G.turnState = TurnState.TV;
       return; // await player action
     }
   }
   if (G.turnState <= TurnState.OfficeTake) {
+    // can do multiple times
     if (G.doOffice > 0) {
       G.doOffice -= 1;
       G.turnState = TurnState.OfficeGive;
@@ -654,7 +656,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   if (G.turnState < TurnState.ActivateLands) {
     activateLands(context);
   }
-  if (G.turnState <= TurnState.MovingCompany2) {
+  if (G.turnState < TurnState.MovingCompany2) {
     if (G.doMovingCompany2) {
       G.doMovingCompany2 = false;
       G.turnState = TurnState.MovingCompany2;
@@ -760,7 +762,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
   const roll = G.roll;
   const allEsts = Est.getAllInUse(G.version, G.expansions);
 
-  // Do `LoanOffice` before `Forest` and `FlowerShop`
+  // Do `LoanOffice` first.
   if (Est.isInUse(Est.LoanOffice, G.version, G.expansions) && Est.LoanOffice.rolls.includes(roll)) {
     const count = Est.countOwned(G, currentPlayer, Est.LoanOffice);
     const earnings = Est.LoanOffice.earn;
@@ -904,7 +906,7 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
         take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
-      G.doTV = count;
+      G.doTV = true;
     } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
       if (officeTradeExists(context)) {
         G.doOffice = count;
@@ -1179,10 +1181,10 @@ const officeTradeExists = (context: FnContext<MachikoroG>): boolean => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  // version: Version.MK1,
-  // expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
-  version: Version.MK2,
-  expansions: [Expansion.Base],
+  version: Version.MK1,
+  expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
+  // version: Version.MK2,
+  // expansions: [Expansion.Base],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
@@ -1199,7 +1201,7 @@ const newTurnG = {
   numDice: 0,
   numRolls: 0,
   secondTurn: false,
-  doTV: 0,
+  doTV: false,
   doOffice: 0,
   doMovingCompany: 0,
   doMovingCompany2: false,
