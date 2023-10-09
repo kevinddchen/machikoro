@@ -794,7 +794,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
 
       // Tuna Boat earnings are based off the tuna roll
       // all other blue establishments get `est.earn` coins from the bank
-      let earnings;
+      let earnings: number;
       if (Est.isEqual(est, Est.TunaBoat)) {
         earnings = getTunaRoll(context);
       } else {
@@ -906,7 +906,9 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
     } else if (Est.isEqual(est, Est.TVStation)) {
       G.doTV = count;
     } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
-      G.doOffice = count;
+      if (officeTradeExists(context)) {
+        G.doOffice = count;
+      }
     } else if (Est.isEqual(est, Est.Publisher)) {
       // take 1 coin for each Cup and Shop type establishment
       for (const opponent of getPreviousPlayers(ctx)) {
@@ -1136,6 +1138,37 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
   events.endGame();
 };
 
+/**
+ * Check if an Office trade exists.
+ * @param context
+ * @returns `true` if a valid trade exists, `false` otherwise.
+ */
+const officeTradeExists = (context: FnContext<MachikoroG>): boolean => {
+  const { G, ctx } = context;
+  const currentPlayer = parseInt(ctx.currentPlayer);
+  let currentPlayerEsts = Est.getAllOwned(G, currentPlayer);
+  if (G.version === Version.MK1) {
+    // filter out major establishments
+    currentPlayerEsts = currentPlayerEsts.filter((est) => est.color !== EstColor.Purple);
+  }
+  if (currentPlayerEsts.length === 0) {
+    return false;
+  }
+
+  for (const opponent of getPreviousPlayers(ctx)) {
+    let opponentEsts = Est.getAllOwned(G, opponent);
+    if (G.version === Version.MK1) {
+      // filter out major establishments
+      opponentEsts = opponentEsts.filter((est) => est.color !== EstColor.Purple);
+    }
+    if (opponentEsts.length > 0) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 //
 // === Game ===
 //
@@ -1146,10 +1179,10 @@ const endGame = (context: FnContext<MachikoroG>, winner: number): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  version: Version.MK1,
-  expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
-  // version: Version.MK2,
-  // expansions: [Expansion.Base],
+  // version: Version.MK1,
+  // expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
+  version: Version.MK2,
+  expansions: [Expansion.Base],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
