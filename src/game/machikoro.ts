@@ -785,6 +785,11 @@ const activateEsts = (context: FnContext<MachikoroG>): void => {
       multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
     } else if (Est.isEqual(est, Est.GeneralStore)) {
       multiplier = Land.countBuilt(G, currentPlayer) < 2 ? 1 : 0;
+    } else if (Est.isEqual(est, Est.SodaBottlingPlant)) {
+      multiplier = 0;
+      for (const player of getNextPlayers(ctx)) {
+        multiplier += Est.countTypeOwned(G, player, EstType.Cup);
+      }
     } else {
       multiplier = 1;
     }
@@ -1055,7 +1060,7 @@ const debugSetupData: SetupData = {
   version: Version.MK1,
   expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
   supplyVariant: SupplyVariant.Total,
-  startCoins: 3,
+  startCoins: 99,
   initialBuyRounds: 0,
   randomizeTurnOrder: false,
 };

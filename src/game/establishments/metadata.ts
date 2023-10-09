@@ -216,7 +216,6 @@ export const PizzaJoint: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const Vineyard: Establishment = {
   _id: 15,
   version: Version.MK1,
@@ -361,7 +360,6 @@ export const AppleOrchard: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const SodaBottlingPlant: Establishment = {
   _id: 25,
   version: Version.MK1,
