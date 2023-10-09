@@ -44,7 +44,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     const currentPlayer = parseInt(ctx.currentPlayer);
     const money = Game.getCoins(G, player);
     const canDoTV = isActive && Game.canDoTV(G, ctx, player);
-    const canDoMovingCompany = isActive && Game.canDoMovingCompanyOpp(G, ctx, player)
+    const canDoMovingCompany = isActive && Game.canDoMovingCompanyOpp(G, ctx, player);
 
     // NOTE: There are 3 different players to keep track of here:
     // `player` is the player ID that this component is rendering info for.
