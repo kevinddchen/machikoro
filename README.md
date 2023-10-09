@@ -24,7 +24,7 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 ### Implementation details
 
 Because this game was implemented to be automatic as much as possible, there are certain uncommon plays that are not possible.
-  
+
 - `Loan Office` always activates before `Forest` and `Flower Shop`.
 - `Demolition Company` always activates before `Corn Field`.
 
