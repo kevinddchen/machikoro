@@ -102,6 +102,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     for (let i = 0; i < ownedEsts.length; i++) {
       const est = ownedEsts[i];
       const count = Est.countOwned(G, player, est);
+      const countRenovation = Est.countRenovation(G, player, est);
 
       let canDoOffice: boolean;
       let doOffice: (est: Est.Establishment) => void;
@@ -120,10 +121,11 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
+        const estIsGrey = j < countRenovation;
         minis.push(
           <td
             key={key}
-            className={classNames('mini_td', estColor, { clickable: canDoOffice })}
+            className={classNames('mini_td', estColor, { inactive: estIsGrey }, { clickable: canDoOffice })}
             onClick={() => doOffice(est)}
           >
             <div className='mini_roll'>{estRollBoxes}</div>

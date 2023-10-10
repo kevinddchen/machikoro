@@ -666,14 +666,12 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   if (G.turnState < TurnState.Buy) {
     // activate city hall before buying
     if (getCoins(G, player) === 0) {
-      if (G.version === Version.MK1 && Land.owns(G, player, Land.CityHall)) {
-        assertNonNull(Land.CityHall.coins);
-        addCoins(G, player, Land.CityHall.coins);
-        Log.logEarn(G, player, Land.CityHall.coins, Land.CityHall.name);
-      } else if (G.version === Version.MK2 && Land.owns(G, player, Land.CityHall2)) {
-        assertNonNull(Land.CityHall2.coins);
-        addCoins(G, player, Land.CityHall2.coins);
-        Log.logEarn(G, player, Land.CityHall2.coins, Land.CityHall2.name);
+      for (const cityHall of [Land.CityHall, Land.CityHall2]) {
+        if (Land.owns(G, player, cityHall)) {
+          assertNonNull(cityHall.coins);
+          addCoins(G, player, cityHall.coins);
+          Log.logEarn(G, player, cityHall.coins, cityHall.name);
+        }
       }
     }
 
@@ -826,57 +824,70 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
       continue; // handled above
     }
 
-    const count = Est.countOwned(G, currentPlayer, est);
-    if (count === 0) {
-      continue;
-    }
+    // get number of establishments owned
+    let count = Est.countOwned(G, currentPlayer, est);
+    // subtract number of establishments under renovation
+    const countRenovation = Est.countRenovation(G, currentPlayer, est);
+    count -= countRenovation;
 
-    if (Est.isEqual(est, Est.MovingCompany)) {
-      G.doMovingCompany = count;
-    }
-
-    let earnings = est.earn;
-    // +1 coin to Shop type if player owns Shopping Mall
-    if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
-      assertNonNull(Land.ShoppingMall.coins);
-      earnings += Land.ShoppingMall.coins;
-    }
-    // +1 coin to Shop type if any player owns Shopping Mall (Machi Koro 2)
-    if (est.type === EstType.Shop && Land.isOwned(G, Land.ShoppingMall2)) {
-      assertNonNull(Land.ShoppingMall2.coins);
-      earnings += Land.ShoppingMall2.coins;
-    }
-
-    // by default a green establishment earns `multiplier * earnings = 1 * earnings`
-    // but there are special cases where `multiplier` is not 1.
-    let multiplier: number;
-    if (Est.isEqual(est, Est.CheeseFactory)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
-    } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
-    } else if (Est.isEqual(est, Est.FarmersMarket)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
-    } else if (Est.isEqual(est, Est.FlowerShop)) {
-      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden);
-    } else if (Est.isEqual(est, Est.FlowerShop2)) {
-      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden2);
-    } else if (Est.isEqual(est, Est.FoodWarehouse) || Est.isEqual(est, Est.FoodWarehouse2)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
-    } else if (Est.isEqual(est, Est.Winery2)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
-    } else if (Est.isEqual(est, Est.GeneralStore)) {
-      multiplier = Land.countBuilt(G, currentPlayer) < 2 ? 1 : 0;
-    } else if (Est.isEqual(est, Est.SodaBottlingPlant)) {
-      multiplier = 0;
-      for (const player of getNextPlayers(ctx)) {
-        multiplier += Est.countTypeOwned(G, player, EstType.Cup);
+    if (count > 0) {
+      if (Est.isEqual(est, Est.MovingCompany)) {
+        G.doMovingCompany = count;
       }
-    } else {
-      multiplier = 1;
+
+      let earnings = est.earn;
+      // +1 coin to Shop type if player owns Shopping Mall
+      if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
+        assertNonNull(Land.ShoppingMall.coins);
+        earnings += Land.ShoppingMall.coins;
+      }
+      // +1 coin to Shop type if any player owns Shopping Mall (Machi Koro 2)
+      if (est.type === EstType.Shop && Land.isOwned(G, Land.ShoppingMall2)) {
+        assertNonNull(Land.ShoppingMall2.coins);
+        earnings += Land.ShoppingMall2.coins;
+      }
+
+      // by default a green establishment earns `multiplier * earnings = 1 * earnings`
+      // but there are special cases where `multiplier` is not 1.
+      let multiplier: number;
+      if (Est.isEqual(est, Est.CheeseFactory)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
+      } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
+      } else if (Est.isEqual(est, Est.FarmersMarket)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
+      } else if (Est.isEqual(est, Est.FlowerShop)) {
+        multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden);
+      } else if (Est.isEqual(est, Est.FlowerShop2)) {
+        multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden2);
+      } else if (Est.isEqual(est, Est.FoodWarehouse) || Est.isEqual(est, Est.FoodWarehouse2)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
+      } else if (Est.isEqual(est, Est.Winery)) {
+        multiplier = Est.countOwned(G, currentPlayer, Est.Vineyard);
+      } else if (Est.isEqual(est, Est.Winery2)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
+      } else if (Est.isEqual(est, Est.GeneralStore)) {
+        multiplier = Land.countBuilt(G, currentPlayer) < 2 ? 1 : 0;
+      } else if (Est.isEqual(est, Est.SodaBottlingPlant)) {
+        multiplier = 0;
+        for (const player of getNextPlayers(ctx)) {
+          multiplier += Est.countTypeOwned(G, player, EstType.Cup);
+        }
+      } else {
+        multiplier = 1;
+      }
+
+      const amount = earnings * multiplier * count;
+      earn(G, ctx, currentPlayer, amount, est.name);
     }
 
-    const amount = earnings * multiplier * count;
-    earn(G, ctx, currentPlayer, amount, est.name);
+    // if there are establishments under renovation, activate them
+    if (Est.isEqual(est, Est.Winery)) {
+      // NOTE: it is slightly strange, but `Winery` will close for renovations even if there are no `Vineyard`
+      Est.setRenovationCount(G, currentPlayer, Est.Winery, count);
+    } else {
+      Est.setRenovationCount(G, currentPlayer, est, 0);
+    }
   }
 };
 

@@ -59,7 +59,6 @@ export const isInUse = (est: Establishment, version: Version, expansions: Expans
  */
 export const countRemaining = (G: MachikoroG, est: Establishment): number => {
   if (G.version !== est.version) {
-    console.warn(`Establishment id=${est._id} ver=${est.version} does not match the game version, ${G.version}.`);
     return 0;
   }
   return G.estData._remainingCount[est._id];
@@ -73,7 +72,6 @@ export const countRemaining = (G: MachikoroG, est: Establishment): number => {
  */
 export const countAvailable = (G: MachikoroG, est: Establishment): number => {
   if (G.version !== est.version) {
-    console.warn(`Establishment id=${est._id} ver=${est.version} does not match the game version, ${G.version}.`);
     return 0;
   }
   return G.estData._availableCount[est._id];
@@ -88,7 +86,6 @@ export const countAvailable = (G: MachikoroG, est: Establishment): number => {
  */
 export const countOwned = (G: MachikoroG, player: number, est: Establishment): number => {
   if (G.version !== est.version) {
-    console.warn(`Establishment id=${est._id} ver=${est.version} does not match the game version, ${G.version}.`);
     return 0;
   }
   return G.estData._ownedCount[player][est._id];
@@ -159,7 +156,7 @@ export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): nu
  */
 export const buy = (G: MachikoroG, player: number, est: Establishment): void => {
   if (G.version !== est.version) {
-    throw new Error(`Establishment id=${est._id} ver=${est.version} does not match the game version, ${G.version}.`);
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
   }
   G.estData._remainingCount[est._id] -= 1;
   G.estData._availableCount[est._id] -= 1;
@@ -175,10 +172,39 @@ export const buy = (G: MachikoroG, player: number, est: Establishment): void => 
  */
 export const transfer = (G: MachikoroG, args: { from: number; to: number }, est: Establishment): void => {
   if (G.version !== est.version) {
-    throw new Error(`Establishment id=${est._id} ver=${est.version} does not match the game version, ${G.version}.`);
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
   }
   G.estData._ownedCount[args.from][est._id] -= 1;
   G.estData._ownedCount[args.to][est._id] += 1;
+};
+
+/**
+ * @param G
+ * @param player
+ * @param est
+ * @returns The number of establishments of this kind that are owned by the
+ * player and are under renovations.
+ */
+export const countRenovation = (G: MachikoroG, player: number, est: Establishment): number => {
+  if (G.version !== est.version) {
+    return 0;
+  }
+  return G.estData._renovationCount[player][est._id];
+};
+
+/**
+ * Update `G` to reflect the number of establishments of this kind that are
+ * owned by the player and are under renovations.
+ * @param G 
+ * @param player 
+ * @param est 
+ * @param count 
+ */
+export const setRenovationCount = (G: MachikoroG, player: number, est: Establishment, count: number): void => {
+  if (G.version !== est.version) {
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
+  }
+  G.estData._renovationCount[player][est._id] = count;
 };
 
 /**

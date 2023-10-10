@@ -300,7 +300,6 @@ export const Mine: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const Winery: Establishment = {
   _id: 21,
   version: Version.MK1,

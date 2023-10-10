@@ -37,7 +37,6 @@ export const isInUse = (land: Landmark, version: Version, expansions: Expansion[
  */
 export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
   if (G.version !== land.version) {
-    console.warn(`Landmark id=${land._id} ver=${land.version} does not match the game version, ${G.version}.`);
     return false;
   }
   return G.landData._available[land._id];
@@ -51,7 +50,6 @@ export const isAvailable = (G: MachikoroG, land: Landmark): boolean => {
  */
 export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => {
   if (G.version !== land.version) {
-    // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
   return G.landData._owned[player][land._id];
@@ -64,7 +62,6 @@ export const owns = (G: MachikoroG, player: number, land: Landmark): boolean => 
  */
 export const isOwned = (G: MachikoroG, land: Landmark): boolean => {
   if (G.version !== land.version) {
-    // this is used often for hard-coded landmarks, so no need to warn
     return false;
   }
   return G.landData._owned.some((ownedArr) => ownedArr[land._id]);
@@ -179,7 +176,7 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
 export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
   const version = G.version;
   if (version !== land.version) {
-    throw new Error(`Landmark id=${land._id} ver=${land.version} does not match the game version, ${G.version}.`);
+    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version}.`);
   }
   G.landData._owned[player][land._id] = true;
   // in Machi Koro 2, each landmark can only be bought by one player
