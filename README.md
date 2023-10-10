@@ -17,11 +17,11 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 
 ### Supply variants
 
-- **Total**: All establishments are available for purchase in the supply. This is the official supply variant of Machi Koro.
-- **Variable**: 10 establishments are available for purchase from the supply. This is the official supply variant of the expansions.
-- **Hybrid**: 5 establishments with rolls 1-6, 5 establishments with rolls 7+, and 2 major establishments are available for purchase from the supply. This is the official supply variant of Machi Koro 2.
+- **Total**: All establishments are available for purchase. This is the official supply variant of Machi Koro.
+- **Variable**: 10 establishments are available for purchase. This is the official supply variant of the expansions.
+- **Hybrid**: 5 establishments with rolls 1-6, 5 establishments with rolls 7+, and 2 major establishments are available for purchase. This is the official supply variant of Machi Koro 2.
 
-### Implementation details
+### Millionaire's Row expansion implementation details
 
 Some rulings that are not explicit in the game rules:
 
