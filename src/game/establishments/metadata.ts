@@ -518,8 +518,6 @@ export const TaxOffice: Establishment = {
   _initial: null,
 };
 
-export const MK1_TAX_OFFICE_TRIGGER = 10;
-
 // TODO: implement this
 export const TechStartup: Establishment = {
   _id: 36,
@@ -555,7 +553,6 @@ export const ExhibitHall: Establishment = {
   _initial: null,
 };
 
-// TODO: implement this
 export const Park: Establishment = {
   _id: 38,
   version: Version.MK1,
