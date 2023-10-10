@@ -1175,8 +1175,8 @@ const activateTaxOffice = (G: MachikoroG, ctx: Ctx, count: number, name: string)
 
 /**
  * Perform the Park action - redistribute everyone's coins evenly.
- * @param G 
- * @param ctx 
+ * @param G
+ * @param ctx
  */
 const activatePark = (G: MachikoroG, ctx: Ctx): void => {
   const { numPlayers } = ctx;
@@ -1205,10 +1205,10 @@ const activatePark = (G: MachikoroG, ctx: Ctx): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  // version: Version.MK1,
-  // expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
-  version: Version.MK2,
-  expansions: [Expansion.Base],
+  version: Version.MK1,
+  expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
+  // version: Version.MK2,
+  // expansions: [Expansion.Base],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
