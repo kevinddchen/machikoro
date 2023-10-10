@@ -932,6 +932,8 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
           take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
         }
       }
+    } else if (Est.isEqual(est, Est.Park)) {
+      activatePark(G, ctx);
     }
   }
 };
@@ -1028,12 +1030,7 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
       take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.Park2)) {
-    // redistribute everyone's coins evenly
-    // HACK: directly accessing coins array
-    const totalCoins = G._coins.reduce((a, b) => a + b, 0);
-    const coinsPerPlayer = Math.ceil(totalCoins / ctx.numPlayers);
-    G._coins.fill(coinsPerPlayer);
-    Log.logPark(G, coinsPerPlayer);
+    activatePark(G, ctx);
   }
 };
 
@@ -1169,6 +1166,28 @@ const officeTradeExists = (context: FnContext<MachikoroG>): boolean => {
   }
 
   return false;
+};
+
+/**
+ * Perform the Park action - redistribute everyone's coins evenly.
+ * @param G 
+ * @param ctx 
+ */
+const activatePark = (G: MachikoroG, ctx: Ctx): void => {
+  const { numPlayers } = ctx;
+
+  const players = [...Array(numPlayers).keys()];
+  const playerCoins = players.map((player) => getCoins(G, player));
+  const totalCoins = playerCoins.reduce((a, b) => a + b, 0);
+
+  // each player should have this many coins
+  const coinsPerPlayer = Math.ceil(totalCoins / numPlayers);
+
+  for (const player of players) {
+    addCoins(G, player, coinsPerPlayer - playerCoins[player]);
+  }
+
+  Log.logPark(G, coinsPerPlayer);
 };
 
 //

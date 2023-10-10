@@ -555,7 +555,6 @@ export const ExhibitHall: Establishment = {
   _initial: null,
 };
 
-// TODO: implement this
 export const Park: Establishment = {
   _id: 38,
   version: Version.MK1,
