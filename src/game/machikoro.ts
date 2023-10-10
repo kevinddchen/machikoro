@@ -843,7 +843,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
 
     // get number of establishments owned
     let count = Est.countOwned(G, currentPlayer, est);
-    // subtract number of establishments close for renovations
+    // subtract number of establishments closed for renovations
     count -= Est.countRenovation(G, currentPlayer, est);
 
     if (count > 0) {

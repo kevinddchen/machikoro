@@ -23,11 +23,14 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 
 ### Implementation details
 
-- `Winery` cards will close for renovations even if the player owns no `Vineyard` cards.
+Some rulings that are not explicit in the game rules:
 
-Because this game was implemented to be automatic as much as possible, there are certain uncommon plays that are not possible.
+- `Winery` cards will activate and close for renovations even if the player owns no `Vineyard` cards.
+
+Because this implementation is automated as much as possible, there are certain uncommon plays that are not possible:
 
 - `Loan Office` cannot activate after `Forest` or `Flower Shop`.
+- `Moving Company` cannot activate before `Mine`, `Winery`, or `Apple Orchard`.
 
 ## Development
 

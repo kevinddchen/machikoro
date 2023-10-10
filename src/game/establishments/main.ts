@@ -172,7 +172,12 @@ export const buy = (G: MachikoroG, player: number, est: Establishment): void => 
  * @param renovation - True if the establishment being transferred is closed
  * for renovations.
  */
-export const transfer = (G: MachikoroG, args: { from: number; to: number }, est: Establishment, renovation: boolean): void => {
+export const transfer = (
+  G: MachikoroG,
+  args: { from: number; to: number },
+  est: Establishment,
+  renovation: boolean,
+): void => {
   if (G.version !== est.version) {
     throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
   }
