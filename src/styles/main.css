@@ -18,6 +18,9 @@
   --est-res-light: #c57f7d; /* Restaurants (Alt) */
   --est-maj: #782b82; /* Major Establishments (Base) */
   --est-maj-light: #ab7fb0; /* Major Establishments (Alt) */
+  
+  --grey: #606060; /* Grey */
+  --grey-light: #a0a0a0; /* Light Grey */
 
   --land: #ae5421; /* Landmark (Base) */
   --land-light: #d9a16e; /* Landmark (Alt) */
@@ -459,6 +462,14 @@ span.tooltip_sym {
 
 .est_img_maj_light {
   background-color: var(--est-maj-light);
+}
+
+.est_img_grey {
+  background-color: var(--grey);
+}
+
+.est_img_grey_light {
+  background-color: var(--grey-light);
 }
 
 .est_roll {

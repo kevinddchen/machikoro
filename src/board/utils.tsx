@@ -7,9 +7,13 @@ import classNames from 'classnames';
  * Convert `Est.EstColor` to CSS class name.
  * @param color
  * @param darker - If true, uses darker variant.
+ * @param renovations - True if establishment is closed under renovations.
  * @returns
  */
-export const estColorToClass = (color: Est.EstColor, darker: boolean): string => {
+export const estColorToClass = (color: Est.EstColor, darker: boolean, renovations = false): string => {
+  if (renovations) {
+    return darker ? 'est_img_grey' : 'est_img_grey_light';
+  }
   switch (color) {
     case Est.EstColor.Blue:
       return darker ? 'est_img_pri' : 'est_img_pri_light';

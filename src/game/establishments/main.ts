@@ -195,16 +195,32 @@ export const countRenovation = (G: MachikoroG, player: number, est: Establishmen
 /**
  * Update `G` to reflect the number of establishments of this kind that are
  * owned by the player and are under renovations.
- * @param G 
- * @param player 
- * @param est 
- * @param count 
+ * @param G
+ * @param player
+ * @param est
+ * @param count
  */
 export const setRenovationCount = (G: MachikoroG, player: number, est: Establishment, count: number): void => {
   if (G.version !== est.version) {
     throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
   }
   G.estData._renovationCount[player][est._id] = count;
+};
+
+/**
+ * Update `G` to reflect the player having `count` number of establishments of
+ * this kind close for renovations. No check is made as to whether the total
+ * count will go negative.
+ * @param G
+ * @param player
+ * @param est
+ * @param count
+ */
+export const addRenovationCount = (G: MachikoroG, player: number, est: Establishment, count: number): void => {
+  if (G.version !== est.version) {
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
+  }
+  G.estData._renovationCount[player][est._id] += count;
 };
 
 /**

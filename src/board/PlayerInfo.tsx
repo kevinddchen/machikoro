@@ -105,28 +105,27 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const countRenovation = Est.countRenovation(G, player, est);
 
       let canDoOffice: boolean;
-      let doOffice: (est: Est.Establishment) => void;
+      let doOffice: (est: Est.Establishment, renovation: boolean) => void;
       if (player === currentPlayer) {
         canDoOffice = isActive && Game.canDoOfficeGive(G, ctx, est);
-        doOffice = (est) => moves.doOfficeGive(est);
+        doOffice = (est, renovation) => moves.doOfficeGive(est, renovation);
       } else {
         canDoOffice = isActive && Game.canDoOfficeTake(G, ctx, player, est);
-        doOffice = (est) => moves.doOfficeTake(player, est);
+        doOffice = (est, renovation) => moves.doOfficeTake(player, est, renovation);
       }
-
-      const estColor = estColorToClass(est.color, canDoOffice);
 
       const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
       const estDescription = parseMaterialSymbols(est.name + '\n\n' + est.description);
 
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
-        const estIsGrey = j < countRenovation;
+        const renovation = j < countRenovation; // true if establishment should display as "closed under renovations"
+        const estColor = estColorToClass(est.color, canDoOffice, renovation);
         minis.push(
           <td
             key={key}
-            className={classNames('mini_td', estColor, { inactive: estIsGrey }, { clickable: canDoOffice })}
-            onClick={() => doOffice(est)}
+            className={classNames('mini_td', estColor, { clickable: canDoOffice })}
+            onClick={() => doOffice(est, renovation)}
           >
             <div className='mini_roll'>{estRollBoxes}</div>
             <div className='mini_type'>

@@ -454,8 +454,9 @@ const doTV: Move<MachikoroG> = (context, opponent: number) => {
  * own to give up.
  * @param context
  * @param est
+ * @param renovation - True if the establishment is closed for renovations.
  */
-const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
+const doOfficeGive: Move<MachikoroG> = (context, est: Establishment, renovation: boolean) => {
   const { G, ctx } = context;
   if (!canDoOfficeGive(G, ctx, est)) {
     return INVALID_MOVE;
@@ -463,16 +464,23 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
 
   if (G.turnState === TurnState.OfficeGive) {
     G.officeGiveEst = est;
+    G.officeGiveRenovation = renovation;
+    console.log(est, renovation);
     // change game state directly instead of calling `switchState`
     G.turnState = TurnState.OfficeTake;
   } else if (G.turnState === TurnState.MovingCompanyGive) {
     G.officeGiveEst = est;
+    G.officeGiveRenovation = renovation;
     // change game state directly instead of calling `switchState`
     G.turnState = TurnState.MovingCompanyOpp;
   } else if (G.turnState === TurnState.MovingCompany2) {
     const player = parseInt(ctx.currentPlayer);
     const prevPlayer = getPreviousPlayers(ctx)[0];
     Est.transfer(G, { from: player, to: prevPlayer }, est);
+    if (renovation) {
+      Est.addRenovationCount(G, player, est, -1);
+      Est.addRenovationCount(G, prevPlayer, est, 1);
+    }
     Log.logMovingCompany(G, est.name, prevPlayer);
     switchState(context);
   } else {
@@ -488,8 +496,9 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
  * @param context
  * @param opponent
  * @param est
+ * @param renovation - True if the establishment is closed for renovations.
  */
-const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establishment) => {
+const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establishment, renovation: boolean) => {
   const { G, ctx } = context;
   if (!canDoOfficeTake(G, ctx, opponent, est)) {
     return INVALID_MOVE;
@@ -500,10 +509,21 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
     throw new Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
   }
   Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
+  if (G.officeGiveRenovation) {
+    Est.addRenovationCount(G, player, G.officeGiveEst, -1);
+    Est.addRenovationCount(G, opponent, G.officeGiveEst, 1);
+  }
   Est.transfer(G, { from: opponent, to: player }, est);
+  if (renovation) {
+    Est.addRenovationCount(G, opponent, est, -1);
+    Est.addRenovationCount(G, player, est, 1);
+  }
   Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
-  G.officeGiveEst = null; // cleanup
+  // cleanup
+  G.officeGiveEst = null;
+  G.officeGiveRenovation = null;
+
   switchState(context);
 
   return;
@@ -520,8 +540,11 @@ const skipOffice: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  G.officeGiveEst = null; // cleanup
+  // cleanup
+  G.officeGiveEst = null;
+  G.officeGiveRenovation = null;
   G.doOffice = 0;
+
   switchState(context);
 
   return;
@@ -544,9 +567,16 @@ const doMovingCompanyOpp: Move<MachikoroG> = (context, opponent: number) => {
     throw new Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeMovingCompanyOpp`.');
   }
   Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
+  if (G.officeGiveRenovation) {
+    Est.addRenovationCount(G, player, G.officeGiveEst, -1);
+    Est.addRenovationCount(G, opponent, G.officeGiveEst, 1);
+  }
   Log.logMovingCompany(G, G.officeGiveEst.name, opponent);
 
-  G.officeGiveEst = null; // cleanup
+  // cleanup
+  G.officeGiveEst = null;
+  G.officeGiveRenovation = null;
+
   switchState(context);
 
   return;
@@ -826,9 +856,8 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
 
     // get number of establishments owned
     let count = Est.countOwned(G, currentPlayer, est);
-    // subtract number of establishments under renovation
-    const countRenovation = Est.countRenovation(G, currentPlayer, est);
-    count -= countRenovation;
+    // subtract number of establishments close for renovations
+    count -= Est.countRenovation(G, currentPlayer, est);
 
     if (count > 0) {
       if (Est.isEqual(est, Est.MovingCompany)) {
@@ -881,9 +910,9 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
       earn(G, ctx, currentPlayer, amount, est.name);
     }
 
-    // if there are establishments under renovation, activate them
+    // if there are establishments closed for renovations, open them
     if (Est.isEqual(est, Est.Winery)) {
-      // NOTE: it is slightly strange, but `Winery` will close for renovations even if there are no `Vineyard`
+      // NOTE: it is slightly strange, but `Winery` will close for renovations even if there is no `Vineyard`
       Est.setRenovationCount(G, currentPlayer, Est.Winery, count);
     } else {
       Est.setRenovationCount(G, currentPlayer, est, 0);
@@ -1241,6 +1270,7 @@ const newTurnG = {
   doMovingCompany: 0,
   doMovingCompany2: false,
   officeGiveEst: null,
+  officeGiveRenovation: null,
   justBoughtEst: null,
   justBoughtLand: null,
   receivedCoins: false,
