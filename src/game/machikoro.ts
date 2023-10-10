@@ -465,7 +465,6 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment, renovation:
   if (G.turnState === TurnState.OfficeGive) {
     G.officeGiveEst = est;
     G.officeGiveRenovation = renovation;
-    console.log(est, renovation);
     // change game state directly instead of calling `switchState`
     G.turnState = TurnState.OfficeTake;
   } else if (G.turnState === TurnState.MovingCompanyGive) {
@@ -476,11 +475,7 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment, renovation:
   } else if (G.turnState === TurnState.MovingCompany2) {
     const player = parseInt(ctx.currentPlayer);
     const prevPlayer = getPreviousPlayers(ctx)[0];
-    Est.transfer(G, { from: player, to: prevPlayer }, est);
-    if (renovation) {
-      Est.addRenovationCount(G, player, est, -1);
-      Est.addRenovationCount(G, prevPlayer, est, 1);
-    }
+    Est.transfer(G, { from: player, to: prevPlayer }, est, renovation);
     Log.logMovingCompany(G, est.name, prevPlayer);
     switchState(context);
   } else {
@@ -505,19 +500,13 @@ const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establis
   }
 
   const player = parseInt(ctx.currentPlayer);
-  if (G.officeGiveEst === null) {
-    throw new Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
+  if (G.officeGiveEst === null || G.officeGiveRenovation === null) {
+    throw new Error(
+      'Unexpected error: `G.officeGiveEst` and `G.officeGiveRenovation` should be set before `doOfficeTake`.',
+    );
   }
-  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
-  if (G.officeGiveRenovation) {
-    Est.addRenovationCount(G, player, G.officeGiveEst, -1);
-    Est.addRenovationCount(G, opponent, G.officeGiveEst, 1);
-  }
-  Est.transfer(G, { from: opponent, to: player }, est);
-  if (renovation) {
-    Est.addRenovationCount(G, opponent, est, -1);
-    Est.addRenovationCount(G, player, est, 1);
-  }
+  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst, G.officeGiveRenovation);
+  Est.transfer(G, { from: opponent, to: player }, est, renovation);
   Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
   // cleanup
@@ -563,14 +552,12 @@ const doMovingCompanyOpp: Move<MachikoroG> = (context, opponent: number) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  if (G.officeGiveEst === null) {
-    throw new Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeMovingCompanyOpp`.');
+  if (G.officeGiveEst === null || G.officeGiveRenovation === null) {
+    throw new Error(
+      'Unexpected error: `G.officeGiveEst` and `G.officeGiveRenovation` should be set before `doMovingCompanyOpp`.',
+    );
   }
-  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
-  if (G.officeGiveRenovation) {
-    Est.addRenovationCount(G, player, G.officeGiveEst, -1);
-    Est.addRenovationCount(G, opponent, G.officeGiveEst, 1);
-  }
+  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst, G.officeGiveRenovation);
   Log.logMovingCompany(G, G.officeGiveEst.name, opponent);
 
   // cleanup

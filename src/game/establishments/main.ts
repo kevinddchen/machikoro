@@ -169,13 +169,19 @@ export const buy = (G: MachikoroG, player: number, est: Establishment): void => 
  * @param args.from - Source player.
  * @param args.to - Destination player.
  * @param est - Establishment in question.
+ * @param renovation - True if the establishment being transferred is closed
+ * for renovations.
  */
-export const transfer = (G: MachikoroG, args: { from: number; to: number }, est: Establishment): void => {
+export const transfer = (G: MachikoroG, args: { from: number; to: number }, est: Establishment, renovation: boolean): void => {
   if (G.version !== est.version) {
     throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
   }
   G.estData._ownedCount[args.from][est._id] -= 1;
   G.estData._ownedCount[args.to][est._id] += 1;
+  if (renovation) {
+    G.estData._renovationCount[args.from][est._id] -= 1;
+    G.estData._renovationCount[args.to][est._id] += 1;
+  }
 };
 
 /**
@@ -205,22 +211,6 @@ export const setRenovationCount = (G: MachikoroG, player: number, est: Establish
     throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
   }
   G.estData._renovationCount[player][est._id] = count;
-};
-
-/**
- * Update `G` to reflect the player having `count` number of establishments of
- * this kind close for renovations. No check is made as to whether the total
- * count will go negative.
- * @param G
- * @param player
- * @param est
- * @param count
- */
-export const addRenovationCount = (G: MachikoroG, player: number, est: Establishment, count: number): void => {
-  if (G.version !== est.version) {
-    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
-  }
-  G.estData._renovationCount[player][est._id] += count;
 };
 
 /**
