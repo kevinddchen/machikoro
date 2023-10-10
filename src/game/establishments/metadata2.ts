@@ -215,8 +215,6 @@ export const TaxOffice2: Establishment = {
   _initial: 3,
 };
 
-export const MK2_TAX_OFFICE_TRIGGER = 11;
-
 export const FamilyRestaurant2: Establishment = {
   _id: 15,
   version: Version.MK2,

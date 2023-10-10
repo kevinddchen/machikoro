@@ -156,8 +156,6 @@ export const ExhibitHall2: Landmark = {
   cost: [12, 16, 22],
 };
 
-export const MK2_EXHIBIT_HALL_TRIGGER = 11;
-
 export const Forge2: Landmark = {
   _id: 13,
   version: Version.MK2,

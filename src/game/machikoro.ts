@@ -920,18 +920,7 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
         take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
       }
     } else if (Est.isEqual(est, Est.TaxOffice) || Est.isEqual(est, Est.TaxOffice2)) {
-      const trigger = G.version === Version.MK1 ? Est.MK1_TAX_OFFICE_TRIGGER : Est.MK2_TAX_OFFICE_TRIGGER;
-      for (const opponent of getPreviousPlayers(ctx)) {
-        // in Machi Koro 2, each copy of the tax office activates
-        for (let i = 0; i < count; i++) {
-          const opp_coins = getCoins(G, opponent);
-          if (opp_coins < trigger) {
-            break;
-          }
-          const amount = Math.floor(opp_coins / 2);
-          take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
-        }
-      }
+      activateTaxOffice(G, ctx, count, est.name);
     } else if (Est.isEqual(est, Est.Park)) {
       activatePark(G, ctx);
     }
@@ -1007,14 +996,7 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
     }
   } else if (Land.isEqual(land, Land.ExhibitHall2)) {
     // do tax office on each opponent
-    for (const opponent of getPreviousPlayers(ctx)) {
-      const opp_coins = getCoins(G, opponent);
-      if (opp_coins < Land.MK2_EXHIBIT_HALL_TRIGGER) {
-        continue;
-      }
-      const amount = Math.floor(opp_coins / 2);
-      take(G, ctx, { from: opponent, to: player }, amount, land.name);
-    }
+    activateTaxOffice(G, ctx, 1, land.name);
   } else if (Land.isEqual(land, Land.Museum2)) {
     // take 3 coins for each landmark, except City Hall
     for (const opponent of getPreviousPlayers(ctx)) {
@@ -1169,6 +1151,29 @@ const officeTradeExists = (context: FnContext<MachikoroG>): boolean => {
 };
 
 /**
+ * Perform the Tax Office action - take half of an opponent's coins.
+ * @param G
+ * @param ctx
+ * @param count - Number of times to activate the Tax Office.
+ * @param name - Name of the establishment / landmark.
+ */
+const activateTaxOffice = (G: MachikoroG, ctx: Ctx, count: number, name: string): void => {
+  const currentPlayer = parseInt(ctx.currentPlayer);
+  // In Machi Koro 1, triggers on 10+ coins. In Machi Koro 2, triggers on 11+ coins.
+  const trigger = G.version === Version.MK1 ? 10 : 11;
+  for (const opponent of getPreviousPlayers(ctx)) {
+    for (let i = 0; i < count; i++) {
+      const opp_coins = getCoins(G, opponent);
+      if (opp_coins < trigger) {
+        break;
+      }
+      const amount = Math.floor(opp_coins / 2);
+      take(G, ctx, { from: opponent, to: currentPlayer }, amount, name);
+    }
+  }
+};
+
+/**
  * Perform the Park action - redistribute everyone's coins evenly.
  * @param G 
  * @param ctx 
@@ -1200,10 +1205,10 @@ const activatePark = (G: MachikoroG, ctx: Ctx): void => {
  * Set-up data for debug mode.
  */
 const debugSetupData: SetupData = {
-  version: Version.MK1,
-  expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
-  // version: Version.MK2,
-  // expansions: [Expansion.Base],
+  // version: Version.MK1,
+  // expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
+  version: Version.MK2,
+  expansions: [Expansion.Base],
   supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
