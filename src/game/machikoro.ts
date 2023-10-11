@@ -599,8 +599,10 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
   for (const opponent of getPreviousPlayers(ctx)) {
     const count = Est.countOwned(G, opponent, est);
     const countRenovation = Est.countRenovation(G, opponent, est);
-    const amount = (count - countRenovation) * Est.RenovationCompany.earn;
-    take(G, ctx, { from: opponent, to: player }, amount, Est.RenovationCompany.name);
+    if (count > countRenovation) {
+      const amount = (count - countRenovation) * Est.RenovationCompany.earn;
+      take(G, ctx, { from: opponent, to: player }, amount, Est.RenovationCompany.name);
+    }
     Est.setRenovationCount(G, opponent, est, count);
   }
 
@@ -770,46 +772,49 @@ const activateRedEsts = (context: FnContext<MachikoroG>): void => {
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red && est.rolls.includes(roll));
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of redEsts) {
-      const count = Est.countOwned(G, opponent, est);
-      if (count === 0) {
-        continue;
+      // get number owned, subtract number closed for renovations
+      const count = Est.countOwned(G, opponent, est) - Est.countRenovation(G, opponent, est);
+
+      if (count > 0) {
+        // Member's Only Club earnings are all coins from the opponent
+        // all other red establishments get `est.earn` coins from the bank
+        let earnings: number;
+        if (Est.isEqual(est, Est.MembersOnlyClub)) {
+          earnings = getCoins(G, currentPlayer);
+        } else {
+          earnings = est.earn;
+        }
+
+        // +1 coin to Cup type if opponent owns Shopping Mall
+        if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
+          assertNonNull(Land.ShoppingMall.coins);
+          earnings += Land.ShoppingMall.coins;
+        }
+        // +1 coin to Cup type if any player owns Soda Bottling Plant (Machi Koro 2)
+        if (est.type === EstType.Cup && Land.isOwned(G, Land.SodaBottlingPlant2)) {
+          assertNonNull(Land.SodaBottlingPlant2.coins);
+          earnings += Land.SodaBottlingPlant2.coins;
+        }
+
+        // by default a red establishment takes `multiplier * earnings = 1 * earnings`
+        // but there are special cases where `multiplier` is not 1.
+        let multiplier: number;
+        if (Est.isEqual(est, Est.SushiBar)) {
+          multiplier = Land.owns(G, opponent, Land.Harbor) ? 1 : 0;
+        } else if (Est.isEqual(est, Est.FrenchRestaurant)) {
+          multiplier = Land.countBuilt(G, currentPlayer) >= 2 ? 1 : 0;
+        } else if (Est.isEqual(est, Est.MembersOnlyClub)) {
+          multiplier = Land.countBuilt(G, currentPlayer) >= 3 ? 1 : 0;
+        } else {
+          multiplier = 1;
+        }
+
+        const amount = earnings * multiplier * count;
+        take(G, ctx, { from: currentPlayer, to: opponent }, amount, est.name);
       }
 
-      // Member's Only Club earnings are all coins from the opponent
-      // all other red establishments get `est.earn` coins from the bank
-      let earnings: number;
-      if (Est.isEqual(est, Est.MembersOnlyClub)) {
-        earnings = getCoins(G, currentPlayer);
-      } else {
-        earnings = est.earn;
-      }
-
-      // +1 coin to Cup type if opponent owns Shopping Mall
-      if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
-        assertNonNull(Land.ShoppingMall.coins);
-        earnings += Land.ShoppingMall.coins;
-      }
-      // +1 coin to Cup type if any player owns Soda Bottling Plant (Machi Koro 2)
-      if (est.type === EstType.Cup && Land.isOwned(G, Land.SodaBottlingPlant2)) {
-        assertNonNull(Land.SodaBottlingPlant2.coins);
-        earnings += Land.SodaBottlingPlant2.coins;
-      }
-
-      // by default a red establishment takes `multiplier * earnings = 1 * earnings`
-      // but there are special cases where `multiplier` is not 1.
-      let multiplier: number;
-      if (Est.isEqual(est, Est.SushiBar)) {
-        multiplier = Land.owns(G, opponent, Land.Harbor) ? 1 : 0;
-      } else if (Est.isEqual(est, Est.FrenchRestaurant)) {
-        multiplier = Land.countBuilt(G, currentPlayer) >= 2 ? 1 : 0;
-      } else if (Est.isEqual(est, Est.MembersOnlyClub)) {
-        multiplier = Land.countBuilt(G, currentPlayer) >= 3 ? 1 : 0;
-      } else {
-        multiplier = 1;
-      }
-
-      const amount = earnings * multiplier * count;
-      take(G, ctx, { from: currentPlayer, to: opponent }, amount, est.name);
+      // if there are establishments closed for renovations, open them
+      Est.setRenovationCount(G, opponent, est, 0);
     }
   }
 };
@@ -828,6 +833,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
   if (Est.isInUse(Est.LoanOffice, G.version, G.expansions) && Est.LoanOffice.rolls.includes(roll)) {
     // get number owned, subtract number closed for renovations
     const count = Est.countOwned(G, currentPlayer, Est.LoanOffice) - Est.countRenovation(G, currentPlayer, Est.LoanOffice);
+
     if (count > 0) {
       const earnings = Est.LoanOffice.earn;
       const amount = earnings * count;
@@ -902,6 +908,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
     if (count > 0) {
       if (Est.isEqual(est, Est.MovingCompany)) {
         G.doMovingCompany = count;
+        // do not continue; player gets coins below
       }
 
       let earnings = est.earn;

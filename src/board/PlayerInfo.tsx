@@ -115,7 +115,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       } else if (canDoOfficeTake) {
         onClickEvent = (est, renovation) => moves.doOfficeTake(player, est, renovation);
       } else if (canDoRenovationCompany) {
-        onClickEvent = (est, _) => moves.doRenovationCompany(est);
+        onClickEvent = (est) => moves.doRenovationCompany(est);
       } else {
         onClickEvent = () => void 0;
       }
