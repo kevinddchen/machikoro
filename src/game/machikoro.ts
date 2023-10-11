@@ -670,6 +670,13 @@ const switchState = (context: FnContext<MachikoroG>): void => {
       return; // await player action
     }
   }
+  if (G.turnState < TurnState.RenovationCompany) {
+    if (G.doRenovationCompany) {
+      G.doRenovationCompany = false;
+      G.turnState = TurnState.RenovationCompany;
+      return; // await player action
+    }
+  }
   if (G.turnState < TurnState.ActivateLands) {
     activateLands(context);
   }
@@ -921,7 +928,7 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
   for (const est of purpleEsts) {
     const count = Est.countOwned(G, currentPlayer, est);
     if (count === 0) {
-      continue;
+      continue; // skips activating unowned purple establishments below
     }
 
     // each purple establishment has its own effect
@@ -950,6 +957,8 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
       activateTaxOffice(G, ctx, count, est.name);
     } else if (Est.isEqual(est, Est.Park)) {
       activatePark(G, ctx);
+    } else if (Est.isEqual(est, Est.RenovationCompany)) {
+      G.doRenovationCompany = true;
     }
   }
 };
@@ -1256,6 +1265,7 @@ const newTurnG = {
   doOffice: 0,
   doMovingCompany: 0,
   doMovingCompany2: false,
+  doRenovationCompany: false,
   officeGiveEst: null,
   officeGiveRenovation: null,
   justBoughtEst: null,

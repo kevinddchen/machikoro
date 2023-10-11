@@ -485,7 +485,6 @@ export const Publisher: Establishment = {
   _initial: null,
 };
 
-// TODO: implement this
 export const RenovationCompany: Establishment = {
   _id: 34,
   version: Version.MK1,

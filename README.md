@@ -23,14 +23,16 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 
 ### Millionaire's Row expansion implementation details
 
-Some rulings that are not explicit in the game rules:
+Some rulings that are not explicit in the official game rules:
 
 - `Winery` cards will activate and close for renovations even if the player owns no `Vineyard` cards.
 
-Because this implementation is automated as much as possible, there are certain uncommon plays that are not possible:
+There are certain uncommon plays that are not possible:
 
-- `Loan Office` cannot activate after `Forest` or `Flower Shop`.
-- `Moving Company` cannot activate before `Mine`, `Winery`, or `Apple Orchard`.
+- `Loan Office` cannot be activated after `Forest` or `Flower Shop`.
+- `Moving Company` cannot be activated before `Mine`, `Winery`, or `Apple Orchard`.
+- `Renovation Company` cannot be activated on an establishment that no one owns.
+- `Renovation Company` cannot be activated before `Tax Office`.
 
 ## Development
 
