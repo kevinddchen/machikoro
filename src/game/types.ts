@@ -28,6 +28,8 @@ import type { LogEvent } from './log';
  * Company landmark (Machi Koro 2).
  * @prop officeGiveEst - the establishment picked for the Office or Moving
  * Company action to give.
+ * @prop officeGiveRenovation - True if the establishment pick for the Office
+ * or Moving Company action is closed for renovations.
  * @prop justBoughtEst - the establishment just bought.
  * @prop justBoughtLand - the landmark just bought.
  * @prop receivedCoins - true if the current player has received coins this turn.
@@ -56,6 +58,7 @@ export interface MachikoroG {
   doMovingCompany: number;
   doMovingCompany2: boolean;
   officeGiveEst: Establishment | null;
+  officeGiveRenovation: boolean | null;
   justBoughtEst: Establishment | null;
   justBoughtLand: Landmark | null;
   receivedCoins: boolean;

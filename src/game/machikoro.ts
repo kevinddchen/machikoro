@@ -454,8 +454,9 @@ const doTV: Move<MachikoroG> = (context, opponent: number) => {
  * own to give up.
  * @param context
  * @param est
+ * @param renovation - True if the establishment is closed for renovations.
  */
-const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
+const doOfficeGive: Move<MachikoroG> = (context, est: Establishment, renovation: boolean) => {
   const { G, ctx } = context;
   if (!canDoOfficeGive(G, ctx, est)) {
     return INVALID_MOVE;
@@ -463,16 +464,18 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
 
   if (G.turnState === TurnState.OfficeGive) {
     G.officeGiveEst = est;
+    G.officeGiveRenovation = renovation;
     // change game state directly instead of calling `switchState`
     G.turnState = TurnState.OfficeTake;
   } else if (G.turnState === TurnState.MovingCompanyGive) {
     G.officeGiveEst = est;
+    G.officeGiveRenovation = renovation;
     // change game state directly instead of calling `switchState`
     G.turnState = TurnState.MovingCompanyOpp;
   } else if (G.turnState === TurnState.MovingCompany2) {
     const player = parseInt(ctx.currentPlayer);
     const prevPlayer = getPreviousPlayers(ctx)[0];
-    Est.transfer(G, { from: player, to: prevPlayer }, est);
+    Est.transfer(G, { from: player, to: prevPlayer }, est, renovation);
     Log.logMovingCompany(G, est.name, prevPlayer);
     switchState(context);
   } else {
@@ -488,22 +491,28 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment) => {
  * @param context
  * @param opponent
  * @param est
+ * @param renovation - True if the establishment is closed for renovations.
  */
-const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establishment) => {
+const doOfficeTake: Move<MachikoroG> = (context, opponent: number, est: Establishment, renovation: boolean) => {
   const { G, ctx } = context;
   if (!canDoOfficeTake(G, ctx, opponent, est)) {
     return INVALID_MOVE;
   }
 
   const player = parseInt(ctx.currentPlayer);
-  if (G.officeGiveEst === null) {
-    throw new Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeTake`.');
+  if (G.officeGiveEst === null || G.officeGiveRenovation === null) {
+    throw new Error(
+      'Unexpected error: `G.officeGiveEst` and `G.officeGiveRenovation` should be set before `doOfficeTake`.',
+    );
   }
-  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
-  Est.transfer(G, { from: opponent, to: player }, est);
+  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst, G.officeGiveRenovation);
+  Est.transfer(G, { from: opponent, to: player }, est, renovation);
   Log.logOffice(G, { player_est_name: G.officeGiveEst.name, opponent_est_name: est.name }, opponent);
 
-  G.officeGiveEst = null; // cleanup
+  // cleanup
+  G.officeGiveEst = null;
+  G.officeGiveRenovation = null;
+
   switchState(context);
 
   return;
@@ -520,8 +529,11 @@ const skipOffice: Move<MachikoroG> = (context) => {
     return INVALID_MOVE;
   }
 
-  G.officeGiveEst = null; // cleanup
+  // cleanup
+  G.officeGiveEst = null;
+  G.officeGiveRenovation = null;
   G.doOffice = 0;
+
   switchState(context);
 
   return;
@@ -540,13 +552,18 @@ const doMovingCompanyOpp: Move<MachikoroG> = (context, opponent: number) => {
   }
 
   const player = parseInt(ctx.currentPlayer);
-  if (G.officeGiveEst === null) {
-    throw new Error('Unexpected error: `G.officeGiveEst` should be set before `doOfficeMovingCompanyOpp`.');
+  if (G.officeGiveEst === null || G.officeGiveRenovation === null) {
+    throw new Error(
+      'Unexpected error: `G.officeGiveEst` and `G.officeGiveRenovation` should be set before `doMovingCompanyOpp`.',
+    );
   }
-  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst);
+  Est.transfer(G, { from: player, to: opponent }, G.officeGiveEst, G.officeGiveRenovation);
   Log.logMovingCompany(G, G.officeGiveEst.name, opponent);
 
-  G.officeGiveEst = null; // cleanup
+  // cleanup
+  G.officeGiveEst = null;
+  G.officeGiveRenovation = null;
+
   switchState(context);
 
   return;
@@ -666,14 +683,12 @@ const switchState = (context: FnContext<MachikoroG>): void => {
   if (G.turnState < TurnState.Buy) {
     // activate city hall before buying
     if (getCoins(G, player) === 0) {
-      if (G.version === Version.MK1 && Land.owns(G, player, Land.CityHall)) {
-        assertNonNull(Land.CityHall.coins);
-        addCoins(G, player, Land.CityHall.coins);
-        Log.logEarn(G, player, Land.CityHall.coins, Land.CityHall.name);
-      } else if (G.version === Version.MK2 && Land.owns(G, player, Land.CityHall2)) {
-        assertNonNull(Land.CityHall2.coins);
-        addCoins(G, player, Land.CityHall2.coins);
-        Log.logEarn(G, player, Land.CityHall2.coins, Land.CityHall2.name);
+      for (const cityHall of [Land.CityHall, Land.CityHall2]) {
+        if (Land.owns(G, player, cityHall)) {
+          assertNonNull(cityHall.coins);
+          addCoins(G, player, cityHall.coins);
+          Log.logEarn(G, player, cityHall.coins, cityHall.name);
+        }
       }
     }
 
@@ -826,57 +841,69 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
       continue; // handled above
     }
 
-    const count = Est.countOwned(G, currentPlayer, est);
-    if (count === 0) {
-      continue;
-    }
+    // get number of establishments owned
+    let count = Est.countOwned(G, currentPlayer, est);
+    // subtract number of establishments closed for renovations
+    count -= Est.countRenovation(G, currentPlayer, est);
 
-    if (Est.isEqual(est, Est.MovingCompany)) {
-      G.doMovingCompany = count;
-    }
-
-    let earnings = est.earn;
-    // +1 coin to Shop type if player owns Shopping Mall
-    if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
-      assertNonNull(Land.ShoppingMall.coins);
-      earnings += Land.ShoppingMall.coins;
-    }
-    // +1 coin to Shop type if any player owns Shopping Mall (Machi Koro 2)
-    if (est.type === EstType.Shop && Land.isOwned(G, Land.ShoppingMall2)) {
-      assertNonNull(Land.ShoppingMall2.coins);
-      earnings += Land.ShoppingMall2.coins;
-    }
-
-    // by default a green establishment earns `multiplier * earnings = 1 * earnings`
-    // but there are special cases where `multiplier` is not 1.
-    let multiplier: number;
-    if (Est.isEqual(est, Est.CheeseFactory)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
-    } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
-    } else if (Est.isEqual(est, Est.FarmersMarket)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
-    } else if (Est.isEqual(est, Est.FlowerShop)) {
-      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden);
-    } else if (Est.isEqual(est, Est.FlowerShop2)) {
-      multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden2);
-    } else if (Est.isEqual(est, Est.FoodWarehouse) || Est.isEqual(est, Est.FoodWarehouse2)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
-    } else if (Est.isEqual(est, Est.Winery2)) {
-      multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
-    } else if (Est.isEqual(est, Est.GeneralStore)) {
-      multiplier = Land.countBuilt(G, currentPlayer) < 2 ? 1 : 0;
-    } else if (Est.isEqual(est, Est.SodaBottlingPlant)) {
-      multiplier = 0;
-      for (const player of getNextPlayers(ctx)) {
-        multiplier += Est.countTypeOwned(G, player, EstType.Cup);
+    if (count > 0) {
+      if (Est.isEqual(est, Est.MovingCompany)) {
+        G.doMovingCompany = count;
       }
-    } else {
-      multiplier = 1;
+
+      let earnings = est.earn;
+      // +1 coin to Shop type if player owns Shopping Mall
+      if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
+        assertNonNull(Land.ShoppingMall.coins);
+        earnings += Land.ShoppingMall.coins;
+      }
+      // +1 coin to Shop type if any player owns Shopping Mall (Machi Koro 2)
+      if (est.type === EstType.Shop && Land.isOwned(G, Land.ShoppingMall2)) {
+        assertNonNull(Land.ShoppingMall2.coins);
+        earnings += Land.ShoppingMall2.coins;
+      }
+
+      // by default a green establishment earns `multiplier * earnings = 1 * earnings`
+      // but there are special cases where `multiplier` is not 1.
+      let multiplier: number;
+      if (Est.isEqual(est, Est.CheeseFactory)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Animal);
+      } else if (Est.isEqual(est, Est.FurnitureFactory) || Est.isEqual(est, Est.FurnitureFactory2)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Gear);
+      } else if (Est.isEqual(est, Est.FarmersMarket)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Wheat);
+      } else if (Est.isEqual(est, Est.FlowerShop)) {
+        multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden);
+      } else if (Est.isEqual(est, Est.FlowerShop2)) {
+        multiplier = Est.countOwned(G, currentPlayer, Est.FlowerGarden2);
+      } else if (Est.isEqual(est, Est.FoodWarehouse) || Est.isEqual(est, Est.FoodWarehouse2)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Cup);
+      } else if (Est.isEqual(est, Est.Winery)) {
+        multiplier = Est.countOwned(G, currentPlayer, Est.Vineyard);
+      } else if (Est.isEqual(est, Est.Winery2)) {
+        multiplier = Est.countTypeOwned(G, currentPlayer, EstType.Fruit);
+      } else if (Est.isEqual(est, Est.GeneralStore)) {
+        multiplier = Land.countBuilt(G, currentPlayer) < 2 ? 1 : 0;
+      } else if (Est.isEqual(est, Est.SodaBottlingPlant)) {
+        multiplier = 0;
+        for (const player of getNextPlayers(ctx)) {
+          multiplier += Est.countTypeOwned(G, player, EstType.Cup);
+        }
+      } else {
+        multiplier = 1;
+      }
+
+      const amount = earnings * multiplier * count;
+      earn(G, ctx, currentPlayer, amount, est.name);
     }
 
-    const amount = earnings * multiplier * count;
-    earn(G, ctx, currentPlayer, amount, est.name);
+    // if there are establishments closed for renovations, open them
+    if (Est.isEqual(est, Est.Winery)) {
+      // NOTE: it is slightly strange, but `Winery` will close for renovations even if there is no `Vineyard`
+      Est.setRenovationCount(G, currentPlayer, Est.Winery, count);
+    } else {
+      Est.setRenovationCount(G, currentPlayer, est, 0);
+    }
   }
 };
 
@@ -1230,6 +1257,7 @@ const newTurnG = {
   doMovingCompany: 0,
   doMovingCompany2: false,
   officeGiveEst: null,
+  officeGiveRenovation: null,
   justBoughtEst: null,
   justBoughtLand: null,
   receivedCoins: false,
