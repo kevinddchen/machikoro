@@ -599,8 +599,8 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
   for (const opponent of getPreviousPlayers(ctx)) {
     const count = Est.countOwned(G, opponent, est);
     const countRenovation = Est.countRenovation(G, opponent, est);
-    const amount = (count - countRenovation) * Est.MovingCompany.earn;
-    take(G, ctx, { from: opponent, to: player }, amount, Est.MovingCompany.name);
+    const amount = (count - countRenovation) * Est.RenovationCompany.earn;
+    take(G, ctx, { from: opponent, to: player }, amount, Est.RenovationCompany.name);
     Est.setRenovationCount(G, opponent, est, count);
   }
 
@@ -827,7 +827,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
   // Do `LoanOffice` first.
   if (Est.isInUse(Est.LoanOffice, G.version, G.expansions) && Est.LoanOffice.rolls.includes(roll)) {
     // get number owned, subtract number closed for renovations
-    const count = Est.countOwned(G, currentPlayer, Est.LoanOffice) - Est.countRenovation(G, currentPlayer, Est.LoanOffice));
+    const count = Est.countOwned(G, currentPlayer, Est.LoanOffice) - Est.countRenovation(G, currentPlayer, Est.LoanOffice);
     if (count > 0) {
       const earnings = Est.LoanOffice.earn;
       const amount = earnings * count;
