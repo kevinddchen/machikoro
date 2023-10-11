@@ -495,7 +495,7 @@ export const RenovationCompany: Establishment = {
     'All establishments owned by any player of that type are closed for renovations. ' +
     'Get 1 coin from each opponent for each of their buildings closed for renovations.',
   cost: 4,
-  earn: 0, // (special case; determined by opponent buildings closed for renovation)
+  earn: 1, // coins earned per establishment closed for renovations
   rolls: [8],
   color: EstColor.Purple,
   type: null,

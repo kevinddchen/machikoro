@@ -241,6 +241,20 @@ export const canDoMovingCompanyOpp = (G: MachikoroG, ctx: Ctx, opponent: number)
 
 /**
  * @param G
+ * @param est
+ * @returns True if the current player can pick the establishment for the
+ * Renovation Company action.
+ */
+export const canDoRenovationCompany = (G: MachikoroG, est: Establishment): boolean => {
+  return (
+    G.turnState === TurnState.RenovationCompany &&
+    // cannot pick major (purple)
+    !Est.isMajor(est)
+  );
+};
+
+/**
+ * @param G
  * @returns True if the current player can end their turn.
  */
 export const canEndTurn = (G: MachikoroG): boolean => {
@@ -563,6 +577,32 @@ const doMovingCompanyOpp: Move<MachikoroG> = (context, opponent: number) => {
   // cleanup
   G.officeGiveEst = null;
   G.officeGiveRenovation = null;
+
+  switchState(context);
+
+  return;
+};
+
+const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
+  const { G, ctx } = context;
+  if (!canDoRenovationCompany(G, est)) {
+    return INVALID_MOVE;
+  }
+
+  const player = parseInt(ctx.currentPlayer);
+  
+  // close own establishments
+  const playerCount = Est.countOwned(G, player, est);
+  Est.setRenovationCount(G, player, est, playerCount);
+
+  // get coins from opponents and close their establishments
+  for (const opponent of getPreviousPlayers(ctx)) {
+    const count = Est.countOwned(G, opponent, est);
+    const countRenovation = Est.countRenovation(G, opponent, est);
+    const amount = (count - countRenovation) * Est.MovingCompany.earn;
+    take(G, ctx, { from: opponent, to: player }, amount, Est.MovingCompany.name);
+    Est.setRenovationCount(G, opponent, est, count);
+  }
 
   switchState(context);
 
@@ -1364,8 +1404,9 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
     doTV,
     doOfficeGive,
     doOfficeTake,
-    doMovingCompanyOpp,
     skipOffice,
+    doMovingCompanyOpp,
+    doRenovationCompany,
     endTurn,
   },
 
