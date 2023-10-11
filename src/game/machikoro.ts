@@ -826,58 +826,66 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
 
   // Do `LoanOffice` first.
   if (Est.isInUse(Est.LoanOffice, G.version, G.expansions) && Est.LoanOffice.rolls.includes(roll)) {
-    const count = Est.countOwned(G, currentPlayer, Est.LoanOffice);
-    const earnings = Est.LoanOffice.earn;
-    const amount = earnings * count;
-    earn(G, ctx, currentPlayer, amount, Est.LoanOffice.name);
+    // get number owned, subtract number closed for renovations
+    const count = Est.countOwned(G, currentPlayer, Est.LoanOffice) - Est.countRenovation(G, currentPlayer, Est.LoanOffice));
+    if (count > 0) {
+      const earnings = Est.LoanOffice.earn;
+      const amount = earnings * count;
+      earn(G, ctx, currentPlayer, amount, Est.LoanOffice.name);
+    }
+    // if there are establishments closed for renovations, open them
+    Est.setRenovationCount(G, currentPlayer, Est.LoanOffice, 0);
   }
 
   // Do Blue establishments.
   const blueEsts = allEsts.filter((est) => est.color === EstColor.Blue && est.rolls.includes(roll));
   for (const player of getNextPlayers(ctx)) {
     for (const est of blueEsts) {
-      const count = Est.countOwned(G, player, est);
-      if (count === 0) {
-        continue; // avoids logging Tuna Boat roll when player has no tuna boats
+      // get number owned, subtract number closed for renovations
+      const count = Est.countOwned(G, player, est) - Est.countRenovation(G, player, est);
+
+      if (count > 0) {
+        // by default a blue establishment earns `multiplier * earnings = 1 * earnings`
+        // but there are special cases where `multiplier` is not 1.
+        let multiplier: number;
+        if (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) {
+          multiplier = Land.owns(G, player, Land.Harbor) ? 1 : 0;
+        } else if (Est.isEqual(est, Est.CornField)) {
+          multiplier = Land.countBuilt(G, player) < 2 ? 1 : 0;
+        } else {
+          multiplier = 1;
+        }
+
+        if (multiplier === 0) {
+          continue; // avoids logging Tuna Boat roll when player has no Harbor
+        }
+
+        // Tuna Boat earnings are based off the tuna roll
+        // all other blue establishments get `est.earn` coins from the bank
+        let earnings: number;
+        if (Est.isEqual(est, Est.TunaBoat)) {
+          earnings = getTunaRoll(context);
+        } else {
+          earnings = est.earn;
+        }
+
+        // +1 coin to Wheat type if any player owns Farmers Market (Machi Koro 2)
+        if (est.type === EstType.Wheat && Land.isOwned(G, Land.FarmersMarket2)) {
+          assertNonNull(Land.FarmersMarket2.coins);
+          earnings += Land.FarmersMarket2.coins;
+        }
+        // +1 coin to Gear type if any player owns Forge (Machi Koro 2)
+        if (est.type === EstType.Gear && Land.isOwned(G, Land.Forge2)) {
+          assertNonNull(Land.Forge2.coins);
+          earnings += Land.Forge2.coins;
+        }
+
+        const amount = earnings * multiplier * count;
+        earn(G, ctx, player, amount, est.name);
       }
 
-      // by default a blue establishment earns `multiplier * earnings = 1 * earnings`
-      // but there are special cases where `multiplier` is not 1.
-      let multiplier: number;
-      if (Est.isEqual(est, Est.MackerelBoat) || Est.isEqual(est, Est.TunaBoat)) {
-        multiplier = Land.owns(G, player, Land.Harbor) ? 1 : 0;
-      } else if (Est.isEqual(est, Est.CornField)) {
-        multiplier = Land.countBuilt(G, player) < 2 ? 1 : 0;
-      } else {
-        multiplier = 1;
-      }
-
-      if (multiplier === 0) {
-        continue; // avoids logging Tuna Boat roll when player has no Harbor
-      }
-
-      // Tuna Boat earnings are based off the tuna roll
-      // all other blue establishments get `est.earn` coins from the bank
-      let earnings: number;
-      if (Est.isEqual(est, Est.TunaBoat)) {
-        earnings = getTunaRoll(context);
-      } else {
-        earnings = est.earn;
-      }
-
-      // +1 coin to Wheat type if any player owns Farmers Market (Machi Koro 2)
-      if (est.type === EstType.Wheat && Land.isOwned(G, Land.FarmersMarket2)) {
-        assertNonNull(Land.FarmersMarket2.coins);
-        earnings += Land.FarmersMarket2.coins;
-      }
-      // +1 coin to Gear type if any player owns Forge (Machi Koro 2)
-      if (est.type === EstType.Gear && Land.isOwned(G, Land.Forge2)) {
-        assertNonNull(Land.Forge2.coins);
-        earnings += Land.Forge2.coins;
-      }
-
-      const amount = earnings * multiplier * count;
-      earn(G, ctx, player, amount, est.name);
+      // if there are establishments closed for renovations, open them
+      Est.setRenovationCount(G, player, est, 0);
     }
   }
 
@@ -888,10 +896,8 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
       continue; // handled above
     }
 
-    // get number of establishments owned
-    let count = Est.countOwned(G, currentPlayer, est);
-    // subtract number of establishments closed for renovations
-    count -= Est.countRenovation(G, currentPlayer, est);
+    // get number owned, subtract number closed for renovations
+    const count = Est.countOwned(G, currentPlayer, est) - Est.countRenovation(G, currentPlayer, est);
 
     if (count > 0) {
       if (Est.isEqual(est, Est.MovingCompany)) {
