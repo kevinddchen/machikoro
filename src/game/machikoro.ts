@@ -602,8 +602,6 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
     return INVALID_MOVE;
   }
 
-  console.log(est);
-
   const player = parseInt(ctx.currentPlayer);
 
   // close own establishments
@@ -866,6 +864,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
       // get number owned, subtract number closed for renovations
       const count = Est.countOwned(G, player, est) - Est.countRenovation(G, player, est);
 
+      // the `if` below avoids logging Tuna Boat roll when player has no tuna boats
       if (count > 0) {
         // by default a blue establishment earns `multiplier * earnings = 1 * earnings`
         // but there are special cases where `multiplier` is not 1.

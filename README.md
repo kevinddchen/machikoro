@@ -27,7 +27,6 @@ In the Millionaire's Row expansion, there are certain uncommon plays that are no
 
 - `Loan Office` cannot be activated after `Forest` or `Flower Shop`.
 - `Moving Company` cannot be activated before `Mine`, `Winery`, or `Apple Orchard`.
-- `Renovation Company` cannot be activated on an establishment that no one owns.
 - `Renovation Company` cannot be activated before `Tax Office`.
 
 ## Development
