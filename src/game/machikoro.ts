@@ -255,6 +255,19 @@ export const canDoRenovationCompany = (G: MachikoroG, est: Establishment): boole
 
 /**
  * @param G
+ * @returns An Establishment that the current player can activate with the
+ * Renovation Company action to effectively "skip" it, of null if the move is
+ * not available.
+ */
+export const canSkipRenovationCompany = (G: MachikoroG): Establishment | null => {
+  if (G.turnState !== TurnState.RenovationCompany) {
+    return null;
+  }
+  return Est.unownedRedBlueGreenEst(G);
+};
+
+/**
+ * @param G
  * @returns True if the current player can end their turn.
  */
 export const canEndTurn = (G: MachikoroG): boolean => {
@@ -589,8 +602,10 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
     return INVALID_MOVE;
   }
 
+  console.log(est);
+
   const player = parseInt(ctx.currentPlayer);
-  
+
   // close own establishments
   const playerCount = Est.countOwned(G, player, est);
   Est.setRenovationCount(G, player, est, playerCount);
@@ -832,7 +847,8 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
   // Do `LoanOffice` first.
   if (Est.isInUse(Est.LoanOffice, G.version, G.expansions) && Est.LoanOffice.rolls.includes(roll)) {
     // get number owned, subtract number closed for renovations
-    const count = Est.countOwned(G, currentPlayer, Est.LoanOffice) - Est.countRenovation(G, currentPlayer, Est.LoanOffice);
+    const count =
+      Est.countOwned(G, currentPlayer, Est.LoanOffice) - Est.countRenovation(G, currentPlayer, Est.LoanOffice);
 
     if (count > 0) {
       const earnings = Est.LoanOffice.earn;

@@ -19,7 +19,22 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
     const canCommitRoll = isActive && Game.canCommitRoll(G);
     const canAddTwo = isActive && Game.canAddTwo(G, ctx);
     const canEndTurn = isActive && Game.canEndTurn(G);
+
+    // if not null, then the player can activate the Renovation Company on this establishment, effectively "skipping" it
+    const skipRenovationCompanyEst = Game.canSkipRenovationCompany(G);
+
     const canSkipOffice = isActive && Game.canSkipOffice(G);
+    const canSkipRenovationCompany = isActive && skipRenovationCompanyEst !== null;
+
+    const skipActive = canSkipOffice || canSkipRenovationCompany;
+    let onSkipEvent: () => void;
+    if (canSkipOffice) {
+      onSkipEvent = () => moves.skipOffice();
+    } else if (canSkipRenovationCompany) {
+      onSkipEvent = () => moves.doRenovationCompany(skipRenovationCompanyEst);
+    } else {
+      onSkipEvent = () => void 0;
+    }
 
     const tbody = (
       <div className='div-row'>
@@ -47,8 +62,8 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
           </button>
 
           <button
-            className={classNames('button', { button_active: canSkipOffice }, { button_hide: !canSkipOffice })}
-            onClick={() => moves.skipOffice()}
+            className={classNames('button', { button_active: skipActive }, { button_hide: !skipActive })}
+            onClick={onSkipEvent}
           >
             Skip
           </button>

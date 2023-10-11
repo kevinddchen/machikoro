@@ -104,8 +104,8 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const count = Est.countOwned(G, player, est);
       const countRenovation = Est.countRenovation(G, player, est);
 
-      const canDoOfficeGive = isActive && (player === currentPlayer) && Game.canDoOfficeGive(G, ctx, est);
-      const canDoOfficeTake = isActive && (player !== currentPlayer) && Game.canDoOfficeTake(G, ctx, player, est);
+      const canDoOfficeGive = isActive && player === currentPlayer && Game.canDoOfficeGive(G, ctx, est);
+      const canDoOfficeTake = isActive && player !== currentPlayer && Game.canDoOfficeTake(G, ctx, player, est);
       const canDoRenovationCompany = isActive && Game.canDoRenovationCompany(G, est);
 
       const clickable = canDoOfficeGive || canDoOfficeTake || canDoRenovationCompany;
