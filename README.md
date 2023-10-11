@@ -21,16 +21,13 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 - **Variable**: 10 establishments are available for purchase. This is the official supply variant of the expansions.
 - **Hybrid**: 5 establishments with rolls 1-6, 5 establishments with rolls 7+, and 2 major establishments are available for purchase. This is the official supply variant of Machi Koro 2.
 
-### Millionaire's Row expansion implementation details
+### Implementation details
 
-Some rulings that are not explicit in the game rules:
+In the Millionaire's Row expansion, there are certain uncommon plays that are not possible:
 
-- `Winery` cards will activate and close for renovations even if the player owns no `Vineyard` cards.
-
-Because this implementation is automated as much as possible, there are certain uncommon plays that are not possible:
-
-- `Loan Office` cannot activate after `Forest` or `Flower Shop`.
-- `Moving Company` cannot activate before `Mine`, `Winery`, or `Apple Orchard`.
+- `Loan Office` cannot be activated after `Forest` or `Flower Shop`.
+- `Moving Company` cannot be activated before `Mine`, `Winery`, or `Apple Orchard`.
+- `Renovation Company` cannot be activated before `Tax Office`.
 
 ## Development
 

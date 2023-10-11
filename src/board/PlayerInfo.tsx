@@ -104,14 +104,21 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const count = Est.countOwned(G, player, est);
       const countRenovation = Est.countRenovation(G, player, est);
 
-      let canDoOffice: boolean;
-      let doOffice: (est: Est.Establishment, renovation: boolean) => void;
-      if (player === currentPlayer) {
-        canDoOffice = isActive && Game.canDoOfficeGive(G, ctx, est);
-        doOffice = (est, renovation) => moves.doOfficeGive(est, renovation);
+      // the establishment minis are clickable for a variety of reasons
+      const canDoOfficeGive = isActive && player === currentPlayer && Game.canDoOfficeGive(G, ctx, est);
+      const canDoOfficeTake = isActive && player !== currentPlayer && Game.canDoOfficeTake(G, ctx, player, est);
+      const canDoRenovationCompany = isActive && Game.canDoRenovationCompany(G, est);
+
+      const estClickable = canDoOfficeGive || canDoOfficeTake || canDoRenovationCompany;
+      let onClickEstEvent: (est: Est.Establishment, renovation: boolean) => void;
+      if (canDoOfficeGive) {
+        onClickEstEvent = (est, renovation) => moves.doOfficeGive(est, renovation);
+      } else if (canDoOfficeTake) {
+        onClickEstEvent = (est, renovation) => moves.doOfficeTake(player, est, renovation);
+      } else if (canDoRenovationCompany) {
+        onClickEstEvent = (est) => moves.doRenovationCompany(est);
       } else {
-        canDoOffice = isActive && Game.canDoOfficeTake(G, ctx, player, est);
-        doOffice = (est, renovation) => moves.doOfficeTake(player, est, renovation);
+        onClickEstEvent = () => void 0;
       }
 
       const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
@@ -120,12 +127,12 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;
         const renovation = j < countRenovation; // true if establishment should display as "closed under renovations"
-        const estColor = estColorToClass(est.color, canDoOffice, renovation);
+        const estColor = estColorToClass(est.color, estClickable, renovation);
         minis.push(
           <td
             key={key}
-            className={classNames('mini_td', estColor, { clickable: canDoOffice })}
-            onClick={() => doOffice(est, renovation)}
+            className={classNames('mini_td', estColor, { clickable: estClickable })}
+            onClick={() => onClickEstEvent(est, renovation)}
           >
             <div className='mini_roll'>{estRollBoxes}</div>
             <div className='mini_type'>

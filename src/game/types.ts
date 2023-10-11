@@ -26,6 +26,8 @@ import type { LogEvent } from './log';
  * Moving Company establishment (Machi Koro 1).
  * @prop doMovingCompany2 - true if the current player will activate the Moving
  * Company landmark (Machi Koro 2).
+ * @prop doRenovationCompany - true if the current player will activate the
+ * Renovation Company establishment (Machi Koro 1).
  * @prop officeGiveEst - the establishment picked for the Office or Moving
  * Company action to give.
  * @prop officeGiveRenovation - True if the establishment pick for the Office
@@ -57,6 +59,7 @@ export interface MachikoroG {
   doOffice: number;
   doMovingCompany: number;
   doMovingCompany2: boolean;
+  doRenovationCompany: boolean;
   officeGiveEst: Establishment | null;
   officeGiveRenovation: boolean | null;
   justBoughtEst: Establishment | null;
@@ -112,6 +115,7 @@ export const TurnState = {
   TV: 31,
   OfficeGive: 32,
   OfficeTake: 33,
+  RenovationCompany: 34,
   ActivateLands: 40,
   MovingCompany2: 41,
   Buy: 50,

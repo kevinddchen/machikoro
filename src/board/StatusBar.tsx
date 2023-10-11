@@ -83,6 +83,13 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
           return currentPlayerName + ' is making a move: Moving company';
         }
       }
+      case Game.TurnState.RenovationCompany: {
+        if (isActive) {
+          return 'Renovation company: Select an establishment type to renovate.';
+        } else {
+          return currentPlayerName + ' is making a move: Renovation company';
+        }
+      }
       case Game.TurnState.End: {
         if (isActive) {
           return 'No actions left. End turn?';
