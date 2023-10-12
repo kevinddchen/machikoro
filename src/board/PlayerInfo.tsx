@@ -63,8 +63,11 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
 
       const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
-      const landIsGrey = !canBuyLand && !owned;
-      const landColor = landColorToClass(canBuyLand);
+      const canDemolitionCompany = isActive && player === currentPlayer && Game.canDoDemolitionCompany(G, ctx, land);
+
+      const landClickable = canBuyLand || canDemolitionCompany;
+      const landIsGrey = !(landClickable || owned);
+      const landColor = landColorToClass(landClickable);
 
       let landDescriptionUnparsed = land.description;
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
@@ -77,8 +80,10 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
 
       // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
       let onClickEvent: () => void;
-      if (player === clientPlayer) {
+      if (player === clientPlayer && canBuyLand) {
         onClickEvent = () => moves.buyLand(land);
+      } else if (player === clientPlayer && canDemolitionCompany) {
+        onClickEvent = () => moves.doDemolitionCompany(land);
       } else {
         onClickEvent = () => void 0;
       }
@@ -86,7 +91,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       lands.push(
         <td
           key={i}
-          className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: canBuyLand })}
+          className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: landClickable })}
           onClick={onClickEvent}
         >
           <div className='mini_name'>{land.miniName}</div>

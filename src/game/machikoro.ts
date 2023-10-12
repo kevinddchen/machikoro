@@ -227,6 +227,24 @@ export const canSkipOffice = (G: MachikoroG): boolean => {
  * @param G
  * @param ctx
  * @param opponent
+ * @returns True if the current player can demolish the landmark as a part of
+ * the Demolition Company action.
+ */
+export const canDoDemolitionCompany = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    G.turnState === TurnState.DemolitionCompany &&
+    // player must own the landmark
+    Land.owns(G, player, land) &&
+    // cannot demolish City Hall
+    !Land.isEqual(land, Land.CityHall)
+  );
+};
+
+/**
+ * @param G
+ * @param ctx
+ * @param opponent
  * @returns True if the current player can give an establishment to the
  * opponent as part of the Moving Company action (Machi Koro 1).
  */
@@ -567,6 +585,26 @@ const skipOffice: Move<MachikoroG> = (context) => {
 };
 
 /**
+ * Perform the Demolition Company action by picking a landmark to demolish.
+ * @param context
+ * @param land
+ */
+const doDemolitionCompany: Move<MachikoroG> = (context, land: Landmark) => {
+  const { G, ctx } = context;
+  if (!canDoDemolitionCompany(G, ctx, land)) {
+    return INVALID_MOVE;
+  }
+
+  const player = parseInt(ctx.currentPlayer);
+  Land.demolish(G, player, land);
+  Log.logDemolitionCompany(G, land.name, player);
+
+  switchState(context);
+
+  return;
+};
+
+/**
  * Perform the Moving Company action (Machi Koro 1) by picking an opponent to
  * give an establishment to.
  * @param context
@@ -695,6 +733,18 @@ const switchState = (context: FnContext<MachikoroG>): void => {
 
   if (G.turnState < TurnState.ActivateRedEsts) {
     activateRedEsts(context);
+  }
+  if (G.turnState < TurnState.DemolitionCompany) {
+    // first get coins
+    activateDemolitionCompany(context);
+    G.turnState = TurnState.DemolitionCompany;
+  }
+  if (G.turnState === TurnState.DemolitionCompany) {
+    // can do multiple times
+    if (G.doDemolitionCompany > 0) {
+      G.doDemolitionCompany -= 1;
+      return; // await player action
+    }
   }
   if (G.turnState < TurnState.ActivateBlueGreenEsts) {
     activateBlueGreenEsts(context);
@@ -833,6 +883,35 @@ const activateRedEsts = (context: FnContext<MachikoroG>): void => {
 };
 
 /**
+ * Activate the Demolition Company establishment.
+ * @param context
+ */
+const activateDemolitionCompany = (context: FnContext<MachikoroG>): void => {
+  const { G, ctx } = context;
+  const currentPlayer = parseInt(ctx.currentPlayer);
+  const roll = G.roll;
+
+  if (Est.isInUse(Est.DemolitionCompany, G.version, G.expansions) && Est.DemolitionCompany.rolls.includes(roll)) {
+    // get number owned, subtract number closed for renovations
+    let count =
+      Est.countOwned(G, currentPlayer, Est.DemolitionCompany) -
+      Est.countRenovation(G, currentPlayer, Est.DemolitionCompany);
+
+    // cannot be more than number of built landmarks
+    count = Math.min(count, Land.countBuilt(G, currentPlayer));
+
+    if (count > 0) {
+      G.doDemolitionCompany = count;
+      const earnings = Est.DemolitionCompany.earn;
+      const amount = earnings * count;
+      earn(G, ctx, currentPlayer, amount, Est.DemolitionCompany.name);
+    }
+    // if there are establishments closed for renovations, open them
+    Est.setRenovationCount(G, currentPlayer, Est.DemolitionCompany, 0);
+  }
+};
+
+/**
  * Activate blue and green establishments.
  * @param context
  */
@@ -913,7 +992,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
   // Do Green establishments.
   const greenEsts = allEsts.filter((est) => est.color === EstColor.Green && est.rolls.includes(roll));
   for (const est of greenEsts) {
-    if (Est.isEqual(est, Est.LoanOffice)) {
+    if (Est.isEqual(est, Est.DemolitionCompany) || Est.isEqual(est, Est.LoanOffice)) {
       continue; // handled above
     }
 
@@ -1331,6 +1410,7 @@ const newTurnG = {
   secondTurn: false,
   doTV: false,
   doOffice: 0,
+  doDemolitionCompany: 0,
   doMovingCompany: 0,
   doMovingCompany2: false,
   doRenovationCompany: false,
@@ -1433,6 +1513,7 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
     doOfficeGive,
     doOfficeTake,
     skipOffice,
+    doDemolitionCompany,
     doMovingCompanyOpp,
     doRenovationCompany,
     endTurn,

@@ -26,6 +26,7 @@ const LogEventType = {
   Take: 'Take',
   Buy: 'Buy',
   Office: 'Office',
+  DemolitionCompany: 'DemolitionCompany',
   MovingCompany: 'MovingCompany',
   Park: 'Park',
   TunaRoll: 'TunaRoll',
@@ -43,6 +44,7 @@ export type LogEvent =
   | Take
   | Buy
   | Office
+  | DemolitionCompany
   | MovingCompany
   | Park
   | TunaRoll
@@ -64,6 +66,8 @@ export const parseLogEvent = (logEvent: LogEvent, names: string[]): string => {
     return parseBuy(logEvent);
   } else if (logEvent.type === LogEventType.Office) {
     return parseOffice(logEvent, names);
+  } else if (logEvent.type === LogEventType.DemolitionCompany) {
+    return parseDemolitionCompany(logEvent, names);
   } else if (logEvent.type === LogEventType.MovingCompany) {
     return parseMovingCompany(logEvent, names);
   } else if (logEvent.type === LogEventType.Park) {
@@ -284,6 +288,35 @@ export const logOffice = (
 const parseOffice = (logEvent: Office, names: string[]): string => {
   const { player_est_name, opponent_est_name, opponent } = logEvent;
   return `\texchanged ${player_est_name} for ${opponent_est_name} with ${names[opponent]} (Business Center)`;
+};
+
+// ----------------------------------------------------------------------------
+
+interface DemolitionCompany extends BaseLogEvent {
+  type: typeof LogEventType.DemolitionCompany;
+  land_name: string;
+  player: number;
+}
+
+/**
+ * Log the effect of the Demolition Company establishment.
+ * @param G
+ * @param land_name
+ * @param opponent
+ */
+export const logDemolitionCompany = (G: MachikoroG, land_name: string, player: number): void => {
+  const logEvent: DemolitionCompany = { type: LogEventType.DemolitionCompany, land_name, player };
+  G._logBuffer.push(logEvent);
+};
+
+/**
+ * @param logEvent
+ * @param names - All player names.
+ * @returns Displayed log text for the Demolition Company establishment.
+ */
+const parseDemolitionCompany = (logEvent: DemolitionCompany, names: string[]): string => {
+  const { land_name, player } = logEvent;
+  return `\t${names[player]} demolished their ${land_name} (Demolition Company)`;
 };
 
 // ----------------------------------------------------------------------------

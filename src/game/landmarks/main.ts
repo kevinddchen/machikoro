@@ -186,6 +186,24 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
 };
 
 /**
+ * Update `G` to reflect a player demolishing a landmark.
+ * @param G 
+ * @param player 
+ * @param land 
+ */
+export const demolish = (G: MachikoroG, player: number, land: Landmark): void => {
+  const version = G.version;
+  if (version !== land.version) {
+    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version}.`);
+  }
+  G.landData._owned[player][land._id] = false;
+  // this should never happen in Machi Koro 2, but if it ever did, we should probably make the landmark available again
+  if (version === Version.MK2) {
+    G.landData._available[land._id] = true;
+  }
+}
+
+/**
  * Replenish the landmark supply. This does nothing for Machi Koro 1.
  * @param G
  */
