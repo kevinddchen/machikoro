@@ -328,7 +328,7 @@ interface MovingCompany extends BaseLogEvent {
 }
 
 /**
- * Log the effect of the Moving Company landmark.
+ * Log the effect of the Moving Company establishment / landmark.
  * @param G
  * @param est_name
  * @param opponent
@@ -341,7 +341,7 @@ export const logMovingCompany = (G: MachikoroG, est_name: string, opponent: numb
 /**
  * @param logEvent
  * @param names - All player names.
- * @returns Displayed log text for the Moving Company landmark.
+ * @returns Displayed log text for the Moving Company establishment / landmark.
  */
 const parseMovingCompany = (logEvent: MovingCompany, names: string[]): string => {
   const { est_name, opponent } = logEvent;
@@ -356,7 +356,7 @@ interface Park extends BaseLogEvent {
 }
 
 /**
- * Log the effect of the Park landmark.
+ * Log the effect of the Park establishment / landmark.
  * @param G
  * @param coins - Number of coins all players end up with.
  */
@@ -367,7 +367,7 @@ export const logPark = (G: MachikoroG, coins: number): void => {
 
 /**
  * @param logEvent
- * @returns Displayed log text for the Park landmark.
+ * @returns Displayed log text for the Park establishment / landmark.
  */
 const parsePark = (logEvent: Park): string => {
   return `\tredistributed ${logEvent.coins} to each player (Park)`;
