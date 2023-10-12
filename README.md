@@ -25,6 +25,7 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 
 In the Millionaire's Row expansion, there are certain uncommon plays that are not possible:
 
+- `Demolition Company` cannot be activated before `Corn Field`.
 - `Loan Office` cannot be activated after `Forest` or `Flower Shop`.
 - `Moving Company` cannot be activated before `Mine`, `Winery`, or `Apple Orchard`.
 - `Renovation Company` cannot be activated before `Tax Office`.

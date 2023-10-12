@@ -156,7 +156,7 @@ export const canBuyLand = (G: MachikoroG, ctx: Ctx, land: Landmark): boolean => 
  * @param ctx
  * @param opponent
  * @returns True if the current player can take coins from the opponent as a
- * part of the TV action.
+ * part of the TV Station (Machi Koro 1) action.
  */
 export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
   const player = parseInt(ctx.currentPlayer);
@@ -172,7 +172,7 @@ export const canDoTV = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
  * @param ctx
  * @param est
  * @returns True if the current player can pick the establishment to give up,
- * as part of the Office or Moving Company action.
+ * as part of the Office or Moving Company actions.
  */
 export const canDoOfficeGive = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
   const player = parseInt(ctx.currentPlayer);
@@ -237,7 +237,7 @@ export const canDoDemolitionCompany = (G: MachikoroG, ctx: Ctx, land: Landmark):
     // player must own the landmark
     Land.owns(G, player, land) &&
     // cannot demolish City Hall
-    !Land.isEqual(land, Land.CityHall)
+    !(Land.isEqual(land, Land.CityHall) || Land.isEqual(land, Land.CityHall2))
   );
 };
 
@@ -246,7 +246,7 @@ export const canDoDemolitionCompany = (G: MachikoroG, ctx: Ctx, land: Landmark):
  * @param ctx
  * @param opponent
  * @returns True if the current player can give an establishment to the
- * opponent as part of the Moving Company action (Machi Koro 1).
+ * opponent as part of the Moving Company (Machi Koro 1) action.
  */
 export const canDoMovingCompanyOpp = (G: MachikoroG, ctx: Ctx, opponent: number): boolean => {
   const player = parseInt(ctx.currentPlayer);
@@ -273,9 +273,9 @@ export const canDoRenovationCompany = (G: MachikoroG, est: Establishment): boole
 
 /**
  * @param G
- * @returns An Establishment that the current player can activate with the
- * Renovation Company action to effectively "skip" it, of null if the move is
- * not available.
+ * @returns An establishment that the current player can activate with the
+ * Renovation Company action to effectively "skip" it, of null if such an
+ * establishment does not exist.
  */
 export const canSkipRenovationCompany = (G: MachikoroG): Establishment | null => {
   if (G.turnState !== TurnState.RenovationCompany) {
@@ -476,7 +476,8 @@ const buyLand: Move<MachikoroG> = (context, land: Landmark) => {
 };
 
 /**
- * Perform the TV action by picking an opponent to take 5 coins from.
+ * Perform the TV Station (Machi Koro 1) action by picking an opponent to take
+ * 5 coins from.
  * @param context
  * @param opponent
  */
@@ -605,7 +606,7 @@ const doDemolitionCompany: Move<MachikoroG> = (context, land: Landmark) => {
 };
 
 /**
- * Perform the Moving Company action (Machi Koro 1) by picking an opponent to
+ * Perform the Moving Company (Machi Koro 1) action by picking an opponent to
  * give an establishment to.
  * @param context
  * @param opponent
@@ -634,6 +635,13 @@ const doMovingCompanyOpp: Move<MachikoroG> = (context, opponent: number) => {
   return;
 };
 
+/**
+ * Perform the Renovation Company action by closing all establishments of the
+ * given type.
+ * @param context
+ * @param est
+ * @returns
+ */
 const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
   const { G, ctx } = context;
   if (!canDoRenovationCompany(G, est)) {
@@ -906,6 +914,7 @@ const activateDemolitionCompany = (context: FnContext<MachikoroG>): void => {
       const amount = earnings * count;
       earn(G, ctx, currentPlayer, amount, Est.DemolitionCompany.name);
     }
+
     // if there are establishments closed for renovations, open them
     Est.setRenovationCount(G, currentPlayer, Est.DemolitionCompany, 0);
   }
@@ -932,6 +941,7 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
       const amount = earnings * count;
       earn(G, ctx, currentPlayer, amount, Est.LoanOffice.name);
     }
+
     // if there are establishments closed for renovations, open them
     Est.setRenovationCount(G, currentPlayer, Est.LoanOffice, 0);
   }

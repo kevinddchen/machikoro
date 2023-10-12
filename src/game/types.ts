@@ -26,7 +26,7 @@ import type { LogEvent } from './log';
  * Moving Company establishment (Machi Koro 1).
  * @prop doMovingCompany2 - true if the current player will activate the Moving
  * Company landmark (Machi Koro 2).
- * @prop doTV - true if the current player will activate the TV Station 
+ * @prop doTV - true if the current player will activate the TV Station
  * establishment (Machi Koro 1).
  * @prop doOffice - number of times the current player will activate the Office.
  * @prop doRenovationCompany - true if the current player will activate the
