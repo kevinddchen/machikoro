@@ -131,7 +131,6 @@ export const ConvenienceStore: Establishment = {
   _initial: 6,
 };
 
-// TODO: implement this
 export const DemolitionCompany: Establishment = {
   _id: 9,
   version: Version.MK1,

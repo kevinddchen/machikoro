@@ -63,8 +63,11 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
 
       const canBuyLand = isActive && player === currentPlayer && Game.canBuyLand(G, ctx, land);
-      const landIsGrey = !canBuyLand && !owned;
-      const landColor = landColorToClass(canBuyLand);
+      const canDemolitionCompany = isActive && player === currentPlayer && Game.canDoDemolitionCompany(G, ctx, land);
+
+      const landClickable = canBuyLand || canDemolitionCompany;
+      const landIsGrey = !(landClickable || owned);
+      const landColor = landColorToClass(landClickable);
 
       let landDescriptionUnparsed = land.description;
       // for Machi Koro 1, add cost to the description if the client does not own the landmark
@@ -76,18 +79,20 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const landDescription = parseMaterialSymbols(landDescriptionUnparsed);
 
       // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
-      let onClickEvent: () => void;
-      if (player === clientPlayer) {
-        onClickEvent = () => moves.buyLand(land);
+      let onClickLandEvent: () => void;
+      if (player === clientPlayer && canBuyLand) {
+        onClickLandEvent = () => moves.buyLand(land);
+      } else if (player === clientPlayer && canDemolitionCompany) {
+        onClickLandEvent = () => moves.doDemolitionCompany(land);
       } else {
-        onClickEvent = () => void 0;
+        onClickLandEvent = () => void 0;
       }
 
       lands.push(
         <td
           key={i}
-          className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: canBuyLand })}
-          onClick={onClickEvent}
+          className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: landClickable })}
+          onClick={onClickLandEvent}
         >
           <div className='mini_name'>{land.miniName}</div>
           <div className={classNames('tooltip', 'mini_tooltip')}>{landDescription}</div>

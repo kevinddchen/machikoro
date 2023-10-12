@@ -186,6 +186,23 @@ export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
 };
 
 /**
+ * Update `G` to reflect a player demolishing a landmark. Only implemented for
+ * Machi Koro 1.
+ * @param G
+ * @param player
+ * @param land
+ */
+export const demolish = (G: MachikoroG, player: number, land: Landmark): void => {
+  const version = G.version;
+  if (version === Version.MK2) {
+    throw new Error('Demolishing landmarks is only implemented for Machi Koro 1.');
+  } else if (version !== land.version) {
+    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version}.`);
+  }
+  G.landData._owned[player][land._id] = false;
+};
+
+/**
  * Replenish the landmark supply. This does nothing for Machi Koro 1.
  * @param G
  */

@@ -20,14 +20,17 @@ import type { LogEvent } from './log';
  * @prop numDice - the number of dice rolled by the current player.
  * @prop numRolls - the number of dice rolls made by the current player.
  * @prop secondTurn - true if the current player can make another turn.
- * @prop doTV - true if the current player will activate the TV Station.
+ * @prop doTV - true if the current player will activate the TV Station
+ * establishment (Machi Koro 1).
  * @prop doOffice - number of times the current player will activate the Office.
+ * @prop doDemolitionCompany - number of times the current player will activate
+ * the Demolition Company establishment.
  * @prop doMovingCompany - number of times the current player will activate the
  * Moving Company establishment (Machi Koro 1).
  * @prop doMovingCompany2 - true if the current player will activate the Moving
  * Company landmark (Machi Koro 2).
  * @prop doRenovationCompany - true if the current player will activate the
- * Renovation Company establishment (Machi Koro 1).
+ * Renovation Company establishment.
  * @prop officeGiveEst - the establishment picked for the Office or Moving
  * Company action to give.
  * @prop officeGiveRenovation - True if the establishment pick for the Office
@@ -57,6 +60,7 @@ export interface MachikoroG {
   secondTurn: boolean;
   doTV: boolean;
   doOffice: number;
+  doDemolitionCompany: number;
   doMovingCompany: number;
   doMovingCompany2: boolean;
   doRenovationCompany: boolean;
@@ -108,6 +112,7 @@ export interface SetupData {
 export const TurnState = {
   Roll: 0,
   ActivateRedEsts: 10,
+  DemolitionCompany: 19,
   ActivateBlueGreenEsts: 20,
   MovingCompanyGive: 21,
   MovingCompanyOpp: 22,
