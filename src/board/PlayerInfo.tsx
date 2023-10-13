@@ -113,7 +113,8 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const canDoOfficeGive = isActive && player === currentPlayer && Game.canDoOfficeGive(G, ctx, est);
       const canDoOfficeTake = isActive && player !== currentPlayer && Game.canDoOfficeTake(G, ctx, player, est);
       const canDoRenovationCompany = isActive && Game.canDoRenovationCompany(G, est);
-      const canInvestTechStartup = isActive && player === currentPlayer && Game.canInvestTechStartup(G, ctx);
+      const canInvestTechStartup =
+        isActive && player === currentPlayer && Est.isEqual(est, Est.TechStartup) && Game.canInvestTechStartup(G, ctx);
 
       const estClickable = canDoOfficeGive || canDoOfficeTake || canDoRenovationCompany || canInvestTechStartup;
       let onClickEstEvent: (est: Est.Establishment, renovation: boolean) => void;
@@ -129,8 +130,14 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         onClickEstEvent = () => void 0;
       }
 
+      let estDescriptionUnparsed = `${est.name}\n\n${est.description}`;
+      if (Est.isEqual(est, Est.TechStartup)) {
+        const investment = Est.getInvestment(G, player);
+        estDescriptionUnparsed = `${estDescriptionUnparsed}\n\nCurrent investment: ${investment}`;
+      }
+
       const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
-      const estDescription = parseMaterialSymbols(est.name + '\n\n' + est.description);
+      const estDescription = parseMaterialSymbols(estDescriptionUnparsed);
 
       for (let j = 0; j < count; j++) {
         const key = `${i}_${j}`;

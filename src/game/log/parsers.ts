@@ -318,7 +318,7 @@ export const logDemolitionCompany = (G: MachikoroG, landName: string): void => {
  */
 const parseDemolitionCompany = (logEvent: DemolitionCompany): string => {
   const { landName } = logEvent;
-  return `\tdemolished ${landName} (Demolition Company)`;
+  return `\tdemolished ${landName}`;
 };
 
 // ----------------------------------------------------------------------------

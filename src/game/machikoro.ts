@@ -292,7 +292,7 @@ export const canSkipRenovationCompany = (G: MachikoroG): Establishment | null =>
 export const canInvestTechStartup = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
   return (
-    G.turnState === TurnState.End &&
+    (G.turnState === TurnState.Buy || G.turnState === TurnState.End) &&
     // player must own the establishment
     Est.countOwned(G, player, Est.TechStartup) > 0 &&
     // player has enough coins
@@ -705,7 +705,8 @@ const investTechStartup: Move<MachikoroG> = (context) => {
   G.didTechStartup = true;
   Log.logInvestTechStartup(G, Est.getInvestment(G, player));
 
-  switchState(context);
+  // change game state directly instead of calling `switchState`
+  G.turnState = TurnState.End;
 
   return;
 }
@@ -726,13 +727,11 @@ const endTurn: Move<MachikoroG> = (context) => {
 
   // a player earns coins via the airport if they did not buy anything
   if (G.turnState === TurnState.Buy) {
-    if (Land.owns(G, player, Land.Airport)) {
-      assertNonNull(Land.Airport.coins);
-      earn(G, ctx, player, Land.Airport.coins, Land.Airport.name);
-    }
-    if (Land.isOwned(G, Land.Airport2)) {
-      assertNonNull(Land.Airport2.coins);
-      earn(G, ctx, player, Land.Airport2.coins, Land.Airport2.name);
+    for (const airport of [Land.Airport, Land.Airport2]) {
+      if (Land.owns(G, player, airport)) {
+        assertNonNull(airport.coins);
+        earn(G, ctx, player, airport.coins, airport.name);
+      }
     }
   }
 
