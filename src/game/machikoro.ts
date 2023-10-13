@@ -690,8 +690,8 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
 
 /**
  * Invest in the Tech Startup establishment (Machi Koro 1).
- * @param context 
- * @returns 
+ * @param context
+ * @returns
  */
 const investTechStartup: Move<MachikoroG> = (context) => {
   const { G, ctx } = context;
@@ -709,7 +709,7 @@ const investTechStartup: Move<MachikoroG> = (context) => {
   G.turnState = TurnState.End;
 
   return;
-}
+};
 
 /**
  * End the turn.

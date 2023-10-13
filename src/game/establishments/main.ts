@@ -237,22 +237,22 @@ export const unownedRedBlueGreenEst = (G: MachikoroG): Establishment | null => {
 /**
  * @param G
  * @param player
- * @returns The number of coins invested in the player's Tech Startup 
+ * @returns The number of coins invested in the player's Tech Startup
  * establishment (Machi Koro 1).
  */
 export const getInvestment = (G: MachikoroG, player: number): number => {
   return G.estData._investment[player];
-}
+};
 
 /**
  * Increments the number of coins invested in the player's Tech Startup
  * establishment (Machi Koro 1).
- * @param G 
- * @param player 
+ * @param G
+ * @param player
  */
 export const incrementInvestment = (G: MachikoroG, player: number): void => {
   G.estData._investment[player] += 1;
-}
+};
 
 /**
  * Replenish the supply.

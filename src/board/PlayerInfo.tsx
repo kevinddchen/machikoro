@@ -131,6 +131,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       }
 
       let estDescriptionUnparsed = `${est.name}\n\n${est.description}`;
+      // for Tech Startup establishment, add the current investment to the description
       if (Est.isEqual(est, Est.TechStartup)) {
         const investment = Est.getInvestment(G, player);
         estDescriptionUnparsed = `${estDescriptionUnparsed}\n\nCurrent investment: ${investment}`;
