@@ -113,8 +113,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       const canDoOfficeGive = isActive && player === currentPlayer && Game.canDoOfficeGive(G, ctx, est);
       const canDoOfficeTake = isActive && player !== currentPlayer && Game.canDoOfficeTake(G, ctx, player, est);
       const canDoRenovationCompany = isActive && Game.canDoRenovationCompany(G, est);
+      const canInvestTechStartup = isActive && player === currentPlayer && Game.canInvestTechStartup(G, ctx);
 
-      const estClickable = canDoOfficeGive || canDoOfficeTake || canDoRenovationCompany;
+      const estClickable = canDoOfficeGive || canDoOfficeTake || canDoRenovationCompany || canInvestTechStartup;
       let onClickEstEvent: (est: Est.Establishment, renovation: boolean) => void;
       if (canDoOfficeGive) {
         onClickEstEvent = (est, renovation) => moves.doOfficeGive(est, renovation);
@@ -122,6 +123,8 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         onClickEstEvent = (est, renovation) => moves.doOfficeTake(player, est, renovation);
       } else if (canDoRenovationCompany) {
         onClickEstEvent = (est) => moves.doRenovationCompany(est);
+      } else if (canInvestTechStartup) {
+        onClickEstEvent = (est) => moves.investTechStartup(est);
       } else {
         onClickEstEvent = () => void 0;
       }

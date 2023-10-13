@@ -12,25 +12,25 @@ import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
 /**
  * Maximum number of unique establishments in the supply for Variable Supply.
  */
-export const _VARIABLE_SUPPLY_LIMIT = 10;
+const VARIABLE_SUPPLY_LIMIT = 10;
 
 /**
  * Maximum number of unique establishments that activate with rolls <= 6 in the
  * supply for Hybrid Supply.
  */
-export const _HYBRID_SUPPY_LIMIT_LOWER = 5;
+const HYBRID_SUPPY_LIMIT_LOWER = 5;
 
 /**
  * Maximum number of unique establishments that activate with rolls > 6 in the
  * supply for Hybrid Supply.
  */
-export const _HYBRID_SUPPY_LIMIT_UPPER = 5;
+const HYBRID_SUPPY_LIMIT_UPPER = 5;
 
 /**
  * Maximum number of unique major (purple) establishments in the supply for
  * Hybrid Supply.
  */
-export const _HYBRID_SUPPY_LIMIT_MAJOR = 2;
+const HYBRID_SUPPY_LIMIT_MAJOR = 2;
 
 /**
  * @param a
@@ -235,6 +235,26 @@ export const unownedRedBlueGreenEst = (G: MachikoroG): Establishment | null => {
 };
 
 /**
+ * @param G
+ * @param player
+ * @returns The number of coins invested in the player's Tech Startup 
+ * establishment (Machi Koro 1).
+ */
+export const getInvestment = (G: MachikoroG, player: number): number => {
+  return G.estData._investment[player];
+}
+
+/**
+ * Increments the number of coins invested in the player's Tech Startup
+ * establishment (Machi Koro 1).
+ * @param G 
+ * @param player 
+ */
+export const incrementInvestment = (G: MachikoroG, player: number): void => {
+  G.estData._investment[player] += 1;
+}
+
+/**
  * Replenish the supply.
  * @param G
  */
@@ -251,7 +271,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     }
   } else if (supplyVariant === SupplyVariant.Variable) {
     // put establishments into the supply until there are ten unique establishments
-    while (decks[0].length > 0 && getAllAvailable(G).length < _VARIABLE_SUPPLY_LIMIT) {
+    while (decks[0].length > 0 && getAllAvailable(G).length < VARIABLE_SUPPLY_LIMIT) {
       const est = decks[0].pop();
       assertNonNull(est);
       G.estData._availableCount[est._id] += 1;
@@ -261,7 +281,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     // establishments with activation <= 6 and 5 establishments with activation
     // > 6 (and for Machi Koro 1, 2 major establishments).
 
-    const limits = [_HYBRID_SUPPY_LIMIT_LOWER, _HYBRID_SUPPY_LIMIT_UPPER, _HYBRID_SUPPY_LIMIT_MAJOR];
+    const limits = [HYBRID_SUPPY_LIMIT_LOWER, HYBRID_SUPPY_LIMIT_UPPER, HYBRID_SUPPY_LIMIT_MAJOR];
 
     let funcs: ((est: Establishment) => boolean)[];
     if (version === Version.MK1) {
@@ -315,6 +335,7 @@ export const initialize = (
     _availableCount: Array.from({ length: numEsts }, () => 0),
     _ownedCount: Array.from({ length: numPlayers }, () => Array.from({ length: numEsts }, () => 0)),
     _renovationCount: Array.from({ length: numPlayers }, () => Array.from({ length: numEsts }, () => 0)),
+    _investment: Array.from({ length: numPlayers }, () => 0),
   };
 
   // populate establishments in use
