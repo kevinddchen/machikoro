@@ -515,7 +515,6 @@ export const TaxOffice: Establishment = {
   _initial: null,
 };
 
-// TODO: implement this
 export const TechStartup: Establishment = {
   _id: 36,
   version: Version.MK1,

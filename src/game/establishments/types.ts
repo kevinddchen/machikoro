@@ -44,12 +44,15 @@ export interface Establishment {
  * @prop _renovationCount - Array tracking how many of each establishment are
  * under renovation for each player. Indexed by player number then by
  * establishment ID.
+ * @prop _investment - Array tracking how many coins have been invested in the
+ * player's Tech Startup (Machi Koro 1) establishment. Indexed by player number.
  */
 export interface EstablishmentData {
   _remainingCount: number[];
   _availableCount: number[];
   _ownedCount: number[][];
   _renovationCount: number[][];
+  _investment: number[];
 }
 
 /**

@@ -286,6 +286,24 @@ export const canSkipRenovationCompany = (G: MachikoroG): Establishment | null =>
 
 /**
  * @param G
+ * @returns True if the current player can invest in the Tech Startup
+ * establishment (Machi Koro 1).
+ */
+export const canInvestTechStartup = (G: MachikoroG, ctx: Ctx): boolean => {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    (G.turnState === TurnState.Buy || G.turnState === TurnState.End) &&
+    // player must own the establishment
+    Est.countOwned(G, player, Est.TechStartup) > 0 &&
+    // player has enough coins
+    getCoins(G, player) >= 1 &&
+    // player must not have invested this turn
+    !G.didTechStartup
+  );
+};
+
+/**
+ * @param G
  * @returns True if the current player can end their turn.
  */
 export const canEndTurn = (G: MachikoroG): boolean => {
@@ -598,7 +616,7 @@ const doDemolitionCompany: Move<MachikoroG> = (context, land: Landmark) => {
 
   const player = parseInt(ctx.currentPlayer);
   Land.demolish(G, player, land);
-  Log.logDemolitionCompany(G, land.name, player);
+  Log.logDemolitionCompany(G, land.name);
 
   switchState(context);
 
@@ -671,6 +689,29 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
 };
 
 /**
+ * Invest in the Tech Startup establishment (Machi Koro 1).
+ * @param context
+ * @returns
+ */
+const investTechStartup: Move<MachikoroG> = (context) => {
+  const { G, ctx } = context;
+  if (!canInvestTechStartup(G, ctx)) {
+    return INVALID_MOVE;
+  }
+
+  const player = parseInt(ctx.currentPlayer);
+  addCoins(G, player, -1);
+  Est.incrementInvestment(G, player);
+  G.didTechStartup = true;
+  Log.logInvestTechStartup(G, Est.getInvestment(G, player));
+
+  // change game state directly instead of calling `switchState`
+  G.turnState = TurnState.End;
+
+  return;
+};
+
+/**
  * End the turn.
  * @param context
  */
@@ -686,13 +727,11 @@ const endTurn: Move<MachikoroG> = (context) => {
 
   // a player earns coins via the airport if they did not buy anything
   if (G.turnState === TurnState.Buy) {
-    if (Land.owns(G, player, Land.Airport)) {
-      assertNonNull(Land.Airport.coins);
-      earn(G, ctx, player, Land.Airport.coins, Land.Airport.name);
-    }
-    if (Land.isOwned(G, Land.Airport2)) {
-      assertNonNull(Land.Airport2.coins);
-      earn(G, ctx, player, Land.Airport2.coins, Land.Airport2.name);
+    for (const airport of [Land.Airport, Land.Airport2]) {
+      if (Land.owns(G, player, airport)) {
+        assertNonNull(airport.coins);
+        earn(G, ctx, player, airport.coins, airport.name);
+      }
     }
   }
 
@@ -824,7 +863,7 @@ const switchState = (context: FnContext<MachikoroG>): void => {
 
     activateBoughtLand(context);
   }
-  if (G.turnState < TurnState.End) {
+  if (G.turnState <= TurnState.End) {
     G.turnState = TurnState.End;
     return; // await player action
   }
@@ -1116,6 +1155,11 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
       activatePark(G, ctx);
     } else if (Est.isEqual(est, Est.RenovationCompany)) {
       G.doRenovationCompany = true;
+    } else if (Est.isEqual(est, Est.TechStartup)) {
+      for (const opponent of getPreviousPlayers(ctx)) {
+        const amount = Est.getInvestment(G, currentPlayer) * count;
+        take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
+      }
     }
   }
 };
@@ -1424,6 +1468,7 @@ const newTurnG = {
   doMovingCompany: 0,
   doMovingCompany2: false,
   doRenovationCompany: false,
+  didTechStartup: false,
   officeGiveEst: null,
   officeGiveRenovation: null,
   justBoughtEst: null,
@@ -1526,6 +1571,7 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
     doDemolitionCompany,
     doMovingCompanyOpp,
     doRenovationCompany,
+    investTechStartup,
     endTurn,
   },
 
