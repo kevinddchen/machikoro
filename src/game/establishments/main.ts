@@ -235,6 +235,25 @@ export const unownedRedBlueGreenEst = (G: MachikoroG): Establishment | null => {
 };
 
 /**
+ * Update `G` to reflect a player demolishing an establishment. Only
+ * implemented for Machi Koro 1.
+ * @param G
+ * @param player
+ * @param est
+ */
+export const demolish = (G: MachikoroG, player: number, est: Establishment): void => {
+  const version = G.version;
+  if (version === Version.MK2) {
+    throw new Error('Demolishing establishments is only implemented for Machi Koro 1.');
+  } else if (version !== est.version) {
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
+  }
+  G.estData._remainingCount[est._id] += 1;
+  G.estData._availableCount[est._id] += 1;
+  G.estData._ownedCount[player][est._id] -= 1;
+};
+
+/**
  * @param G
  * @param player
  * @returns The number of coins invested in the player's Tech Startup

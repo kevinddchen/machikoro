@@ -266,6 +266,8 @@ export const canDoMovingCompanyOpp = (G: MachikoroG, ctx: Ctx, opponent: number)
 export const canDoRenovationCompany = (G: MachikoroG, est: Establishment): boolean => {
   return (
     G.turnState === TurnState.RenovationCompany &&
+    // establishment must be in use
+    Est.isInUse(est, G.version, G.expansions) &&
     // cannot pick major (purple)
     !Est.isMajor(est)
   );
@@ -274,14 +276,40 @@ export const canDoRenovationCompany = (G: MachikoroG, est: Establishment): boole
 /**
  * @param G
  * @returns An establishment that the current player can activate with the
- * Renovation Company action to effectively "skip" it, of null if such an
- * establishment does not exist.
+ * Renovation Company action to effectively "skip" it, or null if such a move
+ * is not allowed / possible.
  */
 export const canSkipRenovationCompany = (G: MachikoroG): Establishment | null => {
   if (G.turnState !== TurnState.RenovationCompany) {
     return null;
   }
   return Est.unownedRedBlueGreenEst(G);
+};
+
+/**
+ * @param G
+ * @param ctx
+ * @param est
+ * @returns True if the current player can pick the establishment for the
+ * Exhibit Hall (Machi Koro 1) action.
+ */
+export const canDoExhibitHall = (G: MachikoroG, ctx: Ctx, est: Establishment): boolean => {
+  const player = parseInt(ctx.currentPlayer);
+  return (
+    G.turnState === TurnState.ExhibitHall &&
+    // player must own the establishment
+    Est.countOwned(G, player, est) > 0 &&
+    // cannot pick major (purple)
+    !Est.isMajor(est)
+  );
+};
+
+/**
+ * @param G
+ * @returns True if the current player can skip the Exhibit Hall action.
+ */
+export const canSkipExhibitHall = (G: MachikoroG): boolean => {
+  return G.turnState === TurnState.ExhibitHall;
 };
 
 /**
@@ -689,6 +717,58 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
 };
 
 /**
+ * Perform the Exhibit Hall (Machi Koro 1) action by picking an establishment
+ * to activate.
+ * @param context 
+ * @param est 
+ * @param renovation - True if the establishment is closed for renovations.
+ */
+const doExhibitHall: Move<MachikoroG> = (context, est: Establishment, renovation: boolean) => {
+  const { G, ctx } = context;
+  if (!canDoExhibitHall(G, ctx, est)) {
+    return INVALID_MOVE;
+  }
+
+  const player = parseInt(ctx.currentPlayer);
+
+  // The current implementation of this action is all sorts of complicated, but
+  // is the best we can do without large-scale refactors. Basically, we replay
+  // all previous moves, but have specific logic to only activate the
+  // establishment that we picked.
+
+  // If the picked establishment is closed for renovations, we can
+  // short-circuit a bunch of logic by just opening it again.
+
+  if (renovation) {
+    const countRenovation = Est.countRenovation(G, player, est);
+    Est.setRenovationCount(G, player, est, countRenovation - 1);
+  } else {
+    Est.demolish(G, player, Est.ExhibitHall);
+    G.exhibitHallEst = est;
+    G.turnState = TurnState.Roll;
+  }
+
+  switchState(context);
+
+  return;
+}
+
+/**
+ * Skip the Exhibit Hall action.
+ * @param context 
+ */
+const skipExhibitHall: Move<MachikoroG> = (context) => {
+  const { G } = context;
+  if (!canSkipExhibitHall(G)) {
+    return INVALID_MOVE;
+  }
+
+  switchState(context);
+
+  return;
+}
+
+/**
  * Invest in the Tech Startup establishment (Machi Koro 1).
  * @param context
  * @returns
@@ -782,62 +862,56 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     activateRedEsts(context);
   }
   if (G.turnState < TurnState.DemolitionCompany) {
-    // first get coins
+    // this must only activate once!
     activateDemolitionCompany(context);
     G.turnState = TurnState.DemolitionCompany;
   }
-  if (G.turnState === TurnState.DemolitionCompany) {
+  if (G.turnState <= TurnState.DemolitionCompany && G.doDemolitionCompany > 0) {
     // can do multiple times
-    if (G.doDemolitionCompany > 0) {
-      G.doDemolitionCompany -= 1;
-      return; // await player action
-    }
+    G.doDemolitionCompany -= 1;
+    G.turnState = TurnState.DemolitionCompany;
+    return; // await player action
   }
   if (G.turnState < TurnState.ActivateBlueGreenEsts) {
     activateBlueGreenEsts(context);
   }
-  if (G.turnState <= TurnState.MovingCompanyOpp) {
+  if (G.turnState <= TurnState.MovingCompanyOpp && G.doMovingCompany > 0) {
     // can do multiple times
-    if (G.doMovingCompany > 0) {
-      G.doMovingCompany -= 1;
-      G.turnState = TurnState.MovingCompanyGive;
-      return; // await player action
-    }
+    G.doMovingCompany -= 1;
+    G.turnState = TurnState.MovingCompanyGive;
+    return; // await player action
   }
   if (G.turnState < TurnState.ActivatePurpleEsts) {
     activatePurpleEsts(context);
   }
-  if (G.turnState < TurnState.TV) {
-    if (G.doTV) {
-      G.doTV = false;
-      G.turnState = TurnState.TV;
-      return; // await player action
-    }
+  if (G.turnState < TurnState.TV && G.doTV) {
+    G.doTV = false;
+    G.turnState = TurnState.TV;
+    return; // await player action
   }
-  if (G.turnState <= TurnState.OfficeTake) {
+  if (G.turnState <= TurnState.OfficeTake && G.doOffice > 0) {
     // can do multiple times
-    if (G.doOffice > 0) {
-      G.doOffice -= 1;
-      G.turnState = TurnState.OfficeGive;
-      return; // await player action
-    }
+    G.doOffice -= 1;
+    G.turnState = TurnState.OfficeGive;
+    return; // await player action
   }
-  if (G.turnState < TurnState.RenovationCompany) {
-    if (G.doRenovationCompany) {
-      G.doRenovationCompany = false;
-      G.turnState = TurnState.RenovationCompany;
-      return; // await player action
-    }
+  if (G.turnState < TurnState.RenovationCompany && G.doRenovationCompany) {
+    G.doRenovationCompany = false;
+    G.turnState = TurnState.RenovationCompany;
+    return; // await player action
+  }
+  if (G.turnState < TurnState.ExhibitHall && G.doExhibitHall) {
+    G.doExhibitHall = false;
+    G.turnState = TurnState.ExhibitHall;
+    return; // await player action
   }
   if (G.turnState < TurnState.ActivateLands) {
     activateLands(context);
   }
-  if (G.turnState < TurnState.MovingCompany2) {
-    if (G.doMovingCompany2) {
-      G.doMovingCompany2 = false;
-      G.turnState = TurnState.MovingCompany2;
-      return; // await player action
-    }
+  if (G.turnState < TurnState.MovingCompany2 && G.doMovingCompany2) {
+    G.doMovingCompany2 = false;
+    G.turnState = TurnState.MovingCompany2;
+    return; // await player action
   }
   if (G.turnState < TurnState.Buy) {
     // activate city hall before buying
@@ -1137,10 +1211,9 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
       }
     } else if (Est.isEqual(est, Est.TVStation)) {
       G.doTV = true;
-    } else if (Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) {
-      if (officeTradeExists(context)) {
-        G.doOffice = count;
-      }
+    } else if ((Est.isEqual(est, Est.Office) || Est.isEqual(est, Est.Office2)) && officeTradeExists(context)) {
+      // only activate if a trade is possible
+      G.doOffice = count;
     } else if (Est.isEqual(est, Est.Publisher)) {
       // take 1 coin for each Cup and Shop type establishment
       for (const opponent of getPreviousPlayers(ctx)) {
@@ -1160,6 +1233,12 @@ const activatePurpleEsts = (context: FnContext<MachikoroG>): void => {
         const amount = Est.getInvestment(G, currentPlayer) * count;
         take(G, ctx, { from: opponent, to: currentPlayer }, amount, est.name);
       }
+    } else if (
+      Est.isEqual(est, Est.ExhibitHall) &&
+      Est.getAllOwned(G, currentPlayer).filter((est) => !Est.isMajor(est)).length > 0
+    ) {
+      // only activate if player owns at least one non-major establishment
+      G.doExhibitHall = true;
     }
   }
 };
@@ -1182,19 +1261,19 @@ const activateLands = (context: FnContext<MachikoroG>): void => {
     earn(G, ctx, player, Land.TechStartup2.coins, Land.TechStartup2.name);
   }
   if (Land.isOwned(G, Land.Temple2) && G.rollDoubles) {
-    // take 2 coins from each opponent
+    // if roll doubles, take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
       assertNonNull(Land.Temple2.coins);
       take(G, ctx, { from: opponent, to: player }, Land.Temple2.coins, Land.Temple2.name);
     }
   }
   if (Land.isOwned(G, Land.MovingCompany2) && G.rollDoubles && Est.getAllOwned(G, player).length > 0) {
-    // give 1 establishment to previous player
+    // if roll doubles and has an establishment, give 1 establishment to previous player
     G.doMovingCompany2 = true;
   }
   if (Land.isOwned(G, Land.Charterhouse2) && G.numDice === 2 && !G.receivedCoins) {
     // NOTE: this must activate after all money-earning landmarks!
-    // get 3 coins from the bank
+    // if roll two dice and did not get coins, get 3 coins from the bank
     assertNonNull(Land.Charterhouse2.coins);
     earn(G, ctx, player, Land.Charterhouse2.coins, Land.Charterhouse2.name);
   }
@@ -1468,9 +1547,11 @@ const newTurnG = {
   doMovingCompany: 0,
   doMovingCompany2: false,
   doRenovationCompany: false,
+  doExhibitHall: false,
   didTechStartup: false,
   officeGiveEst: null,
   officeGiveRenovation: null,
+  exhibitHallEst: null,
   justBoughtEst: null,
   justBoughtLand: null,
   receivedCoins: false,
@@ -1571,6 +1652,8 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
     doDemolitionCompany,
     doMovingCompanyOpp,
     doRenovationCompany,
+    doExhibitHall,
+    skipExhibitHall,
     investTechStartup,
     endTurn,
   },
