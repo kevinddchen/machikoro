@@ -721,9 +721,8 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
  * to activate.
  * @param context
  * @param est
- * @param renovation - True if the establishment is closed for renovations.
  */
-const doExhibitHall: Move<MachikoroG> = (context, est: Establishment, renovation: boolean) => {
+const doExhibitHall: Move<MachikoroG> = (context, est: Establishment) => {
   const { G, ctx } = context;
   if (!canDoExhibitHall(G, ctx, est)) {
     return INVALID_MOVE;
@@ -731,20 +730,14 @@ const doExhibitHall: Move<MachikoroG> = (context, est: Establishment, renovation
 
   const player = parseInt(ctx.currentPlayer);
 
-  // The current implementation of this action is kinda complicated, but is the
-  // best we can do without large-scale refactors. Basically, we reset the
+  // The current implementation of this action is kinda complicated, but it's
+  // the best we can do without large-scale refactors. Basically, we reset the
   // `turnState` and redo all the steps in `switchState()`, but we specifically
   // only activate the one establishment that was picked.
 
-  if (renovation) {
-    // If the picked establishment is closed for renovations, we can
-    // short-circuit a bunch of logic by just opening them
-    Est.setRenovationCount(G, player, est, 0);
-  } else {
-    Est.demolish(G, player, Est.ExhibitHall);
-    G.exhibitHallEst = est;
-    G.turnState = TurnState.Roll;
-  }
+  Est.demolish(G, player, Est.ExhibitHall, false);
+  G.exhibitHallEst = est;
+  G.turnState = TurnState.Roll;
 
   switchState(context);
 
@@ -951,6 +944,18 @@ const activateRedEsts = (context: FnContext<MachikoroG>): void => {
   const allEsts = getAllEsts(G);
 
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red);
+
+  // For exhibit hall, since red establishments don't do anything when they
+  // activate on the current player's turn, skip them and just open from
+  // renovations.
+
+  if (G.exhibitHallEst !== null) {
+    for (const est of redEsts) {
+      Est.setRenovationCount(G, currentPlayer, est, 0);
+    }
+    return;
+  }
+
   for (const opponent of getPreviousPlayers(ctx)) {
     for (const est of redEsts) {
       // get number owned, subtract number closed for renovations
@@ -1058,6 +1063,10 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
   // Do Blue establishments.
   const blueEsts = allEsts.filter((est) => est.color === EstColor.Blue);
   for (const player of getNextPlayers(ctx)) {
+    if (G.exhibitHallEst !== null && player !== currentPlayer) {
+      // For exhibit hall, only activate on current player.
+      continue;
+    }
     for (const est of blueEsts) {
       // get number owned, subtract number closed for renovations
       const count = Est.countOwned(G, player, est) - Est.countRenovation(G, player, est);
@@ -1339,14 +1348,7 @@ const getAllEsts = (G: MachikoroG): Establishment[] => {
     // usually, take all ests that activate with this roll
     return Est.getAllInUse(G.version, G.expansions).filter((est) => est.rolls.includes(G.roll));
   } else {
-    // if red, return nothing. This is because red establishments that are
-    // activated on your turn do nothing.
-    if (G.exhibitHallEst.color === Est.EstColor.Red) {
-      return []
-    } else {
-    // otherwise, return a list of just the picked establishment
-      return [G.exhibitHallEst];
-    }
+    return [G.exhibitHallEst];
   }
 };
 

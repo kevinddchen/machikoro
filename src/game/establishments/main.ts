@@ -240,8 +240,9 @@ export const unownedRedBlueGreenEst = (G: MachikoroG): Establishment | null => {
  * @param G
  * @param player
  * @param est
+ * @param renovation - True if the establishment is closed for renovations.
  */
-export const demolish = (G: MachikoroG, player: number, est: Establishment): void => {
+export const demolish = (G: MachikoroG, player: number, est: Establishment, renovation: boolean): void => {
   const version = G.version;
   if (version !== Version.MK1) {
     throw new Error('Demolishing establishments is only implemented for Machi Koro 1.');
@@ -251,6 +252,9 @@ export const demolish = (G: MachikoroG, player: number, est: Establishment): voi
   G.estData._remainingCount[est._id] += 1;
   G.estData._availableCount[est._id] += 1;
   G.estData._ownedCount[player][est._id] -= 1;
+  if (renovation) {
+    G.estData._renovationCount[player][est._id] -= 1;
+  }
 };
 
 /**
