@@ -1,5 +1,5 @@
 //
-// Types for Machikoro game.
+// Types for Machi Koro game.
 //
 
 import type { Establishment, EstablishmentData } from './establishments/types';

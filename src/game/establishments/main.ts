@@ -243,7 +243,7 @@ export const unownedRedBlueGreenEst = (G: MachikoroG): Establishment | null => {
  */
 export const demolish = (G: MachikoroG, player: number, est: Establishment): void => {
   const version = G.version;
-  if (version === Version.MK2) {
+  if (version !== Version.MK1) {
     throw new Error('Demolishing establishments is only implemented for Machi Koro 1.');
   } else if (version !== est.version) {
     throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
