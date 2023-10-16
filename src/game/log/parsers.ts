@@ -29,6 +29,7 @@ const LogEventType = {
   DemolitionCompany: 'DemolitionCompany',
   MovingCompany: 'MovingCompany',
   Park: 'Park',
+  ExhibitHall: 'ExhibitHall',
   TechStartup: 'TechStartup',
   TunaRoll: 'TunaRoll',
   EndGame: 'EndGame',
@@ -48,6 +49,7 @@ export type LogEvent =
   | DemolitionCompany
   | MovingCompany
   | Park
+  | ExhibitHall
   | TechStartup
   | TunaRoll
   | EndGame
@@ -74,6 +76,8 @@ export const parseLogEvent = (logEvent: LogEvent, names: string[]): string => {
     return parseMovingCompany(logEvent, names);
   } else if (logEvent.type === LogEventType.Park) {
     return parsePark(logEvent);
+  } else if (logEvent.type === LogEventType.ExhibitHall) {
+    return parseExhibitHall(logEvent);
   } else if (logEvent.type === LogEventType.TechStartup) {
     return parseInvestTechStartup(logEvent);
   } else if (logEvent.type === LogEventType.TunaRoll) {
@@ -325,18 +329,18 @@ const parseDemolitionCompany = (logEvent: DemolitionCompany): string => {
 
 interface MovingCompany extends BaseLogEvent {
   type: typeof LogEventType.MovingCompany;
-  est_name: string;
+  estName: string;
   opponent: number;
 }
 
 /**
  * Log the effect of the Moving Company establishment / landmark.
  * @param G
- * @param est_name
+ * @param estName
  * @param opponent
  */
-export const logMovingCompany = (G: MachikoroG, est_name: string, opponent: number): void => {
-  const logEvent: MovingCompany = { type: LogEventType.MovingCompany, est_name, opponent };
+export const logMovingCompany = (G: MachikoroG, estName: string, opponent: number): void => {
+  const logEvent: MovingCompany = { type: LogEventType.MovingCompany, estName, opponent };
   G._logBuffer.push(logEvent);
 };
 
@@ -346,8 +350,8 @@ export const logMovingCompany = (G: MachikoroG, est_name: string, opponent: numb
  * @returns Displayed log text for the Moving Company establishment / landmark.
  */
 const parseMovingCompany = (logEvent: MovingCompany, names: string[]): string => {
-  const { est_name, opponent } = logEvent;
-  return `\tgave ${est_name} to ${names[opponent]} (Moving Company)`;
+  const { estName, opponent } = logEvent;
+  return `\tgave ${estName} to ${names[opponent]} (Moving Company)`;
 };
 
 // ----------------------------------------------------------------------------
@@ -373,6 +377,31 @@ export const logPark = (G: MachikoroG, coins: number): void => {
  */
 const parsePark = (logEvent: Park): string => {
   return `\tredistributed ${logEvent.coins} to each player (Park)`;
+};
+
+// ----------------------------------------------------------------------------
+
+interface ExhibitHall extends BaseLogEvent {
+  type: typeof LogEventType.ExhibitHall;
+  estName: string;
+}
+
+/**
+ * Log the effect of the Exhibit Hall establishment (Machi Koro 1)
+ * @param G
+ * @param estName
+ */
+export const logExhibitHall = (G: MachikoroG, estName: string): void => {
+  const logEvent: ExhibitHall = { type: LogEventType.ExhibitHall, estName };
+  G._logBuffer.push(logEvent);
+};
+
+/**
+ * @param logEvent
+ * @returns Displayed log text for the Exhibit Hall establishment (Machi Koro 1).
+ */
+const parseExhibitHall = (logEvent: ExhibitHall): string => {
+  return `\tdemolished Exhibit Hall to activate ${logEvent.estName}.`;
 };
 
 // ----------------------------------------------------------------------------

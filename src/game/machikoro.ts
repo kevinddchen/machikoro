@@ -738,6 +738,7 @@ const doExhibitHall: Move<MachikoroG> = (context, est: Establishment) => {
   Est.demolish(G, player, Est.ExhibitHall, false);
   G.exhibitHallEst = est;
   G.turnState = TurnState.Roll;
+  Log.logExhibitHall(G, est.name);
 
   switchState(context);
 
