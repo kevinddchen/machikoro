@@ -1013,7 +1013,7 @@ const activateRedEsts = (context: FnContext<MachikoroG>): void => {
 const activateDemolitionCompany = (context: FnContext<MachikoroG>): void => {
   const { G, ctx } = context;
   const currentPlayer = parseInt(ctx.currentPlayer);
-  const allEsts = getAllEsts(G)
+  const allEsts = getAllEsts(G);
 
   if (allEsts.some((est) => Est.isEqual(est, Est.DemolitionCompany))) {
     // get number owned, subtract number closed for renovations
