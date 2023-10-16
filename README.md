@@ -25,10 +25,11 @@ The app is online and free to play at <a href="https://playmachikoro.herokuapp.c
 
 In the Millionaire's Row expansion, there are certain uncommon plays that are not possible:
 
-- `Demolition Company` cannot be activated after `Corn Field`.
-- `Loan Office` cannot be activated after `Forest` or `Flower Shop`.
-- `Moving Company` cannot be activated before `Mine`, `Winery`, or `Apple Orchard`.
-- `Renovation Company` cannot be activated before `Tax Office`.
+- `Demolition Company` cannot be activated after `Corn Field`. This is uncommon because you could get fewer coins.
+- `Loan Office` cannot be activated after `Forest` or `Flower Shop`. This is uncommon because you could get fewer coins.
+- `Moving Company` cannot be activated before `Mine`, `Winery`, or `Apple Orchard`. This is done because (i) you could get fewer coins, and (ii) it is ambiguous whether establishments you give away should be activated, so this keeps things simple.
+- `Renovation Company` cannot be activated before `Tax Office`. This is uncommon because you could get fewer coins.
+- `Exhibit Hall` cannot be activated before `Tech Startup` (e.g. to activate `Loan Office`). While this could give you more coins, (i) it is quite rare, and (ii) activating `Tech Startup` first makes it more clean how many coins you have which can help with picking the establishment to activate.
 
 ## Development
 

@@ -947,7 +947,7 @@ const activateRedEsts = (context: FnContext<MachikoroG>): void => {
   const redEsts = allEsts.filter((est) => est.color === EstColor.Red);
 
   // For exhibit hall, since red establishments don't do anything when they
-  // activate on the current player's turn, skip them and just open from
+  // activate on the current player's turn, just skip and open if closed for
   // renovations.
 
   if (G.exhibitHallEst !== null) {
