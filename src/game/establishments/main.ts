@@ -384,41 +384,11 @@ export const initialize = (
   }
 
   // prepare decks
-  let estDecks: Establishment[][];
-  if (supplyVariant === SupplyVariant.Total || supplyVariant === SupplyVariant.Variable) {
-    // put all cards into one deck
-    estDecks = [[]];
-    for (const est of inUse) {
-      estDecks[0].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
-    }
-  } else if (supplyVariant === SupplyVariant.Hybrid) {
-    if (version === Version.MK1) {
-      // put all cards into three decks: lower, upper, and major (purple)
-      estDecks = [[], [], []];
-      for (const est of inUse) {
-        if (isMajor(est)) {
-          estDecks[2].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
-        } else if (isLower(est)) {
-          estDecks[0].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
-        } else {
-          estDecks[1].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
-        }
-      }
-    } else if (version === Version.MK2) {
-      // put all cards into two decks: lower and upper
-      estDecks = [[], []];
-      for (const est of inUse) {
-        if (isLower(est)) {
-          estDecks[0].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
-        } else {
-          estDecks[1].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
-        }
-      }
-    } else {
-      return assertUnreachable(version);
-    }
-  } else {
-    return assertUnreachable(supplyVariant);
+  const numDecks = getNumDecks(supplyVariant, version);
+  const estDecks: Establishment[][] = Array.from({ length: numDecks }, () => []);
+  for (const est of inUse) {
+    const idx = getDeckIndex(supplyVariant, version, est);
+    estDecks[idx].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
   }
 
   return { estData, estDecks };
@@ -446,4 +416,57 @@ export const isUpper = (est: Establishment): boolean => {
  */
 export const isMajor = (est: Establishment): boolean => {
   return est.color === EstColor.Purple;
+};
+
+/**
+ * @param supplyVariant
+ * @param version
+ * @returns The number of decks to use for the game setup.
+ */
+export const getNumDecks = (supplyVariant: SupplyVariant, version: Version): number => {
+  if (supplyVariant === SupplyVariant.Total || supplyVariant === SupplyVariant.Variable) {
+    return 1; // put all cards into one deck
+  } else if (supplyVariant === SupplyVariant.Hybrid) {
+    if (version === Version.MK1) {
+      return 3; // put all cards into three decks: lower, upper, and major (purple)
+    } else if (version === Version.MK2) {
+      return 2; // put all cards into two decks: lower and upper
+    } else {
+      return assertUnreachable(version);
+    }
+  } else {
+    return assertUnreachable(supplyVariant);
+  }
+};
+
+/**
+ * @param supplyVariant
+ * @param version
+ * @param est
+ * @returns The deck index that the establishment should be placed in.
+ */
+export const getDeckIndex = (supplyVariant: SupplyVariant, version: Version, est: Establishment): number => {
+  if (supplyVariant === SupplyVariant.Total || supplyVariant === SupplyVariant.Variable) {
+    return 0;
+  } else if (supplyVariant === SupplyVariant.Hybrid) {
+    if (version === Version.MK1) {
+      if (isMajor(est)) {
+        return 2;
+      } else if (isLower(est)) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else if (version === Version.MK2) {
+      if (isLower(est)) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else {
+      return assertUnreachable(version);
+    }
+  } else {
+    return assertUnreachable(supplyVariant);
+  }
 };

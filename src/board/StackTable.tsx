@@ -37,7 +37,7 @@ export default class StackTable {
   render(): JSX.Element {
     this.pushRow();
     return (
-      <table className='stack-table'>
+      <table>
         <tbody>{this.tbody}</tbody>
       </table>
     );
