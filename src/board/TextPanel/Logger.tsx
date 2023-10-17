@@ -90,7 +90,7 @@ export default class Logger extends React.Component<LogProps, object> {
     let lines: string[] = [];
 
     lines.push('Game Configuration:');
-    lines.push('\u2013 ' + displayName(G.version, G.expansions))
+    lines.push('\u2013 ' + displayName(G.version, G.expansions));
     lines.push('\u2013 ' + supplyVariantName(G.supplyVariant));
     lines.push(' ');
 

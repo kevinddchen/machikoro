@@ -49,7 +49,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     this.state = {
       toggleState: ToggleState.Log,
     };
-    this.numReadChats = 0;
+    this.numReadChats = 0; // on refresh, all chats are erased since they are ephemeral
     this.logRadioRef = React.createRef();
     this.chatRadioRef = React.createRef();
   }
@@ -86,7 +86,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     const { toggleState } = this.state;
 
     let chatButtonText = 'Chat';
-    
+
     const numChats = chatMessages.length;
     if (toggleState === ToggleState.Log) {
       // if there are unread chat messages, add a number to the button
