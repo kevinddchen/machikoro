@@ -621,12 +621,13 @@ span.tooltip_sym {
   font-size: 18px;
   padding: none;
   position: relative;
-  width: 306px;
+  width: 303px;
 }
 
 .radio-inputs .radio {
   flex: 1 1 auto;
   text-align: center;
+  width: 151.5px;
 }
 
 .radio-inputs .radio input {
