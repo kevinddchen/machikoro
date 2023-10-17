@@ -82,9 +82,10 @@ export default class Supply extends React.Component<SupplyProps, object> {
   private renderEstTable = (): JSX.Element[] => {
     const { G, ctx, moves, isActive } = this.props;
 
-    // use one table for each deck
+    // use one stack table for each deck, so that the rows corresponding to
+    // different decks will not combine into each other
     const numTables = Est.getNumDecks(G.supplyVariant, G.version);
-    const tables = Array.from({length: numTables}, () => new StackTable(5));
+    const tables = Array.from({ length: numTables }, () => new StackTable(5));
 
     const ests = Est.getAllInUse(G.version, G.expansions);
     for (let i = 0; i < ests.length; i++) {

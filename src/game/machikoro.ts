@@ -1546,7 +1546,7 @@ const debugSetupData: SetupData = {
   expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
   // version: Version.MK2,
   // expansions: [Expansion.Base],
-  supplyVariant: SupplyVariant.Hybrid,
+  supplyVariant: SupplyVariant.Total,
   startCoins: 99,
   initialBuyRounds: 0,
   randomizeTurnOrder: false,
