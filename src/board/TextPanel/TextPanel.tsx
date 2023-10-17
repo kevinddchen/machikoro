@@ -21,14 +21,14 @@ type ToggleState = (typeof ToggleState)[keyof typeof ToggleState];
 
 /**
  * @extends BoardProps<MachikoroG>
- * @prop {string[]} names - List of player names.
+ * @prop names - List of player names.
  */
 interface TextPanelProps extends BoardProps<MachikoroG> {
   names: string[];
 }
 
 /**
- * @prop {ToggleState} toggleState - Current toggle state.
+ * @prop toggleState - Current toggle state.
  */
 interface TextPanelState {
   toggleState: ToggleState;
@@ -40,6 +40,7 @@ interface TextPanelState {
  * @prop {RefObject} chatRadioRef - Reference to the chat radio button.
  */
 export default class TextPanel extends React.Component<TextPanelProps, TextPanelState> {
+  private numReadChats: number;
   private logRadioRef: React.RefObject<HTMLInputElement>;
   private chatRadioRef: React.RefObject<HTMLInputElement>;
 
@@ -48,6 +49,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     this.state = {
       toggleState: ToggleState.Log,
     };
+    this.numReadChats = 0;
     this.logRadioRef = React.createRef();
     this.chatRadioRef = React.createRef();
   }
@@ -80,6 +82,24 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
   };
 
   render() {
+    const { chatMessages } = this.props;
+    const { toggleState } = this.state;
+
+    let chatButtonText = 'Chat';
+    
+    const numChats = chatMessages.length;
+    if (toggleState === ToggleState.Log) {
+      // if there are unread chat messages, add a number to the button
+      if (numChats > this.numReadChats) {
+        chatButtonText += ` (${numChats - this.numReadChats})`;
+      }
+    } else if (toggleState === ToggleState.Chat) {
+      // update the number of read chats
+      this.numReadChats = numChats;
+    } else {
+      return assertUnreachable(toggleState);
+    }
+
     return (
       <div className='div-column'>
         <div className='radio-inputs'>
@@ -99,7 +119,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
               ref={this.chatRadioRef}
               onClick={() => this.setToggleState(ToggleState.Chat)}
             />
-            <span className='name'>Chat</span>
+            <span className='name'>{chatButtonText}</span>
           </label>
         </div>
         <div className='textpanel-box'>{this.renderToggledState()}</div>

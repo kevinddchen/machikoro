@@ -7,7 +7,7 @@ import { MachikoroG } from 'game';
 
 /**
  * @extends BoardProps<MachikoroG>
- * @prop {string[]} names - List of player names.
+ * @prop names - List of player names.
  */
 interface ChatProps extends BoardProps<MachikoroG> {
   names: string[];
