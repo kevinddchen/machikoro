@@ -1543,10 +1543,10 @@ const activatePark = (G: MachikoroG, ctx: Ctx): void => {
  */
 const debugSetupData: SetupData = {
   version: Version.MK1,
-  expansions: [Expansion.Base, Expansion.Harbor, Expansion.Million],
+  expansions: [Expansion.Base],
   // version: Version.MK2,
   // expansions: [Expansion.Base],
-  supplyVariant: SupplyVariant.Total,
+  supplyVariant: SupplyVariant.Hybrid,
   startCoins: 99,
   initialBuyRounds: 0,
   randomizeTurnOrder: false,

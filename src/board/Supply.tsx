@@ -79,10 +79,12 @@ export default class Supply extends React.Component<SupplyProps, object> {
     return table.render();
   };
 
-  private renderEstTable = (): JSX.Element => {
+  private renderEstTable = (): JSX.Element[] => {
     const { G, ctx, moves, isActive } = this.props;
 
-    const table = new StackTable(5);
+    // use one table for each deck
+    const numTables = Est.numDecks(G.supplyVariant, G.version);
+    const tables = Array.from({length: numTables}, () => new StackTable(5));
 
     const ests = Est.getAllInUse(G.version, G.expansions);
     for (let i = 0; i < ests.length; i++) {
@@ -109,7 +111,10 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const estRollBoxes = formatRollBoxes(est.rolls, 'est_roll_box');
       const estDescription = parseMaterialSymbols(est.description);
 
-      table.push(
+      // get the table index to push to
+      const idx = Est.deckIndex(G.supplyVariant, G.version, est);
+
+      tables[idx].push(
         <td
           key={i}
           className={classNames('est_td', estColor, { inactive: available === 0 }, { clickable: canBuyEst })}
@@ -129,14 +134,14 @@ export default class Supply extends React.Component<SupplyProps, object> {
       );
     }
 
-    return table.render();
+    return tables.map((table, i) => <div key={i}>{table.render()}</div>);
   };
 
   render() {
     return (
       <div>
         <div>{this.renderLandTable()}</div>
-        <div>{this.renderEstTable()}</div>
+        {this.renderEstTable()}
       </div>
     );
   }
