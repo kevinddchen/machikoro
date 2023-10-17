@@ -4,11 +4,11 @@ import { BoardProps } from 'boardgame.io/react';
 import { LogEntry } from 'boardgame.io';
 import React from 'react';
 
-import { Log, MachikoroG, Version, displayName } from 'game';
+import { Log, MachikoroG, Version, displayName, supplyVariantName } from 'game';
 
 /**
  * @extends BoardProps<MachikoroG>
- * @prop {string[]} names - List of player names.
+ * @prop names - List of player names.
  */
 interface LogProps extends BoardProps<MachikoroG> {
   names: string[];
@@ -24,7 +24,7 @@ interface LogProps extends BoardProps<MachikoroG> {
  * `LogEvent` objects are parsed into strings and displayed in the log. See
  * 'src/game/log/parsers.ts' for more details on how these `LogEvent` objects
  * are created and parsed.
- * @prop {RefObject} textBoxRef - Reference to the log text box.
+ * @prop textBoxRef - Reference to the log text box.
  */
 export default class Logger extends React.Component<LogProps, object> {
   private textBoxRef: React.RefObject<HTMLDivElement>;
@@ -90,7 +90,8 @@ export default class Logger extends React.Component<LogProps, object> {
     let lines: string[] = [];
 
     lines.push('Game Configuration:');
-    lines.push('– ' + displayName(G.version, G.expansions) + ' (' + G.supplyVariant + ' Supply)');
+    lines.push('\u2013 ' + displayName(G.version, G.expansions));
+    lines.push('\u2013 ' + supplyVariantName(G.supplyVariant));
     lines.push(' ');
 
     // for MK2, add a line to indicate the start of the initial build phase
