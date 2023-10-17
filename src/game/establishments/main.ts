@@ -365,8 +365,7 @@ export const initialize = (
   const inUse = getAllInUse(version, expansions);
   for (const est of inUse) {
     // if `est._initial` is null, use the number of players
-    // estData._remainingCount[est._id] = est._initial ?? numPlayers;
-    estData._remainingCount[est._id] = 1;
+    estData._remainingCount[est._id] = est._initial ?? numPlayers;
   }
 
   // give each player their starting establishments
@@ -385,9 +384,10 @@ export const initialize = (
   }
 
   // prepare decks
-  const estDecks: Establishment[][] = Array.from({ length: numDecks(supplyVariant, version) }, () => []);
+  const numDecks = getNumDecks(supplyVariant, version);
+  const estDecks: Establishment[][] = Array.from({ length: numDecks }, () => []);
   for (const est of inUse) {
-    const idx = deckIndex(supplyVariant, version, est);
+    const idx = getDeckIndex(supplyVariant, version, est);
     estDecks[idx].push(...Array.from({ length: estData._remainingCount[est._id] }, () => est));
   }
 
@@ -423,7 +423,7 @@ export const isMajor = (est: Establishment): boolean => {
  * @param version
  * @returns The number of decks to use for the game setup.
  */
-export const numDecks = (supplyVariant: SupplyVariant, version: Version): number => {
+export const getNumDecks = (supplyVariant: SupplyVariant, version: Version): number => {
   if (supplyVariant === SupplyVariant.Total || supplyVariant === SupplyVariant.Variable) {
     return 1; // put all cards into one deck
   } else if (supplyVariant === SupplyVariant.Hybrid) {
@@ -445,7 +445,7 @@ export const numDecks = (supplyVariant: SupplyVariant, version: Version): number
  * @param est
  * @returns The deck index that the establishment should be placed in.
  */
-export const deckIndex = (supplyVariant: SupplyVariant, version: Version, est: Establishment): number => {
+export const getDeckIndex = (supplyVariant: SupplyVariant, version: Version, est: Establishment): number => {
   if (supplyVariant === SupplyVariant.Total || supplyVariant === SupplyVariant.Variable) {
     return 0;
   } else if (supplyVariant === SupplyVariant.Hybrid) {

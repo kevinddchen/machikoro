@@ -83,7 +83,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
     const { G, ctx, moves, isActive } = this.props;
 
     // use one table for each deck
-    const numTables = Est.numDecks(G.supplyVariant, G.version);
+    const numTables = Est.getNumDecks(G.supplyVariant, G.version);
     const tables = Array.from({length: numTables}, () => new StackTable(5));
 
     const ests = Est.getAllInUse(G.version, G.expansions);
@@ -112,7 +112,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
       const estDescription = parseMaterialSymbols(est.description);
 
       // get the table index to push to
-      const idx = Est.deckIndex(G.supplyVariant, G.version, est);
+      const idx = Est.getDeckIndex(G.supplyVariant, G.version, est);
 
       tables[idx].push(
         <td
