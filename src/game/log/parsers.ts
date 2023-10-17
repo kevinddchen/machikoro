@@ -38,6 +38,9 @@ const LogEventType = {
 
 type LogEventType = (typeof LogEventType)[keyof typeof LogEventType];
 
+/**
+ * Type union for all log events.
+ */
 export type LogEvent =
   | RollOne
   | RollTwo
@@ -55,6 +58,11 @@ export type LogEvent =
   | EndGame
   | OtherEvent;
 
+/**
+ * @param logEvent
+ * @param names - Ordered array of player names.
+ * @returns String to display for the log event.
+ */
 export const parseLogEvent = (logEvent: LogEvent, names: string[]): string => {
   if (logEvent.type === LogEventType.RollOne) {
     return parseRollOne(logEvent);
@@ -89,6 +97,14 @@ export const parseLogEvent = (logEvent: LogEvent, names: string[]): string => {
   } else {
     return assertUnreachable(logEvent);
   }
+};
+
+/**
+ * @param amount
+ * @returns 'coin' if amount is 1, 'coins' otherwise.
+ */
+const coinPlural = (amount: number): string => {
+  return amount === 1 ? 'coin' : 'coins';
 };
 
 // ----------------------------------------------------------------------------
@@ -198,9 +214,9 @@ const parseEarn = (logEvent: Earn, names: string[]): string => {
   const { player, amount, name } = logEvent;
   let text: string;
   if (amount > 0) {
-    text = `\t${names[player]} earned ${amount} coins (${name})`;
+    text = `\t${names[player]} earned ${amount} ${coinPlural(amount)} (${name})`;
   } else {
-    text = `\t${names[player]} paid the bank ${-amount} coins (${name})`;
+    text = `\t${names[player]} paid the bank ${-amount} ${coinPlural(-amount)} (${name})`;
   }
   return text;
 };
@@ -235,7 +251,7 @@ export const logTake = (G: MachikoroG, args: { from: number; to: number }, amoun
  */
 const parseTake = (logEvent: Take, names: string[]): string => {
   const { from, to, amount, name } = logEvent;
-  return `\t${names[from]} paid ${names[to]} ${amount} coins (${name})`;
+  return `\t${names[from]} paid ${names[to]} ${amount} ${coinPlural(amount)} (${name})`;
 };
 
 // ----------------------------------------------------------------------------
@@ -376,7 +392,7 @@ export const logPark = (G: MachikoroG, coins: number): void => {
  * @returns Displayed log text for the Park establishment / landmark.
  */
 const parsePark = (logEvent: Park): string => {
-  return `\tredistributed ${logEvent.coins} to each player (Park)`;
+  return `\tredistributed ${logEvent.coins} ${coinPlural(logEvent.coins)} to each player (Park)`;
 };
 
 // ----------------------------------------------------------------------------
