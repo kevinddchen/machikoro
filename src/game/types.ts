@@ -1,5 +1,5 @@
 //
-// Types for Machikoro game.
+// Types for Machi Koro game.
 //
 
 import type { Establishment, EstablishmentData } from './establishments/types';
@@ -31,12 +31,16 @@ import type { LogEvent } from './log';
  * Company landmark (Machi Koro 2).
  * @prop doRenovationCompany - true if the current player will activate the
  * Renovation Company establishment.
+ * @prop doExhibitHall - true if the current player will activate the Exhibit
+ * Hall establishment (Machi Koro 1).
  * @prop didTechStartup - true if the current player has invested in the Tech
  * Startup establishment (Machi Koro 1) this turn.
  * @prop officeGiveEst - the establishment picked for the Office or Moving
  * Company action to give.
  * @prop officeGiveRenovation - True if the establishment picked for the Office
  * or Moving Company action is closed for renovations.
+ * @prop exhibitHallEst - the establishment picked for the Exhibit Hall
+ * establishment (Machi Koro 1).
  * @prop justBoughtEst - the establishment just bought.
  * @prop justBoughtLand - the landmark just bought.
  * @prop receivedCoins - true if the current player has received coins this turn.
@@ -66,9 +70,11 @@ export interface MachikoroG {
   doMovingCompany: number;
   doMovingCompany2: boolean;
   doRenovationCompany: boolean;
+  doExhibitHall: boolean;
   didTechStartup: boolean;
   officeGiveEst: Establishment | null;
   officeGiveRenovation: boolean | null;
+  exhibitHallEst: Establishment | null;
   justBoughtEst: Establishment | null;
   justBoughtLand: Landmark | null;
   receivedCoins: boolean;
@@ -124,6 +130,7 @@ export const TurnState = {
   OfficeGive: 32,
   OfficeTake: 33,
   RenovationCompany: 34,
+  ExhibitHall: 35,
   ActivateLands: 40,
   MovingCompany2: 41,
   Buy: 50,

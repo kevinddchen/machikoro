@@ -532,7 +532,6 @@ export const TechStartup: Establishment = {
   _initial: null,
 };
 
-// TODO: implement this
 export const ExhibitHall: Establishment = {
   _id: 37,
   version: Version.MK1,
