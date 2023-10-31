@@ -275,15 +275,15 @@ export const canDoRenovationCompany = (G: MachikoroG, est: Establishment): boole
 
 /**
  * @param G
- * @returns An establishment that the current player can activate with the
- * Renovation Company action to effectively "skip" it, or null if such a move
- * is not allowed / possible.
+ * @returns True if the current player can skip the Renovation Company action
+ * by activating it on an unowned establishment.
  */
-export const canSkipRenovationCompany = (G: MachikoroG): Establishment | null => {
-  if (G.turnState !== TurnState.RenovationCompany) {
-    return null;
-  }
-  return Est.unownedRedBlueGreenEst(G);
+export const canSkipRenovationCompany = (G: MachikoroG): boolean => {
+  return (
+    G.turnState === TurnState.RenovationCompany &&
+    // an unknown establishment exists
+    Est.unownedRedBlueGreenEst(G) !== null
+  );
 };
 
 /**
@@ -699,6 +699,7 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
   // close own establishments
   const playerCount = Est.countOwned(G, player, est);
   Est.setRenovationCount(G, player, est, playerCount);
+  Log.logRenovationCompany(G, est.name);
 
   // get coins from opponents and close their establishments
   for (const opponent of getPreviousPlayers(ctx)) {
@@ -709,6 +710,23 @@ const doRenovationCompany: Move<MachikoroG> = (context, est: Establishment) => {
       take(G, ctx, { from: opponent, to: player }, amount, Est.RenovationCompany.name);
     }
     Est.setRenovationCount(G, opponent, est, count);
+  }
+
+  switchState(context);
+
+  return;
+};
+
+/**
+ * Skip the Renovation Company action by picking an unowned establishment to
+ * renovate.
+ * @param context
+ * @returns
+ */
+const skipRenovationCompany: Move<MachikoroG> = (context) => {
+  const { G } = context;
+  if (!canSkipRenovationCompany(G)) {
+    return INVALID_MOVE;
   }
 
   switchState(context);
@@ -1673,6 +1691,7 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
     doDemolitionCompany,
     doMovingCompanyOpp,
     doRenovationCompany,
+    skipRenovationCompany,
     doExhibitHall,
     skipExhibitHall,
     investTechStartup,

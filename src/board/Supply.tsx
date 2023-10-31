@@ -126,7 +126,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
             <span className='material-symbols-outlined'>{est.type ? est.type.split('::').join('') : ''}</span>
           </div>
           <div className='est_name'>{est.name}</div>
-          <div className='est_cost'>${est.cost}</div>
+          <div className='est_cost'>{costToString(est.cost)}</div>
           <div className='est_num'>
             {available}/{remaining}
           </div>
@@ -147,3 +147,14 @@ export default class Supply extends React.Component<SupplyProps, object> {
     );
   }
 }
+
+/**
+ * Format a cost as a string.
+ */
+const costToString = (cost: number): string => {
+  if (cost < 0) {
+    return `\u2212$${-cost}`;
+  } else {
+    return `$${cost}`;
+  }
+};
