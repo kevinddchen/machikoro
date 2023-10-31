@@ -85,3 +85,11 @@ export function supplyVariantName(supplyVariant: SupplyVariant | null): string {
     return assertUnreachable(supplyVariant);
   }
 }
+
+/**
+ * @param amount
+ * @returns 'coin' if amount is 1, 'coins' otherwise.
+ */
+export const coinPlural = (amount: number): string => {
+  return amount === 1 ? 'coin' : 'coins';
+};

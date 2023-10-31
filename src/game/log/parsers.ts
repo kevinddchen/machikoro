@@ -3,6 +3,7 @@
 //
 
 import { assertUnreachable } from 'common/typescript';
+import { coinPlural } from '../display';
 
 import type { MachikoroG } from '../types';
 
@@ -97,14 +98,6 @@ export const parseLogEvent = (logEvent: LogEvent, names: string[]): string => {
   } else {
     return assertUnreachable(logEvent);
   }
-};
-
-/**
- * @param amount
- * @returns 'coin' if amount is 1, 'coins' otherwise.
- */
-const coinPlural = (amount: number): string => {
-  return amount === 1 ? 'coin' : 'coins';
 };
 
 // ----------------------------------------------------------------------------
@@ -443,7 +436,7 @@ export const logInvestTechStartup = (G: MachikoroG, newInvestment: number): void
  * (Machi Koro 1).
  */
 const parseInvestTechStartup = (logEvent: TechStartup): string => {
-  return `\tinvested in Tech Startup (total investment: ${logEvent.newInvestment})`;
+  return `\tinvested in Tech Startup (investment: ${logEvent.newInvestment} ${coinPlural(logEvent.newInvestment)})`;
 };
 
 // ----------------------------------------------------------------------------
