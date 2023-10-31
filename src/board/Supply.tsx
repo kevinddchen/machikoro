@@ -155,6 +155,6 @@ const costToString = (cost: number): string => {
   if (cost < 0) {
     return `\u2212$${-cost}`;
   } else {
-    return `$${cost}`
+    return `$${cost}`;
   }
 };
