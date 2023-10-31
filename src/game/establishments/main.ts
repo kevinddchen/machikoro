@@ -220,8 +220,9 @@ export const setRenovationCount = (G: MachikoroG, player: number, est: Establish
 
 /**
  * @param G
- * @returns An unowned red, blue, or green establishment, or null if none
- * exists. This is useful for "skipping" the Renovation Company action.
+ * @returns A non-Major establishment that is in use but no player currently
+ * owns, or null if none exists. This is useful for "skipping" the Renovation
+ * Company action.
  */
 export const unownedRedBlueGreenEst = (G: MachikoroG): Establishment | null => {
   const ests = getAllInUse(G.version, G.expansions).filter((est) => est.color !== EstColor.Purple);

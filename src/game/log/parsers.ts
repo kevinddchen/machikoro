@@ -2,7 +2,6 @@
 // Parsing log entries.
 //
 
-import { assertUnreachable } from 'common/typescript';
 import { coinPlural } from '../display';
 
 import type { MachikoroG } from '../types';
@@ -29,6 +28,7 @@ const LogEventType = {
   Office: 'Office',
   DemolitionCompany: 'DemolitionCompany',
   MovingCompany: 'MovingCompany',
+  RenovationCompany: 'RenovationCompany',
   Park: 'Park',
   ExhibitHall: 'ExhibitHall',
   TechStartup: 'TechStartup',
@@ -52,6 +52,7 @@ export type LogEvent =
   | Office
   | DemolitionCompany
   | MovingCompany
+  | RenovationCompany
   | Park
   | ExhibitHall
   | TechStartup
@@ -65,38 +66,39 @@ export type LogEvent =
  * @returns String to display for the log event.
  */
 export const parseLogEvent = (logEvent: LogEvent, names: string[]): string => {
-  if (logEvent.type === LogEventType.RollOne) {
-    return parseRollOne(logEvent);
-  } else if (logEvent.type === LogEventType.RollTwo) {
-    return parseRollTwo(logEvent);
-  } else if (logEvent.type === LogEventType.AddTwo) {
-    return parseAddTwo(logEvent);
-  } else if (logEvent.type === LogEventType.Earn) {
-    return parseEarn(logEvent, names);
-  } else if (logEvent.type === LogEventType.Take) {
-    return parseTake(logEvent, names);
-  } else if (logEvent.type === LogEventType.Buy) {
-    return parseBuy(logEvent);
-  } else if (logEvent.type === LogEventType.Office) {
-    return parseOffice(logEvent, names);
-  } else if (logEvent.type === LogEventType.DemolitionCompany) {
-    return parseDemolitionCompany(logEvent);
-  } else if (logEvent.type === LogEventType.MovingCompany) {
-    return parseMovingCompany(logEvent, names);
-  } else if (logEvent.type === LogEventType.Park) {
-    return parsePark(logEvent);
-  } else if (logEvent.type === LogEventType.ExhibitHall) {
-    return parseExhibitHall(logEvent);
-  } else if (logEvent.type === LogEventType.TechStartup) {
-    return parseInvestTechStartup(logEvent);
-  } else if (logEvent.type === LogEventType.TunaRoll) {
-    return parseTunaRoll(logEvent);
-  } else if (logEvent.type === LogEventType.EndGame) {
-    return parseEndGame(logEvent, names);
-  } else if (logEvent.type === LogEventType.OtherEvent) {
-    return parseOtherEvent(logEvent);
-  } else {
-    return assertUnreachable(logEvent);
+  switch (logEvent.type) {
+    case LogEventType.RollOne:
+      return parseRollOne(logEvent);
+    case LogEventType.RollTwo:
+      return parseRollTwo(logEvent);
+    case LogEventType.AddTwo:
+      return parseAddTwo(logEvent);
+    case LogEventType.Earn:
+      return parseEarn(logEvent, names);
+    case LogEventType.Take:
+      return parseTake(logEvent, names);
+    case LogEventType.Buy:
+      return parseBuy(logEvent);
+    case LogEventType.Office:
+      return parseOffice(logEvent, names);
+    case LogEventType.DemolitionCompany:
+      return parseDemolitionCompany(logEvent);
+    case LogEventType.MovingCompany:
+      return parseMovingCompany(logEvent, names);
+    case LogEventType.RenovationCompany:
+      return parseRenovationCompany(logEvent);
+    case LogEventType.Park:
+      return parsePark(logEvent);
+    case LogEventType.ExhibitHall:
+      return parseExhibitHall(logEvent);
+    case LogEventType.TechStartup:
+      return parseInvestTechStartup(logEvent);
+    case LogEventType.TunaRoll:
+      return parseTunaRoll(logEvent);
+    case LogEventType.EndGame:
+      return parseEndGame(logEvent, names);
+    case LogEventType.OtherEvent:
+      return parseOtherEvent(logEvent);
   }
 };
 
@@ -361,6 +363,31 @@ export const logMovingCompany = (G: MachikoroG, estName: string, opponent: numbe
 const parseMovingCompany = (logEvent: MovingCompany, names: string[]): string => {
   const { estName, opponent } = logEvent;
   return `\tgave ${estName} to ${names[opponent]} (Moving Company)`;
+};
+
+// ----------------------------------------------------------------------------
+
+interface RenovationCompany extends BaseLogEvent {
+  type: typeof LogEventType.RenovationCompany;
+  estName: string;
+}
+
+/**
+ * Log the effect of the Renovation Company establishment.
+ * @param G
+ * @param estName
+ */
+export const logRenovationCompany = (G: MachikoroG, estName: string): void => {
+  const logEvent: RenovationCompany = { type: LogEventType.RenovationCompany, estName };
+  G._logBuffer.push(logEvent);
+};
+
+/**
+ * @param logEvent
+ * @returns Displayed log text for the Renovation Company establishment.
+ */
+const parseRenovationCompany = (logEvent: RenovationCompany): string => {
+  return `\trenovated ${logEvent.estName}`;
 };
 
 // ----------------------------------------------------------------------------
