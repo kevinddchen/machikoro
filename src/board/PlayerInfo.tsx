@@ -74,7 +74,8 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       if (version === Game.Version.MK1 && (clientPlayer === null || !Land.owns(G, clientPlayer, land))) {
         const landCostArray = Land.costArray(G, land, clientPlayer);
         // Machi Koro 1 only has one cost
-        landDescriptionUnparsed += '\n\nCost: ' + landCostArray[0].toString();
+        const cost = landCostArray[0];
+        landDescriptionUnparsed += `\n\nCost: ${cost} ${Game.coinPlural(cost)}`;
       }
       const landDescription = parseMaterialSymbols(landDescriptionUnparsed);
 
@@ -138,7 +139,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       // for Tech Startup establishment, add the current investment to the description
       if (Est.isEqual(est, Est.TechStartup)) {
         const investment = Est.getInvestment(G, player);
-        estDescriptionUnparsed = `${estDescriptionUnparsed}\n\nCurrent investment: ${investment}`;
+        estDescriptionUnparsed += `\n\nInvestment: ${investment} ${Game.coinPlural(investment)}`;
       }
 
       const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
