@@ -28,7 +28,7 @@ const initializeNames = (matchData: { id: number; name?: string }[]): string[] =
 
 /**
  * Handles all game components
- * @prop {string[]} names - List of player names.
+ * @prop names - List of player names.
  */
 export default class MachikoroBoard extends React.Component<BoardProps<MachikoroG>, object> {
   private names: string[];
@@ -92,7 +92,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
         </div>
         <div className='div-column'>{this.renderPlayerInfo()}</div>
         <div className='div-column'>
-          <TextPanel {...this.props} names={this.names} />
+          <TextPanel {...this.props} clientPlayer={clientPlayer} names={this.names} />
         </div>
       </div>
     );
