@@ -12,7 +12,7 @@ import StackTable from './StackTable';
 
 /**
  * @extends BoardProps<MachikoroG>
- * @prop {number | null} clientPlayer - Player ID of the client, or null if the
+ * @prop clientPlayer - Player ID of the client, or null if the
  * client is not a player.
  */
 interface SupplyProps extends BoardProps<MachikoroG> {
@@ -20,14 +20,10 @@ interface SupplyProps extends BoardProps<MachikoroG> {
 }
 
 /**
- * Supply area, where players see and buy establishments
- * @prop {Establishment[]} establishments - List of establishments in use.
+ * Supply area, where players see and buy establishments (and landmarks, in
+ * Machi Koro 2).
  */
 export default class Supply extends React.Component<SupplyProps, object> {
-  constructor(props: SupplyProps) {
-    super(props);
-  }
-
   /**
    * Render the landmark supply. This returns nothing for Machi Koro 1.
    */
