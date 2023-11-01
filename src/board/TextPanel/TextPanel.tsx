@@ -22,9 +22,12 @@ type ToggleState = (typeof ToggleState)[keyof typeof ToggleState];
 /**
  * @extends BoardProps<MachikoroG>
  * @prop names - List of player names.
+ * @prop clientPlayer - Player ID of the client, or null if the
+ * client is not a player.
  */
 interface TextPanelProps extends BoardProps<MachikoroG> {
   names: string[];
+  clientPlayer: number | null;
 }
 
 /**
@@ -36,8 +39,9 @@ interface TextPanelState {
 
 /**
  * Game log and chat, including buttons that toggle between them.
- * @prop {RefObject} logRadioRef - Reference to the log radio button.
- * @prop {RefObject} chatRadioRef - Reference to the chat radio button.
+ * @prop numReadChats - Number of read chat messages.
+ * @prop logRadioRef - Reference to the log radio button.
+ * @prop chatRadioRef - Reference to the chat radio button.
  */
 export default class TextPanel extends React.Component<TextPanelProps, TextPanelState> {
   private numReadChats: number;
