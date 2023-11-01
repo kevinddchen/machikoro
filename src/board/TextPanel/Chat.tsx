@@ -8,15 +8,18 @@ import { MachikoroG } from 'game';
 /**
  * @extends BoardProps<MachikoroG>
  * @prop names - List of player names.
+ * @prop clientPlayer - Player ID of the client, or null if the
+ * client is not a player.
  */
 interface ChatProps extends BoardProps<MachikoroG> {
   names: string[];
+  clientPlayer: number | null;
 }
 
 /**
  * Chat messages from players. Messages are ephemeral and are lost upon refresh.
- * @prop {RefObject} entryBoxRef - Reference to the chat entry box.
- * @prop {RefObject} textBoxRef - Reference to the chat text box.
+ * @prop entryBoxRef - Reference to the chat entry box.
+ * @prop textBoxRef - Reference to the chat text box.
  */
 export default class Chat extends React.Component<ChatProps, object> {
   private entryBoxRef: React.RefObject<HTMLInputElement>;
@@ -91,6 +94,31 @@ export default class Chat extends React.Component<ChatProps, object> {
 
   // --- Render ---------------------------------------------------------------
 
+  private renderChatBox = (): JSX.Element | null => {
+    const { clientPlayer } = this.props;
+
+    if (clientPlayer === null) {
+      // if spectator, do not render chat box
+      return null;
+    } else {
+      return (
+        <div className='chat-input'>
+          <input
+            id='chat-message'
+            type='text'
+            className='message-input'
+            placeholder='Type your message here'
+            ref={this.entryBoxRef}
+            onKeyDown={(e) => this.entryHandleKeyDown(e)}
+          ></input>
+          <button className='send-button' onClick={this.sendChatAndClear}>
+            Send
+          </button>
+        </div>
+      );
+    }
+  };
+
   render() {
     const lines = this.parseChat();
     const tbody: JSX.Element[] = [];
@@ -108,19 +136,7 @@ export default class Chat extends React.Component<ChatProps, object> {
         <div className='chat-window' ref={this.textBoxRef}>
           <ul className='message-list'>{tbody}</ul>
         </div>
-        <div className='chat-input'>
-          <input
-            id='chat-message'
-            type='text'
-            className='message-input'
-            placeholder='Type your message here'
-            ref={this.entryBoxRef}
-            onKeyDown={(e) => this.entryHandleKeyDown(e)}
-          ></input>
-          <button className='send-button' onClick={this.sendChatAndClear}>
-            Send
-          </button>
-        </div>
+        {this.renderChatBox()}
       </div>
     );
   }

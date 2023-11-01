@@ -377,6 +377,7 @@ select {
   white-space: pre-line;
   width: 140px;
   z-index: 1;
+  pointer-events: none;
 }
 
 /* font size for tooltip Material Symbols */

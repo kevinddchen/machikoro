@@ -10,7 +10,7 @@ import { assertUnreachable } from 'common/typescript';
 
 /**
  * @extends BoardProps<MachikoroG>
- * @prop {string[]} names - List of player names.
+ * @prop names - List of player names.
  */
 interface StatusBarProps extends BoardProps<MachikoroG> {
   names: string[];

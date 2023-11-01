@@ -12,10 +12,10 @@ import StackTable from './StackTable';
 
 /**
  * @extends BoardProps<MachikoroG>
- * @prop {number} player - Player ID corresponding to the component.
- * @prop {number | null} clientPlayer - Player ID of the client, or null if the
+ * @prop player - Player ID corresponding to the component.
+ * @prop clientPlayer - Player ID of the client, or null if the
  * client is not a player.
- * @prop {string} name - Player name corresponding to the component.
+ * @prop name - Player name corresponding to the component.
  */
 interface PlayerInfoProps extends BoardProps<MachikoroG> {
   player: number;
@@ -26,18 +26,8 @@ interface PlayerInfoProps extends BoardProps<MachikoroG> {
 /**
  * Information panels for a player, displaying name, money, purchased landmarks
  * and establishments, etc.
- * @prop {Landmark[]} landmarks - List of landmarks in use.
- * @prop {Establishment[]} establishments - List of establishments in use.
  */
 export default class PlayerInfo extends React.Component<PlayerInfoProps, object> {
-  private landmarks: Land.Landmark[];
-
-  constructor(props: PlayerInfoProps) {
-    super(props);
-    const { G } = this.props;
-    this.landmarks = Land.getAllInUse(G.version, G.expansions);
-  }
-
   render() {
     const { G, ctx, moves, isActive, player, clientPlayer, name } = this.props;
     const version = G.version;
@@ -52,9 +42,11 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     // `currentPlayer` is the player ID whose turn it is in the game.
 
     // landmarks
-    const lands = new StackTable(1);
-    for (let i = 0; i < this.landmarks.length; i++) {
-      const land = this.landmarks[i];
+    const landTable = new StackTable(1);
+
+    const lands = Land.getAllInUse(G.version, G.expansions);
+    for (let i = 0; i < lands.length; i++) {
+      const land = lands[i];
       const owned = Land.owns(G, player, land);
 
       // for Machi Koro 2, only show owned landmarks
@@ -89,7 +81,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         onClickLandEvent = () => void 0;
       }
 
-      lands.push(
+      landTable.push(
         <td
           key={i}
           className={classNames('mini_td', landColor, { inactive: landIsGrey }, { clickable: landClickable })}
@@ -190,7 +182,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           <span className={classNames('material-symbols-outlined', 'dollar_player_money')}>paid</span>
           {money}
         </div>
-        <div>{lands.render()}</div>
+        <div>{landTable.render()}</div>
         <div>{minis.render()}</div>
       </div>
     );
