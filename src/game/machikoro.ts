@@ -816,7 +816,7 @@ const endTurn: Move<MachikoroG> = (context) => {
   const player = parseInt(ctx.currentPlayer);
 
   // a player earns coins via the airport if they did not buy anything
-  if (G.turnState === TurnState.Buy) {
+  if (G.justBoughtEst === null && G.justBoughtLand === null) {
     for (const airport of [Land.Airport, Land.Airport2]) {
       if (Land.owns(G, player, airport)) {
         assertNonNull(airport.coins);
