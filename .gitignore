@@ -132,5 +132,5 @@ dist
 # ==========
 
 .DS_Store
-/build
 /.vscode
+/build

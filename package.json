@@ -37,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "@tsconfig/recommended": "",
     "@types/koa-static": "",
     "@types/node": "",
     "@types/react": "",
