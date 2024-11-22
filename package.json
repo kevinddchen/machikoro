@@ -45,13 +45,18 @@
     "@typescript-eslint/eslint-plugin": "",
     "@typescript-eslint/parser": "",
     "cross-env": "",
+    "css-loader": "",
     "eslint": "",
     "eslint-config-react": "",
     "eslint-plugin-react": "",
     "genversion": "",
+    "html-webpack-plugin": "",
     "prettier": "",
+    "ts-loader": "",
     "ts-node": "",
     "ts-node-dev": "",
-    "typescript": ""
+    "typescript": "",
+    "webpack": "",
+    "webpack-cli": ""
   }
 }
