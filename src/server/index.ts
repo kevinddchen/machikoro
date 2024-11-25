@@ -3,10 +3,11 @@ import path from 'path';
 import serve from 'koa-static';
 
 import { Machikoro } from '../game';
-import { PORT } from '../common/config';
 import { patchRoutes } from './patch';
 
 const games = [Machikoro];
+
+const PORT = parseInt(process.env.PORT ?? '80');
 
 // game server
 const server = Server({
