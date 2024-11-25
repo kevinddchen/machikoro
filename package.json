@@ -51,6 +51,7 @@
     "eslint-plugin-react": "",
     "genversion": "",
     "html-webpack-plugin": "",
+    "mini-css-extract-plugin": "",
     "prettier": "",
     "ts-loader": "",
     "ts-node": "",
