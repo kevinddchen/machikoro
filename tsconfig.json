@@ -2,13 +2,10 @@
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "target": "es6",
-    "module": "CommonJS",
+    "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "./dist/",
     "baseUrl": "./src/",
-    "jsx": "react-jsx",
+    "jsx": "react-jsx"
   },
-  "include": [
-    "./src/**/*"
-  ],
+  "include": ["./src/**/*"]
 }
