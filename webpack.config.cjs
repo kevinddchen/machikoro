@@ -1,6 +1,7 @@
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: './src/index.tsx',
@@ -15,10 +16,6 @@ module.exports = {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
-      {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
-      },
     ],
   },
   resolve: {
@@ -26,8 +23,20 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: './public',
+          globOptions: {
+            ignore: [
+              '**/*.html', // Ignore all `html` files
+            ],
+          },
+        },
+      ],
+    }),
     new HtmlWebpackPlugin({
-      template: "public/index.html",
+      template: 'public/index.html',
     }),
     new MiniCssExtractPlugin(),
   ],
