@@ -3,10 +3,10 @@ name: Tests
 on:
   pull_request:
     branches:
-      - main
+      - "**"
 
 jobs:
-  unit:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,13 +21,14 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
 
-      - name: Run linter
-        run: npm run lint
-      
-      - name: Run tests
-        run: CI=true npm run test
+      - name: Transpile to JS
+        run: npm run transpile
 
-      - name: Run prettier
+      - name: Run tests
+        run: npm run test
+
+      - name: Run linting
         run: |
+          npm run lint
           npm run prettier
           npm run version
