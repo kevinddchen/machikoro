@@ -37,20 +37,17 @@
     ]
   },
   "devDependencies": {
-    "@jest/globals": "",
+    "@eslint/js": "",
     "@tsconfig/recommended": "",
     "@types/koa-static": "",
     "@types/node": "",
     "@types/react": "",
     "@types/react-dom": "",
-    "@typescript-eslint/eslint-plugin": "",
-    "@typescript-eslint/parser": "",
     "concurrently": "",
     "copy-webpack-plugin": "",
     "cross-env": "",
     "css-loader": "",
     "eslint": ">=8.21",
-    "eslint-config-react": "",
     "eslint-plugin-react": "",
     "genversion": "",
     "html-webpack-plugin": "",
@@ -61,6 +58,7 @@
     "ts-loader": "",
     "tsc-alias": "",
     "typescript": "",
+    "typescript-eslint": "",
     "webpack": "",
     "webpack-cli": ""
   }
