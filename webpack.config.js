@@ -18,9 +18,10 @@ module.exports = {
       },
     ],
   },
-  resolve: {
-    modules: ['./src', './node_modules'],
-    extensions: ['.tsx', '.ts', '.js'],
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'build'),
+    clean: true,
   },
   plugins: [
     new CopyPlugin({
@@ -41,9 +42,8 @@ module.exports = {
     }),
     new MiniCssExtractPlugin(),
   ],
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'build'),
-    clean: true,
+  resolve: {
+    modules: ['./src', './node_modules'],
+    extensions: ['.tsx', '.ts', '.js'],
   },
 };
