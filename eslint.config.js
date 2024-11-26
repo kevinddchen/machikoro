@@ -1,4 +1,4 @@
-const eslint = require("@eslint/js");
+const eslint = require('@eslint/js');
 const react = require('eslint-plugin-react');
 const tseslint = require('typescript-eslint');
 
@@ -14,7 +14,7 @@ module.exports = tseslint.config(
       tseslint.configs.strict,
       tseslint.configs.stylistic,
     ],
-    files: ["src/**/*.{ts,tsx}"],
+    files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
       parserOptions: {
         ecmaFeatures: {
@@ -41,4 +41,4 @@ module.exports = tseslint.config(
       },
     },
   },
-)
+);
