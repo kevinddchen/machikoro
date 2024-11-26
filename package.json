@@ -15,7 +15,10 @@
     "transpile": "tsc && tsc-alias",
     "bundle": "webpack",
     "serve": "node ./dist/server/index.js",
-    "dev": "cross-env-shell NODE_ENV=development 'npm run build && concurrently \"tsc -w\" \"tsc-alias -w\" \"webpack -w\" \"nodemon ./dist/server/index.js\"'",
+
+    "predev": "mkdir -p ./dist/server && touch ./dist/server/index.js",
+    "dev": "cross-env-shell NODE_ENV=development 'concurrently \"tsc -w --preserveWatchOutput\" \"tsc-alias -w\" \"webpack -w\" \"nodemon -w ./dist -d 1 ./dist/server/index.js\"'",
+
     "test": "react-scripts test",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
