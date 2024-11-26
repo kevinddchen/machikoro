@@ -4,6 +4,7 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
+    "outDir": "./dist/",
     "baseUrl": "./src/",
     "jsx": "react-jsx"
   },
