@@ -39,7 +39,7 @@ Then, clone this repo and install the project dependencies.
 ```bash
 git clone git@github.com:kevinddchen/machikoro.git
 cd machikoro
-npm install --include=dev
+npm install
 ```
 
 We recommend using [VS Code](https://code.visualstudio.com/) as your code editor.

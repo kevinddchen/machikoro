@@ -7,18 +7,15 @@
     "classnames": "",
     "koa-static": "",
     "react": "",
-    "react-dom": "",
-    "react-scripts": ""
+    "react-dom": ""
   },
   "scripts": {
     "build": "npm run transpile && npm run bundle",
     "transpile": "tsc && tsc-alias",
     "bundle": "webpack",
     "serve": "node ./dist/server/index.js",
-
     "predev": "mkdir -p ./dist/server && touch ./dist/server/index.js",
     "dev": "cross-env-shell NODE_ENV=development 'concurrently \"tsc -w --preserveWatchOutput\" \"tsc-alias -w\" \"webpack -w\" \"nodemon -w ./dist -d 1 ./dist/server/index.js\"'",
-
     "test": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
