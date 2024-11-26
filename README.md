@@ -39,7 +39,7 @@ Then, clone this repo and install the project dependencies.
 ```bash
 git clone git@github.com:kevinddchen/machikoro.git
 cd machikoro
-npm install
+npm install --include=dev
 ```
 
 We recommend using [VS Code](https://code.visualstudio.com/) as your code editor.
@@ -54,20 +54,14 @@ Some contribution guidelines:
 In a terminal window, run the following command:
 
 ```bash
-npm run serve:dev
+npm run dev
 ```
 
-This will start the game server.
-Without closing the window, open a new terminal window and run:
+The app will be hosted at `localhost:80`.
+If you open multiple browsers and go to the link (e.g. incognito mode) you can play with yourself.
 
-```bash
-npm run start
-```
-
-This will open the app in development mode at `localhost:3000` in your browser.
 There are some debugging tools which become unavailable in the production version of the app.
 Additionally, any changes made in the source code will be automatically updated in the browser, which is very convenient.
-
 To change the debug game settings, edit `debugSetupData` in [src/game/machikoro.ts](src/game/machikoro.ts).
 
 ### Run locally in production mode
@@ -81,7 +75,7 @@ npm run build
 Once the app has been built, you start the game server by running the same command as above,
 
 ```bash
-npm run serve:prod
+npm run serve
 ```
 
 The app will be hosted at `localhost:80`.
