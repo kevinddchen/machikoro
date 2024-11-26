@@ -28,6 +28,7 @@ module.exports = {
         {
           from: './public',
           globOptions: {
+            gitignore: true,
             ignore: [
               '**/*.html', // Ignore all `html` files
             ],
