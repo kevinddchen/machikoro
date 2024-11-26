@@ -24,7 +24,7 @@ const server = Server({
 patchRoutes(server, games);
 
 // Build path relative to this file
-const frontEndAppBuildPath = path.resolve(__dirname, '../../build');
+const frontEndAppBuildPath = path.resolve(__dirname, '../../dist');
 server.app.use(serve(frontEndAppBuildPath));
 
 void server.run(PORT, () => {
