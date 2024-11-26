@@ -1,4 +1,4 @@
 .eslintrc.js
 build/
 dist/
-webpack.config.js
+*.config.*

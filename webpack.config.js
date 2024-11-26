@@ -19,7 +19,7 @@ module.exports = {
     ],
   },
   resolve: {
-    modules: [path.resolve(__dirname, 'src'), 'node_modules'],
+    modules: ['./src', './node_modules'],
     extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
@@ -37,7 +37,7 @@ module.exports = {
       ],
     }),
     new HtmlWebpackPlugin({
-      template: 'public/index.html',
+      template: './public/index.html',
     }),
     new MiniCssExtractPlugin(),
   ],
