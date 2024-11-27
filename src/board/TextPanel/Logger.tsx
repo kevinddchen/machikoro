@@ -3,6 +3,7 @@ import 'styles/main.css';
 import { BoardProps } from 'boardgame.io/react';
 import { LogEntry } from 'boardgame.io';
 import React from 'react';
+import has from 'lodash/has';
 
 import { Log, MachikoroG, Version, displayName, supplyVariantName } from 'game';
 
@@ -172,5 +173,5 @@ export default class Logger extends React.Component<LogProps, object> {
  * @returns
  */
 const isLogEventArray = (obj: unknown): obj is Log.LogEvent[] => {
-  return Array.isArray(obj) && obj.every((e) => (e as Log.LogEvent).type !== undefined);
+  return Array.isArray(obj) && obj.every((e) => has(e, 'type'));
 };
