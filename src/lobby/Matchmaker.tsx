@@ -76,7 +76,7 @@ export default class Matchmaker extends React.Component<MatchmakerProps, Matchma
     const { matchInfo } = this.props;
     const { name, errorMessage } = this.state;
 
-    let component: JSX.Element;
+    let component: React.JSX.Element;
     if (matchInfo) {
       // Render `Room` if the client has a match.
       component = (

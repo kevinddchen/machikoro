@@ -73,7 +73,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
 
   // --- Render ---------------------------------------------------------------
 
-  private renderToggledState = (): JSX.Element | null => {
+  private renderToggledState = (): React.JSX.Element | null => {
     const { toggleState } = this.state;
 
     if (toggleState === ToggleState.Log) {

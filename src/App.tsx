@@ -51,7 +51,7 @@ export default class App extends React.Component<object, AppState> {
 
   // --- Render ---------------------------------------------------------------
 
-  private debugButton = (): JSX.Element => {
+  private debugButton = (): React.JSX.Element => {
     // only render in development mode!
     return (
       <div className='padded_div'>

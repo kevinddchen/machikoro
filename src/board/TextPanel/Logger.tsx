@@ -146,7 +146,7 @@ export default class Logger extends React.Component<LogProps, object> {
     const { log } = this.props;
 
     const lines = this.parseLog(log);
-    const tbody: JSX.Element[] = [];
+    const tbody: React.JSX.Element[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       tbody.push(

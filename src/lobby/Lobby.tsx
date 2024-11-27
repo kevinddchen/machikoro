@@ -356,7 +356,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * @returns Elements for player name entry.
    */
-  private renderPlayerName = (): JSX.Element => {
+  private renderPlayerName = (): React.JSX.Element => {
     return (
       <div className='padded_div'>
         <span>Enter Player Name: </span>
@@ -375,7 +375,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * @returns Elements for creating a new match.
    */
-  private renderCreateMatch = (): JSX.Element => {
+  private renderCreateMatch = (): React.JSX.Element => {
     // prettier-ignore
     const numPlayersOptions = 
       <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
@@ -449,10 +449,10 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * @returns Elements displaying available matches.
    */
-  private renderMatches = (): JSX.Element => {
+  private renderMatches = (): React.JSX.Element => {
     let { matches } = this.state;
 
-    const tbody: JSX.Element[] = [];
+    const tbody: React.JSX.Element[] = [];
 
     // Matches have not been fetched yet
     if (matches === null) {
@@ -473,7 +473,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         const numPlayers = players.length;
 
         // Button to join the room
-        let button: JSX.Element | null = null;
+        let button: React.JSX.Element | null = null;
         if (this.authenticator.hasMatchInfo(matchID)) {
           // Able to rejoin the room (e.g. joined before, but closed browser)
           button = (

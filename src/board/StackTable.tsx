@@ -4,8 +4,8 @@
  */
 export default class StackTable {
   private numColumns: number;
-  private tbody: JSX.Element[];
-  private tr: JSX.Element[];
+  private tbody: React.JSX.Element[];
+  private tr: React.JSX.Element[];
 
   constructor(numColumns: number) {
     this.numColumns = numColumns;
@@ -17,7 +17,7 @@ export default class StackTable {
    * Push an element to the table. Automatically forms a new row if needed.
    * @param td - <td> element to insert into the table.
    */
-  push(td: JSX.Element): void {
+  push(td: React.JSX.Element): void {
     this.tr.push(td);
     if (this.tr.length === this.numColumns) {
       this.pushRow();
@@ -34,7 +34,7 @@ export default class StackTable {
    * Render the table.
    * @returns A JSX element.
    */
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     this.pushRow();
     return (
       <table>
