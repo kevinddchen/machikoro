@@ -63,7 +63,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
         <td
           key={i}
           className={classNames('est_td', landColor, { inactive: !isAvailable }, { clickable: canBuyLand })}
-          onClick={() => moves.buyLand(land)}
+          onClick={() => { moves.buyLand(land); }}
         >
           <div className='est_name'>{land.name}</div>
           <div className='est_cost'>{costsString}</div>
@@ -115,7 +115,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
         <td
           key={i}
           className={classNames('est_td', estColor, { inactive: available === 0 }, { clickable: canBuyEst })}
-          onClick={() => moves.buyEst(est)}
+          onClick={() => { moves.buyEst(est); }}
         >
           <div className='est_roll'>{estRollBoxes}</div>
           <div className='est_type'>

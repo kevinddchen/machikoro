@@ -30,5 +30,5 @@ export interface IDetails {
  * @returns
  */
 export const hasDetails = (obj: unknown): obj is IDetails => {
-  return (obj as IDetails)?.details !== undefined && typeof (obj as IDetails).details === 'string';
+  return (obj as IDetails).details !== undefined && typeof (obj as IDetails).details === 'string';
 };

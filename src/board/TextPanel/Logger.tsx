@@ -172,5 +172,5 @@ export default class Logger extends React.Component<LogProps, object> {
  * @returns
  */
 const isLogEventArray = (obj: unknown): obj is Log.LogEvent[] => {
-  return Array.isArray(obj) && obj.every((e) => (e as Log.LogEvent)?.type !== undefined);
+  return Array.isArray(obj) && obj.every((e) => (e as Log.LogEvent).type !== undefined);
 };

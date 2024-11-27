@@ -112,7 +112,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
               type='radio'
               name='chatlog-select'
               ref={this.logRadioRef}
-              onClick={() => this.setToggleState(ToggleState.Log)}
+              onClick={() => { this.setToggleState(ToggleState.Log); }}
             />
             <span className='name'>Game Log</span>
           </label>
@@ -121,7 +121,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
               type='radio'
               name='chatlog-select'
               ref={this.chatRadioRef}
-              onClick={() => this.setToggleState(ToggleState.Chat)}
+              onClick={() => { this.setToggleState(ToggleState.Chat); }}
             />
             <span className='name'>{chatButtonText}</span>
           </label>
