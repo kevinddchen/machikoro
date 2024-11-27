@@ -13,7 +13,7 @@ module.exports = tseslint.config(
       react.configs.flat['jsx-runtime'],
       tseslint.configs.recommendedTypeCheckedOnly,
       tseslint.configs.strict,
-      // tseslint.configs.stylistic,
+      tseslint.configs.stylistic,
     ],
     files: ['src/**/*.{ts,tsx}'],
     languageOptions: {

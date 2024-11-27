@@ -66,7 +66,7 @@ export const landCostsToString = (G: MachikoroG, land: Land.Landmark, player: nu
  * Parses the Material Symbols in a description by splitting the string and extracting the keywords.
  * @param description - string to be parsed
  */
-export const parseMaterialSymbols = (description: string): Array<string | JSX.Element> => {
+export const parseMaterialSymbols = (description: string): (string | JSX.Element)[] => {
   const parsedDescription = [];
   const splitDescString = description.split('::');
   for (let i = 0; i < splitDescString.length; i++) {
@@ -89,7 +89,7 @@ export const parseMaterialSymbols = (description: string): Array<string | JSX.El
  * @param rolls - string to be parsed
  * @param subclass - keyword for CSS formatting
  */
-export const formatRollBoxes = (rolls: number[], subclass: string): Array<string | JSX.Element> => {
+export const formatRollBoxes = (rolls: number[], subclass: string): (string | JSX.Element)[] => {
   const formattedRollBox = [];
   const splitRollString = rolls.map((roll) => roll.toString());
   for (let i = 0; i < splitRollString.length; i++) {
