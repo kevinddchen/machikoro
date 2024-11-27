@@ -155,13 +155,11 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
 
   if (isEqual(land, Meta2.LaunchPad2) && isOwned(G, Meta2.Observatory2)) {
     // if anyone owns Observatory, Launch Pad costs 5 fewer coins
-    assertNonNull(Meta2.Observatory2.coins);
-    arr = arr.map((cost) => cost - (Meta2.Observatory2.coins as number));
+    arr = arr.map((cost) => cost - (Meta2.Observatory2.coins ?? 0));
   }
   if (player !== null && owns(G, player, Meta2.LoanOffice2)) {
     // if the player owns Loan Office, all landmarks cost 2 fewer coins
-    assertNonNull(Meta2.LoanOffice2.coins);
-    arr = arr.map((cost) => cost - (Meta2.LoanOffice2.coins as number));
+    arr = arr.map((cost) => cost - (Meta2.LoanOffice2.coins ?? 0));
   }
 
   return arr;
