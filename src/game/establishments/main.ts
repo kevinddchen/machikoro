@@ -156,7 +156,7 @@ export const countTypeOwned = (G: MachikoroG, player: number, type: EstType): nu
  */
 export const buy = (G: MachikoroG, player: number, est: Establishment): void => {
   if (G.version !== est.version) {
-    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.estData._remainingCount[est._id] -= 1;
   G.estData._availableCount[est._id] -= 1;
@@ -179,7 +179,7 @@ export const transfer = (
   renovation: boolean,
 ): void => {
   if (G.version !== est.version) {
-    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.estData._ownedCount[args.from][est._id] -= 1;
   G.estData._ownedCount[args.to][est._id] += 1;
@@ -213,7 +213,7 @@ export const countRenovation = (G: MachikoroG, player: number, est: Establishmen
  */
 export const setRenovationCount = (G: MachikoroG, player: number, est: Establishment, count: number): void => {
   if (G.version !== est.version) {
-    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.estData._renovationCount[player][est._id] = count;
 };
@@ -248,7 +248,7 @@ export const demolish = (G: MachikoroG, player: number, est: Establishment, reno
   if (version !== Version.MK1) {
     throw new Error('Demolishing establishments is only implemented for Machi Koro 1.');
   } else if (version !== est.version) {
-    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Establishment ${est.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.estData._remainingCount[est._id] += 1;
   G.estData._availableCount[est._id] += 1;

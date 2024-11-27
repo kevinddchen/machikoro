@@ -571,7 +571,7 @@ const doOfficeGive: Move<MachikoroG> = (context, est: Establishment, renovation:
     Log.logMovingCompany(G, est.name, prevPlayer);
     switchState(context);
   } else {
-    throw new Error(`Unexpected error: 'doOfficeGive' called in an unexpected state ${G.turnState}.`);
+    throw new Error(`Unexpected error: 'doOfficeGive' called in an unexpected state ${G.turnState.toString()}.`);
   }
 
   return;

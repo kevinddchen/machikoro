@@ -174,7 +174,7 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
 export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
   const version = G.version;
   if (version !== land.version) {
-    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.landData._owned[player][land._id] = true;
   // in Machi Koro 2, each landmark can only be bought by one player
@@ -195,7 +195,7 @@ export const demolish = (G: MachikoroG, player: number, land: Landmark): void =>
   if (version !== Version.MK1) {
     throw new Error('Demolishing landmarks is only implemented for Machi Koro 1.');
   } else if (version !== land.version) {
-    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.landData._owned[player][land._id] = false;
 };

@@ -46,7 +46,7 @@ export default class Logger extends React.Component<LogProps, object> {
     const { ctx, names } = this.props;
     const player = ctx.playOrder[(turn - repeatedTurns) % names.length];
     const name = names[parseInt(player)];
-    return `Turn ${turn + 1}: ${name}`;
+    return `Turn ${(turn + 1).toString()}: ${name}`;
   };
 
   /**

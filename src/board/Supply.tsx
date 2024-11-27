@@ -149,8 +149,8 @@ export default class Supply extends React.Component<SupplyProps, object> {
  */
 const costToString = (cost: number): string => {
   if (cost < 0) {
-    return `\u2212$${-cost}`;
+    return `\u2212$${(-cost).toString()}`;
   } else {
-    return `$${cost}`;
+    return `$${cost.toString()}`;
   }
 };

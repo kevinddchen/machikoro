@@ -20,7 +20,7 @@ const initializeNames = (matchData: { id: number; name?: string }[]): string[] =
   const numPlayers = matchData.length;
   const names = Array.from({ length: numPlayers }, () => '');
   for (const { id, name } of matchData) {
-    const displayName = name ? name : `player_${id}`; // use a default name if none is provided
+    const displayName = name ? name : `player_${id.toString()}`; // use a default name if none is provided
     names[id] = displayName;
   }
   return names;

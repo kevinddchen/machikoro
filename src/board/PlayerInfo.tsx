@@ -67,7 +67,7 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         const landCostArray = Land.costArray(G, land, clientPlayer);
         // Machi Koro 1 only has one cost
         const cost = landCostArray[0];
-        landDescriptionUnparsed += `\n\nCost: ${cost} ${Game.coinPlural(cost)}`;
+        landDescriptionUnparsed += `\n\nCost: ${cost.toString()} ${Game.coinPlural(cost)}`;
       }
       const landDescription = parseMaterialSymbols(landDescriptionUnparsed);
 
@@ -131,14 +131,14 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       // for Tech Startup establishment, add the current investment to the description
       if (Est.isEqual(est, Est.TechStartup)) {
         const investment = Est.getInvestment(G, player);
-        estDescriptionUnparsed += `\n\nInvestment: ${investment} ${Game.coinPlural(investment)}`;
+        estDescriptionUnparsed += `\n\nInvestment: ${investment.toString()} ${Game.coinPlural(investment)}`;
       }
 
       const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
       const estDescription = parseMaterialSymbols(estDescriptionUnparsed);
 
       for (let j = 0; j < count; j++) {
-        const key = `${i}_${j}`;
+        const key = `${i.toString()}_${j.toString()}`;
         const renovation = j < countRenovation; // true if establishment should display as "closed under renovations"
         const estColor = estColorToClass(est.color, estClickable, renovation);
         minis.push(

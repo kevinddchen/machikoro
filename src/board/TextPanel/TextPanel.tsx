@@ -95,7 +95,7 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     if (toggleState === ToggleState.Log) {
       // if there are unread chat messages, add a number to the button
       if (numChats > this.numReadChats) {
-        chatButtonText += ` (${numChats - this.numReadChats})`;
+        chatButtonText += ` (${(numChats - this.numReadChats).toString()})`;
       }
     } else if (toggleState === ToggleState.Chat) {
       // update the number of read chats
