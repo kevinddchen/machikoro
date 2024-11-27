@@ -58,6 +58,7 @@ npm run build
 ```
 
 This does two things:
+
 1.  Transpile source code into Javascript in the _build/_ directory.
     This is what is run on the server using `node`.
 1.  Bundle static assets in the _dist/_ directory.
