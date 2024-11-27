@@ -33,7 +33,7 @@ In the Millionaire's Row expansion, there are certain uncommon plays that are no
 
 ## Development
 
-First, install [Node.js](https://nodejs.org/en/).
+First, install [Node.js](https://nodejs.org/en/) (recommend version >= 18).
 Then, clone this repo and install the project dependencies.
 
 ```bash
@@ -49,6 +49,30 @@ Some contribution guidelines:
 - Run `npm run prettier:fix` to autoformat the code.
 - Run `npm run version:fix` to update the version in [src/version.ts](src/version.ts) with the version in [package.json](package.json).
 
+### Run locally in production mode
+
+You must first build the app by running,
+
+```bash
+npm run build
+```
+
+This does two things:
+1.  Transpile source code into Javascript in the _build/_ directory.
+    This is what is run on the server using `node`.
+1.  Bundle static assets in the _dist/_ directory.
+    This is what the browser loads.
+
+Once the app has been built, you start the game server by running,
+
+```bash
+npm run serve
+```
+
+The app will be hosted at `localhost:80`.
+If you open multiple browsers and go to the link (e.g. incognito mode) you can play with yourself.
+Note that any changes in the code will not be reflected in the app until it is rebuilt.
+
 ### Run locally in debug mode
 
 In a terminal window, run the following command:
@@ -58,29 +82,10 @@ npm run dev
 ```
 
 The app will be hosted at `localhost:80`.
-If you open multiple browsers and go to the link (e.g. incognito mode) you can play with yourself.
 
-There are some debugging tools which become unavailable in the production version of the app.
+There are some debugging tools which are unavailable in the production version of the app.
 Additionally, any changes made in the source code will be automatically updated in the browser, which is very convenient.
 To change the debug game settings, edit `debugSetupData` in [src/game/machikoro.ts](src/game/machikoro.ts).
-
-### Run locally in production mode
-
-You must first build the app by running,
-
-```bash
-npm run build
-```
-
-Once the app has been built, you start the game server by running the same command as above,
-
-```bash
-npm run serve
-```
-
-The app will be hosted at `localhost:80`.
-If you open multiple browsers and go to the link (e.g. incognito mode) you can play with yourself.
-The downside is that any changes in the code will not be reflected in the app until it is rebuilt.
 
 ## Deploy to Heroku
 
