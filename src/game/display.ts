@@ -43,7 +43,7 @@ export function versionName(version: Version | null): string {
     case Version.MK2:
       return 'Machi Koro 2';
     default:
-      return '???'
+      return '???';
   }
 }
 

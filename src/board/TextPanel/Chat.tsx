@@ -109,7 +109,9 @@ export default class Chat extends React.Component<ChatProps, object> {
             className='message-input'
             placeholder='Type your message here'
             ref={this.entryBoxRef}
-            onKeyDown={(e) => { this.entryHandleKeyDown(e); }}
+            onKeyDown={(e) => {
+              this.entryHandleKeyDown(e);
+            }}
           ></input>
           <button className='send-button' onClick={this.sendChatAndClear}>
             Send

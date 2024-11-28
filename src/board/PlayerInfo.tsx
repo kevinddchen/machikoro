@@ -74,9 +74,13 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
       let onClickLandEvent: () => void;
       if (player === clientPlayer && canBuyLand) {
-        onClickLandEvent = () => { moves.buyLand(land); };
+        onClickLandEvent = () => {
+          moves.buyLand(land);
+        };
       } else if (player === clientPlayer && canDemolitionCompany) {
-        onClickLandEvent = () => { moves.doDemolitionCompany(land); };
+        onClickLandEvent = () => {
+          moves.doDemolitionCompany(land);
+        };
       } else {
         onClickLandEvent = () => void 0;
       }
@@ -114,15 +118,25 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         canDoOfficeGive || canDoOfficeTake || canDoRenovationCompany || canDoExhibitHall || canInvestTechStartup;
       let onClickEstEvent: (est: Est.Establishment, renovation: boolean) => void;
       if (canDoOfficeGive) {
-        onClickEstEvent = (est, renovation) => { moves.doOfficeGive(est, renovation); };
+        onClickEstEvent = (est, renovation) => {
+          moves.doOfficeGive(est, renovation);
+        };
       } else if (canDoOfficeTake) {
-        onClickEstEvent = (est, renovation) => { moves.doOfficeTake(player, est, renovation); };
+        onClickEstEvent = (est, renovation) => {
+          moves.doOfficeTake(player, est, renovation);
+        };
       } else if (canDoRenovationCompany) {
-        onClickEstEvent = (est) => { moves.doRenovationCompany(est); };
+        onClickEstEvent = (est) => {
+          moves.doRenovationCompany(est);
+        };
       } else if (canDoExhibitHall) {
-        onClickEstEvent = (est) => { moves.doExhibitHall(est); };
+        onClickEstEvent = (est) => {
+          moves.doExhibitHall(est);
+        };
       } else if (canInvestTechStartup) {
-        onClickEstEvent = (est) => { moves.investTechStartup(est); };
+        onClickEstEvent = (est) => {
+          moves.investTechStartup(est);
+        };
       } else {
         onClickEstEvent = () => void 0;
       }
@@ -145,7 +159,9 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
           <td
             key={key}
             className={classNames('mini_td', estColor, { clickable: estClickable })}
-            onClick={() => { onClickEstEvent(est, renovation); }}
+            onClick={() => {
+              onClickEstEvent(est, renovation);
+            }}
           >
             <div className='mini_roll'>{estRollBoxes}</div>
             <div className='mini_type'>
@@ -160,9 +176,13 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     // player name
     let onClickNameEvent: () => void;
     if (canDoTV) {
-      onClickNameEvent = () => { moves.doTV(player); };
+      onClickNameEvent = () => {
+        moves.doTV(player);
+      };
     } else if (canDoMovingCompany) {
-      onClickNameEvent = () => { moves.doMovingCompanyOpp(player); };
+      onClickNameEvent = () => {
+        moves.doMovingCompanyOpp(player);
+      };
     } else {
       onClickNameEvent = () => void 0;
     }

@@ -27,11 +27,17 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
     const skipButtonActive = canSkipOffice || canSkipRenovationCompany || canSkipExhibitHall;
     let onClickSkipEvent: () => void;
     if (canSkipOffice) {
-      onClickSkipEvent = () => { moves.skipOffice(); };
+      onClickSkipEvent = () => {
+        moves.skipOffice();
+      };
     } else if (canSkipRenovationCompany) {
-      onClickSkipEvent = () => { moves.skipRenovationCompany(); };
+      onClickSkipEvent = () => {
+        moves.skipRenovationCompany();
+      };
     } else if (canSkipExhibitHall) {
-      onClickSkipEvent = () => { moves.skipExhibitHall(); };
+      onClickSkipEvent = () => {
+        moves.skipExhibitHall();
+      };
     } else {
       onClickSkipEvent = () => void 0;
     }
@@ -39,24 +45,38 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
     const tbody = (
       <div className='div-row'>
         <div className='div-column'>
-          <button className={classNames('button', { button_active: canRoll1 })} onClick={() => { moves.rollOne(); }}>
+          <button
+            className={classNames('button', { button_active: canRoll1 })}
+            onClick={() => {
+              moves.rollOne();
+            }}
+          >
             Roll 1
           </button>
 
-          <button className={classNames('button', { button_active: canRoll2 })} onClick={() => { moves.rollTwo(); }}>
+          <button
+            className={classNames('button', { button_active: canRoll2 })}
+            onClick={() => {
+              moves.rollTwo();
+            }}
+          >
             Roll 2
           </button>
 
           <button
             className={classNames('button', { button_active: canCommitRoll }, { button_hide: !canCommitRoll })}
-            onClick={() => { moves.keepRoll(); }}
+            onClick={() => {
+              moves.keepRoll();
+            }}
           >
             Keep ({G.roll})
           </button>
 
           <button
             className={classNames('button', { button_active: canAddTwo }, { button_hide: !canAddTwo })}
-            onClick={() => { moves.addTwo(); }}
+            onClick={() => {
+              moves.addTwo();
+            }}
           >
             Keep ({G.roll + 2})
           </button>
@@ -69,11 +89,21 @@ export default class Buttons extends React.Component<BoardProps<MachikoroG>, obj
           </button>
         </div>
         <div className='div-column-right'>
-          <button className={classNames('button', { button_active: canEndTurn })} onClick={() => { moves.endTurn(); }}>
+          <button
+            className={classNames('button', { button_active: canEndTurn })}
+            onClick={() => {
+              moves.endTurn();
+            }}
+          >
             End Turn
           </button>
 
-          <button className='button' onClick={() => { undo(); }}>
+          <button
+            className='button'
+            onClick={() => {
+              undo();
+            }}
+          >
             Undo
           </button>
         </div>
