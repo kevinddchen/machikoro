@@ -135,9 +135,7 @@ export const cost = (G: MachikoroG, land: Landmark, player: number): number => {
     case Version.MK2: {
       // Machi Koro 2 landmark costs change based on the number of built landmarks
       const built = countBuilt(G, player);
-      // TODO: loud error on out of bounds
-      const costIdx = Math.min(Math.max(built, 0), land.cost.length - 1); // avoid array out of bounds
-      return landCostArray[costIdx];
+      return landCostArray[built];
     }
   }
 };
