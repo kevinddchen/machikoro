@@ -21,7 +21,6 @@ import {
 import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 import { createMatchAPI, joinMatchAPI } from 'server/api';
-import { assertNonNull } from 'common/typescript';
 
 import { countPlayers, hasDetails } from './utils';
 import Authenticator from './Authenticator';
@@ -253,8 +252,8 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     // first, try to join the match on saved credentials
     if (this.authenticator.hasMatchInfo(matchID)) {
-      const matchInfo = this.authenticator.fetchMatchInfo(matchID);
-      assertNonNull(matchInfo);
+      // TODO: should handle this more gracefully than non-null-assert
+      const matchInfo = this.authenticator.fetchMatchInfo(matchID)!;
       this.props.setMatchInfo(matchInfo);
       // this will trigger `Matchmaker` to switch to the waiting room
       return;

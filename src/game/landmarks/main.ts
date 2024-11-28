@@ -2,8 +2,6 @@
 // Utility functions for landmarks.
 //
 
-import { assertNonNull } from 'common/typescript';
-
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { Expansion, MachikoroG, SupplyVariant, Version } from '../types';
@@ -218,8 +216,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     case SupplyVariant.Total: {
       // put all landmarks into the supply
       while (deck.length > 0) {
-        const land = deck.pop();
-        assertNonNull(land);
+        const land = deck.pop()!;
         G.landData._available[land._id] = true;
       }
       break;
@@ -228,8 +225,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     case SupplyVariant.Hybrid: {
       // put landmarks into the supply until there are 5 unique landmarks
       while (deck.length > 0 && getAllAvailable(G).length < Meta2._MK2_LANDMARK_SUPPLY_LIMIT) {
-        const land = deck.pop();
-        assertNonNull(land);
+        const land = deck.pop()!;
         G.landData._available[land._id] = true;
       }
       break;

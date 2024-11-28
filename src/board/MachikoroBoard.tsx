@@ -9,8 +9,6 @@ import StatusBar from './StatusBar';
 import Supply from './Supply';
 import TextPanel from './TextPanel';
 
-import { assertNonNull } from 'common/typescript';
-
 /**
  * Initialize the names array given the match data.
  * @param matchData
@@ -36,8 +34,7 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
   constructor(props: BoardProps<MachikoroG>) {
     super(props);
     const { matchData } = props;
-    assertNonNull(matchData);
-    this.names = initializeNames(matchData);
+    this.names = initializeNames(matchData!);
   }
 
   /**

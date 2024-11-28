@@ -28,7 +28,7 @@ module.exports = tseslint.config(
       react,
     },
     rules: {
-      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/no-non-null-assertion': 'off',
       'sort-imports': ['error', { allowSeparatedGroups: true }],
     },
     settings: {
