@@ -2,7 +2,7 @@
 // Utility functions for landmarks.
 //
 
-import { assertNonNull, assertUnreachable } from 'common/typescript';
+import { assertNonNull } from 'common/typescript';
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
@@ -73,12 +73,11 @@ export const isOwned = (G: MachikoroG, land: Landmark): boolean => {
  * @returns
  */
 const getAll = (version: Version): Landmark[] => {
-  if (version === Version.MK1) {
-    return Meta._LANDMARKS;
-  } else if (version === Version.MK2) {
-    return Meta2._LANDMARKS2;
-  } else {
-    return assertUnreachable(version);
+  switch (version) {
+    case Version.MK1:
+      return Meta._LANDMARKS;
+    case Version.MK2:
+      return Meta2._LANDMARKS2;
   }
 };
 
@@ -130,16 +129,18 @@ export const countBuilt = (G: MachikoroG, player: number): number => {
 export const cost = (G: MachikoroG, land: Landmark, player: number): number => {
   const version = G.version;
   const landCostArray = costArray(G, land, player);
-  if (version === Version.MK1) {
-    // Machi Koro 1 only has one cost
-    return landCostArray[0];
-  } else if (version === Version.MK2) {
-    // Machi Koro 2 landmark costs change based on the number of built landmarks
-    const built = countBuilt(G, player);
-    const costIdx = Math.min(Math.max(built, 0), land.cost.length - 1); // avoid array out of bounds
-    return landCostArray[costIdx];
-  } else {
-    return assertUnreachable(version);
+
+  switch (version) {
+    case Version.MK1:
+      // Machi Koro 1 only has one cost
+      return landCostArray[0];
+    case Version.MK2: {
+      // Machi Koro 2 landmark costs change based on the number of built landmarks
+      const built = countBuilt(G, player);
+      // TODO: loud error on out of bounds
+      const costIdx = Math.min(Math.max(built, 0), land.cost.length - 1); // avoid array out of bounds
+      return landCostArray[costIdx];
+    }
   }
 };
 
@@ -155,13 +156,11 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
 
   if (isEqual(land, Meta2.LaunchPad2) && isOwned(G, Meta2.Observatory2)) {
     // if anyone owns Observatory, Launch Pad costs 5 fewer coins
-    assertNonNull(Meta2.Observatory2.coins);
-    arr = arr.map((cost) => cost - (Meta2.Observatory2.coins as number));
+    arr = arr.map((cost) => cost - Meta2.Observatory2.coins!);
   }
   if (player !== null && owns(G, player, Meta2.LoanOffice2)) {
     // if the player owns Loan Office, all landmarks cost 2 fewer coins
-    assertNonNull(Meta2.LoanOffice2.coins);
-    arr = arr.map((cost) => cost - (Meta2.LoanOffice2.coins as number));
+    arr = arr.map((cost) => cost - Meta2.LoanOffice2.coins!);
   }
 
   return arr;
@@ -176,7 +175,7 @@ export const costArray = (G: MachikoroG, land: Landmark, player: number | null):
 export const buy = (G: MachikoroG, player: number, land: Landmark): void => {
   const version = G.version;
   if (version !== land.version) {
-    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.landData._owned[player][land._id] = true;
   // in Machi Koro 2, each landmark can only be bought by one player
@@ -197,7 +196,7 @@ export const demolish = (G: MachikoroG, player: number, land: Landmark): void =>
   if (version !== Version.MK1) {
     throw new Error('Demolishing landmarks is only implemented for Machi Koro 1.');
   } else if (version !== land.version) {
-    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version}.`);
+    throw new Error(`Landmark ${land.name} does not match the game version, ${G.version.toString()}.`);
   }
   G.landData._owned[player][land._id] = false;
 };
@@ -215,22 +214,26 @@ export const replenishSupply = (G: MachikoroG): void => {
     return;
   }
 
-  if (supplyVariant === SupplyVariant.Total) {
-    // put all landmarks into the supply
-    while (deck.length > 0) {
-      const land = deck.pop();
-      assertNonNull(land);
-      G.landData._available[land._id] = true;
+  switch (supplyVariant) {
+    case SupplyVariant.Total: {
+      // put all landmarks into the supply
+      while (deck.length > 0) {
+        const land = deck.pop();
+        assertNonNull(land);
+        G.landData._available[land._id] = true;
+      }
+      break;
     }
-  } else if (supplyVariant === SupplyVariant.Variable || supplyVariant === SupplyVariant.Hybrid) {
-    // put landmarks into the supply until there are 5 unique landmarks
-    while (deck.length > 0 && getAllAvailable(G).length < Meta2._MK2_LANDMARK_SUPPLY_LIMIT) {
-      const land = deck.pop();
-      assertNonNull(land);
-      G.landData._available[land._id] = true;
+    case SupplyVariant.Variable:
+    case SupplyVariant.Hybrid: {
+      // put landmarks into the supply until there are 5 unique landmarks
+      while (deck.length > 0 && getAllAvailable(G).length < Meta2._MK2_LANDMARK_SUPPLY_LIMIT) {
+        const land = deck.pop();
+        assertNonNull(land);
+        G.landData._available[land._id] = true;
+      }
+      break;
     }
-  } else {
-    return assertUnreachable(supplyVariant);
   }
 };
 
@@ -270,16 +273,20 @@ export const initialize = (version: Version, expansions: Expansion[], numPlayers
 
   // give each player their starting landmarks
   let starting: number[];
-  if (version === Version.MK1) {
-    starting = [];
-    if (expansions.includes(Expansion.Harbor)) {
-      starting.push(...Meta._HARBOR_STARTING_LANDMARKS);
+  switch (version) {
+    case Version.MK1: {
+      starting = [];
+      if (expansions.includes(Expansion.Harbor)) {
+        starting.push(...Meta._HARBOR_STARTING_LANDMARKS);
+      }
+      break;
     }
-  } else if (version === Version.MK2) {
-    starting = Meta2._MK2_STARTING_LANDMARKS;
-  } else {
-    return assertUnreachable(version);
+    case Version.MK2: {
+      starting = Meta2._MK2_STARTING_LANDMARKS;
+      break;
+    }
   }
+
   for (const id of starting) {
     for (const player of Array(numPlayers).keys()) {
       landData._owned[player][id] = true;
@@ -288,12 +295,15 @@ export const initialize = (version: Version, expansions: Expansion[], numPlayers
 
   // prepare deck
   let landDeck: Landmark[];
-  if (version === Version.MK1) {
-    landDeck = [];
-  } else if (version === Version.MK2) {
-    landDeck = inUse.filter((land) => !isEqual(land, Meta2.CityHall2)); // manually exclude `CityHall2`
-  } else {
-    return assertUnreachable(version);
+  switch (version) {
+    case Version.MK1: {
+      landDeck = [];
+      break;
+    }
+    case Version.MK2: {
+      landDeck = inUse.filter((land) => !isEqual(land, Meta2.CityHall2)); // manually exclude `CityHall2`
+      break;
+    }
   }
 
   return { landData, landDeck };

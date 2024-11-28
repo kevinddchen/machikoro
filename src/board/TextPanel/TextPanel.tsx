@@ -4,7 +4,6 @@ import { BoardProps } from 'boardgame.io/react';
 import React from 'react';
 
 import { MachikoroG } from 'game';
-import { assertUnreachable } from 'common/typescript';
 
 import Chat from './Chat';
 import Logger from './Logger';
@@ -73,15 +72,14 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
 
   // --- Render ---------------------------------------------------------------
 
-  private renderToggledState = (): JSX.Element | null => {
+  private renderToggledState = (): React.JSX.Element => {
     const { toggleState } = this.state;
 
-    if (toggleState === ToggleState.Log) {
-      return <Logger {...this.props} />;
-    } else if (toggleState === ToggleState.Chat) {
-      return <Chat {...this.props} />;
-    } else {
-      return assertUnreachable(toggleState);
+    switch (toggleState) {
+      case ToggleState.Log:
+        return <Logger {...this.props} />;
+      case ToggleState.Chat:
+        return <Chat {...this.props} />;
     }
   };
 
@@ -92,16 +90,19 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
     let chatButtonText = 'Chat';
 
     const numChats = chatMessages.length;
-    if (toggleState === ToggleState.Log) {
-      // if there are unread chat messages, add a number to the button
-      if (numChats > this.numReadChats) {
-        chatButtonText += ` (${numChats - this.numReadChats})`;
+    switch (toggleState) {
+      case ToggleState.Log: {
+        // if there are unread chat messages, add a number to the button
+        if (numChats > this.numReadChats) {
+          chatButtonText += ` (${(numChats - this.numReadChats).toString()})`;
+        }
+        break;
       }
-    } else if (toggleState === ToggleState.Chat) {
-      // update the number of read chats
-      this.numReadChats = numChats;
-    } else {
-      return assertUnreachable(toggleState);
+      case ToggleState.Chat: {
+        // update the number of read chats
+        this.numReadChats = numChats;
+        break;
+      }
     }
 
     return (
@@ -112,7 +113,9 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
               type='radio'
               name='chatlog-select'
               ref={this.logRadioRef}
-              onClick={() => this.setToggleState(ToggleState.Log)}
+              onClick={() => {
+                this.setToggleState(ToggleState.Log);
+              }}
             />
             <span className='name'>Game Log</span>
           </label>
@@ -121,7 +124,9 @@ export default class TextPanel extends React.Component<TextPanelProps, TextPanel
               type='radio'
               name='chatlog-select'
               ref={this.chatRadioRef}
-              onClick={() => this.setToggleState(ToggleState.Chat)}
+              onClick={() => {
+                this.setToggleState(ToggleState.Chat);
+              }}
             />
             <span className='name'>{chatButtonText}</span>
           </label>

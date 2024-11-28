@@ -67,16 +67,20 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         const landCostArray = Land.costArray(G, land, clientPlayer);
         // Machi Koro 1 only has one cost
         const cost = landCostArray[0];
-        landDescriptionUnparsed += `\n\nCost: ${cost} ${Game.coinPlural(cost)}`;
+        landDescriptionUnparsed += `\n\nCost: ${cost.toString()} ${Game.coinPlural(cost)}`;
       }
       const landDescription = parseMaterialSymbols(landDescriptionUnparsed);
 
       // this prevents the player from buying a landmark by clicking on a landmark not in their `PlayerInfo` component
       let onClickLandEvent: () => void;
       if (player === clientPlayer && canBuyLand) {
-        onClickLandEvent = () => moves.buyLand(land);
+        onClickLandEvent = () => {
+          moves.buyLand(land);
+        };
       } else if (player === clientPlayer && canDemolitionCompany) {
-        onClickLandEvent = () => moves.doDemolitionCompany(land);
+        onClickLandEvent = () => {
+          moves.doDemolitionCompany(land);
+        };
       } else {
         onClickLandEvent = () => void 0;
       }
@@ -114,15 +118,25 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
         canDoOfficeGive || canDoOfficeTake || canDoRenovationCompany || canDoExhibitHall || canInvestTechStartup;
       let onClickEstEvent: (est: Est.Establishment, renovation: boolean) => void;
       if (canDoOfficeGive) {
-        onClickEstEvent = (est, renovation) => moves.doOfficeGive(est, renovation);
+        onClickEstEvent = (est, renovation) => {
+          moves.doOfficeGive(est, renovation);
+        };
       } else if (canDoOfficeTake) {
-        onClickEstEvent = (est, renovation) => moves.doOfficeTake(player, est, renovation);
+        onClickEstEvent = (est, renovation) => {
+          moves.doOfficeTake(player, est, renovation);
+        };
       } else if (canDoRenovationCompany) {
-        onClickEstEvent = (est) => moves.doRenovationCompany(est);
+        onClickEstEvent = (est) => {
+          moves.doRenovationCompany(est);
+        };
       } else if (canDoExhibitHall) {
-        onClickEstEvent = (est) => moves.doExhibitHall(est);
+        onClickEstEvent = (est) => {
+          moves.doExhibitHall(est);
+        };
       } else if (canInvestTechStartup) {
-        onClickEstEvent = (est) => moves.investTechStartup(est);
+        onClickEstEvent = (est) => {
+          moves.investTechStartup(est);
+        };
       } else {
         onClickEstEvent = () => void 0;
       }
@@ -131,21 +145,23 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
       // for Tech Startup establishment, add the current investment to the description
       if (Est.isEqual(est, Est.TechStartup)) {
         const investment = Est.getInvestment(G, player);
-        estDescriptionUnparsed += `\n\nInvestment: ${investment} ${Game.coinPlural(investment)}`;
+        estDescriptionUnparsed += `\n\nInvestment: ${investment.toString()} ${Game.coinPlural(investment)}`;
       }
 
       const estRollBoxes = formatRollBoxes(est.rolls, 'mini_roll_box');
       const estDescription = parseMaterialSymbols(estDescriptionUnparsed);
 
       for (let j = 0; j < count; j++) {
-        const key = `${i}_${j}`;
+        const key = `${i.toString()}_${j.toString()}`;
         const renovation = j < countRenovation; // true if establishment should display as "closed under renovations"
         const estColor = estColorToClass(est.color, estClickable, renovation);
         minis.push(
           <td
             key={key}
             className={classNames('mini_td', estColor, { clickable: estClickable })}
-            onClick={() => onClickEstEvent(est, renovation)}
+            onClick={() => {
+              onClickEstEvent(est, renovation);
+            }}
           >
             <div className='mini_roll'>{estRollBoxes}</div>
             <div className='mini_type'>
@@ -160,9 +176,13 @@ export default class PlayerInfo extends React.Component<PlayerInfoProps, object>
     // player name
     let onClickNameEvent: () => void;
     if (canDoTV) {
-      onClickNameEvent = () => moves.doTV(player);
+      onClickNameEvent = () => {
+        moves.doTV(player);
+      };
     } else if (canDoMovingCompany) {
-      onClickNameEvent = () => moves.doMovingCompanyOpp(player);
+      onClickNameEvent = () => {
+        moves.doMovingCompanyOpp(player);
+      };
     } else {
       onClickNameEvent = () => void 0;
     }

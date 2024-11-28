@@ -1,4 +1,5 @@
 import { Server } from 'boardgame.io';
+import has from 'lodash/has';
 
 /**
  * Currently, the most reliable way to check if a seat is occupied is to check
@@ -30,5 +31,5 @@ export interface IDetails {
  * @returns
  */
 export const hasDetails = (obj: unknown): obj is IDetails => {
-  return (obj as IDetails)?.details !== undefined && typeof (obj as IDetails).details === 'string';
+  return has(obj, 'details') && typeof obj.details === 'string';
 };

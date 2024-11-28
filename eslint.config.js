@@ -11,9 +11,8 @@ module.exports = tseslint.config(
       eslint.configs.recommended,
       react.configs.flat.recommended,
       react.configs.flat['jsx-runtime'],
-      tseslint.configs.recommendedTypeCheckedOnly,
-      tseslint.configs.strict,
-      // tseslint.configs.stylistic,
+      tseslint.configs.strictTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
     ],
     files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
@@ -29,12 +28,8 @@ module.exports = tseslint.config(
       react,
     },
     rules: {
-      'sort-imports': [
-        'error',
-        {
-          allowSeparatedGroups: true,
-        },
-      ],
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      'sort-imports': ['error', { allowSeparatedGroups: true }],
     },
     settings: {
       react: {

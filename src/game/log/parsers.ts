@@ -124,7 +124,7 @@ export const logRollOne = (G: MachikoroG, roll: number): void => {
  * @returns Displayed log text for rolling one die.
  */
 const parseRollOne = (logEvent: RollOne): string => {
-  return `\trolled ${logEvent.roll}`;
+  return `\trolled ${logEvent.roll.toString()}`;
 };
 
 // ----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ export const logRollTwo = (G: MachikoroG, dice: [number, number]): void => {
 const parseRollTwo = (logEvent: RollTwo): string => {
   const { dice } = logEvent;
   const roll = dice[0] + dice[1];
-  return `\trolled ${roll} (${dice[0]}, ${dice[1]})`;
+  return `\trolled ${roll.toString()} (${dice[0].toString()}, ${dice[1].toString()})`;
 };
 
 // ----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ export const logAddTwo = (G: MachikoroG, roll: number): void => {
  * @returns Displayed log text for adding two to the roll.
  */
 const parseAddTwo = (logEvent: AddTwo): string => {
-  return `\tchanged roll to ${logEvent.roll} (Harbor)`;
+  return `\tchanged roll to ${logEvent.roll.toString()} (Harbor)`;
 };
 
 // ----------------------------------------------------------------------------
@@ -209,9 +209,9 @@ const parseEarn = (logEvent: Earn, names: string[]): string => {
   const { player, amount, name } = logEvent;
   let text: string;
   if (amount > 0) {
-    text = `\t${names[player]} earned ${amount} ${coinPlural(amount)} (${name})`;
+    text = `\t${names[player]} earned ${amount.toString()} ${coinPlural(amount)} (${name})`;
   } else {
-    text = `\t${names[player]} paid the bank ${-amount} ${coinPlural(-amount)} (${name})`;
+    text = `\t${names[player]} paid the bank ${(-amount).toString()} ${coinPlural(-amount)} (${name})`;
   }
   return text;
 };
@@ -246,7 +246,7 @@ export const logTake = (G: MachikoroG, args: { from: number; to: number }, amoun
  */
 const parseTake = (logEvent: Take, names: string[]): string => {
   const { from, to, amount, name } = logEvent;
-  return `\t${names[from]} paid ${names[to]} ${amount} ${coinPlural(amount)} (${name})`;
+  return `\t${names[from]} paid ${names[to]} ${amount.toString()} ${coinPlural(amount)} (${name})`;
 };
 
 // ----------------------------------------------------------------------------
@@ -412,7 +412,7 @@ export const logPark = (G: MachikoroG, coins: number): void => {
  * @returns Displayed log text for the Park establishment / landmark.
  */
 const parsePark = (logEvent: Park): string => {
-  return `\tredistributed ${logEvent.coins} ${coinPlural(logEvent.coins)} to each player (Park)`;
+  return `\tredistributed ${logEvent.coins.toString()} ${coinPlural(logEvent.coins)} to each player (Park)`;
 };
 
 // ----------------------------------------------------------------------------
@@ -463,7 +463,7 @@ export const logInvestTechStartup = (G: MachikoroG, newInvestment: number): void
  * (Machi Koro 1).
  */
 const parseInvestTechStartup = (logEvent: TechStartup): string => {
-  return `\tinvested in Tech Startup (investment: ${logEvent.newInvestment} ${coinPlural(logEvent.newInvestment)})`;
+  return `\tinvested in Tech Startup (investment: ${logEvent.newInvestment.toString()} ${coinPlural(logEvent.newInvestment)})`;
 };
 
 // ----------------------------------------------------------------------------
@@ -488,7 +488,7 @@ export const logTunaRoll = (G: MachikoroG, roll: number): void => {
  * @returns Displayed log text for the tuna roll.
  */
 const parseTunaRoll = (logEvent: TunaRoll): string => {
-  return `\t(Tuna boat roll: ${logEvent.roll})`;
+  return `\t(Tuna boat roll: ${logEvent.roll.toString()})`;
 };
 
 // ----------------------------------------------------------------------------

@@ -6,6 +6,7 @@
     "boardgame.io": "",
     "classnames": "",
     "koa-static": "",
+    "lodash": "",
     "react": "",
     "react-dom": ""
   },
@@ -40,6 +41,7 @@
     "@eslint/js": "",
     "@tsconfig/recommended": "",
     "@types/koa-static": "",
+    "@types/lodash": "",
     "@types/node": "",
     "@types/react": "",
     "@types/react-dom": "",

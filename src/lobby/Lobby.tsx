@@ -19,9 +19,9 @@ import {
 } from 'game';
 
 import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
-import { assertNonNull, assertUnreachable } from 'common/typescript';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 import { createMatchAPI, joinMatchAPI } from 'server/api';
+import { assertNonNull } from 'common/typescript';
 
 import { countPlayers, hasDetails } from './utils';
 import Authenticator from './Authenticator';
@@ -186,14 +186,16 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     // initialize setup data
     let startCoins;
     let initialBuyRounds;
-    if (version === Version.MK1) {
-      startCoins = MK1_STARTING_COINS;
-      initialBuyRounds = 0;
-    } else if (version === Version.MK2) {
-      startCoins = MK2_STARTING_COINS;
-      initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
-    } else {
-      return assertUnreachable(version);
+    switch (version) {
+      case Version.MK1: {
+        startCoins = MK1_STARTING_COINS;
+        initialBuyRounds = 0;
+        break;
+      }
+      case Version.MK2: {
+        startCoins = MK2_STARTING_COINS;
+        initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
+      }
     }
 
     const expansions: Expansion[] = [Expansion.Base];
@@ -356,7 +358,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * @returns Elements for player name entry.
    */
-  private renderPlayerName = (): JSX.Element => {
+  private renderPlayerName = (): React.JSX.Element => {
     return (
       <div className='padded_div'>
         <span>Enter Player Name: </span>
@@ -375,7 +377,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * @returns Elements for creating a new match.
    */
-  private renderCreateMatch = (): JSX.Element => {
+  private renderCreateMatch = (): React.JSX.Element => {
     // prettier-ignore
     const numPlayersOptions = 
       <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
@@ -449,10 +451,10 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
   /**
    * @returns Elements displaying available matches.
    */
-  private renderMatches = (): JSX.Element => {
+  private renderMatches = (): React.JSX.Element => {
     let { matches } = this.state;
 
-    const tbody: JSX.Element[] = [];
+    const tbody: React.JSX.Element[] = [];
 
     // Matches have not been fetched yet
     if (matches === null) {
@@ -473,7 +475,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
         const numPlayers = players.length;
 
         // Button to join the room
-        let button: JSX.Element | null = null;
+        let button: React.JSX.Element | null = null;
         if (this.authenticator.hasMatchInfo(matchID)) {
           // Able to rejoin the room (e.g. joined before, but closed browser)
           button = (

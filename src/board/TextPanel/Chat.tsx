@@ -94,7 +94,7 @@ export default class Chat extends React.Component<ChatProps, object> {
 
   // --- Render ---------------------------------------------------------------
 
-  private renderChatBox = (): JSX.Element | null => {
+  private renderChatBox = (): React.JSX.Element | null => {
     const { clientPlayer } = this.props;
 
     if (clientPlayer === null) {
@@ -109,7 +109,9 @@ export default class Chat extends React.Component<ChatProps, object> {
             className='message-input'
             placeholder='Type your message here'
             ref={this.entryBoxRef}
-            onKeyDown={(e) => this.entryHandleKeyDown(e)}
+            onKeyDown={(e) => {
+              this.entryHandleKeyDown(e);
+            }}
           ></input>
           <button className='send-button' onClick={this.sendChatAndClear}>
             Send
@@ -121,7 +123,7 @@ export default class Chat extends React.Component<ChatProps, object> {
 
   render() {
     const lines = this.parseChat();
-    const tbody: JSX.Element[] = [];
+    const tbody: React.JSX.Element[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       tbody.push(

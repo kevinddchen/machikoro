@@ -20,7 +20,7 @@ const initializeNames = (matchData: { id: number; name?: string }[]): string[] =
   const numPlayers = matchData.length;
   const names = Array.from({ length: numPlayers }, () => '');
   for (const { id, name } of matchData) {
-    const displayName = name ? name : `player_${id}`; // use a default name if none is provided
+    const displayName = name ? name : `player_${id.toString()}`; // use a default name if none is provided
     names[id] = displayName;
   }
   return names;
@@ -58,11 +58,11 @@ export default class MachikoroBoard extends React.Component<BoardProps<Machikoro
   /**
    * @returns Elements displaying player information (e.g. coins, landmarks, establishments)
    */
-  private renderPlayerInfo = (): JSX.Element[] => {
+  private renderPlayerInfo = (): React.JSX.Element[] => {
     const { ctx } = this.props;
     const clientPlayer = this.getClientPlayer();
 
-    const tbody: JSX.Element[] = [];
+    const tbody: React.JSX.Element[] = [];
     for (let i = 0; i < this.names.length; i++) {
       // Player ID we are rendering info for.
       const player = parseInt(ctx.playOrder[i]);

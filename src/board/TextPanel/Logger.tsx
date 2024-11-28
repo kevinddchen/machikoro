@@ -3,6 +3,7 @@ import 'styles/main.css';
 import { BoardProps } from 'boardgame.io/react';
 import { LogEntry } from 'boardgame.io';
 import React from 'react';
+import has from 'lodash/has';
 
 import { Log, MachikoroG, Version, displayName, supplyVariantName } from 'game';
 
@@ -46,7 +47,7 @@ export default class Logger extends React.Component<LogProps, object> {
     const { ctx, names } = this.props;
     const player = ctx.playOrder[(turn - repeatedTurns) % names.length];
     const name = names[parseInt(player)];
-    return `Turn ${turn + 1}: ${name}`;
+    return `Turn ${(turn + 1).toString()}: ${name}`;
   };
 
   /**
@@ -146,7 +147,7 @@ export default class Logger extends React.Component<LogProps, object> {
     const { log } = this.props;
 
     const lines = this.parseLog(log);
-    const tbody: JSX.Element[] = [];
+    const tbody: React.JSX.Element[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       tbody.push(
@@ -172,5 +173,5 @@ export default class Logger extends React.Component<LogProps, object> {
  * @returns
  */
 const isLogEventArray = (obj: unknown): obj is Log.LogEvent[] => {
-  return Array.isArray(obj) && obj.every((e) => (e as Log.LogEvent)?.type !== undefined);
+  return Array.isArray(obj) && obj.every((e) => has(e, 'type'));
 };

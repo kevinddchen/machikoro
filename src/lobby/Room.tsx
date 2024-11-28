@@ -157,16 +157,16 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   /**
    * @returns Elements displaying player names.
    */
-  private renderPlayers = (): JSX.Element[] => {
+  private renderPlayers = (): React.JSX.Element[] => {
     const { matchInfo } = this.props;
     const { players } = this.state;
 
-    const tbody: JSX.Element[] = [];
+    const tbody: React.JSX.Element[] = [];
     for (let seat = 0; seat < players.length; seat++) {
       const { id, name } = players[seat];
 
       let indicator = 'mm-td';
-      let button: JSX.Element | null = null;
+      let button: React.JSX.Element | null = null;
 
       // If the element corresponds to the client, add a leave button.
       if (id.toString() === matchInfo.playerID) {

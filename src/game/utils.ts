@@ -14,7 +14,7 @@ export const validateSetupData = (setupData: SetupData | undefined, numPlayers: 
   if (setupData) {
     const { version, expansions, supplyVariant, initialBuyRounds, startCoins } = setupData;
     if (!Object.values(Version).includes(version)) {
-      return `Unknown version: ${version}`;
+      return `Unknown version: ${version.toString()}`;
     }
     for (const expansion of expansions) {
       if (!Object.values(Expansion).includes(expansion)) {
@@ -25,10 +25,10 @@ export const validateSetupData = (setupData: SetupData | undefined, numPlayers: 
       return `Unknown supply variant: ${supplyVariant}`;
     }
     if (!Number.isInteger(startCoins) || startCoins < 0) {
-      return `Number of starting coins, ${startCoins}, must be a non-negative integer`;
+      return `Number of starting coins, ${startCoins.toString()}, must be a non-negative integer`;
     }
     if (!Number.isInteger(initialBuyRounds) || initialBuyRounds < 0) {
-      return `Number of initial buying rounds, ${initialBuyRounds}, must be a non-negative integer`;
+      return `Number of initial buying rounds, ${initialBuyRounds.toString()}, must be a non-negative integer`;
     }
     // Base expansion must always be included
     if (!expansions.includes(Expansion.Base)) {
@@ -40,7 +40,7 @@ export const validateSetupData = (setupData: SetupData | undefined, numPlayers: 
     }
   }
   if (!(Number.isInteger(numPlayers) && numPlayers >= 2 && numPlayers <= 5)) {
-    return `Number of players, ${numPlayers}, must be an integer between 2 to 5.`;
+    return `Number of players, ${numPlayers.toString()}, must be an integer between 2 to 5.`;
   }
   return;
 };

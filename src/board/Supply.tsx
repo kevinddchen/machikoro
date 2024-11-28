@@ -27,7 +27,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
   /**
    * Render the landmark supply. This returns nothing for Machi Koro 1.
    */
-  private renderLandTable = (): JSX.Element | null => {
+  private renderLandTable = (): React.JSX.Element | null => {
     const { G, ctx, moves, isActive, clientPlayer } = this.props;
     // return nothing for Machi Koro 1.
     if (G.version === Game.Version.MK1) {
@@ -63,7 +63,9 @@ export default class Supply extends React.Component<SupplyProps, object> {
         <td
           key={i}
           className={classNames('est_td', landColor, { inactive: !isAvailable }, { clickable: canBuyLand })}
-          onClick={() => moves.buyLand(land)}
+          onClick={() => {
+            moves.buyLand(land);
+          }}
         >
           <div className='est_name'>{land.name}</div>
           <div className='est_cost'>{costsString}</div>
@@ -75,7 +77,7 @@ export default class Supply extends React.Component<SupplyProps, object> {
     return table.render();
   };
 
-  private renderEstTable = (): JSX.Element[] => {
+  private renderEstTable = (): React.JSX.Element[] => {
     const { G, ctx, moves, isActive } = this.props;
 
     // use one stack table for each deck, so that the rows corresponding to
@@ -115,7 +117,9 @@ export default class Supply extends React.Component<SupplyProps, object> {
         <td
           key={i}
           className={classNames('est_td', estColor, { inactive: available === 0 }, { clickable: canBuyEst })}
-          onClick={() => moves.buyEst(est)}
+          onClick={() => {
+            moves.buyEst(est);
+          }}
         >
           <div className='est_roll'>{estRollBoxes}</div>
           <div className='est_type'>
@@ -149,8 +153,8 @@ export default class Supply extends React.Component<SupplyProps, object> {
  */
 const costToString = (cost: number): string => {
   if (cost < 0) {
-    return `\u2212$${-cost}`;
+    return `\u2212$${(-cost).toString()}`;
   } else {
-    return `$${cost}`;
+    return `$${cost.toString()}`;
   }
 };
