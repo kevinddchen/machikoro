@@ -251,10 +251,9 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     }
 
     // first, try to join the match on saved credentials
-    if (this.authenticator.hasMatchInfo(matchID)) {
-      // TODO: should handle this more gracefully than non-null-assert
-      const matchInfo = this.authenticator.fetchMatchInfo(matchID)!;
-      this.props.setMatchInfo(matchInfo);
+    const fetchedMatchInfo = this.authenticator.fetchMatchInfo(matchID);
+    if (fetchedMatchInfo !== null) {
+      this.props.setMatchInfo(fetchedMatchInfo);
       // this will trigger `Matchmaker` to switch to the waiting room
       return;
     }
@@ -379,7 +378,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
    */
   private renderCreateMatch = (): React.JSX.Element => {
     // prettier-ignore
-    const numPlayersOptions = 
+    const numPlayersOptions =
       <select ref={this.numPlayersRef} onChange={this.setNumPlayers}>
         <option key='0' value='2'>2 Players</option>,
         <option key='1' value='3'>3 Players</option>,
@@ -388,7 +387,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       </select>
 
     // prettier-ignore
-    const versionOptions = 
+    const versionOptions =
       <select ref={this.versionRef} onChange={this.setVersion}>
         <option key='0' value={Version.MK1.toString()}>{versionName(Version.MK1)}</option>
         <option key='1' value={Version.MK2.toString()}>{versionName(Version.MK2)}</option>
