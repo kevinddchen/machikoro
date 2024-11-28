@@ -1,5 +1,4 @@
 import { Est, Land, MachikoroG } from 'game';
-import { assertUnreachable } from 'common/typescript';
 
 import classNames from 'classnames';
 
@@ -23,8 +22,6 @@ export const estColorToClass = (color: Est.EstColor, darker: boolean, renovation
       return darker ? 'est_img_res' : 'est_img_res_light';
     case Est.EstColor.Purple:
       return darker ? 'est_img_maj' : 'est_img_maj_light';
-    default:
-      return assertUnreachable(color);
   }
 };
 

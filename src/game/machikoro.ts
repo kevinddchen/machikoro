@@ -6,8 +6,6 @@ import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
 
-import { assertNonNull } from 'common/typescript';
-
 import * as Est from './establishments';
 import * as Land from './landmarks';
 import * as Log from './log';
@@ -819,8 +817,7 @@ const endTurn: Move<MachikoroG> = (context) => {
   if (G.justBoughtEst === null && G.justBoughtLand === null) {
     for (const airport of [Land.Airport, Land.Airport2]) {
       if (Land.owns(G, player, airport)) {
-        assertNonNull(airport.coins);
-        earn(G, ctx, player, airport.coins, airport.name);
+        earn(G, ctx, player, airport.coins!, airport.name);
       }
     }
   }
@@ -928,9 +925,8 @@ const switchState = (context: FnContext<MachikoroG>): void => {
     if (getCoins(G, player) === 0) {
       for (const cityHall of [Land.CityHall, Land.CityHall2]) {
         if (Land.owns(G, player, cityHall)) {
-          assertNonNull(cityHall.coins);
-          addCoins(G, player, cityHall.coins);
-          Log.logEarn(G, player, cityHall.coins, cityHall.name);
+          addCoins(G, player, cityHall.coins!);
+          Log.logEarn(G, player, cityHall.coins!, cityHall.name);
         }
       }
     }
@@ -992,13 +988,11 @@ const activateRedEsts = (context: FnContext<MachikoroG>): void => {
 
         // +1 coin to Cup type if opponent owns Shopping Mall
         if (est.type === EstType.Cup && Land.owns(G, opponent, Land.ShoppingMall)) {
-          assertNonNull(Land.ShoppingMall.coins);
-          earnings += Land.ShoppingMall.coins;
+          earnings += Land.ShoppingMall.coins!;
         }
         // +1 coin to Cup type if any player owns Soda Bottling Plant (Machi Koro 2)
         if (est.type === EstType.Cup && Land.isOwned(G, Land.SodaBottlingPlant2)) {
-          assertNonNull(Land.SodaBottlingPlant2.coins);
-          earnings += Land.SodaBottlingPlant2.coins;
+          earnings += Land.SodaBottlingPlant2.coins!;
         }
 
         // by default a red establishment takes `multiplier * earnings = 1 * earnings`
@@ -1118,13 +1112,11 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
 
         // +1 coin to Wheat type if any player owns Farmers Market (Machi Koro 2)
         if (est.type === EstType.Wheat && Land.isOwned(G, Land.FarmersMarket2)) {
-          assertNonNull(Land.FarmersMarket2.coins);
-          earnings += Land.FarmersMarket2.coins;
+          earnings += Land.FarmersMarket2.coins!;
         }
         // +1 coin to Gear type if any player owns Forge (Machi Koro 2)
         if (est.type === EstType.Gear && Land.isOwned(G, Land.Forge2)) {
-          assertNonNull(Land.Forge2.coins);
-          earnings += Land.Forge2.coins;
+          earnings += Land.Forge2.coins!;
         }
 
         const amount = earnings * multiplier * count;
@@ -1155,13 +1147,11 @@ const activateBlueGreenEsts = (context: FnContext<MachikoroG>): void => {
       let earnings = est.earn;
       // +1 coin to Shop type if player owns Shopping Mall
       if (est.type === EstType.Shop && Land.owns(G, currentPlayer, Land.ShoppingMall)) {
-        assertNonNull(Land.ShoppingMall.coins);
-        earnings += Land.ShoppingMall.coins;
+        earnings += Land.ShoppingMall.coins!;
       }
       // +1 coin to Shop type if any player owns Shopping Mall (Machi Koro 2)
       if (est.type === EstType.Shop && Land.isOwned(G, Land.ShoppingMall2)) {
-        assertNonNull(Land.ShoppingMall2.coins);
-        earnings += Land.ShoppingMall2.coins;
+        earnings += Land.ShoppingMall2.coins!;
       }
 
       // by default a green establishment earns `multiplier * earnings = 1 * earnings`
@@ -1280,14 +1270,12 @@ const activateLands = (context: FnContext<MachikoroG>): void => {
   }
   if (Land.isOwned(G, Land.TechStartup2) && G.roll === 12) {
     // if roll 12, get 8 coins
-    assertNonNull(Land.TechStartup2.coins);
-    earn(G, ctx, player, Land.TechStartup2.coins, Land.TechStartup2.name);
+    earn(G, ctx, player, Land.TechStartup2.coins!, Land.TechStartup2.name);
   }
   if (Land.isOwned(G, Land.Temple2) && G.rollDoubles) {
     // if roll doubles, take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
-      assertNonNull(Land.Temple2.coins);
-      take(G, ctx, { from: opponent, to: player }, Land.Temple2.coins, Land.Temple2.name);
+      take(G, ctx, { from: opponent, to: player }, Land.Temple2.coins!, Land.Temple2.name);
     }
   }
   if (Land.isOwned(G, Land.MovingCompany2) && G.rollDoubles && Est.getAllOwned(G, player).length > 0) {
@@ -1297,8 +1285,7 @@ const activateLands = (context: FnContext<MachikoroG>): void => {
   if (Land.isOwned(G, Land.Charterhouse2) && G.numDice === 2 && !G.receivedCoins) {
     // NOTE: this must activate after all money-earning landmarks!
     // if roll two dice and did not get coins, get 3 coins from the bank
-    assertNonNull(Land.Charterhouse2.coins);
-    earn(G, ctx, player, Land.Charterhouse2.coins, Land.Charterhouse2.name);
+    earn(G, ctx, player, Land.Charterhouse2.coins!, Land.Charterhouse2.name);
   }
 };
 
@@ -1322,15 +1309,13 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
   } else if (Land.isEqual(land, Land.FrenchRestaurant2)) {
     // take 2 coins from each opponent
     for (const opponent of getPreviousPlayers(ctx)) {
-      assertNonNull(land.coins);
-      const amount = land.coins;
+      const amount = land.coins!;
       take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.Publisher2)) {
     // take 1 coin for each Shop type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
-      assertNonNull(land.coins);
-      const amount = land.coins * Est.countTypeOwned(G, opponent, EstType.Shop);
+      const amount = land.coins! * Est.countTypeOwned(G, opponent, EstType.Shop);
       take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.ExhibitHall2)) {
@@ -1339,15 +1324,13 @@ const activateBoughtLand = (context: FnContext<MachikoroG>): void => {
   } else if (Land.isEqual(land, Land.Museum2)) {
     // take 3 coins for each landmark, except City Hall
     for (const opponent of getPreviousPlayers(ctx)) {
-      assertNonNull(land.coins);
-      const amount = land.coins * Land.countBuilt(G, opponent);
+      const amount = land.coins! * Land.countBuilt(G, opponent);
       take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.TVStation2)) {
     // take 1 coin for each Cup type establishment
     for (const opponent of getPreviousPlayers(ctx)) {
-      assertNonNull(land.coins);
-      const amount = land.coins * Est.countTypeOwned(G, opponent, EstType.Cup);
+      const amount = land.coins! * Est.countTypeOwned(G, opponent, EstType.Cup);
       take(G, ctx, { from: opponent, to: player }, amount, land.name);
     }
   } else if (Land.isEqual(land, Land.Park2)) {
@@ -1717,6 +1700,5 @@ export const Machikoro: Game<MachikoroG, Record<string, unknown>, SetupData> = {
 
   plugins: [Log.LogxPlugin],
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   playerView: PlayerView.STRIP_SECRETS!,
 };

@@ -6,7 +6,6 @@ import classNames from 'classnames';
 
 import * as Game from 'game';
 import { MachikoroG } from 'game';
-import { assertUnreachable } from 'common/typescript';
 
 /**
  * @extends BoardProps<MachikoroG>
@@ -118,9 +117,6 @@ export default class StatusBar extends React.Component<StatusBarProps, object> {
       case Game.TurnState.ActivateBoughtLand: {
         // these game states are transitionary, so the player should not see any message
         return '';
-      }
-      default: {
-        return assertUnreachable(G.turnState);
       }
     }
   };

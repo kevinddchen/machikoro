@@ -2,8 +2,6 @@
 // Utility functions for establishments.
 //
 
-import { assertNonNull } from 'common/typescript';
-
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
 import { EstColor, EstType, Establishment, EstablishmentData } from './types';
@@ -289,8 +287,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     case SupplyVariant.Total: {
       // put all establishments into the supply
       while (decks[0].length > 0) {
-        const est = decks[0].pop();
-        assertNonNull(est);
+        const est = decks[0].pop()!;
         G.estData._availableCount[est._id] += 1;
       }
       break;
@@ -298,8 +295,7 @@ export const replenishSupply = (G: MachikoroG): void => {
     case SupplyVariant.Variable: {
       // put establishments into the supply until there are ten unique establishments
       while (decks[0].length > 0 && getAllAvailable(G).length < VARIABLE_SUPPLY_LIMIT) {
-        const est = decks[0].pop();
-        assertNonNull(est);
+        const est = decks[0].pop()!;
         G.estData._availableCount[est._id] += 1;
       }
       break;
@@ -325,8 +321,7 @@ export const replenishSupply = (G: MachikoroG): void => {
 
       for (let i = 0; i < decks.length; i++) {
         while (decks[i].length > 0 && getAllAvailable(G).filter(funcs[i]).length < limits[i]) {
-          const est = decks[i].pop();
-          assertNonNull(est);
+          const est = decks[i].pop()!;
           G.estData._availableCount[est._id] += 1;
         }
       }
