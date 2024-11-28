@@ -195,6 +195,7 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
       case Version.MK2: {
         startCoins = MK2_STARTING_COINS;
         initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
+        break;
       }
     }
 
