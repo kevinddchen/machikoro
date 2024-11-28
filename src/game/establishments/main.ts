@@ -2,7 +2,7 @@
 // Utility functions for establishments.
 //
 
-import { assertNonNull, assertUnreachable } from 'common/typescript';
+import { assertNonNull } from 'common/typescript';
 
 import * as Meta from './metadata';
 import * as Meta2 from './metadata2';
@@ -97,12 +97,11 @@ export const countOwned = (G: MachikoroG, player: number, est: Establishment): n
  * @returns
  */
 const getAll = (version: Version): Establishment[] => {
-  if (version === Version.MK1) {
-    return Meta._ESTABLISHMENTS;
-  } else if (version === Version.MK2) {
-    return Meta2._ESTABLISHMENTS2;
-  } else {
-    return assertUnreachable(version);
+  switch (version) {
+    case Version.MK1:
+      return Meta._ESTABLISHMENTS;
+    case Version.MK2:
+      return Meta2._ESTABLISHMENTS2;
   }
 };
 
@@ -286,45 +285,53 @@ export const replenishSupply = (G: MachikoroG): void => {
   const { version, supplyVariant } = G;
   const decks = G.secret.estDecks;
 
-  if (supplyVariant === SupplyVariant.Total) {
-    // put all establishments into the supply
-    while (decks[0].length > 0) {
-      const est = decks[0].pop();
-      assertNonNull(est);
-      G.estData._availableCount[est._id] += 1;
-    }
-  } else if (supplyVariant === SupplyVariant.Variable) {
-    // put establishments into the supply until there are ten unique establishments
-    while (decks[0].length > 0 && getAllAvailable(G).length < VARIABLE_SUPPLY_LIMIT) {
-      const est = decks[0].pop();
-      assertNonNull(est);
-      G.estData._availableCount[est._id] += 1;
-    }
-  } else if (supplyVariant === SupplyVariant.Hybrid) {
-    // put establishments into the supply until there are 5 unique
-    // establishments with activation <= 6 and 5 establishments with activation
-    // > 6 (and for Machi Koro 1, 2 major establishments).
-
-    const limits = [HYBRID_SUPPY_LIMIT_LOWER, HYBRID_SUPPY_LIMIT_UPPER, HYBRID_SUPPY_LIMIT_MAJOR];
-
-    let funcs: ((est: Establishment) => boolean)[];
-    if (version === Version.MK1) {
-      funcs = [(est) => isLower(est) && !isMajor(est), (est) => isUpper(est) && !isMajor(est), isMajor];
-    } else if (version === Version.MK2) {
-      funcs = [isLower, isUpper];
-    } else {
-      return assertUnreachable(version);
-    }
-
-    for (let i = 0; i < decks.length; i++) {
-      while (decks[i].length > 0 && getAllAvailable(G).filter(funcs[i]).length < limits[i]) {
-        const est = decks[i].pop();
+  switch (supplyVariant) {
+    case SupplyVariant.Total: {
+      // put all establishments into the supply
+      while (decks[0].length > 0) {
+        const est = decks[0].pop();
         assertNonNull(est);
         G.estData._availableCount[est._id] += 1;
       }
+      break;
     }
-  } else {
-    return assertUnreachable(supplyVariant);
+    case SupplyVariant.Variable: {
+      // put establishments into the supply until there are ten unique establishments
+      while (decks[0].length > 0 && getAllAvailable(G).length < VARIABLE_SUPPLY_LIMIT) {
+        const est = decks[0].pop();
+        assertNonNull(est);
+        G.estData._availableCount[est._id] += 1;
+      }
+      break;
+    }
+    case SupplyVariant.Hybrid: {
+      // put establishments into the supply until there are 5 unique
+      // establishments with activation <= 6 and 5 establishments with activation
+      // > 6 (and for Machi Koro 1, 2 major establishments).
+
+      const limits = [HYBRID_SUPPY_LIMIT_LOWER, HYBRID_SUPPY_LIMIT_UPPER, HYBRID_SUPPY_LIMIT_MAJOR];
+
+      let funcs: ((est: Establishment) => boolean)[];
+      switch (version) {
+        case Version.MK1: {
+          funcs = [(est) => isLower(est) && !isMajor(est), (est) => isUpper(est) && !isMajor(est), isMajor];
+          break;
+        }
+        case Version.MK2: {
+          funcs = [isLower, isUpper];
+          break;
+        }
+      }
+
+      for (let i = 0; i < decks.length; i++) {
+        while (decks[i].length > 0 && getAllAvailable(G).filter(funcs[i]).length < limits[i]) {
+          const est = decks[i].pop();
+          assertNonNull(est);
+          G.estData._availableCount[est._id] += 1;
+        }
+      }
+      break;
+    }
   }
 };
 
@@ -371,12 +378,15 @@ export const initialize = (
 
   // give each player their starting establishments
   let starting: number[];
-  if (version === Version.MK1) {
-    starting = Meta._STARTING_ESTABLISHMENTS;
-  } else if (version === Version.MK2) {
-    starting = Meta2._MK2_STARTING_ESTABLISHMENTS;
-  } else {
-    return assertUnreachable(version);
+  switch (version) {
+    case Version.MK1: {
+      starting = Meta._STARTING_ESTABLISHMENTS;
+      break;
+    }
+    case Version.MK2: {
+      starting = Meta2._MK2_STARTING_ESTABLISHMENTS;
+      break;
+    }
   }
   for (const id of starting) {
     for (const player of Array(numPlayers).keys()) {
@@ -425,18 +435,18 @@ export const isMajor = (est: Establishment): boolean => {
  * @returns The number of decks to use for the game setup.
  */
 export const getNumDecks = (supplyVariant: SupplyVariant, version: Version): number => {
-  if (supplyVariant === SupplyVariant.Total || supplyVariant === SupplyVariant.Variable) {
-    return 1; // put all cards into one deck
-  } else if (supplyVariant === SupplyVariant.Hybrid) {
-    if (version === Version.MK1) {
-      return 3; // put all cards into three decks: lower, upper, and major (purple)
-    } else if (version === Version.MK2) {
-      return 2; // put all cards into two decks: lower and upper
-    } else {
-      return assertUnreachable(version);
+  switch (supplyVariant) {
+    case SupplyVariant.Total:
+    case SupplyVariant.Variable:
+      return 1; // put all cards into one deck
+    case SupplyVariant.Hybrid: {
+      switch (version) {
+        case Version.MK1:
+          return 3; // put all cards into three decks: lower, upper, and major (purple)
+        case Version.MK2:
+          return 2; // put all cards into two decks: lower and upper
+      }
     }
-  } else {
-    return assertUnreachable(supplyVariant);
   }
 };
 
@@ -447,27 +457,29 @@ export const getNumDecks = (supplyVariant: SupplyVariant, version: Version): num
  * @returns The deck index that the establishment should be placed in.
  */
 export const getDeckIndex = (supplyVariant: SupplyVariant, version: Version, est: Establishment): number => {
-  if (supplyVariant === SupplyVariant.Total || supplyVariant === SupplyVariant.Variable) {
-    return 0;
-  } else if (supplyVariant === SupplyVariant.Hybrid) {
-    if (version === Version.MK1) {
-      if (isMajor(est)) {
-        return 2;
-      } else if (isLower(est)) {
-        return 0;
-      } else {
-        return 1;
+  switch (supplyVariant) {
+    case SupplyVariant.Total:
+    case SupplyVariant.Variable:
+      return 0;
+    case SupplyVariant.Hybrid: {
+      switch (version) {
+        case Version.MK1: {
+          if (isMajor(est)) {
+            return 2;
+          } else if (isLower(est)) {
+            return 0;
+          } else {
+            return 1;
+          }
+        }
+        case Version.MK2: {
+          if (isLower(est)) {
+            return 0;
+          } else {
+            return 1;
+          }
+        }
       }
-    } else if (version === Version.MK2) {
-      if (isLower(est)) {
-        return 0;
-      } else {
-        return 1;
-      }
-    } else {
-      return assertUnreachable(version);
     }
-  } else {
-    return assertUnreachable(supplyVariant);
   }
 };

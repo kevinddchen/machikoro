@@ -2,8 +2,6 @@
 // Useful functions for displaying game-related text
 //
 
-import { assertUnreachable } from 'common/typescript';
-
 import { Expansion, SupplyVariant, Version } from './types';
 
 /**
@@ -15,22 +13,22 @@ export function displayName(version: Version | null, expansions: Expansion[] | n
   if (version === null || expansions === null) {
     return '???';
   }
-  if (version === Version.MK1) {
-    const harbor = expansions.includes(Expansion.Harbor);
-    const million = expansions.includes(Expansion.Million);
-    if (harbor && million) {
-      return "Harbor + Millionaire's Row Expansions";
-    } else if (harbor) {
-      return 'Harbor Expansion';
-    } else if (million) {
-      return "Millionaire's Row Expansion";
-    } else {
-      return 'Base Game';
+  switch (version) {
+    case Version.MK1: {
+      const harbor = expansions.includes(Expansion.Harbor);
+      const million = expansions.includes(Expansion.Million);
+      if (harbor && million) {
+        return "Harbor + Millionaire's Row Expansions";
+      } else if (harbor) {
+        return 'Harbor Expansion';
+      } else if (million) {
+        return "Millionaire's Row Expansion";
+      } else {
+        return 'Base Game';
+      }
     }
-  } else if (version === Version.MK2) {
-    return 'Machi Koro 2';
-  } else {
-    return assertUnreachable(version);
+    case Version.MK2:
+      return 'Machi Koro 2';
   }
 }
 
@@ -39,14 +37,13 @@ export function displayName(version: Version | null, expansions: Expansion[] | n
  * @returns Display name for version.
  */
 export function versionName(version: Version | null): string {
-  if (version === null) {
-    return '???';
-  } else if (version === Version.MK1) {
-    return 'Machi Koro';
-  } else if (version === Version.MK2) {
-    return 'Machi Koro 2';
-  } else {
-    return assertUnreachable(version);
+  switch (version) {
+    case Version.MK1:
+      return 'Machi Koro';
+    case Version.MK2:
+      return 'Machi Koro 2';
+    default:
+      return '???'
   }
 }
 
@@ -55,16 +52,15 @@ export function versionName(version: Version | null): string {
  * @returns Display name for expansion.
  */
 export function expansionName(expansion: Expansion | null): string {
-  if (expansion === null) {
-    return '???';
-  } else if (expansion === Expansion.Base) {
-    return 'Base Game';
-  } else if (expansion === Expansion.Harbor) {
-    return 'Harbor Expansion';
-  } else if (expansion === Expansion.Million) {
-    return "Millionaire's Row Expansion";
-  } else {
-    return assertUnreachable(expansion);
+  switch (expansion) {
+    case Expansion.Base:
+      return 'Base Game';
+    case Expansion.Harbor:
+      return 'Harbor Expansion';
+    case Expansion.Million:
+      return "Millionaire's Row Expansion";
+    default:
+      return '???';
   }
 }
 
@@ -73,16 +69,15 @@ export function expansionName(expansion: Expansion | null): string {
  * @returns Display name for supply variant.
  */
 export function supplyVariantName(supplyVariant: SupplyVariant | null): string {
-  if (supplyVariant === null) {
-    return '???';
-  } else if (supplyVariant === SupplyVariant.Hybrid) {
-    return 'Hybrid Supply';
-  } else if (supplyVariant === SupplyVariant.Variable) {
-    return 'Variable Supply';
-  } else if (supplyVariant === SupplyVariant.Total) {
-    return 'Total Supply';
-  } else {
-    return assertUnreachable(supplyVariant);
+  switch (supplyVariant) {
+    case SupplyVariant.Hybrid:
+      return 'Hybrid Supply';
+    case SupplyVariant.Variable:
+      return 'Variable Supply';
+    case SupplyVariant.Total:
+      return 'Total Supply';
+    default:
+      return '???';
   }
 }
 

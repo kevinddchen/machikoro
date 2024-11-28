@@ -19,9 +19,9 @@ import {
 } from 'game';
 
 import { FETCH_INTERVAL_MS, FETCH_TIMEOUT_MS } from 'common/config';
-import { assertNonNull, assertUnreachable } from 'common/typescript';
 import { asyncCallWithTimeout, defaultErrorCatcher } from 'common/async';
 import { createMatchAPI, joinMatchAPI } from 'server/api';
+import { assertNonNull } from 'common/typescript';
 
 import { countPlayers, hasDetails } from './utils';
 import Authenticator from './Authenticator';
@@ -186,14 +186,16 @@ export default class Lobby extends React.Component<LobbyProps, LobbyState> {
     // initialize setup data
     let startCoins;
     let initialBuyRounds;
-    if (version === Version.MK1) {
-      startCoins = MK1_STARTING_COINS;
-      initialBuyRounds = 0;
-    } else if (version === Version.MK2) {
-      startCoins = MK2_STARTING_COINS;
-      initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
-    } else {
-      return assertUnreachable(version);
+    switch (version) {
+      case Version.MK1: {
+        startCoins = MK1_STARTING_COINS;
+        initialBuyRounds = 0;
+        break;
+      }
+      case Version.MK2: {
+        startCoins = MK2_STARTING_COINS;
+        initialBuyRounds = MK2_INITIAL_BUY_ROUNDS;
+      }
     }
 
     const expansions: Expansion[] = [Expansion.Base];

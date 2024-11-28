@@ -6,7 +6,7 @@ import { Ctx, Game, Move } from 'boardgame.io';
 import { INVALID_MOVE, PlayerView, TurnOrder } from 'boardgame.io/core';
 import { FnContext } from 'boardgame.io/dist/types/src/types';
 
-import { assertNonNull, assertUnreachable } from 'common/typescript';
+import { assertNonNull } from 'common/typescript';
 
 import * as Est from './establishments';
 import * as Land from './landmarks';
@@ -346,14 +346,14 @@ export const canEndTurn = (G: MachikoroG): boolean => {
 export const canEndGame = (G: MachikoroG, ctx: Ctx): boolean => {
   const player = parseInt(ctx.currentPlayer);
   const { version, expansions } = G;
-  if (version === Version.MK1) {
-    // a player has won if they own all landmarks in use
-    return Land.getAllInUse(version, expansions).every((land) => Land.owns(G, player, land));
-  } else if (version === Version.MK2) {
-    // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
-    return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
-  } else {
-    return assertUnreachable(version);
+
+  switch (version) {
+    case Version.MK1:
+      // a player has won if they own all landmarks in use
+      return Land.getAllInUse(version, expansions).every((land) => Land.owns(G, player, land));
+    case Version.MK2:
+      // a player has won if they have built Launch Pad or 3 landmarks (excluding City Hall)
+      return Land.owns(G, player, Land.LaunchPad2) || Land.countBuilt(G, player) >= Land.MK2_LANDMARKS_TO_WIN;
   }
 };
 
